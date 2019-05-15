@@ -20,6 +20,7 @@ pipeline {
     }
     parameters {
         booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
+        booleanParam(name: "TEST_RUN_PYTEST", defaultValue: true, description: "Run unit tests with PyTest")
     }
     stages {
         stage('Configure Environment') {
@@ -135,7 +136,7 @@ pipeline {
 
                                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'reports/coverage', reportFiles: 'index.html', reportName: 'Coverage', reportTitles: ''])
                                 } catch(exec){
-                                    echo "No Coverage data added: reason ${exec}"
+                                    echo "No Coverage data collected"
                                 }
                             }
                         }
