@@ -243,7 +243,7 @@ pipeline {
         }
         stage("Packaging") {
             environment{
-                PATH = "${tool 'CPython-3.6'};${tool 'CPython-3.6'}\\Scripts;${PATH}"
+                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
             }
             failFast true
             steps{
