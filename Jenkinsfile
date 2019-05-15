@@ -168,14 +168,12 @@ pipeline {
                             }
                             steps{
                                 bat "if not exist reports\\mypy\\html mkdir reports\\mypy\\html"
-                                script{
-                                    try{
-                                        dir("scm"){
-                                            bat "mypy -p avforms --html-report ${WORKSPACE}\\reports\\mypy\\html > ${WORKSPACE}\\logs\\mypy.log"
-                                        }
-                                    } catch (exc) {
-                                      echo "MyPy found some warnings"
-                                    }
+                                dir("scm"){
+                                    bat(returnStatus: true,
+                                        script: "mypy -p avforms --html-report ${WORKSPACE}\\reports\\mypy\\html > ${WORKSPACE}\\logs\\mypy.log",
+                                        label: "Running MyPy"
+                                        )
+
                                 }
                             }
                             post {
@@ -190,13 +188,11 @@ pipeline {
                                 equals expected: true, actual: params.TEST_RUN_FLAKE8
                             }
                             steps{
-                                script{
-                                    dir("scm"){
-                                        bat(returnStatus: true,
-                                            script: "flake8 avforms --tee --output-file=${WORKSPACE}\\logs\\flake8.log",
-                                            label: "Running flake8"
-                                            )
-                                    }
+                                dir("scm"){
+                                    bat(returnStatus: true,
+                                        script: "flake8 avforms --tee --output-file=${WORKSPACE}\\logs\\flake8.log",
+                                        label: "Running Flake8"
+                                        )
                                 }
                             }
                             post {
