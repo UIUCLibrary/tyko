@@ -76,7 +76,7 @@ pipeline {
         }
         stage("Building"){
             environment{
-                PATH = "venv\\37\\Scripts;$PATH"
+                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
             }
             steps{
                 dir("scm"){
@@ -86,7 +86,7 @@ pipeline {
         }
         stage('Testing') {
             environment{
-                PATH = "venv\\37\\Scripts;$PATH"
+                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
             }
             stages{
                 stage("Tnstalling Python Testing Packages"){
