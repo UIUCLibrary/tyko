@@ -21,6 +21,7 @@ pipeline {
     parameters {
         booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
         booleanParam(name: "TEST_RUN_PYTEST", defaultValue: true, description: "Run unit tests with PyTest")
+        booleanParam(name: "TEST_RUN_TOX", defaultValue: true, description: "Run Tox Tests")
     }
     stages {
         stage('Configure Environment') {
@@ -115,6 +116,47 @@ pipeline {
                                 }
                                 cleanup{
                                     cleanWs(patterns: [[pattern: 'reports/pytest/junit-*.xml', type: 'INCLUDE']])
+                                }
+                            }
+                        }
+                        stage("Tox") {
+                            when {
+                                equals expected: true, actual: params.TEST_RUN_TOX
+                            }
+                            environment {
+                                PATH = "${tool 'CPython-3.6'};${tool 'CPython-3.7'};$PATH"
+                            }
+                            steps {
+                                dir("scm"){
+                                    script{
+                                        try{
+                                            bat (
+                                                label: "Run Tox",
+                                                script: "tox --parallel=auto --parallel-live --workdir ${WORKSPACE}\\.tox -vv --result-json=${WORKSPACE}\\logs\\tox_report.json -- --junitxml=${WORKSPACE}\\reports\\${junit_filename} --junit-prefix=${env.NODE_NAME}-pytest"
+                                            )
+
+                                        } catch (exc) {
+                                            bat(
+                                                label: "Run Tox with new environments",
+                                                script: "tox --recreate --parallel=auto --parallel-live --workdir ${WORKSPACE}\\.tox -vv --result-json=${WORKSPACE}\\logs\\tox_report.json -- --junitxml=${WORKSPACE}\\reports\\${junit_filename} --junit-prefix=${env.NODE_NAME}-pytest"
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            post {
+                                always {
+                                    archiveArtifacts allowEmptyArchive: true, artifacts: '.tox/py*/log/*.log,.tox/log/*.log,logs/tox_report.json'
+                                    recordIssues(tools: [pep8(id: 'tox', name: 'Tox', pattern: '.tox/py*/log/*.log,.tox/log/*.log')])
+                                }
+                                cleanup{
+                                    cleanWs(
+                                        patterns: [
+                                            [pattern: '.tox/py*/log/*.log', type: 'INCLUDE'],
+                                            [pattern: '.tox/log/*.log', type: 'INCLUDE'],
+                                            [pattern: 'logs/rox_report.json', type: 'INCLUDE']
+                                        ]
+                                    )
                                 }
                             }
                         }
