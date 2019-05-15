@@ -93,7 +93,7 @@ pipeline {
             stages{
                 stage("Installing Python Testing Packages"){
                     steps{
-                        bat "pip install tox pytest mypy flake8 coverage"
+                        bat 'pip install "tox<3.10" pytest mypy flake8 coverage'
                     }
                 }
                 stage("Running Tests"){
