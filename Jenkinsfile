@@ -39,6 +39,14 @@ pipeline {
                     }
                 }
             }
+            post{
+                failure {
+                    deleteDir()
+                }
+                success{
+                    echo "Configured ${env.PKG_NAME}, version ${env.PKG_VERSION}, for testing."
+                }
+          }
         }
      }
      post {
