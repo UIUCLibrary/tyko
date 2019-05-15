@@ -23,6 +23,7 @@ pipeline {
         booleanParam(name: "TEST_RUN_PYTEST", defaultValue: true, description: "Run unit tests with PyTest")
         booleanParam(name: "TEST_RUN_TOX", defaultValue: true, description: "Run Tox Tests")
         booleanParam(name: "TEST_RUN_MYPY", defaultValue: true, description: "Run MyPy Tests")
+        booleanParam(name: "TEST_RUN_FLAKE8", defaultValue: true, description: "Run Flake8 Tests")
     }
     stages {
         stage('Configure Environment') {
@@ -181,6 +182,30 @@ pipeline {
                                 always {
                                     recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
                                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/mypy/html/", reportFiles: 'index.html', reportName: 'MyPy HTML Report', reportTitles: ''])
+                                }
+                            }
+                        }
+                        stage("Run Flake8 Static Analysis") {
+                            when {
+                                equals expected: true, actual: params.TEST_RUN_FLAKE8
+                            }
+                            steps{
+                                script{
+                                    dir("scm"){
+                                        bat(returnStatus: true,
+                                            script: "flake8 avforms --tee --output-file=${WORKSPACE}\\logs\\flake8.log",
+                                            label: "Running flake8"
+                                            )
+                                    }
+                                }
+                            }
+                            post {
+                                always {
+                                    archiveArtifacts 'logs/flake8.log'
+                                    recordIssues(tools: [flake8(pattern: 'logs/flake8.log')])
+                                }
+                                cleanup{
+                                    cleanWs(patterns: [[pattern: 'logs/flake8.log', type: 'INCLUDE']])
                                 }
                             }
                         }
