@@ -22,6 +22,7 @@ pipeline {
         booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
         booleanParam(name: "TEST_RUN_PYTEST", defaultValue: true, description: "Run unit tests with PyTest")
         booleanParam(name: "TEST_RUN_TOX", defaultValue: true, description: "Run Tox Tests")
+        booleanParam(name: "TEST_RUN_MYPY", defaultValue: true, description: "Run MyPy Tests")
     }
     stages {
         stage('Configure Environment') {
@@ -157,6 +158,29 @@ pipeline {
                                             [pattern: 'logs/rox_report.json', type: 'INCLUDE']
                                         ]
                                     )
+                                }
+                            }
+                        }
+                        stage("Run MyPy Static Analysis") {
+                            when {
+                                equals expected: true, actual: params.TEST_RUN_MYPY
+                            }
+                            steps{
+                                bat "if not exist reports\\mypy\\html mkdir reports\\mypy\\html"
+                                script{
+                                    try{
+                                        dir("scm"){
+                                            bat "mypy -p avforms --html-report ${WORKSPACE}\\reports\\mypy\\html > ${WORKSPACE}\\logs\\mypy.log"
+                                        }
+                                    } catch (exc) {
+                                      echo "MyPy found some warnings"
+                                    }
+                                }
+                            }
+                            post {
+                                always {
+                                    recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
+                                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/mypy/html/", reportFiles: 'index.html', reportName: 'MyPy HTML Report', reportTitles: ''])
                                 }
                             }
                         }
