@@ -89,9 +89,60 @@ pipeline {
                 PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
             }
             stages{
-                stage("Tnstalling Python Testing Packages"){
+                stage("Installing Python Testing Packages"){
                     steps{
-                        bat "pip install tox pytest mypy flake8"
+                        bat "pip install tox pytest mypy flake8 coverage"
+                    }
+                }
+                stage("Running Tests"){
+                    parallel {
+                        stage("PyTest"){
+                            when {
+                                equals expected: true, actual: params.TEST_RUN_PYTEST
+                            }
+                            steps{
+                                dir("source"){
+                                    bat(
+                                        label: "Run PyTest",
+                                        script: "coverage run --parallel-mode --source=avforms -m pytest --junitxml=${WORKSPACE}/reports/pytest/junit-${env.NODE_NAME}-pytest.xml --junit-prefix=${env.NODE_NAME}-pytest"
+                                    )
+                                }
+                            }
+                            post {
+                                always{
+                                    junit "reports/pytest/junit-*.xml"
+                                }
+                                cleanup{
+                                    cleanWs(patterns: [[pattern: 'reports/pytest/junit-*.xml', type: 'INCLUDE']])
+                                }
+                            }
+                        }
+                    }
+                    post{
+                        always{
+                            dir("scm"){
+                                bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe combine"
+                                bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe xml -o ${WORKSPACE}\\reports\\coverage.xml"
+                                bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe html -d ${WORKSPACE}\\reports\\coverage"
+                            }
+                            publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/coverage", reportFiles: 'index.html', reportName: 'Coverage', reportTitles: ''])
+                            publishCoverage adapters: [
+                                            coberturaAdapter('reports/coverage.xml')
+                                            ],
+                                        sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
+
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'reports/coverage', reportFiles: 'index.html', reportName: 'Coverage', reportTitles: ''])
+                        }
+                        cleanup{
+                            cleanWs(patterns:
+                                [
+                                    [pattern: 'reports/coverage.xml', type: 'INCLUDE'],
+                                    [pattern: 'reports/coverage', type: 'INCLUDE'],
+                                    [pattern: 'scm/.coverage', type: 'INCLUDE']
+                                ]
+                            )
+
+                        }
                     }
                 }
             }
