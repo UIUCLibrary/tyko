@@ -24,7 +24,7 @@ pipeline {
     stages {
         stage('Configure Environment') {
             environment{
-                PATH = "${tool 'CPython-3.7'}\\Scripts"
+                PATH = "${tool 'CPython-3.7'};$PATH"
             }
             stages{
                 stage("Purge All Existing Data in Workspace"){
