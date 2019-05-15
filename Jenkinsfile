@@ -84,7 +84,18 @@ pipeline {
                 }
             }
         }
-
+        stage('Testing') {
+            environment{
+                PATH = "venv\\37\\Scripts;$PATH"
+            }
+            stages{
+                stage("Tnstalling Python Testing Packages"){
+                    steps{
+                        bat "pip install tox pytest mypy flake8"
+                    }
+                }
+            }
+        }
      }
      post {
         cleanup {
