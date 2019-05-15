@@ -241,6 +241,26 @@ pipeline {
                 }
             }
         }
+        stage("Packaging") {
+            environment{
+                PATH = "${tool 'CPython-3.6'};${tool 'CPython-3.6'}\\Scripts;${PATH}"
+            }
+            failFast true
+            steps{
+                dir("scm"){
+                    bat script: "python setup.py build -b ${WORKSPACE}/build sdist -d ${WORKSPACE}/dist --format zip bdist_wheel -d ${WORKSPACE}/dist"
+                }
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: "dist/*.whl,dist/*.zip", fingerprint: true
+                    stash includes: "dist/*.whl,dist/*.zip", name: 'PYTHON_PACKAGES'
+                }
+                cleanup{
+                    cleanWs deleteDirs: true, patterns: [[pattern: 'dist/*.whl,dist/*.tar.gz,dist/*.zip', type: 'INCLUDE']]
+                }
+            }
+        }
      }
      post {
         cleanup {
