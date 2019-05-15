@@ -53,7 +53,7 @@ pipeline {
                                 bat "venv\\37\\Scripts\\python.exe -m pip install -U pip --no-cache-dir"
                             }
                         }
-                        bat "venv\\37\\Scripts\\pip.exe install -U setuptools"
+                        bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel"
 //                        bat "venv36\\Scripts\\pip.exe install pytest-cov lxml flake8 mypy -r source\\requirements.txt --upgrade-strategy only-if-needed"
                     }
                 post{
@@ -72,8 +72,19 @@ pipeline {
                 success{
                     echo "Configured ${env.PKG_NAME}, version ${env.PKG_VERSION}, for testing."
                 }
-          }
+            }
         }
+        stage("Building"){
+            environment{
+                PATH = "venv\\37\\Scripts;$PATH"
+            }
+            steps{
+                dir("scm"){
+                    bat "python setup.py build -b ${WORKSPACE}\\build"
+                }
+            }
+        }
+
      }
      post {
         cleanup {
