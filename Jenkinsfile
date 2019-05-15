@@ -18,6 +18,9 @@ pipeline {
         DOC_ZIP_FILENAME = "${env.PKG_NAME}-${env.PKG_VERSION}.doc.zip"
         DEVPI = credentials("DS_devpi")
     }
+    parameters {
+        booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
+    }
     stages {
         stage('Configure Environment') {
             environment{
