@@ -215,7 +215,7 @@ pipeline {
                                     withSonarQubeEnv('sonarqube.library.illinois.edu') {
                                         echo "${env.scannerHome}"
                                         bat "dir ${env.scannerHome}"
-                                        bat "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=tests,avforms"
+                                        bat "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=scm"
                                     }
 //                                    }
 
