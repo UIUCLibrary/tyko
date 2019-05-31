@@ -210,13 +210,12 @@ pipeline {
                                 scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                             }
                             steps{
-//                                script{
-//                                    def sonarqube_home = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                                    withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                                        bat "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}/scm"
-                                    }
-//                                    }
-//                                    }
+                                withSonarQubeEnv('sonarqube.library.illinois.edu') {
+                                    bat(
+                                        label: "Running Sonar Scanner",
+                                        script:"${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}/scm"
+                                        )
+                                }
 
                             }
                         }
