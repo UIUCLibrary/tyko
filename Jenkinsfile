@@ -57,7 +57,7 @@ pipeline {
                                 bat "venv\\37\\Scripts\\python.exe -m pip install -U pip --no-cache-dir"
                             }
                         }
-                        bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel sqlalchemy mysqlclient sqlalchemy-stubs"
+                        bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel sqlalchemy mysqlclient sqlalchemy-stubs pylint"
 //                        bat "venv36\\Scripts\\pip.exe install pytest-cov lxml flake8 mypy -r source\\requirements.txt --upgrade-strategy only-if-needed"
                     }
                 post{
@@ -234,7 +234,6 @@ pipeline {
                     }
                     steps{
                         withSonarQubeEnv('sonarqube.library.illinois.edu') {
-//                            bat "dir ..\\reports\\pytest\\*.xml"
                             bat(
                                 label: "Running Sonar Scanner",
                                 script: "${env.scannerHome}/bin/sonar-scanner \
