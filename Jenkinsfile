@@ -85,6 +85,7 @@ pipeline {
             steps{
                 dir("scm"){
                     bat "python setup.py build -b ${WORKSPACE}\\build"
+                    bat "git status"
                 }
             }
         }
