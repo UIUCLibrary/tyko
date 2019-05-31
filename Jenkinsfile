@@ -241,7 +241,9 @@ pipeline {
 -Dsonar.projectKey=avdatabase -Dsonar.sources=. \
 -Dsonar.projectBaseDir=${WORKSPACE}/scm \
 -Dsonar.python.coverage.reportPaths=reports/coverage.xml \
--Dsonar.python.xunit.reportPath=reports/pytest/junit-${env.NODE_NAME}-pytest.xml"
+-Dsonar.python.xunit.reportPath=reports/pytest/junit-${env.NODE_NAME}-pytest.xml \
+-Dsonar.python.pylint=${WORKSPACE}\\${WORKSPACE}\\venv\\37\\Scripts\\pylint.exe \
+"
                                 )
                         }
 
