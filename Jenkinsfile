@@ -206,13 +206,17 @@ pipeline {
                             }
                         }
                         stage("Run Sonarqube Analysis"){
+                            environment{
+                                scanneHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                            }
                             steps{
-                                script{
-                                    def sonarqube_home = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                                        withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                                            echo "${sonarqube_home}"
-                                        }
+//                                script{
+//                                    def sonarqube_home = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                                    withSonarQubeEnv('sonarqube.library.illinois.edu') {
+                                        echo "${env.scanneHome}"
+                                        bat "dir ${env.scanneHome}"
                                     }
+//                                    }
 
                             }
                         }
