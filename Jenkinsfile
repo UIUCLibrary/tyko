@@ -96,7 +96,7 @@ pipeline {
                 stage("Installing Python Testing Packages"){
                     steps{
                         // Bandit version 1.6 exclude the directories doesn't work
-                        bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml sqlalchemy-stubs pylint "bandit<1.6'
+                        bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml sqlalchemy-stubs "bandit<1.6'
                     }
                 }
                 stage("Running Tests"){
@@ -219,24 +219,6 @@ pipeline {
                                 }
                             }
                         }
-                        stage("Run Pylint Static Analysis") {
-                            steps{
-                                bat "if not exist reports mkdir reports"
-                                dir("scm"){
-                                    bat(returnStatus: true,
-                                        label: "Running pylint",
-                                        script: "pylint avforms -r n --msg-template=\"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}\" > ${WORKSPACE}\\reports\\pylint-report.txt"
-
-                                        )
-                                }
-                            }
-                            post {
-                                always {
-                                    archiveArtifacts 'reports/pylint-report.txt'
-                                }
-                            }
-                        }
-
                     }
                     post{
                         always{
@@ -277,7 +259,6 @@ pipeline {
 -Dsonar.python.xunit.reportPath=reports/pytest/junit-${env.NODE_NAME}-pytest.xml \
 -Dsonar.projectVersion=${PKG_VERSION} \
 -Dsonar.python.bandit.reportPaths=${WORKSPACE}/reports/bandit-report.json \
--Dsonar.python.pylint.reportPath=${WORKSPACE}/reports/pylint-report.txt \
 -Dsonar.buildString=${env.BUILD_URL} \
 -X "
                                 )
