@@ -95,6 +95,7 @@ pipeline {
             stages{
                 stage("Installing Python Testing Packages"){
                     steps{
+                        // Bandit version 1.6 exclude the directories doesn't work
                         bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml sqlalchemy-stubs pylint "bandit<1.6'
                     }
                 }
@@ -263,6 +264,7 @@ pipeline {
 -Dsonar.python.xunit.reportPath=reports/pytest/junit-${env.NODE_NAME}-pytest.xml \
 -Dsonar.python.pylint=${WORKSPACE}\\${WORKSPACE}\\venv\\37\\Scripts\\pylint.exe \
 -Dsonar.projectVersion=${PKG_VERSION} \
+-Dsonar.python.bandit.reportPaths=reports/bandit-report.json \
 -X "
                                 )
                         }
