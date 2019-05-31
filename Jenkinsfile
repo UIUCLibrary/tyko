@@ -95,7 +95,7 @@ pipeline {
             stages{
                 stage("Installing Python Testing Packages"){
                     steps{
-                        bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml sqlalchemy-stubs pylint'
+                        bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml sqlalchemy-stubs pylint bandit'
                     }
                 }
                 stage("Running Tests"){
@@ -177,6 +177,25 @@ pipeline {
                                 always {
                                     recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
                                     publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/mypy/html/", reportFiles: 'index.html', reportName: 'MyPy HTML Report', reportTitles: ''])
+                                }
+                            }
+                        }
+                        stage("Run Bandit Static Analysis") {
+                            when {
+                                equals expected: true, actual: params.TEST_RUN_MYPY
+                            }
+                            steps{
+                                dir("scm"){
+                                    bat(returnStatus: true,
+                                        label: "Running bandit",
+                                        script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}/scm",
+                                        )
+
+                                }
+                            }
+                            post {
+                                always {
+                                    archiveArtifacts "reports/bandit-report.json"
                                 }
                             }
                         }
