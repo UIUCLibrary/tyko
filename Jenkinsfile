@@ -262,9 +262,9 @@ pipeline {
 -Dsonar.projectBaseDir=${WORKSPACE}/scm \
 -Dsonar.python.coverage.reportPaths=reports/coverage.xml \
 -Dsonar.python.xunit.reportPath=reports/pytest/junit-${env.NODE_NAME}-pytest.xml \
--Dsonar.python.pylint=${WORKSPACE}\\${WORKSPACE}\\venv\\37\\Scripts\\pylint.exe \
+-Dsonar.python.pylint=${WORKSPACE}\\venv\\37\\Scripts\\pylint.exe \
 -Dsonar.projectVersion=${PKG_VERSION} \
--Dsonar.python.bandit.reportPaths=reports/bandit-report.json \
+-Dsonar.python.bandit.reportPaths=${WORKSPACE}/reports/bandit-report.json \
 -X "
                                 )
                         }
