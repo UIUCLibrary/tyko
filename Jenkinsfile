@@ -251,7 +251,10 @@ pipeline {
                     }
                     steps{
                         withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                            withEnv(["PROJECT_HOMEPAGE=${bat(label: 'Getting url metadata', returnStdout: true, script: '@python scm/setup.py --url').trim()}"]) {
+                            withEnv(
+                                ["PROJECT_HOMEPAGE=${bat(label: 'Getting url metadata', returnStdout: true, script: '@python scm/setup.py --url').trim()}"],
+                                ["PROJECT_DESCRIPTION=${bat(label: 'Getting description metadata', returnStdout: true, script: '@python scm/setup.py --description').trim()}"],
+                            ) {
 
                                 bat(
                                     label: "Running Sonar Scanner",
@@ -266,6 +269,7 @@ pipeline {
 -Dsonar.links.homepage=${env.PROJECT_HOMEPAGE} \
 -Dsonar.buildString=${env.BUILD_TAG} \
 -Dsonar.analysis.packageName=${env.PKG_NAME} \
+-Dsonar.projectDescription=%PROJECT_DESCRIPTION% \
 -X "
                                     )
                                 }
