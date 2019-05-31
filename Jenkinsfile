@@ -212,11 +212,10 @@ pipeline {
                             steps{
 //                                script{
 //                                    def sonarqube_home = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                                    dir("scm"){
-                                        withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                                            bat "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=."
-                                        }
+                                    withSonarQubeEnv('sonarqube.library.illinois.edu') {
+                                        bat "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}/scm"
                                     }
+//                                    }
 //                                    }
 
                             }
