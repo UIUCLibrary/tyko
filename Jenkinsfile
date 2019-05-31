@@ -260,7 +260,7 @@ pipeline {
 -Dsonar.projectVersion=${PKG_VERSION} \
 -Dsonar.python.bandit.reportPaths=${WORKSPACE}/reports/bandit-report.json \
 -Dsonar.links.ci=${env.JOB_URL} \
--Dsonar.buildString=${env.BUILD_TAG} \
+-Dsonar.buildString=${env.BUILD_TAG}-${env.BRANCH_NAME} \
 -X "
                                 )
                         }
