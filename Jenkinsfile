@@ -245,6 +245,10 @@ pipeline {
                     }
                 }
                 stage("Run Sonarqube Analysis"){
+                    when{
+                        equals expected: "master", actual: env.BRANCH_NAME
+                    }
+
                     environment{
                         scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
 
@@ -269,8 +273,7 @@ pipeline {
 -Dsonar.links.homepage=${env.PROJECT_HOMEPAGE} \
 -Dsonar.buildString=${env.BUILD_TAG} \
 -Dsonar.analysis.packageName=${env.PKG_NAME} \
--Dsonar.projectDescription=\"%PROJECT_DESCRIPTION%\" \
--X "
+-Dsonar.projectDescription=\"%PROJECT_DESCRIPTION%\" "
                                     )
                                 }
                         }
