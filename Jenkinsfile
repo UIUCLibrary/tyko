@@ -215,6 +215,7 @@ pipeline {
                                     withSonarQubeEnv('sonarqube.library.illinois.edu') {
                                         echo "${env.scanneHome}"
                                         bat "dir ${env.scanneHome}"
+                                        bat "set"
                                     }
 //                                    }
 
