@@ -205,20 +205,6 @@ pipeline {
                                 }
                             }
                         }
-                        stage("Run Sonarqube Analysis"){
-                            environment{
-                                scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                            }
-                            steps{
-                                withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                                    bat(
-                                        label: "Running Sonar Scanner",
-                                        script:"${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}/scm"
-                                        )
-                                }
-
-                            }
-                        }
 
                     }
                     post{
@@ -254,6 +240,20 @@ pipeline {
                         }
                     }
                 }
+                stage("Run Sonarqube Analysis"){
+                            environment{
+                                scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                            }
+                            steps{
+                                withSonarQubeEnv('sonarqube.library.illinois.edu') {
+                                    bat(
+                                        label: "Running Sonar Scanner",
+                                        script:"${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}/scm"
+                                        )
+                                }
+
+                            }
+                        }
             }
         }
         stage("Packaging") {
