@@ -266,7 +266,6 @@ pipeline {
                         scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     }
                     steps{
-                        bat "where pylint"
                         withSonarQubeEnv('sonarqube.library.illinois.edu') {
                             bat(
                                 label: "Running Sonar Scanner",
@@ -275,7 +274,6 @@ pipeline {
 -Dsonar.projectBaseDir=${WORKSPACE}/scm \
 -Dsonar.python.coverage.reportPaths=reports/coverage.xml \
 -Dsonar.python.xunit.reportPath=reports/pytest/junit-${env.NODE_NAME}-pytest.xml \
--Dsonar.python.pylint=${WORKSPACE}\\venv\\37\\Scripts\\pylint.exe \
 -Dsonar.projectVersion=${PKG_VERSION} \
 -Dsonar.python.bandit.reportPaths=${WORKSPACE}/reports/bandit-report.json \
 -Dsonar.python.pylint.reportPath=${WORKSPACE}/reports/pylint-report.txt \
