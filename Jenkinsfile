@@ -234,6 +234,7 @@ pipeline {
                     }
                     steps{
                         withSonarQubeEnv('sonarqube.library.illinois.edu') {
+                            bat "dir reports\\pytest\\*.xml"
                             bat(
                                 label: "Running Sonar Scanner",
                                 script: "${env.scannerHome}/bin/sonar-scanner \
