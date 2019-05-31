@@ -259,7 +259,7 @@ pipeline {
 -Dsonar.python.xunit.reportPath=reports/pytest/junit-${env.NODE_NAME}-pytest.xml \
 -Dsonar.projectVersion=${PKG_VERSION} \
 -Dsonar.python.bandit.reportPaths=${WORKSPACE}/reports/bandit-report.json \
--Dsonar.links.ci=${env.BUILD_URL} \
+-Dsonar.links.ci=${env.JOB_URL} \
 -Dsonar.buildString=${env.BUILD_URL} \
 -X "
                                 )
