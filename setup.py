@@ -9,7 +9,7 @@ setup(
     author='University Library at The University of Illinois at Urbana '
            'Champaign: Preservation Services',
     author_email='prescons@library.illinois.edu',
-    description='',
+    description='Database for handling entering metadata for AV content',
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-bdd"],
     install_requires=[
