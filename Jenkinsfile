@@ -57,7 +57,7 @@ pipeline {
                                 bat "venv\\37\\Scripts\\python.exe -m pip install -U pip --no-cache-dir"
                             }
                         }
-                        bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel sqlalchemy mysqlclient sqlalchemy-stubs pylint"
+                        bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel sqlalchemy mysqlclient"
 //                        bat "venv36\\Scripts\\pip.exe install pytest-cov lxml flake8 mypy -r source\\requirements.txt --upgrade-strategy only-if-needed"
                     }
                 post{
@@ -95,7 +95,7 @@ pipeline {
             stages{
                 stage("Installing Python Testing Packages"){
                     steps{
-                        bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml'
+                        bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml sqlalchemy-stubs pylint'
                     }
                 }
                 stage("Running Tests"){
