@@ -233,6 +233,7 @@ pipeline {
                         scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     }
                     steps{
+                        bat "where pylint"
                         withSonarQubeEnv('sonarqube.library.illinois.edu') {
                             bat(
                                 label: "Running Sonar Scanner",
