@@ -182,9 +182,6 @@ pipeline {
                             }
                         }
                         stage("Run Bandit Static Analysis") {
-                            when {
-                                equals expected: true, actual: params.TEST_RUN_MYPY
-                            }
                             steps{
                                 dir("scm"){
                                     bat(returnStatus: true,
@@ -219,6 +216,22 @@ pipeline {
                                 }
                                 cleanup{
                                     cleanWs(patterns: [[pattern: 'logs/flake8.log', type: 'INCLUDE']])
+                                }
+                            }
+                        }
+                        stage("Run Pylint Static Analysis") {
+                            steps{
+                                dir("scm"){
+                                    bat(returnStatus: true,
+                                        label: "Running pylint",
+                                        script: "pylint avforms -r n --msg-template=\"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}\" > ${WORKSPACE}\\reports\\pylint-report.txt"
+
+                                        )
+                                }
+                            }
+                            post {
+                                always {
+                                    archiveArtifacts 'reports/pylint-report.txt'
                                 }
                             }
                         }
