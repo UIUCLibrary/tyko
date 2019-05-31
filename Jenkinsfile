@@ -95,7 +95,7 @@ pipeline {
             stages{
                 stage("Installing Python Testing Packages"){
                     steps{
-                        bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml sqlalchemy-stubs pylint bandit'
+                        bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml sqlalchemy-stubs pylint "bandit<1.6'
                     }
                 }
                 stage("Running Tests"){
@@ -188,7 +188,7 @@ pipeline {
                                 dir("scm"){
                                     bat(returnStatus: true,
                                         label: "Running bandit",
-                                        script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}\\scm --exclude .eggs",
+                                        script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}\\scm --exclude ${WORKSPACE}\\scm\\.eggs",
                                         )
 
                                 }
