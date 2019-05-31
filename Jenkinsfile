@@ -207,7 +207,10 @@ pipeline {
                         }
                         stage("Run Sonarqube Analysis"){
                             steps{
-                                echo "pass"
+                                withSonarQubeEnv('sonarqube.library.illinois.edu') {
+                                    echo "pass"
+                                }
+
                             }
                         }
 
