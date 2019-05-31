@@ -188,7 +188,7 @@ pipeline {
                                 dir("scm"){
                                     bat(returnStatus: true,
                                         label: "Running bandit",
-                                        script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}/scm",
+                                        script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}\\scm --exclude .eggs",
                                         )
 
                                 }
