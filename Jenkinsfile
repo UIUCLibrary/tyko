@@ -228,32 +228,35 @@ pipeline {
                                 }
                             }
                         }
-                        cleanup{
-                            cleanWs(patterns:
-                                [
-                                    [pattern: 'reports/coverage.xml', type: 'INCLUDE'],
-                                    [pattern: 'reports/coverage', type: 'INCLUDE'],
-                                    [pattern: 'scm/.coverage', type: 'INCLUDE']
-                                ]
-                            )
 
-                        }
                     }
                 }
                 stage("Run Sonarqube Analysis"){
-                            environment{
-                                scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                            }
-                            steps{
-                                withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                                    bat(
-                                        label: "Running Sonar Scanner",
-                                        script:"${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}/scm"
-                                        )
-                                }
-
-                            }
+                    environment{
+                        scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    }
+                    steps{
+                        withSonarQubeEnv('sonarqube.library.illinois.edu') {
+                            bat(
+                                label: "Running Sonar Scanner",
+                                script: "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}/scm -Dsonar.python.coverage.reportPaths=reports/coverage.xml"
+                                )
                         }
+
+                    }
+                }
+            }
+            post{
+                cleanup{
+                    cleanWs(patterns:
+                        [
+                            [pattern: 'reports/coverage.xml', type: 'INCLUDE'],
+                            [pattern: 'reports/coverage', type: 'INCLUDE'],
+                            [pattern: 'scm/.coverage', type: 'INCLUDE']
+                        ]
+                    )
+
+                }
             }
         }
         stage("Packaging") {
