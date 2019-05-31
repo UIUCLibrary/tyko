@@ -85,7 +85,6 @@ pipeline {
             steps{
                 dir("scm"){
                     bat "python setup.py build -b ${WORKSPACE}\\build"
-                    bat "git status"
                 }
             }
         }
@@ -213,10 +212,10 @@ pipeline {
                             steps{
 //                                script{
 //                                    def sonarqube_home = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                                    withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                                        echo "${env.scannerHome}"
-                                        bat "dir ${env.scannerHome}"
-                                        bat "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=scm"
+                                    dir("scm"){
+                                        withSonarQubeEnv('sonarqube.library.illinois.edu') {
+                                            bat "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=."
+                                        }
                                     }
 //                                    }
 
