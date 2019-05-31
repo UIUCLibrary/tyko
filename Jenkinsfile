@@ -234,14 +234,13 @@ pipeline {
                     }
                     steps{
                         withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                            bat "dir reports\\pytest\\*.xml"
                             bat(
                                 label: "Running Sonar Scanner",
                                 script: "${env.scannerHome}/bin/sonar-scanner \
 -Dsonar.projectKey=avdatabase -Dsonar.sources=. \
 -Dsonar.projectBaseDir=${WORKSPACE}/scm \
 -Dsonar.python.coverage.reportPaths=reports/coverage.xml \
--Dsonar.python.xunit.reportPath=reports/pytest/*.xml"
+-Dsonar.python.xunit.reportPath=${WORKSPACE}/reports/pytest/*.xml"
                                 )
                         }
 
