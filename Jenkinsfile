@@ -116,9 +116,6 @@ pipeline {
                                 always{
                                     junit "reports/pytest/junit-*.xml"
                                 }
-                                cleanup{
-                                    cleanWs(patterns: [[pattern: 'reports/pytest/junit-*.xml', type: 'INCLUDE']])
-                                }
                             }
                         }
                         stage("Tox") {
@@ -239,7 +236,10 @@ pipeline {
                         withSonarQubeEnv('sonarqube.library.illinois.edu') {
                             bat(
                                 label: "Running Sonar Scanner",
-                                script: "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}/scm -Dsonar.python.coverage.reportPaths=reports/coverage.xml"
+                                script: "${env.scannerHome}/bin/sonar-scanner \
+                                        -Dsonar.projectKey=avdatabase -Dsonar.sources=. \
+                                        -Dsonar.projectBaseDir=${WORKSPACE}/scm \
+                                        -Dsonar.python.coverage.reportPaths=reports/coverage.xml"
                                 )
                         }
 
@@ -252,7 +252,8 @@ pipeline {
                         [
                             [pattern: 'reports/coverage.xml', type: 'INCLUDE'],
                             [pattern: 'reports/coverage', type: 'INCLUDE'],
-                            [pattern: 'scm/.coverage', type: 'INCLUDE']
+                            [pattern: 'scm/.coverage', type: 'INCLUDE'],
+                            [pattern: 'reports/pytest/junit-*.xml', type: 'INCLUDE']
                         ]
                     )
 
