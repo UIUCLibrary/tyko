@@ -326,7 +326,7 @@ pipeline {
                 deleteDirs: true,
                 patterns: [
                     [pattern: 'dist', type: 'INCLUDE'],
-//                    [pattern: 'reports', type: 'INCLUDE'],
+                    [pattern: 'reports', type: 'INCLUDE'],
                     [pattern: 'logs', type: 'INCLUDE'],
                     [pattern: 'certs', type: 'INCLUDE'],
                     [pattern: 'mypy_stubs', type: 'INCLUDE'],
