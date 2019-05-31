@@ -251,7 +251,6 @@ pipeline {
                     }
                     steps{
                         withSonarQubeEnv('sonarqube.library.illinois.edu') {
-//                        https://github.com/UIUCLibrary/avdatabase
                             withEnv(["PROJECT_HOMEPAGE=${bat(label: 'Getting url metadata', returnStdout: true, script: '@python scm/setup.py --url').trim()}"]) {
 
                                 bat(
