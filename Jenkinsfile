@@ -207,9 +207,12 @@ pipeline {
                         }
                         stage("Run Sonarqube Analysis"){
                             steps{
-                                withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                                    echo "pass"
-                                }
+                                script{
+                                    def sonarqube_home = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                                        withSonarQubeEnv('sonarqube.library.illinois.edu') {
+                                            echo "${sonarqube_home}"
+                                        }
+                                    }
 
                             }
                         }
