@@ -237,9 +237,9 @@ pipeline {
                             bat(
                                 label: "Running Sonar Scanner",
                                 script: "${env.scannerHome}/bin/sonar-scanner \
-                                        -Dsonar.projectKey=avdatabase -Dsonar.sources=. \
-                                        -Dsonar.projectBaseDir=${WORKSPACE}/scm \
-                                        -Dsonar.python.coverage.reportPaths=reports/coverage.xml"
+-Dsonar.projectKey=avdatabase -Dsonar.sources=. \
+-Dsonar.projectBaseDir=${WORKSPACE}/scm \
+-Dsonar.python.coverage.reportPaths=reports/coverage.xml"
                                 )
                         }
 
