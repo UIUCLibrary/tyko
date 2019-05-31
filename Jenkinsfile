@@ -266,6 +266,7 @@ pipeline {
 -Dsonar.links.ci=${env.JOB_URL} \
 -Dsonar.links.homepage=${env.PROJECT_HOMEPAGE} \
 -Dsonar.buildString=${env.BUILD_TAG} \
+-Dsonar.analysis.packageName=${env.PKG_NAME} \
 -X "
                                     )
                                 }
