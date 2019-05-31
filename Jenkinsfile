@@ -278,6 +278,7 @@ pipeline {
 -Dsonar.python.pylint=${WORKSPACE}\\venv\\37\\Scripts\\pylint.exe \
 -Dsonar.projectVersion=${PKG_VERSION} \
 -Dsonar.python.bandit.reportPaths=${WORKSPACE}/reports/bandit-report.json \
+-Dsonar.python.pylint.reportPath=${WORKSPACE}/reports/pylint-report.txt \
 -X "
                                 )
                         }
