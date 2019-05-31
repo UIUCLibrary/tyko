@@ -247,12 +247,15 @@ pipeline {
                 stage("Run Sonarqube Analysis"){
                     environment{
                         scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+
                     }
                     steps{
                         withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                            bat(
-                                label: "Running Sonar Scanner",
-                                script: "${env.scannerHome}/bin/sonar-scanner \
+                            withEnv(["PROJECT_HOMEPAGE=https://github.com/UIUCLibrary/avdatabase"]) {
+
+                                bat(
+                                    label: "Running Sonar Scanner",
+                                    script: "${env.scannerHome}/bin/sonar-scanner \
 -Dsonar.projectKey=avdatabase -Dsonar.sources=. \
 -Dsonar.projectBaseDir=${WORKSPACE}/scm \
 -Dsonar.python.coverage.reportPaths=reports/coverage.xml \
@@ -260,9 +263,11 @@ pipeline {
 -Dsonar.projectVersion=${PKG_VERSION} \
 -Dsonar.python.bandit.reportPaths=${WORKSPACE}/reports/bandit-report.json \
 -Dsonar.links.ci=${env.JOB_URL} \
+-Dsonar.links.homepage=${env.PROJECT_HOMEPAGE} \
 -Dsonar.buildString=${env.BUILD_TAG} \
 -X "
-                                )
+                                    )
+                                }
                         }
 
                     }
