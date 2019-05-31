@@ -205,6 +205,12 @@ pipeline {
                                 }
                             }
                         }
+                        stage("Run Sonarqube Analysis"){
+                            steps{
+                                echo "pass"
+                            }
+                        }
+
                     }
                     post{
                         always{
