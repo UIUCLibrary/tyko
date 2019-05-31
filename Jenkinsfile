@@ -240,7 +240,7 @@ pipeline {
 -Dsonar.projectKey=avdatabase -Dsonar.sources=. \
 -Dsonar.projectBaseDir=${WORKSPACE}/scm \
 -Dsonar.python.coverage.reportPaths=reports/coverage.xml \
--Dsonar.python.xunit.reportPath=${WORKSPACE}/reports/pytest/*.xml"
+-Dsonar.python.xunit.reportPath=${WORKSPACE}\\reports\\pytest\\*.xml"
                                 )
                         }
 
