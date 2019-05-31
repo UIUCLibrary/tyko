@@ -221,6 +221,7 @@ pipeline {
                         }
                         stage("Run Pylint Static Analysis") {
                             steps{
+                                bat "if not exist reports mkdir reports"
                                 dir("scm"){
                                     bat(returnStatus: true,
                                         label: "Running pylint",
