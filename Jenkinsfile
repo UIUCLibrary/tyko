@@ -207,15 +207,15 @@ pipeline {
                         }
                         stage("Run Sonarqube Analysis"){
                             environment{
-                                scanneHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                                scannerHome = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                             }
                             steps{
 //                                script{
 //                                    def sonarqube_home = tool name: 'sonar-scanner-3.3.0', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                                     withSonarQubeEnv('sonarqube.library.illinois.edu') {
-                                        echo "${env.scanneHome}"
-                                        bat "dir ${env.scanneHome}"
-                                        bat "set"
+                                        echo "${env.scannerHome}"
+                                        bat "dir ${env.scannerHome}"
+                                        bat "${env.scannerHome}/bin/sonar-scanner -Dsonar.projectKey=avdatabase -Dsonar.sources=tests,avforms"
                                     }
 //                                    }
 
