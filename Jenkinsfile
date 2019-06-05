@@ -6,9 +6,9 @@ def test_python_package(tox_exec, pkgRegex, tox_config_file, tox_environments){
         def python_wheel = findFiles glob: "${pkgRegex}"
         def environments = []
 
-        for(String it: tox_environments)(
+        tox_environments.each{
             environments.add("-e ${it}")
-        )
+        }
 
         def test_environments = environments.join(" ")
 
