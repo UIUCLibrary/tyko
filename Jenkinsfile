@@ -1,5 +1,20 @@
 @Library(["devpi", "PythonHelpers"]) _
 
+def test_python_package(pkgRegex, tox_exec){
+    script{
+
+        def python_wheel = findFiles glob: "${pkgRegex}"
+
+        python_wheel.each{
+            bat(label: "Testing ${it}",
+                script: "${tox_exec} --installpkg=${WORKSPACE}\\${it} -e py"
+                )
+        }
+
+
+    }
+}
+
 pipeline {
     agent {
         label 'Windows && Python3'
@@ -314,7 +329,7 @@ pipeline {
                     parallel{
                         stage("Testing sdist package"){
                             steps{
-                                echo "I'm testing sdist"
+                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts", "dist/*.tar.gz,dist/*.zip")
                             }
                         }
                         stage("Testing whl package"){
