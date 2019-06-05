@@ -4,10 +4,16 @@ def test_python_package(tox_exec, pkgRegex, tox_config_file, tox_environments){
     script{
 
         def python_wheel = findFiles glob: "${pkgRegex}"
-        def test_environments = tox_environments[0]
+        def environments = []
+
+        tox_environments.each(
+            environments.add("-e ${it}")
+        )
+
+        def test_environments = environments[0]
         python_wheel.each{
             bat(label: "Testing ${it}",
-                script: "${tox_exec} -c ${tox_config_file} --installpkg=${WORKSPACE}\\${it} -e ${test_environments}"
+                script: "${tox_exec} -c ${tox_config_file} --installpkg=${WORKSPACE}\\${it} ${test_environments}"
                 )
         }
 
