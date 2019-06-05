@@ -301,9 +301,14 @@ pipeline {
                 PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
             }
             failFast true
-            steps{
-                dir("scm"){
-                    bat script: "python setup.py build -b ${WORKSPACE}/build sdist -d ${WORKSPACE}/dist --format zip bdist_wheel -d ${WORKSPACE}/dist"
+            stages{
+                stage("Creating Python Packages"){
+
+                    steps{
+                        dir("scm"){
+                            bat script: "python setup.py build -b ${WORKSPACE}/build sdist -d ${WORKSPACE}/dist --format zip bdist_wheel -d ${WORKSPACE}/dist"
+                        }
+                    }
                 }
             }
             post {
