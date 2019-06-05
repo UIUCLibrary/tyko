@@ -7,7 +7,7 @@ def test_python_package(tox_exec, pkgRegex, tox_config_file, tox_environments){
         def test_environments = tox_environments[0]
         python_wheel.each{
             bat(label: "Testing ${it}",
-                script: "${tox_exec} -c ${tox_config_file} --installpkg=${WORKSPACE}\\${it} -e ${tox_environments}"
+                script: "${tox_exec} -c ${tox_config_file} --installpkg=${WORKSPACE}\\${it} -e ${test_environments}"
                 )
         }
 
