@@ -1,6 +1,6 @@
 @Library(["devpi", "PythonHelpers"]) _
 
-def test_python_package(pkgRegex, tox_exec){
+def test_python_package(tox_exec, pkgRegex){
     script{
 
         def python_wheel = findFiles glob: "${pkgRegex}"
@@ -329,7 +329,7 @@ pipeline {
                     parallel{
                         stage("Testing sdist package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts", "dist/*.tar.gz,dist/*.zip")
+                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.tar.gz,dist/*.zip")
                             }
                         }
                         stage("Testing whl package"){
