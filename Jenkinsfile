@@ -311,8 +311,17 @@ pipeline {
                     }
                 }
                 stage("Testing Python Packages"){
-                    steps{
-                        echo "I'm testting"
+                    parallel{
+                        stage("Testing sdist package"){
+                            steps{
+                                echo "I'm testing sdist"
+                            }
+                        }
+                        stage("Testing whl package"){
+                            steps{
+                                echo "I'm testing wheel"
+                            }
+                        }
                     }
                 }
             }
