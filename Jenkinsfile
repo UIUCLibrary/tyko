@@ -310,6 +310,11 @@ pipeline {
                         }
                     }
                 }
+                stage("Testing Python Packages"){
+                    steps{
+                        echo "I'm testting"
+                    }
+                }
             }
             post {
                 success {
