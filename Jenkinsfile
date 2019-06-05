@@ -1,6 +1,6 @@
 @Library(["devpi", "PythonHelpers"]) _
 
-def test_python_package(tox_exec, pkgRegex, tox_config_file, tox_environments){
+def test_python_package(tox_exec, pkgRegex, tox_config_file, tox_workdir, tox_environments){
     script{
 
         def python_wheel = findFiles glob: "${pkgRegex}"
@@ -14,7 +14,7 @@ def test_python_package(tox_exec, pkgRegex, tox_config_file, tox_environments){
 
         python_wheel.each{
             bat(label: "Testing ${it}",
-                script: "${tox_exec} -c ${tox_config_file} --installpkg=${WORKSPACE}\\${it} ${test_environments}"
+                script: "${tox_exec} -c ${tox_config_file} --workdir=${tox_workdir}--installpkg=${WORKSPACE}\\${it} ${test_environments}"
                 )
         }
 
@@ -336,12 +336,12 @@ pipeline {
                     parallel{
                         stage("Testing sdist package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.tar.gz,dist/*.zip", "${WORKSPACE}/scm/tox.ini", ["py36", "py37"])
+                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.tar.gz,dist/*.zip", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/1", ["py36", "py37"])
                             }
                         }
                         stage("Testing whl package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.whl", "${WORKSPACE}/scm/tox.ini", ["py36", "py37"])
+                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.whl", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/2", ["py36", "py37"])
                             }
                         }
                     }
