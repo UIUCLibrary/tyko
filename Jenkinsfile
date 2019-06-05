@@ -334,7 +334,7 @@ pipeline {
                         }
                         stage("Testing whl package"){
                             steps{
-                                echo "I'm testing wheel"
+                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.whl", "${WORKSPACE}/scm/tox.ini")
                             }
                         }
                     }
