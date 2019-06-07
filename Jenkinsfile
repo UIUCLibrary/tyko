@@ -73,6 +73,7 @@ def run_tox_test_in_node(python_exec, pythonPkgFile, test_args){
                     )
 
                     unstash "${stashCode}"
+                    bat "dir"
                     _run_tox_test("%VENVPATH%\\Scripts\\tox.exe", "${WORKSPACE}", pythonPkgFile, "${WORKSPACE}/tox.ini", "${WORKSPACE}/tox", "${test_args}")
     //                bat(label: "Testing ${pythonPkgFile}",
     //                    script: "%VENVPATH%\\Scripts\\ -c ${tox_config_file} --parallel=auto -o --workdir=${tox_workdir} --installpkg=${pythonPkgFile} ${test_args} -vv"
