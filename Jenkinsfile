@@ -19,12 +19,65 @@ def test_python_package(tox_exec, pkgRegex, tox_config_file, tox_workdir, source
 
     }
 }
+def test_python_package2(python_exec, pkgRegex, tox_environments){
+    script{
+        def python_pkgs = findFiles glob: "${pkgRegex}"
+        def environments = []
+
+        tox_environments.each{
+            environments.add("-e ${it}")
+        }
+
+        def test_environments = environments.join(" ")
+
+        python_pkgs.each{
+            run_tox_test_in_node(python_exec, "${WORKSPACE}/${it}", test_environments)
+        }
+    }
+}
 
 def _run_tox_test(tox_exec, sourceRoot, pythonPkgFile, tox_config_file, tox_workdir, test_args){
     dir("${sourceRoot}"){
         bat(label: "Testing ${pythonPkgFile}",
             script: "${tox_exec} -c ${tox_config_file} --parallel=auto -o --workdir=${tox_workdir} --installpkg=${pythonPkgFile} ${test_args} -vv"
             )
+    }
+}
+
+def run_tox_test_in_node(python_exec, pythonPkgFile, test_args){
+    stash includes: "${pythonPkgFile}", name: "${pythonPkgFile}"
+
+    node("Windows"){
+        withEnv(['VENVPATH = "venv"']) {
+            script{
+                def python_version = bat(
+                    label: "Checking Python version for ${python_exec}",
+                    returnStdout: true,
+                    script: 'python --version').trim()
+
+                bat(label: "Create virtualenv based on ${python_version}",
+                    script: "${python_exec} -m venv %VENVPATH%"
+                    )
+                bat(label: "Update pip version in virtualenv",
+                    script: "%VENVPATH%\\Scripts\\python.exe -m pip install pip --upgrade"
+                )
+
+                bat(label: "Update setuptools version in virtualenv",
+                    script: "%VENVPATH%\\Scripts\\pip install setuptools --upgrade"
+                )
+
+                bat(label: "Install Tox in virtualenv",
+                    script: "%VENVPATH%\\Scripts\\pip install tox"
+                )
+
+                unstash "${pythonPkgFile}"
+                _run_tox_test("%VENVPATH%\\Scripts\\tox.exe", "${WORKSPACE}", "${WORKSPACE}/tox.ini", "${WORKSPACE}/tox", "${test_args}")
+//                bat(label: "Testing ${pythonPkgFile}",
+//                    script: "%VENVPATH%\\Scripts\\ -c ${tox_config_file} --parallel=auto -o --workdir=${tox_workdir} --installpkg=${pythonPkgFile} ${test_args} -vv"
+//                    )
+            }
+        }
+        deleteDir()
     }
 }
 
@@ -342,12 +395,14 @@ pipeline {
                     parallel{
                         stage("Testing sdist package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.tar.gz,dist/*.zip", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/sdist","scm", ["py36", "py37"])
+                                test_python_package2("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.tar.gz,dist/*.zip", ["py36", "py37"])
+//                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.tar.gz,dist/*.zip", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/sdist","scm", ["py36", "py37"])
                             }
                         }
                         stage("Testing whl package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.whl", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/whl", "scm", ["py36", "py37"])
+                                test_python_package2("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.whl", ["py36", "py37"])
+//                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.whl", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/whl", "scm", ["py36", "py37"])
                             }
                         }
                     }
