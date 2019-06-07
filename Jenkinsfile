@@ -374,7 +374,7 @@ pipeline {
                         stage("Testing sdist Package"){
                             steps{
                                 testPythonPackage(
-                                    pythonExec: "${WORKSPACE}\\venv\\37\\Scripts\\python.exe",
+                                    pythonToolName: "CPython-3.7",
                                     pkgRegex: "dist/*.tar.gz,dist/*.zip",
                                     testNodeLabels: "Windows",
                                     testEnv: ["py36", "py37"]
@@ -385,7 +385,7 @@ pipeline {
                         stage("Testing whl Package"){
                             steps{
                                 testPythonPackage(
-                                    pythonExec: "${WORKSPACE}\\venv\\37\\Scripts\\python.exe",
+                                    pythonToolName: "CPython-3.7",
                                     pkgRegex: "dist/*.whl",
                                     testNodeLabels: "Windows",
                                     testEnv: ["py36", "py37"]
