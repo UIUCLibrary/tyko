@@ -1,7 +1,7 @@
 @Library(["devpi", "PythonHelpers"]) _
 
 
-def test_python_package(python_exec, pkgRegex, tox_environments){
+def test_python_package(python_exec, pkgRegex, nodeLabels, tox_environments){
     script{
         def python_pkgs = findFiles glob: "${pkgRegex}"
         def environments = []
@@ -13,12 +13,12 @@ def test_python_package(python_exec, pkgRegex, tox_environments){
         def test_environments = environments.join(" ")
 
         python_pkgs.each{
-            run_tox_test_in_node(python_exec, it, test_environments)
+            run_tox_test_in_node(python_exec, it, test_environments, nodeLabels)
         }
     }
 }
 
-def run_tox_test_in_node(python_exec, pythonPkgFile, test_args){
+def run_tox_test_in_node(python_exec, pythonPkgFile, test_args, nodeLabels){
     script{
         def stashCode = UUID.randomUUID().toString()
         stash includes: "${pythonPkgFile}", name: "${stashCode}"
@@ -27,7 +27,7 @@ def run_tox_test_in_node(python_exec, pythonPkgFile, test_args){
             returnStdout: true,
             script: '@python --version').trim()
 
-        node("Windows"){
+        node("${nodeLabels}"){
             try{
                 checkout scm
                 withEnv(['VENVPATH=venv']) {
@@ -373,12 +373,12 @@ pipeline {
                     parallel{
                         stage("Testing sdist package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.tar.gz,dist/*.zip", ["py36", "py37"])
+                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.tar.gz,dist/*.zip", "Windows", ["py36", "py37"])
                             }
                         }
                         stage("Testing whl package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.whl", ["py36", "py37"])
+                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.whl", "Windows", ["py36", "py37"])
                             }
                         }
                     }
