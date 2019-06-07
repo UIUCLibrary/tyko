@@ -373,7 +373,14 @@ pipeline {
                     parallel{
                         stage("Testing sdist package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.tar.gz,dist/*.zip", "Windows", ["py36", "py37"])
+                                testPythonPackage(
+                                    pythonExec: "${WORKSPACE}\\venv\\37\\Scripts\\python.exe",
+                                    pkgRegex: "dist/*.tar.gz,dist/*.zip",
+                                    testNodeLabels: "Windows",
+                                    testEnv: ["py36", "py37"]
+
+                                )
+//                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.tar.gz,dist/*.zip", "Windows", ["py36", "py37"])
                             }
                         }
                         stage("Testing whl package"){
