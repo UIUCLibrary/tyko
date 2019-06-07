@@ -31,7 +31,7 @@ def test_python_package2(python_exec, pkgRegex, tox_environments){
         def test_environments = environments.join(" ")
 
         python_pkgs.each{
-            run_tox_test_in_node(python_exec, "${WORKSPACE}/${it}", test_environments)
+            run_tox_test_in_node(python_exec, it, test_environments)
         }
     }
 }
@@ -71,7 +71,7 @@ def run_tox_test_in_node(python_exec, pythonPkgFile, test_args){
                 )
 
                 unstash "${pythonPkgFile}"
-                _run_tox_test("%VENVPATH%\\Scripts\\tox.exe", "${WORKSPACE}", "${WORKSPACE}/tox.ini", "${WORKSPACE}/tox", "${test_args}")
+                _run_tox_test("%VENVPATH%\\Scripts\\tox.exe", "${WORKSPACE}", pythonPkgFile, "${WORKSPACE}/tox.ini", "${WORKSPACE}/tox", "${test_args}")
 //                bat(label: "Testing ${pythonPkgFile}",
 //                    script: "%VENVPATH%\\Scripts\\ -c ${tox_config_file} --parallel=auto -o --workdir=${tox_workdir} --installpkg=${pythonPkgFile} ${test_args} -vv"
 //                    )
