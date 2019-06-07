@@ -55,7 +55,7 @@ def run_tox_test_in_node(python_exec, pythonPkgFile, test_args){
 
         node("Windows"){
             try{
-                withEnv(['VENVPATH = "venv"']) {
+                withEnv(['VENVPATH=venv']) {
                     bat(script: "set")
                     bat(label: "Create virtualenv based on ${python_version}",
                         script: "${python_exec} -m venv %VENVPATH%"
