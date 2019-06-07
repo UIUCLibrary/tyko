@@ -1,63 +1,63 @@
 @Library(["devpi", "PythonHelpers"]) _
 
-
-def test_python_package(python_exec, pkgRegex, nodeLabels, tox_environments){
-    script{
-        def python_pkgs = findFiles glob: "${pkgRegex}"
-        def environments = []
-
-        tox_environments.each{
-            environments.add("-e ${it}")
-        }
-
-        def test_environments = environments.join(" ")
-
-        python_pkgs.each{
-            run_tox_test_in_node(python_exec, it, test_environments, nodeLabels)
-        }
-    }
-}
-
-def run_tox_test_in_node(python_exec, pythonPkgFile, test_args, nodeLabels){
-    script{
-        def stashCode = UUID.randomUUID().toString()
-        stash includes: "${pythonPkgFile}", name: "${stashCode}"
-        def python_version = bat(
-            label: "Checking Python version for ${python_exec}",
-            returnStdout: true,
-            script: '@python --version').trim()
-
-        node("${nodeLabels}"){
-            try{
-                checkout scm
-                withEnv(['VENVPATH=venv']) {
-                    bat(label: "Create virtualenv based on ${python_version} on ${NODE_NAME}",
-                        script: "${python_exec} -m venv %VENVPATH%"
-                        )
-                    bat(label: "Update pip version in virtualenv",
-                        script: "%VENVPATH%\\Scripts\\python.exe -m pip install pip --upgrade"
-                    )
-
-//                    bat(label: "Update setuptools version in virtualenv",
-//                        script: "%VENVPATH%\\Scripts\\pip install setuptools --upgrade"
+//
+//def test_python_package(python_exec, pkgRegex, nodeLabels, tox_environments){
+//    script{
+//        def python_pkgs = findFiles glob: "${pkgRegex}"
+//        def environments = []
+//
+//        tox_environments.each{
+//            environments.add("-e ${it}")
+//        }
+//
+//        def test_environments = environments.join(" ")
+//
+//        python_pkgs.each{
+//            run_tox_test_in_node(python_exec, it, test_environments, nodeLabels)
+//        }
+//    }
+//}
+//
+//def run_tox_test_in_node(python_exec, pythonPkgFile, test_args, nodeLabels){
+//    script{
+//        def stashCode = UUID.randomUUID().toString()
+//        stash includes: "${pythonPkgFile}", name: "${stashCode}"
+//        def python_version = bat(
+//            label: "Checking Python version for ${python_exec}",
+//            returnStdout: true,
+//            script: '@python --version').trim()
+//
+//        node("${nodeLabels}"){
+//            try{
+//                checkout scm
+//                withEnv(['VENVPATH=venv']) {
+//                    bat(label: "Create virtualenv based on ${python_version} on ${NODE_NAME}",
+//                        script: "${python_exec} -m venv %VENVPATH%"
+//                        )
+//                    bat(label: "Update pip version in virtualenv",
+//                        script: "%VENVPATH%\\Scripts\\python.exe -m pip install pip --upgrade"
 //                    )
-
-                    bat(label: "Install Tox in virtualenv",
-                        script: "%VENVPATH%\\Scripts\\pip install tox"
-                    )
-
-                    unstash "${stashCode}"
-                    bat(label: "Testing ${pythonPkgFile}",
-                        script: "%VENVPATH%\\Scripts\\tox.exe -c ${WORKSPACE}/tox.ini --parallel=auto -o --workdir=${WORKSPACE}/tox --installpkg=${pythonPkgFile} ${test_args} -vv"
-                        )
-                }
-            }
-            finally{
-                deleteDir()
-            }
-        }
-    }
-}
+//
+////                    bat(label: "Update setuptools version in virtualenv",
+////                        script: "%VENVPATH%\\Scripts\\pip install setuptools --upgrade"
+////                    )
+//
+//                    bat(label: "Install Tox in virtualenv",
+//                        script: "%VENVPATH%\\Scripts\\pip install tox"
+//                    )
+//
+//                    unstash "${stashCode}"
+//                    bat(label: "Testing ${pythonPkgFile}",
+//                        script: "%VENVPATH%\\Scripts\\tox.exe -c ${WORKSPACE}/tox.ini --parallel=auto -o --workdir=${WORKSPACE}/tox --installpkg=${pythonPkgFile} ${test_args} -vv"
+//                        )
+//                }
+//            }
+//            finally{
+//                deleteDir()
+//            }
+//        }
+//    }
+//}
 
 pipeline {
     agent {
@@ -380,12 +380,17 @@ pipeline {
                                     testEnv: ["py36", "py37"]
 
                                 )
-//                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.tar.gz,dist/*.zip", "Windows", ["py36", "py37"])
                             }
                         }
                         stage("Testing whl package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\python.exe", "dist/*.whl", "Windows", ["py36", "py37"])
+                                testPythonPackage(
+                                    pythonExec: "${WORKSPACE}\\venv\\37\\Scripts\\python.exe",
+                                    pkgRegex: "dist/*.whl",
+                                    testNodeLabels: "Windows",
+                                    testEnv: ["py36", "py37"]
+
+                                )
                             }
                         }
                     }
