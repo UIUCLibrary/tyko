@@ -54,30 +54,34 @@ def run_tox_test_in_node(python_exec, pythonPkgFile, test_args){
             script: '@python --version').trim()
 
         node("Windows"){
-            withEnv(['VENVPATH = "venv"']) {
-                bat(script: "set")
-                bat(label: "Create virtualenv based on ${python_version}",
-                    script: "${python_exec} -m venv %VENVPATH%"
+            try{
+                withEnv(['VENVPATH = "venv"']) {
+                    bat(script: "set")
+                    bat(label: "Create virtualenv based on ${python_version}",
+                        script: "${python_exec} -m venv %VENVPATH%"
+                        )
+                    bat(label: "Update pip version in virtualenv",
+                        script: "%VENVPATH%\\Scripts\\python.exe -m pip install pip --upgrade"
                     )
-                bat(label: "Update pip version in virtualenv",
-                    script: "%VENVPATH%\\Scripts\\python.exe -m pip install pip --upgrade"
-                )
 
-                bat(label: "Update setuptools version in virtualenv",
-                    script: "%VENVPATH%\\Scripts\\pip install setuptools --upgrade"
-                )
+                    bat(label: "Update setuptools version in virtualenv",
+                        script: "%VENVPATH%\\Scripts\\pip install setuptools --upgrade"
+                    )
 
-                bat(label: "Install Tox in virtualenv",
-                    script: "%VENVPATH%\\Scripts\\pip install tox"
-                )
+                    bat(label: "Install Tox in virtualenv",
+                        script: "%VENVPATH%\\Scripts\\pip install tox"
+                    )
 
-                unstash "${stashCode}"
-                _run_tox_test("%VENVPATH%\\Scripts\\tox.exe", "${WORKSPACE}", pythonPkgFile, "${WORKSPACE}/tox.ini", "${WORKSPACE}/tox", "${test_args}")
-//                bat(label: "Testing ${pythonPkgFile}",
-//                    script: "%VENVPATH%\\Scripts\\ -c ${tox_config_file} --parallel=auto -o --workdir=${tox_workdir} --installpkg=${pythonPkgFile} ${test_args} -vv"
-//                    )
+                    unstash "${stashCode}"
+                    _run_tox_test("%VENVPATH%\\Scripts\\tox.exe", "${WORKSPACE}", pythonPkgFile, "${WORKSPACE}/tox.ini", "${WORKSPACE}/tox", "${test_args}")
+    //                bat(label: "Testing ${pythonPkgFile}",
+    //                    script: "%VENVPATH%\\Scripts\\ -c ${tox_config_file} --parallel=auto -o --workdir=${tox_workdir} --installpkg=${pythonPkgFile} ${test_args} -vv"
+    //                    )
+                }
             }
-        deleteDir()
+            finally{
+                deleteDir()
+            }
         }
     }
 }
