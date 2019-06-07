@@ -336,12 +336,16 @@ pipeline {
                     parallel{
                         stage("Testing sdist package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.tar.gz,dist/*.zip", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/sdist", ["py36", "py37"])
+                                dir("scm"){
+                                    test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.tar.gz,dist/*.zip", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/sdist", ["py36", "py37"])
+                                }
                             }
                         }
                         stage("Testing whl package"){
                             steps{
-                                test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.whl", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/whl", ["py36", "py37"])
+                                dir("scm"){
+                                    test_python_package("${WORKSPACE}\\venv\\37\\Scripts\\tox.exe", "dist/*.whl", "${WORKSPACE}/scm/tox.ini", "${WORKSPACE}/tox/whl", ["py36", "py37"])
+                                }
                             }
                         }
                     }
