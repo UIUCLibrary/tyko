@@ -371,7 +371,7 @@ pipeline {
                 }
                 stage("Testing Python Packages"){
                     parallel{
-                        stage("Testing sdist package"){
+                        stage("Testing sdist Package"){
                             steps{
                                 testPythonPackage(
                                     pythonExec: "${WORKSPACE}\\venv\\37\\Scripts\\python.exe",
@@ -382,7 +382,7 @@ pipeline {
                                 )
                             }
                         }
-                        stage("Testing whl package"){
+                        stage("Testing whl Package"){
                             steps{
                                 testPythonPackage(
                                     pythonExec: "${WORKSPACE}\\venv\\37\\Scripts\\python.exe",
