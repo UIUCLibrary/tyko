@@ -13,15 +13,18 @@ def test_python_package(tox_exec, pkgRegex, tox_config_file, tox_workdir, source
         def test_environments = environments.join(" ")
 
         python_wheel.each{
-            dir("sourceRoot"){
-                bat(label: "Testing ${it}",
-                    script: "${tox_exec} -c ${tox_config_file} --parallel=auto -o --workdir=${tox_workdir} --installpkg=${WORKSPACE}\\${it} ${test_environments} -vv"
-                    )
-            }
-
+            _run_tox_test(tox_exec, sourceRoot, "${WORKSPACE}/${it}", "${tox_config_file}", "${tox_workdir}", "${test_environments}")
         }
 
 
+    }
+}
+
+def _run_tox_test(tox_exec, sourceRoot, pythonPkgFile, tox_config_file, tox_workdir, test_args){
+    dir("${sourceRoot}"){
+        bat(label: "Testing ${pythonPkgFile}",
+            script: "${tox_exec} -c ${tox_config_file} --parallel=auto -o --workdir=${tox_workdir} --installpkg=${pythonPkgFile} ${test_args} -vv"
+            )
     }
 }
 
