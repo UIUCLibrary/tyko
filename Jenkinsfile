@@ -377,7 +377,7 @@ pipeline {
                                     pythonToolName: "CPython-3.7",
                                     pkgRegex: "dist/*.tar.gz,dist/*.zip",
                                     testNodeLabels: "Windows",
-                                    testEnv: ["py36", "py37"]
+                                    testEnvs: ["py36", "py37"]
 
                                 )
                             }
@@ -388,7 +388,7 @@ pipeline {
                                     pythonToolName: "CPython-3.7",
                                     pkgRegex: "dist/*.whl",
                                     testNodeLabels: "Windows",
-                                    testEnv: ["py36", "py37"]
+                                    testEnvs: ["py36", "py37"]
 
                                 )
                             }
