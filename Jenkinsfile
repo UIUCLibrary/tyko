@@ -51,7 +51,7 @@ def run_tox_test_in_node(python_exec, pythonPkgFile, test_args){
         def python_version = bat(
             label: "Checking Python version for ${python_exec}",
             returnStdout: true,
-            script: 'python --version').trim()
+            script: '@python --version').trim()
 
         node("Windows"){
             withEnv(['VENVPATH = "venv"']) {
