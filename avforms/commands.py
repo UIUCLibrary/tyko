@@ -1,11 +1,11 @@
 import avforms.database
 import sqlalchemy as db
-from typing import NamedTuple, Dict
+from typing import NamedTuple, Dict, Callable
 
 
 class Command(NamedTuple):
     help_documentation: str
-    func: callable
+    func: Callable
 
 
 # TODO: FILL in this Information
