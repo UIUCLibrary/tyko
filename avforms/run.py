@@ -1,7 +1,12 @@
 import argparse
 import sys
 
+from flask import Flask
+
 from avforms.commands import commands
+from avforms import routes
+
+app = Flask(__name__)
 
 
 def setup_cli_parser() -> argparse.ArgumentParser:
@@ -22,3 +27,6 @@ def main() -> None:
         sys.exit()
 
     print("Running normal program")
+    routes.init_api_routes(app)
+    routes.init_website_routes(app)
+    app.run(debug=True, host='0.0.0.0')

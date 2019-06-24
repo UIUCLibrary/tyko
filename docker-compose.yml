@@ -10,10 +10,12 @@ services:
       - MYSQL_DATABASE=av_preservation
       - MYSQL_USER=avuser
       - MYSQL_PASSWORD=avpsw
-  python:
+  api:
     depends_on:
       - db
     build: .
+    ports:
+      - "5000:5000"
 
 
 
