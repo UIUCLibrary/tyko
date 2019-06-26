@@ -4,7 +4,6 @@
         <file>qtquickcontrols2.conf</file>
         <file>ProjectsViewTable.qml</file>
         <file>ApiModel.qml</file>
-        <file>MyComponent.qml</file>
         <file>resource.js</file>
         <file>EditingDialog.qml</file>
     </qresource>

@@ -17,11 +17,11 @@ ApplicationWindow {
         text: "New"
         icon.name: "document-new"
         onTriggered:{
-            projectFormDialog.projectTitle = ""
-            projectFormDialog.projectCode = ""
-            projectFormDialog.status = ""
-            projectFormDialog.currentLocation = ""
-            projectFormDialog.open()
+            newProjectFormDialog.projectTitle = ""
+            newProjectFormDialog.projectCode = ""
+            newProjectFormDialog.status = ""
+            newProjectFormDialog.currentLocation = ""
+            newProjectFormDialog.open()
          }
         shortcut: StandardKey.New
     }
@@ -50,6 +50,16 @@ ApplicationWindow {
         id: projectFormDialog
         standardButtons: Dialog.Save | Dialog.Cancel
     }
+    EditingDialog {
+        id: newProjectFormDialog
+        title: "New Project"
+        standardButtons: Dialog.Save | Dialog.Cancel
+        onAccepted: {
+
+            createNewProject(this)
+
+        }
+    }
 
     Dialog{
         id: confirmDeleteDialog
@@ -65,6 +75,30 @@ ApplicationWindow {
     Dialog{
         id: editRecordDialog
         title: "Edit Record"
+    }
+    Dialog{
+        property alias message: text.text
+        id: resultDialog
+        title: "Result"
+        width: 400
+        height: 200
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        padding: 20
+        Rectangle{
+            color: appPalette.dark
+            anchors.fill: parent
+            Text {
+                id: text
+                color: appPalette.light
+                padding: 10
+            }
+            border.color: appPalette.shadow
+
+        }
+        standardButtons: Dialog.Ok
+
+
     }
 
     Component {
@@ -114,7 +148,7 @@ ApplicationWindow {
     }
     ApiModel {
         id: projectsModel
-        sourceURL: "http://0.0.0.0:5000/"
+        sourceURL: "http://127.0.0.1:5000/"
         apiRoute: "api/projects"
     }
 
@@ -138,6 +172,18 @@ ApplicationWindow {
         }
     }
 
+    function createNewProject(dialog){
+        var projectTitle = dialog.projectTitle
+        var projectCode = dialog.projectCode
+        var status = dialog.status
+        var currentLocation = dialog.currentLocation
+        console.log("new project")
+        console.log("projectTitle: " + projectTitle)
+        console.log("projectCode: " + projectCode)
+        resultDialog.message = "Added new record"
+        resultDialog.open()
+    }
+
     function openEditor(row){
         var row = row || 0
 
@@ -145,11 +191,10 @@ ApplicationWindow {
         var item = projectsModel.get(row)
         console.log("id = " + item.id)
 
-
         projectFormDialog.projectTitle = item.title
         projectFormDialog.projectCode = item.project_code
-        projectFormDialog.status = item.status
-        projectFormDialog.currentLocation = item.current_location
+        projectFormDialog.status = item.status ? item.status: ""
+        projectFormDialog.currentLocation = item.current_location ? item.current_location:
 
         projectFormDialog.open()
 
