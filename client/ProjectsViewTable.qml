@@ -13,7 +13,6 @@ Item{
     signal activated(int row)
     SystemPalette { id: appPalette; colorGroup: SystemPalette.Active }
     property alias currentRow: projectsView.currentRow
-
     Loader {
         id: loader_contextMenu
         sourceComponent: Menu{

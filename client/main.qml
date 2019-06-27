@@ -7,10 +7,9 @@ ApplicationWindow {
     visible: true
     width: 640
     height: 480
-    property int dataRefreshRate: 2000
+    property int dataRefreshRate: 4000
     title: qsTr("Projects")
     SystemPalette { id: appPalette; colorGroup: SystemPalette.Active }
-
 
     Action{
         id: newItemAction
@@ -77,23 +76,48 @@ ApplicationWindow {
         title: "Edit Record"
     }
     Dialog{
-        property alias message: text.text
+        property alias details: text.text
+        property int returnCode
+
         id: resultDialog
         title: "Result"
-        width: 400
-        height: 200
+        width: 600
+        height: 400
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
         padding: 20
         Rectangle{
-            color: appPalette.dark
+            color: appPalette.alternateBase
             anchors.fill: parent
-            Text {
-                id: text
-                color: appPalette.light
-                padding: 10
-            }
             border.color: appPalette.shadow
+
+            ColumnLayout{
+                spacing: 2
+                clip: true
+                anchors.fill: parent
+                Rectangle{
+                    Layout.preferredHeight: statusLabel.height
+                    Layout.fillWidth: true
+                    Label {
+                        id: statusLabel
+                        text: qsTr("Return Code: " + resultDialog.returnCode )
+                    }
+                }
+                Rectangle{
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    ScrollView{
+                        anchors.fill: parent
+                        TextArea {
+                            id: text
+                            color: appPalette.text
+                            padding: 10
+                        }
+
+                    }
+
+                }
+            }
 
         }
         standardButtons: Dialog.Ok
@@ -150,18 +174,16 @@ ApplicationWindow {
         id: projectsModel
         sourceURL: "http://127.0.0.1:5000/"
         apiRoute: "api/projects"
+
     }
 
-    Rectangle{
-        anchors.fill: parent
-        color: appPalette.base
-        ProjectsViewTable {
-            id: projectsView
-            clip: true
-            contextMenu: component_contextMenu
-            onActivated: {
-                openEditor(row)
-            }
+
+    ProjectsViewTable {
+        id: projectsView
+        clip: true
+        contextMenu: component_contextMenu
+        onActivated: {
+            openEditor(row)
         }
     }
     footer:ToolBar{
@@ -180,8 +202,25 @@ ApplicationWindow {
         console.log("new project")
         console.log("projectTitle: " + projectTitle)
         console.log("projectCode: " + projectCode)
-        resultDialog.message = "Added new record"
-        resultDialog.open()
+        var params = "title=dummy"
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://127.0.0.1:5000/api/projects/", true)
+        xhr.setRequestHeader("Content-type", "application/json")
+
+        xhr.onreadystatechange = function(){
+            console.log(xhr.responseText)
+            console.log(xhr.status)
+            resultDialog.details = " "+ xhr.responseText
+            resultDialog.returnCode = xhr.status
+            resultDialog.open()
+        }
+        var parmas = JSON.stringify({"title": "asdfadsf"})
+        console.log(parmas)
+        xhr.send(params)
+
+
+
+
     }
 
     function openEditor(row){
