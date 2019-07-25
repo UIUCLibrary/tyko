@@ -1,5 +1,3 @@
-import sys
-
 from flask import jsonify, request, url_for, abort
 from avforms.data_provider import DataProvider
 

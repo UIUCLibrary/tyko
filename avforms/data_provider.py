@@ -50,7 +50,8 @@ class DataProvider:
         else:
             return all_projects
 
-    def add_project(self, title, project_code, current_location, status, specs):
+    def add_project(self, title, project_code, current_location, status,
+                    specs):
         new_project = scheme.Project(
             title=title,
             project_code=project_code,

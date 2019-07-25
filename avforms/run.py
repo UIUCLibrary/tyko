@@ -1,12 +1,8 @@
 import sys
 
-import sqlalchemy
 from flask import Flask
-
-from avforms.commands import commands
 from avforms import routes
 from avforms.config import setup_cli_parser
-from avforms.middleware import data_provider
 
 app = Flask(__name__)
 

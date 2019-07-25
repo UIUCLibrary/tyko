@@ -1,7 +1,5 @@
 import argparse
 
-from avforms.commands import commands
-
 
 def setup_cli_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
