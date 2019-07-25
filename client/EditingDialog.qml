@@ -8,6 +8,7 @@ Dialog{
     y: (parent.height - height) / 2
     width: 400
     title: "Edit"
+    modal: true
 
     property alias projectTitle: titleData.text
     property alias projectCode: projectCodeData.text

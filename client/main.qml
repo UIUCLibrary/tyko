@@ -1,6 +1,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.3
+import Api 1.0
 
 ApplicationWindow {
     id: window
@@ -8,8 +9,17 @@ ApplicationWindow {
     width: 640
     height: 480
     property int dataRefreshRate: 4000
+    property url sourceURL:"http://127.0.0.1:8000/"
     title: qsTr("Projects")
     SystemPalette { id: appPalette; colorGroup: SystemPalette.Active }
+    ProjectAdder{
+        id: myAdder
+        property url sourceURL: window.sourceURL
+        url: sourceURL
+        route: "/api/projects/"
+
+
+    }
 
     Action{
         id: newItemAction
@@ -54,8 +64,16 @@ ApplicationWindow {
         title: "New Project"
         standardButtons: Dialog.Save | Dialog.Cancel
         onAccepted: {
-
-            createNewProject(this)
+            myAdder.title = newProjectFormDialog.projectTitle
+            myAdder.currentLocation = newProjectFormDialog.currentLocation
+            myAdder.projectCode = newProjectFormDialog.projectCode
+            myAdder.projectStatus = newProjectFormDialog.status
+//            myAdder.specs = newProjectFormDialog.specs
+//            myAdder.onSuccess = console.log("success")
+//            myAdder.onFailure = console.log("Failed")
+            myAdder.send()
+            projectsModel.update()
+//            createNewProject(this)
 
         }
     }
@@ -172,7 +190,7 @@ ApplicationWindow {
     }
     ApiModel {
         id: projectsModel
-        sourceURL: "http://127.0.0.1:5000/"
+        sourceURL: window.sourceURL
         apiRoute: "api/projects"
 
     }
@@ -234,7 +252,7 @@ ApplicationWindow {
         projectFormDialog.projectCode = item.project_code
         projectFormDialog.status = item.status ? item.status: ""
         projectFormDialog.currentLocation = item.current_location ? item.current_location:
-
+        console.log("Opening")
         projectFormDialog.open()
 
     }

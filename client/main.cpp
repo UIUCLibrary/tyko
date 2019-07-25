@@ -1,3 +1,5 @@
+#include "projectadder.h"
+
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
@@ -9,6 +11,7 @@ int main(int argc, char *argv[])
 #endif
 
     QGuiApplication app(argc, argv);
+    qmlRegisterType<ProjectAdder>("Api", 1, 0, "ProjectAdder");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
