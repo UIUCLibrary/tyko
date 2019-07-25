@@ -1,32 +1,37 @@
-import argparse
 import sys
 
+import sqlalchemy
 from flask import Flask
 
 from avforms.commands import commands
 from avforms import routes
+from avforms.config import setup_cli_parser
+from avforms.middleware import data_provider
 
 app = Flask(__name__)
 
 
-def setup_cli_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(title="Extra", dest="subcommand")
-    for k, v in commands.items():
-        subparsers.add_parser(k, help=v[0])
+def create_app(db_engine):
+    app_routes = routes.Routes(db_engine, app=app)
+    if not app_routes.is_valid():
+        sys.exit(1)
 
-    return parser
+    # print("Running normal program")
+
+    app_routes.init_api_routes()
+    routes.init_website_routes(app)
+    return app
+    # app.run(host='0.0.0.0')
 
 
 def main() -> None:
+    """Run as a local program and not for production"""
+
     parser = setup_cli_parser()
     args = parser.parse_args()
 
-    if args.subcommand:
-        commands[args.subcommand][1]()
-        sys.exit()
+    # Validate that the database can be connected to
+    print(args)
 
-    print("Running normal program")
-    routes.init_api_routes(app)
-    routes.init_website_routes(app)
-    app.run(debug=True, host='0.0.0.0')
+    my_app = create_app(args.db_engine)
+    my_app.run(host='0.0.0.0')

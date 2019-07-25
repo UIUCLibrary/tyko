@@ -1,15 +1,56 @@
+import sys
+
+import sqlalchemy.exc
 from flask import Flask, jsonify, render_template
 from avforms import middleware
 
 the_app = Flask(__name__)
 
 
+class Routes:
+
+    def __init__(self, db_engine, app) -> object:
+        self.db_engine = db_engine
+        self.app = app
+
+    def is_valid(self):
+        try:
+            middleware.DataProvider(self.db_engine)
+        except sqlalchemy.exc.OperationalError as e:
+            print(e, file=sys.stderr)
+            return False
+        return True
+
+    def init_api_routes(self):
+        init_api_routes(self.app)
+
+    def init_website_routes(self):
+        init_website_routes(self.app)
+
+
 def init_api_routes(app):
     if app:
         app.add_url_rule("/api/projects", "projects", middleware.get_projects)
 
+        app.add_url_rule("/api/projects/<string:id>", "project_by_id",
+                         middleware.get_project_by_id, methods=["GET"]
+                         )
+        app.add_url_rule("/api/projects/", "add_project",
+                         middleware.add_project,
+                         methods=["POST"])
+
+        app.add_url_rule("/api/collections/<string:id>", "collection_by_id",
+                         middleware.collection_by_id,
+                         methods=["GET"])
+
         app.add_url_rule("/api/collections", "collection",
-                         middleware.get_collections)
+                         middleware.get_collections,
+                         methods=["GET"]
+                         )
+
+        app.add_url_rule("/api/collections/", "add_collection",
+                         middleware.add_collection,
+                         methods=["POST"])
 
         app.add_url_rule("/api/formats", "formats", middleware.get_formats)
         app.add_url_rule("/api", "list_routes", list_routes,

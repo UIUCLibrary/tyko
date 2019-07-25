@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='avform',
+    name='avforms',
     version='0.0.1',
     packages=['avforms'],
     url='https://github.com/UIUCLibrary/avdatabase',
