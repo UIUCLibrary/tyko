@@ -434,7 +434,8 @@ pipeline {
                                 testPythonPackage(
                                     pythonToolName: "CPython-3.7",
                                     pkgRegex: "dist/*.tar.gz,dist/*.zip",
-                                    testNodeLabels: "Windows",
+//                                    testNodeLabels: "Windows",
+                                    testNodeLabels: "Windows&&!Docker",
                                     testEnvs: ["py36", "py37"]
 
                                 )
