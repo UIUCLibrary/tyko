@@ -205,7 +205,7 @@ pipeline {
                                     catchError(buildResult: 'UNSTABLE', message: 'Did not pass all pytest tests', stageResult: 'UNSTABLE') {
                                         bat(
                                             label: "Run PyTest",
-                                            script: "coverage run --parallel-mode --branch --source=avforms,tests,setup.py -m pytest --junitxml=${WORKSPACE}/reports/pytest/junit-${env.NODE_NAME}-pytest.xml --junit-prefix=${env.NODE_NAME}-pytest"
+                                            script: "coverage run --parallel-mode --branch --source=avforms,tests -m pytest --junitxml=${WORKSPACE}/reports/pytest/junit-${env.NODE_NAME}-pytest.xml --junit-prefix=${env.NODE_NAME}-pytest"
                                         )
                                     }
                                 }
