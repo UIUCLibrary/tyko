@@ -15,7 +15,7 @@ def create_app(db_engine):
     # print("Running normal program")
 
     app_routes.init_api_routes()
-    routes.init_website_routes(app)
+    routes.init_website_routes(app, db_engine)
     return app
     # app.run(host='0.0.0.0')
 
