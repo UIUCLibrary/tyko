@@ -155,7 +155,7 @@ pipeline {
                                 bat "venv\\37\\Scripts\\python.exe -m pip install -U pip --no-cache-dir"
                             }
                         }
-                        bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel sqlalchemy mysqlclient"
+                        bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel sqlalchemy mysqlclient -r source\\requirements.txt --upgrade-strategy only-if-needed"
 //                        bat "venv36\\Scripts\\pip.exe install pytest-cov lxml flake8 mypy -r source\\requirements.txt --upgrade-strategy only-if-needed"
                     }
                     post{
