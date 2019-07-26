@@ -11,7 +11,6 @@ def server():
 @pytest.mark.parametrize(
     "route", ["/",
               "/about",
-              "/api",
               "/api/formats",
               "/api/projects",
               "/api/collections",
