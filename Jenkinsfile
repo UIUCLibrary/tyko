@@ -158,14 +158,14 @@ pipeline {
                         bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel sqlalchemy mysqlclient"
 //                        bat "venv36\\Scripts\\pip.exe install pytest-cov lxml flake8 mypy -r source\\requirements.txt --upgrade-strategy only-if-needed"
                     }
-                post{
-                    success{
-                        bat "if not exist logs mkdir logs"
-                        bat "venv\\37\\Scripts\\pip.exe list > ${WORKSPACE}\\logs\\pippackages_venv_${NODE_NAME}.log"
-                        archiveArtifacts artifacts: "logs/pippackages_venv_${NODE_NAME}.log"
+                    post{
+                        success{
+                            bat "if not exist logs mkdir logs"
+                            bat "venv\\37\\Scripts\\pip.exe list > ${WORKSPACE}\\logs\\pippackages_venv_${NODE_NAME}.log"
+                            archiveArtifacts artifacts: "logs/pippackages_venv_${NODE_NAME}.log"
+                        }
                     }
                 }
-            }
             }
             post{
                 failure {
