@@ -16,7 +16,7 @@ ApplicationWindow {
         id: myAdder
         property url sourceURL: window.sourceURL
         url: sourceURL
-        route: "/api/projects/"
+        route: "/api/project/"
 
 
     }
@@ -49,7 +49,16 @@ ApplicationWindow {
         id: deleteItemAction
         text: "Delete"
         icon.name: "edit-delete"
-        onTriggered: deleteByRow(projectsView.currentRow)
+        onTriggered: {
+            var row = projectsView.currentRow
+            statusMessage.text = "deleting row " + row
+            var item = projectsModel.get(row)
+            confirmDeleteDialog.title = "Delete Project: " + item.title
+            confirmDeleteDialog.open()
+
+            // TODO: on accept confirmDeleteDialog delete project from given id
+//            deleteByRow(projectsView.currentRow)
+        }
         shortcut: StandardKey.Delete
         enabled: projectsView.validSelection
     }
@@ -82,6 +91,9 @@ ApplicationWindow {
         id: confirmDeleteDialog
         title: "Are you sure?"
         standardButtons: Dialog.Yes | Dialog.Cancel
+        onAccepted: {
+            console.log("deleting")
+        }
     }
 
     Dialog{
@@ -191,7 +203,7 @@ ApplicationWindow {
     ApiModel {
         id: projectsModel
         sourceURL: window.sourceURL
-        apiRoute: "api/projects"
+        apiRoute: "api/project"
 
     }
 
@@ -222,7 +234,7 @@ ApplicationWindow {
         console.log("projectCode: " + projectCode)
         var params = "title=dummy"
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://127.0.0.1:5000/api/projects/", true)
+        xhr.open("POST", "http://127.0.0.1:5000/api/project/", true)
         xhr.setRequestHeader("Content-type", "application/json")
 
         xhr.onreadystatechange = function(){
@@ -259,6 +271,9 @@ ApplicationWindow {
     function deleteByRow(row){
         confirmDeleteDialog.open()
         statusMessage.text = "deleting row " + row
+        var item = projectsModel.get(row)
+        console.log("deleting row = " + item.id)
+
     }
 
     Timer{
