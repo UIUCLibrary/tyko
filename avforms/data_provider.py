@@ -55,7 +55,7 @@ class DataProvider:
         projects = self.get_project(id)
         project = None
 
-        if len(projects) is not 1:
+        if len(projects) != 1:
             return updated_project
         else:
             project = projects[0]
@@ -78,8 +78,6 @@ class DataProvider:
                     .delete()
             return items_deleted > 0
         return False
-
-
 
     def add_project(self, title, project_code, current_location, status,
                     specs):

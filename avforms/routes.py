@@ -9,7 +9,7 @@ the_app = Flask(__name__)
 
 class Routes:
 
-    def __init__(self, db_engine, app) -> object:
+    def __init__(self, db_engine, app) -> None:
         self.db_engine = db_engine
         self.app = app
 

@@ -56,6 +56,7 @@ class Middleware:
                 "url": url_for("project_by_id", id=new_project_id)
             }
         )
+
     def get_collections(self, serialize=True):
         collections = self.data_provider.get_collection(serialize=serialize)
         if serialize:
@@ -63,7 +64,6 @@ class Middleware:
         else:
             result = collections
         return result
-
 
     def collection_by_id(self, id):
         current_collection = \
@@ -89,8 +89,6 @@ class Middleware:
             "id": new_collection_id,
             "url": url_for("collection_by_id", id=new_collection_id)
         })
-
-
 
     def get_formats(self, serialize=True):
         formats = self.data_provider.get_formats(serialize=serialize)
