@@ -11,7 +11,7 @@ services:
       dockerfile: deploy/Dockerfile
     ports:
       - "8000:8000"
-    command: gunicorn --bind 0.0.0.0:8000  "avforms.run:create_app(\"${DB_ENGINE}\")"
+    command: gunicorn --bind 0.0.0.0:8000  "avforms.run:create_app(\"mysql://avuser:avpsw@db:3306/av_preservation\")"
   db:
     build:
       context: ..
