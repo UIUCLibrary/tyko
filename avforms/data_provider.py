@@ -50,6 +50,37 @@ class DataProvider:
         else:
             return all_projects
 
+    def update_project(self, id, new_project):
+        updated_project = None
+        projects = self.get_project(id)
+        project = None
+
+        if len(projects) is not 1:
+            return updated_project
+        else:
+            project = projects[0]
+
+        if project:
+            project.title = new_project['title']
+            project.current_location = new_project['current_location']
+            project.status = new_project['status']
+            self.session.add(project)
+            self.session.commit()
+            updated_project = self.get_project(id)[0]
+
+        return updated_project.serialize()
+
+    def delete_project(self, id):
+        if id:
+            items_deleted = \
+                self.session.query(scheme.Project)\
+                    .filter(scheme.Project.id == id)\
+                    .delete()
+            return items_deleted > 0
+        return False
+
+
+
     def add_project(self, title, project_code, current_location, status,
                     specs):
         new_project = scheme.Project(

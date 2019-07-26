@@ -31,6 +31,8 @@ class Routes:
 def init_api_routes(app):
     mw = middleware.Middleware("sqlite:///dummy.db?check_same_thread=False")
     if app:
+
+        # ###### projects
         app.add_url_rule(
             "/api/projects",
             "projects",
@@ -52,6 +54,20 @@ def init_api_routes(app):
         )
 
         app.add_url_rule(
+            "/api/projects/<string:id>",
+            "update_project",
+            mw.update_project,
+            methods=["PUT"]
+        )
+        app.add_url_rule(
+            "/api/projects/<string:id>",
+            "delete_project",
+            mw.delete_project,
+            methods=["DELETE"]
+        )
+
+        # ###### collections
+        app.add_url_rule(
             "/api/collections/<string:id>",
             "collection_by_id",
             mw.collection_by_id,
@@ -72,12 +88,14 @@ def init_api_routes(app):
             methods=["POST"]
         )
 
+        # ###### Formats
         app.add_url_rule(
             "/api/formats",
             "formats",
             mw.get_formats
         )
 
+        # ##############
         app.add_url_rule(
             "/api",
             "list_routes",
