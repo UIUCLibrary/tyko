@@ -12,8 +12,6 @@ def create_app(db_engine):
     if not app_routes.is_valid():
         sys.exit(1)
 
-    # print("Running normal program")
-
     app_routes.init_api_routes()
     routes.init_website_routes(app, db_engine)
     return app

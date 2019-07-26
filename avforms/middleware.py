@@ -5,7 +5,6 @@ from avforms.data_provider import DataProvider
 
 class Middleware:
     def __init__(self, data_provider: str) -> None:
-        None
         self.data_provider = DataProvider(data_provider)
 
     def update_project(self, id):
