@@ -30,4 +30,4 @@ def main() -> None:
     print(args)
 
     my_app = create_app(args.db_engine)
-    my_app.run(host='0.0.0.0')
+    my_app.run()
