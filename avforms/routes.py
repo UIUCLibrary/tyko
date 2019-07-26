@@ -34,33 +34,33 @@ def init_api_routes(app):
 
         # ###### projects
         app.add_url_rule(
-            "/api/projects",
+            "/api/project",
             "projects",
             mw.get_projects
         )
 
         app.add_url_rule(
-            "/api/projects/<string:id>",
+            "/api/project/<string:id>",
             "project_by_id",
             mw.get_project_by_id,
             methods=["GET"]
         )
 
         app.add_url_rule(
-            "/api/projects/",
+            "/api/project/",
             "add_project",
             mw.add_project,
             methods=["POST"]
         )
 
         app.add_url_rule(
-            "/api/projects/<string:id>",
+            "/api/project/<string:id>",
             "update_project",
             mw.update_project,
             methods=["PUT"]
         )
         app.add_url_rule(
-            "/api/projects/<string:id>",
+            "/api/project/<string:id>",
             "delete_project",
             mw.delete_project,
             methods=["DELETE"]
@@ -68,21 +68,21 @@ def init_api_routes(app):
 
         # ###### collections
         app.add_url_rule(
-            "/api/collections/<string:id>",
+            "/api/collection/<string:id>",
             "collection_by_id",
             mw.collection_by_id,
             methods=["GET"]
         )
 
         app.add_url_rule(
-            "/api/collections",
+            "/api/collection",
             "collection",
             mw.get_collections,
             methods=["GET"]
         )
 
         app.add_url_rule(
-            "/api/collections/",
+            "/api/collection/",
             "add_collection",
             mw.add_collection,
             methods=["POST"]
@@ -90,7 +90,7 @@ def init_api_routes(app):
 
         # ###### Formats
         app.add_url_rule(
-            "/api/formats",
+            "/api/format",
             "formats",
             mw.get_formats
         )
@@ -159,19 +159,19 @@ def init_website_routes(app, db_engine):
         )
 
         app.add_url_rule(
-            "/collections",
+            "/collection",
             "page_collections",
             wr.page_collections
         )
 
         app.add_url_rule(
-            "/projects",
+            "/project",
             "page_projects",
             wr.page_projects
         )
 
         app.add_url_rule(
-            "/formats",
+            "/format`",
             "page_formats",
             wr.page_formats
         )
