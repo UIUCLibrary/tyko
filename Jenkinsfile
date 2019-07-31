@@ -177,12 +177,24 @@ pipeline {
             }
         }
         stage("Building"){
-            environment{
-                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-            }
-            steps{
-                dir("scm"){
-                    bat "python setup.py build -b ${WORKSPACE}\\build"
+            parallel{
+                stage("Building Server"){
+                    environment{
+                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                    }
+                    steps{
+                        dir("scm"){
+                            bat "python setup.py build -b ${WORKSPACE}\\build\\server"
+                        }
+                    }
+                }
+                stage("Building Client"){
+                    agent {
+                        label 'VS2015'
+                    }
+                    steps{
+                        echo "Building the client"
+                    }
                 }
             }
         }
@@ -423,7 +435,7 @@ pipeline {
 
                     steps{
                         dir("scm"){
-                            bat script: "python setup.py build -b ${WORKSPACE}/build sdist -d ${WORKSPACE}/dist --format zip bdist_wheel -d ${WORKSPACE}/dist"
+                            bat script: "python setup.py build -b ${WORKSPACE}/build/server sdist -d ${WORKSPACE}/dist --format zip bdist_wheel -d ${WORKSPACE}/dist"
                         }
                     }
                 }
