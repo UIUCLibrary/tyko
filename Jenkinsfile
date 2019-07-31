@@ -443,33 +443,33 @@ pipeline {
                         }
                     }
                 }
-                stage("Testing Python Packages"){
-                    parallel{
-                        stage("Testing sdist Package"){
-                            steps{
-                                testPythonPackage(
-                                    pythonToolName: "CPython-3.7",
-                                    pkgRegex: "dist/*.tar.gz,dist/*.zip",
-//                                    testNodeLabels: "Windows",
-                                    testNodeLabels: "Windows&&!Docker",
-                                    testEnvs: ["py36", "py37"]
-
-                                )
-                            }
-                        }
-                        stage("Testing whl Package"){
-                            steps{
-                                testPythonPackage(
-                                    pythonToolName: "CPython-3.7",
-                                    pkgRegex: "dist/*.whl",
-                                    testNodeLabels: "Windows&&!Docker",
-                                    testEnvs: ["py36", "py37"]
-
-                                )
-                            }
-                        }
-                    }
-                }
+//                stage("Testing Python Packages"){
+//                    parallel{
+//                        stage("Testing sdist Package"){
+//                            steps{
+//                                testPythonPackage(
+//                                    pythonToolName: "CPython-3.7",
+//                                    pkgRegex: "dist/*.tar.gz,dist/*.zip",
+////                                    testNodeLabels: "Windows",
+//                                    testNodeLabels: "Windows&&!Docker",
+//                                    testEnvs: ["py36", "py37"]
+//
+//                                )
+//                            }
+//                        }
+//                        stage("Testing whl Package"){
+//                            steps{
+//                                testPythonPackage(
+//                                    pythonToolName: "CPython-3.7",
+//                                    pkgRegex: "dist/*.whl",
+//                                    testNodeLabels: "Windows&&!Docker",
+//                                    testEnvs: ["py36", "py37"]
+//
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
             }
             post {
                 success {
