@@ -184,7 +184,7 @@ pipeline {
                     }
                     steps{
                         dir("scm"){
-                            bat "python setup.py build -b ${WORKSPACE}\\build\\server"
+                            bat "python setup.py build -b ${WORKSPACE}/build/server"
                         }
                     }
                 }
@@ -193,7 +193,11 @@ pipeline {
                         label 'VS2015'
                     }
                     steps{
-                        echo "Building the client"
+                        cmakeBuild(
+                            buildDir: 'build/server',
+                            installation: 'cmake3.15',
+                            sourceDir: 'scm'
+                        )
                     }
                 }
             }
