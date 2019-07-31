@@ -14,22 +14,29 @@ find_package(Qt5 REQUIRED
             Widgets
         OPTIONAL_COMPONENTS
             QuickTest
-        )
+    )
 
 add_library(ProjectAdder OBJECT
         projectadder.cpp
         CurlPostBehavior.cpp
-
-        qtPostBehavior.cpp qtPostBehavior.h)
+        qtPostBehavior.cpp qtPostBehavior.h
+    )
 
 target_link_libraries(ProjectAdder
     PUBLIC
         Qt5::Core
         Qt5::Quick
         CURL::libcurl
-        )
+    )
 
-add_executable(avdatabaseEditor "main.cpp" "qml.qrc")
+add_executable(avdatabaseEditor
+        "main.cpp"
+        "qml.qrc"
+    )
+set_target_properties(avdatabaseEditor PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+
 
 target_link_libraries(avdatabaseEditor
         PRIVATE
@@ -40,6 +47,7 @@ target_link_libraries(avdatabaseEditor
         Qt5::QuickControls2
         Qt5::Widgets
         )
+
 get_target_property(editor_apple_bundle avdatabaseEditor MACOSX_BUNDLE)
 install(TARGETS avdatabaseEditor)
 
@@ -50,13 +58,18 @@ if(editor_apple_bundle)
         include(BundleUtilities)
         copy_and_fixup_bundle($<TARGET_BUNDLE_DIR:avdatabaseEditor> ${CMAKE_INSTALL_PREFIX}/avdatabaseEditor.app "" "")
     ]])
+
 endif()
 
 if(WIN32)
+
+    #========================================================================
     #    the root for QT should be one directory up from the Qt5 core runtime
     get_target_property(Qt_root_path Qt5::Core LOCATION)
     get_filename_component(Qt_root_path ${Qt_root_path} DIRECTORY)
     get_filename_component(Qt_root_path ${Qt_root_path} DIRECTORY)
+    #========================================================================
+
     find_file(platform_plugin
         NAMES
             qwindows
@@ -67,6 +80,7 @@ if(WIN32)
 
     message("Using ${platform_plugin} for the qt platform plugin")
     install(FILES ${platform_plugin} DESTINATION bin/platforms)
+
 #    FIND QML PATHS:
     find_path(QML_QtQuick
         NAMES
@@ -94,33 +108,39 @@ if(WIN32)
         PATH_SUFFIXES
             QtQML
         )
-    install(DIRECTORY ${QML_QtQuick} ${QML_QtQuick.2} ${QML_QtQML} DESTINATION bin)
+
+    install(DIRECTORY
+                ${QML_QtQuick}
+                ${QML_QtQuick.2}
+                ${QML_QtQML}
+            DESTINATION
+                bin
+        )
 
     #    ##############################
 
     set_target_properties(avdatabaseEditor PROPERTIES
             WIN32_EXECUTABLE ON
-            )
+        )
+
     set_property(INSTALL "bin/$<TARGET_FILE_NAME:avdatabaseEditor>"
             PROPERTY
                 CPACK_START_MENU_SHORTCUTS "AV Database"
-            )
+        )
 
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::Widgets>
-            $<TARGET_FILE:Qt5::QuickControls2>
-        DESTINATION bin
-    )
+    install(FILES
+                $<TARGET_FILE:Qt5::Widgets>
+                $<TARGET_FILE:Qt5::QuickControls2>
+            DESTINATION bin
+        )
 
     install(CODE [[
-
-        get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
-        list(APPEND lib_paths ${CURL_PARENT_DIR}/bin)
-        list(APPEND lib_paths $<TARGET_FILE_DIR:Qt5::Core>)
-        include(BundleUtilities)
-        fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>" "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>" "${lib_paths}")
-    ]])
+            get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
+            list(APPEND lib_paths ${CURL_PARENT_DIR}/bin)
+            list(APPEND lib_paths $<TARGET_FILE_DIR:Qt5::Core>)
+            include(BundleUtilities)
+            fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>" "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>" "${lib_paths}")
+        ]])
 
 endif()
 
@@ -134,11 +154,8 @@ target_link_libraries(tst_editor
             Qt5::Qml
             ProjectAdder
 
-        )
-
-set_target_properties(avdatabaseEditor PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     )
+
 
 add_dependencies(tst_editor avdatabaseEditor)
 add_test(tst_editor tst_editor -input ${CMAKE_CURRENT_SOURCE_DIR})
