@@ -196,7 +196,8 @@ pipeline {
                         cmakeBuild(
                             buildDir: 'build/server',
                             installation: 'cmake3.15',
-                            sourceDir: 'scm'
+                            sourceDir: 'scm',
+                            cmakeArgs: '-DCMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE=x64'
                         )
                     }
                 }
