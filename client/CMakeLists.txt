@@ -15,6 +15,7 @@ find_package(Qt5 REQUIRED
         OPTIONAL_COMPONENTS
             QuickTest
         )
+
 add_library(ProjectAdder OBJECT
         projectadder.cpp
         CurlPostBehavior.cpp
