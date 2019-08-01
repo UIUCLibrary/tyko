@@ -210,7 +210,7 @@ pipeline {
                             }
                             steps{
                                 dir("build/server"){
-                                    bat "conan install ${WORKSPACE}/scm"
+                                    bat "conan install ${WORKSPACE}/scm --build missing"
                                 }
                             }
                         }
