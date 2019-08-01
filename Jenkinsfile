@@ -482,7 +482,7 @@ pipeline {
                 timeout(10)
             }
             failFast true
-            stages{
+            parallel{
                 stage("Creating Python Packages"){
 
                     steps{
