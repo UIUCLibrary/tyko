@@ -142,6 +142,8 @@ if(WIN32)
             list(APPEND lib_paths ${CURL_PARENT_DIR}/bin)
             list(APPEND lib_paths $<TARGET_FILE_DIR:Qt5::Core>)
             include(BundleUtilities)
+            set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+            include(InstallRequiredSystemLibraries)
             fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>" "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>" "${lib_paths}")
         ]])
 
