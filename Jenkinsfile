@@ -196,7 +196,7 @@ pipeline {
                         PYTHON = "${tool 'CPython-3.6'}"
                     }
                     steps{
-                        bat '%PYTHON% -m venv venv && venv\\Scripts\\pip install conan'
+                        bat '"%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan'
 
                         cmakeBuild(
                             buildDir: 'build/server',
