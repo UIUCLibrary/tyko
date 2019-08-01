@@ -496,7 +496,8 @@ pipeline {
                     }
                     steps{
                         unstash 'CLIENT_BUILD'
-                        bat "dir build\\client"
+                        cpack arguments: '-G WIX', installation: 'cmake3.15', workingDir: 'build/client'
+//                        bat "dir build\\client"
                     }
                 }
 
