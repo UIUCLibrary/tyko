@@ -229,7 +229,8 @@ pipeline {
                                     buildDir: 'build/server',
                                     installation: 'cmake3.15',
                                     sourceDir: 'scm',
-                                    cmakeArgs: '-DCMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/server/conan_paths.cmake'
+                                    cmakeArgs: '-DCMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/server/conan_paths.cmake',
+                                    steps: [[withCmake: true]]
                                 )
                             }
                         }
