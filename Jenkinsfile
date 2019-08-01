@@ -237,7 +237,7 @@ pipeline {
                     }
                     post{
                         success{
-                            stash includes: "build/server/*", name: 'CLIENT_BUILD'
+                            stash includes: "build/client/**", name: 'CLIENT_BUILD'
                         }
                     }
                 }
