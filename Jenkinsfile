@@ -191,19 +191,36 @@ pipeline {
                 stage("Building Client"){
                     agent {
                         label 'VS2015'
-                    }
-                    environment{
-                        PYTHON = "${tool 'CPython-3.6'}"
-                    }
-                    steps{
-                        bat '"%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan'
-
-                        cmakeBuild(
-                            buildDir: 'build/server',
-                            installation: 'cmake3.15',
-                            sourceDir: 'scm',
-                            cmakeArgs: '-DCMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE=x64'
-                        )
+                        }
+                    stages{
+                        stage("Install Conan"){
+                            environment{
+                                PYTHON = "${tool 'CPython-3.6'}"
+                            }
+                            steps{
+                                bat(
+                                    label: "Installing Conan",
+                                    script:'"%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan'
+                                    )
+                            }
+                        }
+                        stage("Getting Dependencies"){
+                            steps{
+                                dir("build/server"){
+                                    bat "conan install ${WORKSPACE}/scm"
+                                }
+                            }
+                        }
+                        stage("Compiling Client"){
+                            steps{
+                                cmakeBuild(
+                                    buildDir: 'build/server',
+                                    installation: 'cmake3.15',
+                                    sourceDir: 'scm',
+                                    cmakeArgs: '-DCMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/server/conan_paths.cmake'
+                                )
+                            }
+                        }
                     }
                 }
             }
