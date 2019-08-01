@@ -85,6 +85,7 @@ if(WIN32)
     find_path(QML_QtQuick
         NAMES
             Controls/qtquickcontrolsplugin.dll
+            Controls/libqtquickcontrolsplugin.dylib
         PATHS
             ${Qt_root_path}/qml
         PATH_SUFFIXES
@@ -94,6 +95,7 @@ if(WIN32)
     find_path(QML_QtQuick.2
         NAMES
             qtquick2plugin.dll
+            libqtquick2plugin.dylib
         PATHS
             ${Qt_root_path}/qml
         PATH_SUFFIXES
@@ -103,6 +105,7 @@ if(WIN32)
     find_path(QML_QtQML
         NAMES
             Models.2/modelsplugin.dll
+            Models.2/libmodelsplugin.dylib
         PATHS
             ${Qt_root_path}/qml
         PATH_SUFFIXES
