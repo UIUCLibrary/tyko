@@ -110,7 +110,7 @@ pipeline {
     }
     options {
         disableConcurrentBuilds()  //each branch has 1 job running at a time
-        timeout(60)  // Timeout after 60 minutes. This shouldn't take this long but it hangs for some reason
+        timeout(120)  // Timeout after 120 minutes. This shouldn't take this long
         checkoutToSubdirectory("scm")
     }
     environment{
@@ -127,6 +127,9 @@ pipeline {
         stage('Configure Environment') {
             environment{
                 PATH = "${tool 'CPython-3.7'};$PATH"
+            }
+            options{
+                timeout(5)
             }
             stages{
                 stage("Purge All Existing Data in Workspace"){
@@ -205,6 +208,9 @@ pipeline {
                             }
                         }
                         stage("Getting Dependencies"){
+                            options{
+                                timeout(90)
+                            }
                             environment{
                                 PATH = "${WORKSPACE}\\venv\\Scripts;$PATH"
                             }
@@ -215,6 +221,9 @@ pipeline {
                             }
                         }
                         stage("Compiling Client"){
+                            options{
+                                timeout(10)
+                            }
                             steps{
                                 cmakeBuild(
                                     buildDir: 'build/server',
@@ -231,6 +240,9 @@ pipeline {
         stage('Testing') {
             environment{
                 PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+            }
+            options{
+                timeout(10)
             }
             stages{
                 stage("Installing Python Testing Packages"){
@@ -458,6 +470,9 @@ pipeline {
         stage("Packaging") {
             environment{
                 PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+            }
+            options{
+                timeout(10)
             }
             failFast true
             stages{
