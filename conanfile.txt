@@ -1,6 +1,6 @@
 [requires]
 OpenSSL/1.1.1c@conan/stable
-libcurl/7.64.1@bincrafters/stable
+libcurl/7.61.1@bincrafters/stable
 qt/5.13.0@bincrafters/stable
 
 [generators]
