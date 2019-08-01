@@ -230,7 +230,8 @@ pipeline {
                                     installation: 'cmake3.15',
                                     sourceDir: 'scm',
                                     cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/client/conan_paths.cmake",
-                                    steps: [[withCmake: true]]
+                                    steps: [[args: '--config Release', withCmake: true]]
+
                                 )
                             }
                         }
@@ -496,7 +497,7 @@ pipeline {
                     }
                     steps{
                         unstash 'CLIENT_BUILD'
-                        cpack arguments: '-G WIX --verbose', installation: 'cmake3.15', workingDir: 'build/client'
+                        cpack arguments: '-G WIX --Config Release --verbose', installation: 'cmake3.15', workingDir: 'build/client'
 //                        bat "dir build\\client"
                     }
                 }
