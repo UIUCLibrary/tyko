@@ -203,7 +203,7 @@ pipeline {
                             steps{
                                 bat(
                                     label: "Installing Conan",
-                                    script:'if not exist "venv\\Scripts\\conan.exe" ("%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan ) && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
+                                    script:'if NOT exist "venv\\Scripts\\conan.exe" ("%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan ) && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
                                     )
                             }
                         }
@@ -499,6 +499,11 @@ pipeline {
                         unstash 'CLIENT_BUILD'
                         cpack arguments: '-G WIX --Config Release --verbose', installation: 'cmake3.15', workingDir: 'build/client'
 //                        bat "dir build\\client"
+                    }
+                    post{
+                        success{
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/client/*.msi'
+                        }
                     }
                 }
 
