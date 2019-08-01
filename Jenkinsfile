@@ -192,7 +192,12 @@ pipeline {
                     agent {
                         label 'VS2015'
                     }
+                    environment{
+                        PYTHON = "${tool 'CPython-3.6'}"
+                    }
                     steps{
+                        bat '%PYTHON% -m venv venv && venv\\Scripts\\pip install conan'
+
                         cmakeBuild(
                             buildDir: 'build/server',
                             installation: 'cmake3.15',
