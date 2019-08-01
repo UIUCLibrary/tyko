@@ -215,7 +215,7 @@ pipeline {
                                 PATH = "${WORKSPACE}\\venv\\Scripts;$PATH"
                             }
                             steps{
-                                dir("build/server"){
+                                dir("build/client"){
                                     bat "conan install ${WORKSPACE}/scm --build missing"
                                 }
                             }
@@ -229,7 +229,7 @@ pipeline {
                                     buildDir: 'build/server',
                                     installation: 'cmake3.15',
                                     sourceDir: 'scm',
-                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/server/conan_paths.cmake",
+                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/client/conan_paths.cmake",
                                     steps: [[withCmake: true]]
                                 )
                             }
@@ -237,7 +237,7 @@ pipeline {
                     }
                     post{
                         success{
-                            stash includes: "build/server/*", name: 'SERVER_BUILD'
+                            stash includes: "build/server/*", name: 'CLIENT_BUILD'
                         }
                     }
                 }
@@ -490,6 +490,16 @@ pipeline {
                         }
                     }
                 }
+                stage("Packaging Client"){
+                    agent {
+                        label 'VS2015'
+                    }
+                    steps{
+                        unstash 'CLIENT_BUILD'
+                        bat "dir build\\client"
+                    }
+                }
+
 //                stage("Testing Python Packages"){
 //                    parallel{
 //                        stage("Testing sdist Package"){
