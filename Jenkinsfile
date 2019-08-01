@@ -235,6 +235,11 @@ pipeline {
                             }
                         }
                     }
+                    post{
+                        success{
+                            stash includes: "build/server/*", name: 'SERVER_BUILD'
+                        }
+                    }
                 }
             }
         }
