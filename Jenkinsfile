@@ -203,7 +203,7 @@ pipeline {
                             steps{
                                 bat(
                                     label: "Installing Conan",
-                                    script:'if not exist venv\\Script\\python.exe ("%PYTHON%\\python.exe" -m venv venv) && venv\\Scripts\\pip install conan && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
+                                    script:'if not exist venv\\Scripts\\python.exe ("%PYTHON%\\python.exe" -m venv venv) && venv\\Scripts\\pip install conan && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
                                     )
                             }
                         }
@@ -229,7 +229,7 @@ pipeline {
                                     buildDir: 'build/server',
                                     installation: 'cmake3.15',
                                     sourceDir: 'scm',
-                                    cmakeArgs: '-DCMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/server/conan_paths.cmake',
+                                    cmakeArgs: "-DCMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/server/conan_paths.cmake",
                                     steps: [[withCmake: true]]
                                 )
                             }
