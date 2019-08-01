@@ -205,6 +205,9 @@ pipeline {
                             }
                         }
                         stage("Getting Dependencies"){
+                            environment{
+                                PATH = "${WORKSPACE}\\venv\\Scripts;$PATH"
+                            }
                             steps{
                                 dir("build/server"){
                                     bat "conan install ${WORKSPACE}/scm"
