@@ -203,7 +203,7 @@ pipeline {
                             steps{
                                 bat(
                                     label: "Installing Conan",
-                                    script:'if not exist venv\\Scripts\\conan.exe ("%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan ) && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
+                                    script:'if not exist "venv\\Scripts\\conan.exe" ("%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan ) && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
                                     )
                             }
                         }
