@@ -226,7 +226,7 @@ pipeline {
                             }
                             steps{
                                 cmakeBuild(
-                                    buildDir: 'build/server',
+                                    buildDir: 'build/client',
                                     installation: 'cmake3.15',
                                     sourceDir: 'scm',
                                     cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/client/conan_paths.cmake",
