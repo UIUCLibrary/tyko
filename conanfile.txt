@@ -9,7 +9,9 @@ cmake_paths
 [options]
 qt:qtquickcontrols=True
 qt:qtquickcontrols2=True
-libcurl:shared=True
+libcurl:shared=False
+
+
 
 [imports]
 bin, *.dll -> .
