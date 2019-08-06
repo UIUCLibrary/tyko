@@ -10,7 +10,7 @@
 
 #pragma comment(lib, "Wldap32.lib" )
 #pragma comment(lib, "Crypt32.lib" )
-#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Ws2_32.lib"  )
 
 extern "C"{
 
