@@ -6,6 +6,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(CURL REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(ZLIB REQUIRED)
 find_package(Qt5 REQUIRED
         COMPONENTS
             Core
@@ -26,8 +28,13 @@ target_link_libraries(ProjectAdder
     PUBLIC
         Qt5::Core
         Qt5::Quick
+        ZLIB::ZLIB
+    PRIVATE
         CURL::libcurl
+        OpenSSL::SSL
+        OpenSSL::Crypto
     )
+
 
 add_executable(avdatabaseEditor
         "main.cpp"
@@ -43,9 +50,10 @@ target_link_libraries(avdatabaseEditor
             Qt5::Core
             Qt5::Quick
             ProjectAdder
-        Qt5::Qml
-        Qt5::QuickControls2
-        Qt5::Widgets
+            Qt5::Qml
+            Qt5::QuickControls2
+            Qt5::Widgets
+
         )
 
 get_target_property(editor_apple_bundle avdatabaseEditor MACOSX_BUNDLE)
@@ -142,8 +150,6 @@ if(WIN32)
             list(APPEND lib_paths ${CURL_PARENT_DIR}/bin)
             list(APPEND lib_paths $<TARGET_FILE_DIR:Qt5::Core>)
             include(BundleUtilities)
-            set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-            include(InstallRequiredSystemLibraries)
             fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>" "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>" "${lib_paths}")
         ]])
 

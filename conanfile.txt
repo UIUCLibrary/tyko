@@ -1,6 +1,6 @@
 [requires]
-OpenSSL/1.1.1c@conan/stable
-libcurl/7.61.1@bincrafters/stable
+OpenSSL/1.1.1d@conan/stable
+libcurl/7.64.1@bincrafters/stable
 qt/5.13.0@bincrafters/stable
 
 [generators]
@@ -9,9 +9,8 @@ cmake_paths
 [options]
 qt:qtquickcontrols=True
 qt:qtquickcontrols2=True
-libcurl:shared=False
-
-
+qt:with_mysql=False
+qt:with_sqlite3=False
 
 [imports]
 bin, *.dll -> .

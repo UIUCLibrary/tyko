@@ -3,12 +3,20 @@
 //
 
 #include "CurlPostBehavior.h"
-extern "C"{
-#include <curl/curl.h>
-}
 
 #include <iostream>
 #include <sstream>
+
+
+#pragma comment(lib, "Wldap32.lib" )
+#pragma comment(lib, "Crypt32.lib" )
+#pragma comment(lib, "Ws2_32.lib")
+
+extern "C"{
+
+#define CURL_STATICLIB
+#include <curl/curl.h>
+}
 
 long
 CurlPostBehavior::send(const std::string &url, std::string &response_text, const std::map<std::string, QString> &form_data) {
