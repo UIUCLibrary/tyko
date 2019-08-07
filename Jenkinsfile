@@ -220,7 +220,7 @@ pipeline {
 //                                }
                             }
                         }
-                        stage("Compiling Client"){
+                        stage("Building Client App"){
                             options{
                                 timeout(10)
                             }
