@@ -235,7 +235,7 @@ pipeline {
                                     buildDir: 'build/client',
                                     installation: 'cmake3.15',
                                     sourceDir: 'scm',
-                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=build/client/Release/conan_paths.cmake",
+                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/client/Release/conan_paths.cmake",
 //                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${vcpkg}/scripts/buildsystems/vcpkg.cmake",
                                     steps: [[args: '--config Release', withCmake: true]]
 
