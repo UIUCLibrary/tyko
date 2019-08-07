@@ -150,10 +150,10 @@ if(WIN32)
         )
 
     install(CODE [[
-            list(APPEND lib_paths ${CMAKE_BINARY_DIR})
             get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
             list(APPEND lib_paths ${CURL_PARENT_DIR}/bin)
             list(APPEND lib_paths $<TARGET_FILE_DIR:Qt5::Core>)
+            list(APPEND lib_paths $<TARGET_FILE_DIR:avdatabaseEditor>)
             include(BundleUtilities)
             fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>" "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>" "${lib_paths}")
         ]])
