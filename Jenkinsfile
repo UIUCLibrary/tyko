@@ -195,9 +195,6 @@ pipeline {
                     agent {
                         label 'VS2015'
                         }
-//                    environment{
-//                        vcpkg = tool name: 'vcpkg', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'
-//                    }
                     stages{
                         stage("Install Conan"){
                             environment{
@@ -217,12 +214,9 @@ pipeline {
                             environment{
 
                                 PATH = "${WORKSPACE}\\venv\\Scripts;$PATH"
-//                                PATH = "${vcpkg};$PATH"
                             }
                             steps{
-//                                dir("build/client"){
                                 bat "conan install ${WORKSPACE}/scm -if build/client/Release"
-//                                    bat "vcpkg install qt5:x64-windows curl:x64-windows"
 //                                }
                             }
                         }
@@ -236,7 +230,6 @@ pipeline {
                                     installation: 'cmake3.15',
                                     sourceDir: 'scm',
                                     cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/client/Release/conan_paths.cmake",
-//                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${vcpkg}/scripts/buildsystems/vcpkg.cmake",
                                     steps: [[args: '--config Release', withCmake: true]]
 
                                 )
