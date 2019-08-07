@@ -17,10 +17,17 @@ find_package(Qt5 REQUIRED
         OPTIONAL_COMPONENTS
             QuickTest
     )
-
-add_library(ProjectAdder OBJECT
-        projectadder.cpp
+add_library(PostCurl OBJECT
         CurlPostBehavior.cpp
+        )
+
+target_link_libraries(PostCurl
+    PRIVATE
+        CURL::libcurl
+        )
+
+add_library(ProjectAdder
+        projectadder.cpp
         qtPostBehavior.cpp qtPostBehavior.h
     )
 
@@ -28,11 +35,8 @@ target_link_libraries(ProjectAdder
     PUBLIC
         Qt5::Core
         Qt5::Quick
-        ZLIB::ZLIB
     PRIVATE
-        CURL::libcurl
-        OpenSSL::SSL
-        OpenSSL::Crypto
+        PostCurl
     )
 
 

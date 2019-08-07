@@ -6,12 +6,13 @@
 #define AVDATABASEEDITOR_POSTBEHAVIOR_H
 
 
-#include "projectadder.h"
+//#include "projectadder.h"
 #include <string>
+#include <map>
 class PostBehavior {
 public:
     virtual ~PostBehavior() {};
-    virtual long send(const std::string &url, std::string &response_text, const std::map<std::string, QString> &form_data) = 0;
+    virtual long send(const std::string &url, std::string &response_text, const std::map<std::string,std::string> &form_data) = 0;
 };
 
 

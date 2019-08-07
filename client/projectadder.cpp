@@ -36,15 +36,15 @@ void ProjectAdder::send()
 {
     auto senderURL = mUrl;
     senderURL.setPath(mRoute);
-    auto stat = CurlPostBehavior();
+    CurlPostBehavior stat = CurlPostBehavior();
     const std::string send_url = senderURL.toString().toStdString();
     std::string response_text;
-    std::map<std::string, QString> my_data;
-    my_data["project_code"] = mProjectCode;
-    my_data["current_location"] = mCurrentLocation;
-    my_data["status"] = mProjectStatus;
-    my_data["specs"] = mSpecs;
-    my_data["title"] = mTitle;
+    std::map<std::string, std::string> my_data;
+    my_data["project_code"] = mProjectCode.toStdString();
+    my_data["current_location"] = mCurrentLocation.toStdString();
+    my_data["status"] = mProjectStatus.toStdString();
+    my_data["specs"] = mSpecs.toStdString();
+    my_data["title"] = mTitle.toStdString();
     long rc = stat.send(send_url, response_text, my_data);
     if(rc == 200){
         success();

@@ -7,19 +7,19 @@
 #include <iostream>
 #include <sstream>
 
-
-#pragma comment(lib, "Wldap32.lib" )
-#pragma comment(lib, "Crypt32.lib" )
-#pragma comment(lib, "Ws2_32.lib"  )
+//
+//#pragma comment(lib, "Wldap32.lib" )
+//#pragma comment(lib, "Crypt32.lib" )
+//#pragma comment(lib, "Ws2_32.lib"  )
 
 extern "C"{
 
-#define CURL_STATICLIB
+//#define CURL_STATICLIB
 #include <curl/curl.h>
 }
 
 long
-CurlPostBehavior::send(const std::string &url, std::string &response_text, const std::map<std::string, QString> &form_data) {
+CurlPostBehavior::send(const std::string &url, std::string &response_text, const std::map<std::string, std::string> &form_data) {
     CURL *hnd = curl_easy_init();
     curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(hnd, CURLOPT_URL, url.c_str());
@@ -49,14 +49,14 @@ CurlPostBehavior::send(const std::string &url, std::string &response_text, const
     return rc;
 }
 
-std::string CurlPostBehavior::getFormData(const std::string &boundary, const std::map<std::string, QString> &form_data) const {
+std::string CurlPostBehavior::getFormData(const std::string &boundary, const std::map<std::string, std::string> &form_data) const {
     std::ostringstream data;
 
     for(auto & kv: form_data){
         data <<  "--" << boundary << "\r\n";
         data <<  "Content-Disposition: form-data; name=\"" << kv.first << "\"\r\n";
         data <<  "\r\n";
-        data << kv.second.toStdString() << "\r\n";
+        data << kv.second << "\r\n";
     }
     data <<  "--" << boundary << "--";
     return data.str();

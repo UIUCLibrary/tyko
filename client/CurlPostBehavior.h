@@ -6,13 +6,14 @@
 #define AVDATABASEEDITOR_CURLPOSTBEHAVIOR_H
 
 #include "postBehavior.h"
+#include <map>
 
 class CurlPostBehavior: public PostBehavior {
     static size_t WriteCallback(void *content, size_t size, size_t nmemb, void *userp);
 public:
-    long send(const std::string &url, std::string &response_text, const std::map<std::string, QString> &form_data) override;
+    long send(const std::string &url, std::string &response_text, const std::map<std::string, std::string> &form_data) override;
 
-    std::string getFormData(const std::string &boundary, const std::map<std::string, QString> &form_data) const;
+    std::string getFormData(const std::string &boundary, const std::map<std::string, std::string> &form_data) const;
 };
 
 

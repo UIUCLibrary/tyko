@@ -10,7 +10,7 @@
 
 class qtPostBehavior: public PostBehavior {
 public:
-    long send(const std::string &url, std::string &response_text, const std::map<std::string, QString> &form_data) override;
+    long send(const std::string &url, std::string &response_text, const std::map<std::string, std::string > &form_data) override;
 };
 
 

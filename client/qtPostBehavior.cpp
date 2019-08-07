@@ -10,7 +10,7 @@
 #include <QJsonObject>
 
 long
-qtPostBehavior::send(const std::string &url, std::string &response_text, const std::map<std::string, QString> &form_data) {
+qtPostBehavior::send(const std::string &url, std::string &response_text, const std::map<std::string, std::string> &form_data) {
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::RelatedType);
     QNetworkRequest request(QUrl(url.c_str()));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "text/plain");
