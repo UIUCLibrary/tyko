@@ -195,28 +195,32 @@ pipeline {
                     agent {
                         label 'VS2015'
                         }
+                    environment{
+                        vcpkg = tool name: 'vcpkg', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'
+                    }
                     stages{
-                        stage("Install Conan"){
-                            environment{
-                                PYTHON = "${tool 'CPython-3.6'}"
-                            }
-                            steps{
-                                bat(
-                                    label: "Installing Conan",
-                                    script:'if NOT exist "venv\\Scripts\\conan.exe" ("%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan ) && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
-                                    )
-                            }
-                        }
+//                        stage("Install Conan"){
+//                            environment{
+//                                PYTHON = "${tool 'CPython-3.6'}"
+//                            }
+//                            steps{
+//                                bat(
+//                                    label: "Installing Conan",
+//                                    script:'if NOT exist "venv\\Scripts\\conan.exe" ("%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan ) && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
+//                                    )
+//                            }
+//                        }
                         stage("Getting Dependencies"){
                             options{
                                 timeout(90)
                             }
                             environment{
-                                PATH = "${WORKSPACE}\\venv\\Scripts;$PATH"
+
+                                PATH = "${vcpkg};$PATH"
                             }
                             steps{
                                 dir("build/client"){
-                                    bat "conan install ${WORKSPACE}/scm --build missing"
+                                    bat "vcpkg install qt5:x64-windows curl:x64-windows"
                                 }
                             }
                         }
@@ -229,7 +233,7 @@ pipeline {
                                     buildDir: 'build/client',
                                     installation: 'cmake3.15',
                                     sourceDir: 'scm',
-                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/client/conan_paths.cmake",
+                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${vcpkg}/scripts/buildsystems/vcpkg.cmake",
                                     steps: [[args: '--config Release', withCmake: true]]
 
                                 )
