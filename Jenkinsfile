@@ -220,10 +220,10 @@ pipeline {
 //                                PATH = "${vcpkg};$PATH"
                             }
                             steps{
-                                dir("build/client"){
-                                    bat "conan install ${WORKSPACE}/scm"
+//                                dir("build/client"){
+                                bat "conan install ${WORKSPACE}/scm -if build/client/Release"
 //                                    bat "vcpkg install qt5:x64-windows curl:x64-windows"
-                                }
+//                                }
                             }
                         }
                         stage("Compiling Client"){
@@ -235,7 +235,7 @@ pipeline {
                                     buildDir: 'build/client',
                                     installation: 'cmake3.15',
                                     sourceDir: 'scm',
-                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake",
+                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=build/client/Release/conan_paths.cmake",
 //                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${vcpkg}/scripts/buildsystems/vcpkg.cmake",
                                     steps: [[args: '--config Release', withCmake: true]]
 
