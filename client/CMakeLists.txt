@@ -90,7 +90,7 @@ if(WIN32)
             ${Qt_root_path}/plugins/platforms
             )
 
-    message("Using ${platform_plugin} for the qt platform plugin")
+    message(STATUS "Using ${platform_plugin} for the qt platform plugin")
     install(FILES ${platform_plugin} DESTINATION bin/platforms)
 
 #    FIND QML PATHS:
@@ -138,7 +138,7 @@ if(WIN32)
             WIN32_EXECUTABLE ON
         )
 
-    set_property(INSTALL "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>"
+    set_property(INSTALL "bin/$<TARGET_FILE_NAME:avdatabaseEditor>"
             PROPERTY
                 CPACK_START_MENU_SHORTCUTS "AV Database"
         )
