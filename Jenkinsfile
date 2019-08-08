@@ -467,6 +467,7 @@ pipeline {
                             [pattern: 'reports/coverage.xml', type: 'INCLUDE'],
                             [pattern: 'reports/coverage', type: 'INCLUDE'],
                             [pattern: 'scm/.coverage', type: 'INCLUDE'],
+                            [pattern: 'scm/**/__pycache__', type: 'INCLUDE'],
                             [pattern: 'reports/pytest/junit-*.xml', type: 'INCLUDE']
                         ]
                     )
