@@ -6,8 +6,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(CURL REQUIRED)
-find_package(OpenSSL REQUIRED)
-find_package(ZLIB REQUIRED)
+#find_package(OpenSSL REQUIRED)
+#find_package(ZLIB REQUIRED)
 find_package(Qt5 REQUIRED
         COMPONENTS
             Core
