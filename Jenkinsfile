@@ -495,6 +495,11 @@ pipeline {
                     agent {
                         label 'VS2015'
                     }
+
+                    environment{
+                        wix_path = tool name: 'WixToolset_311', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'
+                        PATH = "${wix_path};$PATH"
+                    }
                     steps{
                         unstash 'CLIENT_BUILD'
                         cpack arguments: '-G WIX  --verbose', installation: 'cmake3.15', workingDir: 'build/client'
