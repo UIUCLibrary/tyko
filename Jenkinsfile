@@ -191,9 +191,12 @@ pipeline {
                         }
                     }
                 }
-                stage("Build Client with Docker Conainer"){
+                stage("Build Client with Docker Container"){
                     agent{
                         label "Docker"
+                    }
+                    options{
+                        timestamps()
                     }
                     stages{
                         stage("Build Docker Container"){
