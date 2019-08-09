@@ -191,11 +191,27 @@ pipeline {
                         }
                     }
                 }
+                stage("Build Client with Docker Conainer"){
+                    agent{
+                        label "Docker"
+                    }
+                    stages{
+                        stage("Build Docker Container"){
+                            steps{
+                                dir("scm"){
+                                    bat("docker build . -f CI/build_VS2017/Dockerfile -m 8GB -t avmetadatabuild")
+                                }
+                            }
+
+                        }
+                    }
+                }
                 stage("Building Client"){
                     agent {
                         label 'VS2015'
                         }
                     stages{
+
                         stage("Install Conan"){
                             environment{
                                 PYTHON = "${tool 'CPython-3.6'}"
