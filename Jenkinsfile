@@ -110,7 +110,7 @@ pipeline {
     }
     options {
         disableConcurrentBuilds()  //each branch has 1 job running at a time
-        timeout(120)  // Timeout after 120 minutes. This shouldn't take this long
+        timeout(180)  // Timeout after 180 minutes. This shouldn't take this long
         checkoutToSubdirectory("scm")
     }
     environment{
