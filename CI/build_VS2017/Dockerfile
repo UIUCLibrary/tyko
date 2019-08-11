@@ -68,7 +68,7 @@ RUN powershell.exe -Command `
   Start-Process C:\TEMP\python-3.7.4-amd64.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1 Include_test=0' -Wait ; `
   Remove-Item C:\TEMP\python-3.7.4-amd64.exe -Force
 
-RUN python --version
+RUN python -m pip install pip --upgrade && pip install conan
 
 COPY conanfile.txt C:/TEMP/
 ENV CONAN_COLOR_DISPLAY=0
