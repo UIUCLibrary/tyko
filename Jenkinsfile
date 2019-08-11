@@ -205,7 +205,12 @@ pipeline {
                                     bat("docker build . -f CI/build_VS2017/Dockerfile -m 8GB -t avmetadatabuild")
                                 }
                             }
-
+                        }
+                        stage("Install deps"){
+                            steps{
+                                bat "if not exist build mkdir build"
+                                bat("docker run -v ${WORKSPACE}/build:/c/build --rm avmetadatabuild dir ")
+                            }
                         }
                     }
                 }
