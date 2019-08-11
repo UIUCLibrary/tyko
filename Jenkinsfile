@@ -209,7 +209,7 @@ pipeline {
                         stage("Install deps"){
                             steps{
                                 bat "if not exist build mkdir build"
-                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\" --rm avmetadatabuild dir ")
+                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\\client\" --rm avmetadatabuild dir ")
                             }
                         }
                     }
