@@ -73,6 +73,7 @@ RUN python -m pip install pip --upgrade && pip install conan
 COPY conanfile.txt C:/TEMP/
 ENV CONAN_COLOR_DISPLAY=0
 ENV CONAN_NON_INTERACTIVE=1
+ENV PYTHONUNBUFFERED=0
 RUN conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 RUN conan install C:/TEMP/ --build  missing --no-import
 
