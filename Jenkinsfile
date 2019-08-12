@@ -228,6 +228,18 @@ pipeline {
                             }
                         }
                     }
+                    post{
+
+                        cleanup{
+                            cleanWs(
+                                deleteDirs: true,
+                                patterns: [
+                                    [pattern: 'build', type: 'INCLUDE'],
+                                    ]
+                            )
+                        }
+
+                    }
                 }
                 stage("Building Client"){
                     agent {
