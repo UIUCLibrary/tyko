@@ -118,6 +118,7 @@ pipeline {
         PKG_VERSION = pythonPackageVersion(toolName: "CPython-3.7")
         DOC_ZIP_FILENAME = "${env.PKG_NAME}-${env.PKG_VERSION}.doc.zip"
         DEVPI = credentials("DS_devpi")
+        DOCKER_IMAGE_TAG="avmetadatabuild"
     }
     parameters {
         booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
@@ -199,9 +200,7 @@ pipeline {
                     options{
                         timestamps()
                     }
-                    environment{
-                        DOCKER_IMAGE_TAG="avmetadatabuild"
-                    }
+
                     stages{
                         stage("Build Docker Container"){
                             steps{
@@ -572,7 +571,7 @@ foreach($file in $opengl32_libraries){
                             unstash "CLIENT_BUILD_DOCKER"
                             bat(
                                 label: "Running build command from CMake on node ${NODE_NAME}",
-                                script: "docker run -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm avmetadatabuild cpack -G NSIS --verbose"
+                                script: "docker run -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% cpack -G NSIS --verbose"
                             )
                     }
                     post{
