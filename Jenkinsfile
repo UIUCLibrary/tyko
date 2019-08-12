@@ -208,12 +208,19 @@ pipeline {
                         }
                         stage("Install Dependencies"){
                             steps{
-                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source\" --workdir=\"c:\\build\" --rm avmetadatabuild conan install c:\\source")
+                                bat(
+                                    label: "Using conan to install dependencies to build directory.",
+                                    script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source\" --workdir=\"c:\\build\" --rm avmetadatabuild conan install c:\\source"
+                                    )
                             }
                         }
                         stage("Configure and Build Client"){
                             steps{
-                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source\" --workdir=\"c:\\build\" --rm avmetadatabuild cmake -S c:\\source -B c:\\build -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_GENERATOR_PLATFORM=x64")
+                                bat(
+                                    label: "Configuring CMake",
+                                    script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source\" --workdir=\"c:\\build\" --rm avmetadatabuild cmake -S c:\\source -B c:\\build -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_GENERATOR_PLATFORM=x64"
+                                )
+
                             }
                         }
                     }
