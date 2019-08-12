@@ -83,7 +83,15 @@ ENV CONAN_NON_INTERACTIVE=1
 RUN conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 RUN set PYTHONUNBUFFERED=TRUE && conan install C:/TEMP/ --build  missing --no-import && conan remove * --src -f
 
+RUN powershell.exe -Command `
+  $ErrorActionPreference = 'Stop'; `
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
+  Invoke-WebRequest https://www.sourceforge.net/projects/nsis/files/NSIS%203/3.04/nsis-3.04-setup.exe -OutFile C:\TEMP\nsis-3.04-setup.exe ; `
+  Start-Process C:\TEMP\nsis-3.04-setup.exe -ArgumentList '/S' -Wait ; `
+  Remove-Item C:\TEMP\nsis-3.04-setup.exe -Force
+
 ADD opengl32.dll c:\windows\system32
+
 
 ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat &&
 CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
