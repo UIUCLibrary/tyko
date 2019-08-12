@@ -230,7 +230,9 @@ pipeline {
                         }
                     }
                     post{
-
+                        success{
+                            stash includes: "build/**", name: 'CLIENT_BUILD_DOCKER'
+                        }
                         cleanup{
                             cleanWs(
                                 deleteDirs: true,
