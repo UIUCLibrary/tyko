@@ -553,7 +553,7 @@ pipeline {
                     steps{
                             unstash "CLIENT_BUILD_DOCKER"
                             bat(
-                                label: "Running build command from CMake",
+                                label: "Running build command from CMake on ${NODE_NAME}",
                                 script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm avmetadatabuild cpack -G WIX"
                             )
                     }
