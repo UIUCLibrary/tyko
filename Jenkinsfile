@@ -204,7 +204,7 @@ pipeline {
                                 dir("scm"){
                                     powershell(
                                         label: "Searching for opengl32.dll",
-                                        script: "Get-ChildItem -Path c:\\Windows -Include opengl32.dll"
+                                        script: "Get-ChildItem -Path c:\\Windows -Recurse -Include opengl32.dll"
                                         )
                                     bat("docker build . -f CI/build_VS2017/Dockerfile -m 8GB -t avmetadatabuild")
                                 }
