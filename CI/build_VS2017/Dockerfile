@@ -87,7 +87,7 @@ RUN powershell.exe -Command `
   $ErrorActionPreference = 'Stop'; `
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
   Invoke-WebRequest https://sourceforge.net/projects/nsis/files/NSIS%203/3.04/nsis-3.04-setup.exe -OutFile C:\TEMP\nsis-3.04-setup.exe ; `
-  Start-Process C:\TEMP\nsis-3.04-setup.exe -ArgumentList '/S /D=C:\Program Files (x86)\NSIS' -Wait ; `
+  & C:\TEMP\nsis-3.04-setup.exe /S ; `
   Remove-Item C:\TEMP\nsis-3.04-setup.exe -Force
 
 ADD opengl32.dll c:\windows\system32
