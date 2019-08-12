@@ -584,6 +584,9 @@ foreach($file in $opengl32_libraries){
                                     ]
                             )
                         }
+                        failure{
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/**/*.log'
+                        }
                         success{
                             archiveArtifacts allowEmptyArchive: true, artifacts: 'build/*.msi'
                         }
