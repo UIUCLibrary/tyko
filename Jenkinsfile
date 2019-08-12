@@ -206,12 +206,14 @@ pipeline {
                                 }
                             }
                         }
-                        stage("Install deps"){
+                        stage("Install Dependencies"){
                             steps{
-                                bat "dir"
-                                bat "dir ${WORKSPACE}\\scm"
-                                bat "if not exist build mkdir build"
-                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\\client\" -v \"${WORKSPACE}\\scm:c:\\source\" --workdir=\"c:\\build\\client\" --rm avmetadatabuild conan install c:\\source")
+                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source\" --workdir=\"c:\\build\" --rm avmetadatabuild conan install c:\\source")
+                            }
+                        }
+                        stage("Configure and Build Client"){
+                            steps{
+                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source\" --workdir=\"c:\\build\" --rm avmetadatabuild cmake -S c:\\source -B c:\\build -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake")
                             }
                         }
                     }
