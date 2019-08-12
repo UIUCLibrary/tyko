@@ -208,6 +208,7 @@ pipeline {
                         }
                         stage("Install Dependencies"){
                             steps{
+                                bat "if not exist build mkdir build"
                                 bat(
                                     label: "Using conan to install dependencies to build directory.",
                                     script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm avmetadatabuild conan install c:\\source"
