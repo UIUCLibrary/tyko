@@ -574,7 +574,7 @@ foreach($file in $opengl32_libraries){
                     }
                     post{
                         always{
-                            bat "tree build"
+                            bat "tree /A /F build"
                         }
                         cleanup{
                             cleanWs(
