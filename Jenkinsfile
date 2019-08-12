@@ -573,6 +573,7 @@ foreach($file in $opengl32_libraries){
                                 label: "Running build command from CMake on node ${NODE_NAME}",
                                 script: "docker run -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% cpack -G NSIS --verbose"
                             )
+                            bat "if not exist mkdir dist"
                             bat "move build\\*.exe dist\\ "
                     }
                     post{
