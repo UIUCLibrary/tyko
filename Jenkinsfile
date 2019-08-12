@@ -588,7 +588,7 @@ foreach($file in $opengl32_libraries){
                             archiveArtifacts allowEmptyArchive: true, artifacts: 'build/**/*.log'
                         }
                         success{
-                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/*.zip'
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/*.exe'
                         }
                     }
                 }
