@@ -86,7 +86,7 @@ RUN set PYTHONUNBUFFERED=TRUE && conan install C:/TEMP/ --build  missing --no-im
 RUN powershell.exe -Command `
   $ErrorActionPreference = 'Stop'; `
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
-  Invoke-WebRequest https://sourceforge.net/projects/nsis/files/NSIS%203/3.04/nsis-3.04-setup.exe -OutFile C:\TEMP\nsis-3.04-setup.exe ; `
+  Invoke-WebRequest https://iweb.dl.sourceforge.net/project/nsis/NSIS%203/3.04/nsis-3.04-setup.exe -OutFile C:\TEMP\nsis-3.04-setup.exe ; `
   & C:\TEMP\nsis-3.04-setup.exe /S ; `
   Remove-Item C:\TEMP\nsis-3.04-setup.exe -Force
 
