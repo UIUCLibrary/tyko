@@ -546,6 +546,18 @@ pipeline {
                         }
                     }
                 }
+                stage("Packaging Client in Docker Container"){
+                    agent{
+                        label "Docker"
+                    }
+                    steps{
+                            unstash "CLIENT_BUILD_DOCKER"
+                            bat(
+                                label: "Running build command from CMake",
+                                script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm avmetadatabuild cpack -G WIX"
+                            )
+                    }
+                }
                 stage("Packaging Client"){
                     agent {
                         label 'VS2015'
