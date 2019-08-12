@@ -212,6 +212,7 @@ pipeline {
                                 bat "dir ${WORKSPACE}\\scm"
                                 bat "if not exist build mkdir build"
 //                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\\client\" -v \"${WORKSPACE}\\scm;c:\\source\" --workdir=\"c:\\build\\client\" --rm avmetadatabuild conan install c:\\source")
+                                bat("docker run --rm avmetadatabuild dir")
                                 bat("docker run -v \"${WORKSPACE}\\scm;c:\\source\" --workdir=\"c:\\source\" --rm avmetadatabuild conan install c:\\source")
                             }
                         }
