@@ -208,7 +208,7 @@ pipeline {
                                         script: '''
 $opengl32_libraries = Get-ChildItem -Path c:\\Windows -Recurse -Include opengl32.dll
 foreach($file in $opengl32_libraries){
-    $file.FullName
+    Copy-Item $file.FullName
     break
 }'''
                                         )
