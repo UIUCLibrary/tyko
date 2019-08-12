@@ -213,7 +213,7 @@ pipeline {
                         }
                         stage("Configure and Build Client"){
                             steps{
-                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source\" --workdir=\"c:\\build\" --rm avmetadatabuild cmake -S c:\\source -B c:\\build -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake")
+                                bat("docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source\" --workdir=\"c:\\build\" --rm avmetadatabuild cmake -S c:\\source -B c:\\build -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_GENERATOR_PLATFORM=x64")
                             }
                         }
                     }
