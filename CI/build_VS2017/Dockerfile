@@ -64,6 +64,13 @@ RUN powershell.exe -Command `
 RUN powershell.exe -Command `
   $ErrorActionPreference = 'Stop'; `
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
+  Invoke-WebRequest https://github.com/wixtoolset/wix3/releases/download/wix3111rtm/wix311.exe -OutFile C:\TEMP\wix311.exe ; `
+  Start-Process C:\TEMP\wix311.exe -ArgumentList '/q' -Wait ; `
+  Remove-Item C:\TEMP\wix311.exe -Force
+
+RUN powershell.exe -Command `
+  $ErrorActionPreference = 'Stop'; `
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
   Invoke-WebRequest https://www.python.org/ftp/python/3.7.4/python-3.7.4-amd64.exe -OutFile C:\TEMP\python-3.7.4-amd64.exe ; `
   Start-Process C:\TEMP\python-3.7.4-amd64.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1 Include_test=0' -Wait ; `
   Remove-Item C:\TEMP\python-3.7.4-amd64.exe -Force
