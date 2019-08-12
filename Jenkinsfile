@@ -567,11 +567,23 @@ foreach($file in $opengl32_libraries){
                     }
                     steps{
                             unstash "CLIENT_BUILD_DOCKER"
-                            bat "where docker"
                             bat(
                                 label: "Running build command from CMake on node ${NODE_NAME}",
                                 script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm avmetadatabuild cpack -G WIX --verbose"
                             )
+                    }
+                    post{
+                        cleanup{
+                            cleanWs(
+                                deleteDirs: true,
+                                patterns: [
+                                    [pattern: 'build', type: 'INCLUDE'],
+                                    ]
+                            )
+                        }
+                        success{
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/*.msi'
+                        }
                     }
                 }
                 stage("Packaging Client"){
