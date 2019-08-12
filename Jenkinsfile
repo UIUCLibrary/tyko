@@ -573,6 +573,7 @@ foreach($file in $opengl32_libraries){
                                 label: "Running build command from CMake on node ${NODE_NAME}",
                                 script: "docker run -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% cpack -G NSIS --verbose"
                             )
+                            bat "move build\\*.exe dist\\ "
                     }
                     post{
                         always{
@@ -590,7 +591,7 @@ foreach($file in $opengl32_libraries){
                             archiveArtifacts allowEmptyArchive: true, artifacts: 'build/**/*.log'
                         }
                         success{
-                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/*.exe'
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'dist/*.exe'
                         }
                     }
                 }
