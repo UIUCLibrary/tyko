@@ -68,6 +68,14 @@ RUN powershell.exe -Command `
 RUN powershell.exe -Command `
   $ErrorActionPreference = 'Stop'; `
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
+  Invoke-WebRequest https://iweb.dl.sourceforge.net/project/nsis/NSIS%203/3.04/nsis-3.04-setup.exe -OutFile C:\TEMP\nsis-3.04-setup.exe ; `
+  Start-Process C:\TEMP\nsis-3.04-setup.exe -ArgumentList "/S" -Wait; `
+  Remove-Item C:\TEMP\nsis-3.04-setup.exe -Force
+
+
+RUN powershell.exe -Command `
+  $ErrorActionPreference = 'Stop'; `
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
   Invoke-WebRequest https://www.python.org/ftp/python/3.7.4/python-3.7.4-amd64.exe -OutFile C:\TEMP\python-3.7.4-amd64.exe ; `
   Start-Process C:\TEMP\python-3.7.4-amd64.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1 Include_test=0' -Wait ; `
   Remove-Item C:\TEMP\python-3.7.4-amd64.exe -Force
