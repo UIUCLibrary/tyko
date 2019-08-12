@@ -202,6 +202,10 @@ pipeline {
                         stage("Build Docker Container"){
                             steps{
                                 dir("scm"){
+                                    powershell(
+                                        label: "Searching for opengl32.dll",
+                                        script: "echo hello"
+                                        )
                                     bat("docker build . -f CI/build_VS2017/Dockerfile -m 8GB -t avmetadatabuild")
                                 }
                             }
