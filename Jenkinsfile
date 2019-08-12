@@ -550,6 +550,11 @@ pipeline {
                     agent{
                         label "Docker"
                     }
+                    environment{
+
+                    DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
+                    PATH = "${DOCKER_PATH};$PATH"
+                    }
                     steps{
                             unstash "CLIENT_BUILD_DOCKER"
                             bat "where docker"
