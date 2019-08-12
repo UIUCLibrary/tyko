@@ -83,6 +83,7 @@ ENV CONAN_NON_INTERACTIVE=1
 RUN conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 RUN set PYTHONUNBUFFERED=TRUE && conan install C:/TEMP/ --build  missing --no-import && conan remove * --src -f
 
+ADD opengl32.dll c:\windows\system32
 
 ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat &&
 CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
