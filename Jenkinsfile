@@ -199,6 +199,9 @@ pipeline {
                     options{
                         timestamps()
                     }
+                    environment{
+                        DOCKER_IMAGE_TAG="avmetadatabuild"
+                    }
                     stages{
                         stage("Build Docker Container"){
                             steps{
@@ -212,7 +215,7 @@ foreach($file in $opengl32_libraries){
     break
 }'''
                                         )
-                                    bat("docker build . -f CI/build_VS2017/Dockerfile -m 8GB -t avmetadatabuild")
+                                    bat("docker build . -f CI/build_VS2017/Dockerfile -m 8GB -t %DOCKER_IMAGE_TAG%")
                                 }
                             }
                         }
@@ -221,7 +224,7 @@ foreach($file in $opengl32_libraries){
                                 bat "if not exist build mkdir build"
                                 bat(
                                     label: "Using conan to install dependencies to build directory.",
-                                    script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm avmetadatabuild conan install c:\\source"
+                                    script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% conan install c:\\source"
                                     )
                             }
                         }
@@ -229,11 +232,11 @@ foreach($file in $opengl32_libraries){
                             steps{
                                 bat(
                                     label: "Configuring CMake",
-                                    script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm avmetadatabuild cmake -S c:\\source -B c:\\build -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_GENERATOR_PLATFORM=x64"
+                                    script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% cmake -S c:\\source -B c:\\build -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_GENERATOR_PLATFORM=x64"
                                 )
                                 bat(
                                     label: "Running build command from CMake",
-                                    script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm avmetadatabuild cmake --build c:\\build --config Release"
+                                    script: "docker run -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% cmake --build c:\\build --config Release"
                                 )
 
                             }
@@ -254,58 +257,58 @@ foreach($file in $opengl32_libraries){
 
                     }
                 }
-                stage("Building Client"){
-                    agent {
-                        label 'VS2015'
-                        }
-                    stages{
-
-                        stage("Install Conan"){
-                            environment{
-                                PYTHON = "${tool 'CPython-3.6'}"
-                            }
-                            steps{
-                                bat(
-                                    label: "Installing Conan",
-                                    script:'if NOT exist "venv\\Scripts\\conan.exe" ("%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan ) && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
-                                    )
-                            }
-                        }
-                        stage("Getting Dependencies"){
-                            options{
-                                timeout(90)
-                            }
-                            environment{
-
-                                PATH = "${WORKSPACE}\\venv\\Scripts;$PATH"
-                            }
-                            steps{
-                                bat "conan install ${WORKSPACE}/scm -if build/client/Release"
-//                                }
-                            }
-                        }
-                        stage("Building Client App"){
-                            options{
-                                timeout(10)
-                            }
-                            steps{
-                                cmakeBuild(
-                                    buildDir: 'build/client',
-                                    installation: 'cmake3.15',
-                                    sourceDir: 'scm',
-                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/client/Release/conan_paths.cmake",
-                                    steps: [[args: '--config Release', withCmake: true]]
-
-                                )
-                            }
-                        }
-                    }
-                    post{
-                        success{
-                            stash includes: "build/client/**", name: 'CLIENT_BUILD'
-                        }
-                    }
-                }
+//                stage("Building Client"){
+//                    agent {
+//                        label 'VS2015'
+//                        }
+//                    stages{
+//
+//                        stage("Install Conan"){
+//                            environment{
+//                                PYTHON = "${tool 'CPython-3.6'}"
+//                            }
+//                            steps{
+//                                bat(
+//                                    label: "Installing Conan",
+//                                    script:'if NOT exist "venv\\Scripts\\conan.exe" ("%PYTHON%\\python.exe" -m venv venv && venv\\Scripts\\pip install conan ) && venv\\Scripts\\conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan '
+//                                    )
+//                            }
+//                        }
+//                        stage("Getting Dependencies"){
+//                            options{
+//                                timeout(90)
+//                            }
+//                            environment{
+//
+//                                PATH = "${WORKSPACE}\\venv\\Scripts;$PATH"
+//                            }
+//                            steps{
+//                                bat "conan install ${WORKSPACE}/scm -if build/client/Release"
+////                                }
+//                            }
+//                        }
+//                        stage("Building Client App"){
+//                            options{
+//                                timeout(10)
+//                            }
+//                            steps{
+//                                cmakeBuild(
+//                                    buildDir: 'build/client',
+//                                    installation: 'cmake3.15',
+//                                    sourceDir: 'scm',
+//                                    cmakeArgs: "-DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_TOOLCHAIN_FILE=${WORKSPACE}/build/client/Release/conan_paths.cmake",
+//                                    steps: [[args: '--config Release', withCmake: true]]
+//
+//                                )
+//                            }
+//                        }
+//                    }
+//                    post{
+//                        success{
+//                            stash includes: "build/client/**", name: 'CLIENT_BUILD'
+//                        }
+//                    }
+//                }
             }
         }
         stage('Testing') {
