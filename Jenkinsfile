@@ -180,6 +180,7 @@ pipeline {
             }
         }
         stage("Building"){
+            failFast true
             parallel{
                 stage("Building Server"){
                     environment{
