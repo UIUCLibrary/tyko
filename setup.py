@@ -24,7 +24,7 @@ setup(
     tests_require=["pytest", "pytest-bdd"],
     install_requires=[
         "sqlalchemy",
-        "mysqlclient",
+        # "mysqlclient",
         "flask"
         ],
     entry_points={
