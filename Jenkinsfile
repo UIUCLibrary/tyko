@@ -210,8 +210,8 @@ pipeline {
                         stage("Build Docker Container"){
                             steps{
                                 bat "set"
-                                bat "echo ${DOCKER_CREDS} > dummy.txt"
-                                archiveArtifacts "dummy.txt"
+                                bat "dir ${DOCKER_CREDS}"
+
                                 dir("scm"){
                                     powershell(
                                         label: "Searching for opengl32.dll",
