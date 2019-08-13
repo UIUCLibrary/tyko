@@ -206,22 +206,6 @@ pipeline {
                     }
 
                     stages{
-                        stage("Test Linux"){
-                            agent{
-                                label "master"
-                            }
-                            options {
-                                skipDefaultCheckout()
-                                }
-                             steps{
-                                echo "here"
-                                sh(
-                                    label: "Doing something",
-                                    script:'echo "here"'
-                                )
-                             }
-                         }
-
                         stage("Locate files for docker build"){
                             agent{
                                 label "Windows"
@@ -242,38 +226,11 @@ foreach($file in $opengl32_libraries){
                                 stash includes: "opengl32.dll", name: "opengl32.dll"
                             }
                         }
-                        stage("Build Docker Container from Linux"){
-                            agent{
-                                label "Linux"
-                            }
-//                            environment{
-//                                DOCKER_HOST="tcp://lib-docker-win.library.illinois.edu:2376"
-//                                DOCKER_CERT_PATH=credentials("lib-docker-win-2019")
-//                                DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
-////                                PATH = "${DOCKER_PATH}:$PATH"
-//                            }
-                            steps{
-                                dir("scm"){
-//                                    unstash "opengl32.dll"
-                                    sh "ls"
-//                                    sh "$DOCKER_PATH --version"
-                                }
-                            }
-                        }
                         stage("Build Docker Container"){
                             steps{
 
                                 dir("scm"){
                                     unstash "opengl32.dll"
-//                                    powershell(
-//                                        label: "Searching for opengl32.dll",
-//                                        script: '''
-//$opengl32_libraries = Get-ChildItem -Path c:\\Windows -Recurse -Include opengl32.dll
-//foreach($file in $opengl32_libraries){
-//    Copy-Item $file.FullName
-//    break
-//}'''
-//                                        )
                                     bat("docker build . --isolation=process -f CI/build_VS2019/Dockerfile -m 8GB -t %DOCKER_IMAGE_TAG%")
                                 }
                             }
@@ -631,7 +588,7 @@ foreach($file in $opengl32_libraries){
                             unstash "CLIENT_BUILD_DOCKER"
                             bat(
                                 label: "Running build command from CMake on node ${NODE_NAME}",
-                                script: "docker run --isolation=process -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% \"conan install c:\\source && cpack -G NSIS -G WIX --verbose\""
+                                script: "docker run --isolation=process -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\TEMP\" --rm %DOCKER_IMAGE_TAG% \"mkdir c:\\TEMP\\build && xcopy c:\build c:\\TEMP\\build cd c:\\TEMP\\build && cpack -G NSIS -G WIX && copy *.msi c:\build\\\""
                             )
                             bat "if not exist dist (mkdir dist)  && move build\\*.exe dist\\ "
                     }
