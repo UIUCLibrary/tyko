@@ -197,6 +197,10 @@ pipeline {
                     agent{
                         label "Docker"
                     }
+                    environment{
+                        DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
+                        PATH = "${DOCKER_PATH};$PATH"
+                    }
                     options{
                         timestamps()
                     }
@@ -564,8 +568,8 @@ foreach($file in $opengl32_libraries){
                     }
                     environment{
 
-                    DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
-                    PATH = "${DOCKER_PATH};$PATH"
+                        DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
+                        PATH = "${DOCKER_PATH};$PATH"
                     }
                     steps{
                             unstash "CLIENT_BUILD_DOCKER"
