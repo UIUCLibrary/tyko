@@ -208,7 +208,7 @@ pipeline {
                     stages{
                         stage("Test Linux"){
                             agent{
-                                label "Linux"
+                                label "master"
                             }
                             options {
                                 skipDefaultCheckout()
@@ -217,10 +217,7 @@ pipeline {
                                 echo "here"
                                 sh(
                                     label: "Doing something",
-                                    script: """ #!/bin/bash
-                                    ls
-                                    """
-
+                                    script:"ls"
                                 )
                              }
                          }
