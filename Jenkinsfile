@@ -207,13 +207,15 @@ pipeline {
                     }
 
                     stages{
-                        stage("Build Docker Container"){
+                        stage("Locate files for docker build"){
+                            agent{
+                                label "Windows"
+                            }
+                            options {
+                                skipDefaultCheckout()
+                                }
                             steps{
-                                bat "set"
-                                bat "dir ${DOCKER_CREDS}"
-
-                                dir("scm"){
-                                    powershell(
+                                powershell(
                                         label: "Searching for opengl32.dll",
                                         script: '''
 $opengl32_libraries = Get-ChildItem -Path c:\\Windows -Recurse -Include opengl32.dll
@@ -221,7 +223,24 @@ foreach($file in $opengl32_libraries){
     Copy-Item $file.FullName
     break
 }'''
-                                        )
+                                )
+                                stash includes: "opengl32.dll", name: "opengl32.dll"
+                            }
+                        }
+                        stage("Build Docker Container"){
+                            steps{
+
+                                dir("scm"){
+                                    unstash "opengl32.dll"
+//                                    powershell(
+//                                        label: "Searching for opengl32.dll",
+//                                        script: '''
+//$opengl32_libraries = Get-ChildItem -Path c:\\Windows -Recurse -Include opengl32.dll
+//foreach($file in $opengl32_libraries){
+//    Copy-Item $file.FullName
+//    break
+//}'''
+//                                        )
                                     bat("docker build . --isolation=process -f CI/build_VS2019/Dockerfile -m 8GB -t %DOCKER_IMAGE_TAG%")
                                 }
                             }
