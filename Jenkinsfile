@@ -215,7 +215,9 @@ pipeline {
                                 }
                              steps{
                                 echo "here"
-                                sh "ls"
+                                sh """ #!/bin/bash
+ls
+                                """
                              }
                          }
 
