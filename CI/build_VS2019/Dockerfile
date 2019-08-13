@@ -36,7 +36,7 @@ RUN powershell.exe -Command `
   Start-Process C:\TEMP\python-3.7.4-amd64.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1 Include_test=0' -Wait ; `
   Remove-Item C:\TEMP\python-3.7.4-amd64.exe -Force
 
-ADD deps.py c:\scripts\
+ADD CI/build_VS2019/deps.py c:\scripts\
 RUN powershell.exe -Command `
       $ErrorActionPreference = 'Stop'; `
       [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
