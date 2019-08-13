@@ -200,7 +200,6 @@ pipeline {
                     environment{
                         DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
                         PATH = "${DOCKER_PATH};$PATH"
-                        DOCKER_CREDS = credentials("lib-docker-win-2019")
                     }
                     options{
                         timestamps()
@@ -225,6 +224,20 @@ foreach($file in $opengl32_libraries){
 }'''
                                 )
                                 stash includes: "opengl32.dll", name: "opengl32.dll"
+                            }
+                        }
+                        stage("Build Docker Container from Linux"){
+                            agent{
+                                label "Linux"
+                            }
+                            environment{
+                                DOCKER_HOST="tcp://lib-docker-win.library.illinois.edu:2376"
+                                DOCKER_CERT_PATH=credentials("lib-docker-win-2019")
+                            }
+                            steps{
+                                dir("scm"){
+                                    unstash "opengl32.dll"
+                                }
                             }
                         }
                         stage("Build Docker Container"){
