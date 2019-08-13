@@ -239,7 +239,8 @@ foreach($file in $opengl32_libraries){
                             steps{
                                 dir("scm"){
                                     unstash "opengl32.dll"
-                                    sh "$DOCKER_PATH --version"
+                                    sh "printenv"
+//                                    sh "$DOCKER_PATH --version"
                                 }
                             }
                         }
