@@ -86,7 +86,7 @@ COPY conanfile.txt C:/TEMP/
 ENV CONAN_COLOR_DISPLAY=0
 ENV CONAN_NON_INTERACTIVE=1
 RUN conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan
-RUN set PYTHONUNBUFFERED=TRUE && conan install C:/TEMP/ --build  missing --no-import && conan remove * --src -f
+RUN set PYTHONUNBUFFERED=TRUE && conan install C:/TEMP/ --build  missing --no-import && conan remove * -b --src -f
 
 ADD opengl32.dll c:\windows\system32
 
