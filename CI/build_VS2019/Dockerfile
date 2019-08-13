@@ -37,7 +37,21 @@ RUN powershell.exe -Command `
   Remove-Item C:\TEMP\python-3.7.4-amd64.exe -Force
 
 ADD deps.py c:\scripts\
-RUN set PYTHONUNBUFFERED=0 && python c:\scripts\deps.py && python -m pip install pip --no-cache-dir --upgrade && pip install --no-cache-dir conan
+RUN powershell.exe -Command `
+      $ErrorActionPreference = 'Stop'; `
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
+      $Env:PYTHONUNBUFFERED = 0 ; `
+      python c:\scripts\deps.py ; `
+      python -m pip install pip --no-cache-dir --upgrade ; `
+      pip install --no-cache-dir conan
+
+
+RUN powershell.exe -Command `
+  $ErrorActionPreference = 'Stop'; `
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
+  Invoke-WebRequest https://iweb.dl.sourceforge.net/project/nsis/NSIS%203/3.04/nsis-3.04-setup.exe -OutFile C:\TEMP\nsis-3.04-setup.exe ; `
+  Start-Process C:\TEMP\nsis-3.04-setup.exe -ArgumentList "/S" -Wait; `
+  Remove-Item C:\TEMP\nsis-3.04-setup.exe -Force
 
 COPY conanfile.txt C:/TEMP/
 ENV CONAN_COLOR_DISPLAY=0

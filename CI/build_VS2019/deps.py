@@ -7,7 +7,6 @@ from zipfile import ZipFile
 EXE_DEPS = [
     ("https://github.com/git-for-windows/git/releases/download/v2.22.0.windows.1/Git-2.22.0-64-bit.exe",  "Git-2.22.0-64-bit.exe", ['/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART' '/NOCANCEL']),
     ("https://github.com/wixtoolset/wix3/releases/download/wix3111rtm/wix311.exe", "wix311.exe", ["/q"]),
-    ("https://iweb.dl.sourceforge.net/project/nsis/NSIS%203/3.04/nsis-3.04-setup.exe", "nsis-3.04-setup.exe", ["/S"])
 ]
 
 MSI_DEPS = [
