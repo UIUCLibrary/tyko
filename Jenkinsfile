@@ -219,7 +219,7 @@ foreach($file in $opengl32_libraries){
     break
 }'''
                                 )
-                                    bat("docker build . --isolation=process -f CI/build_VS2019/Dockerfile -m 8GB --cpuset-cpus=4 -t %DOCKER_IMAGE_TAG%")
+                                    bat("docker build . --isolation=process -f CI/build_VS2019/Dockerfile -m 10GB -t %DOCKER_IMAGE_TAG%")
                                 }
                             }
                         }
