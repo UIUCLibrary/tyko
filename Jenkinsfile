@@ -209,6 +209,7 @@ pipeline {
                     stages{
                         stage("Build Docker Container"){
                             steps{
+                                bat "set"
                                 dir("scm"){
                                     powershell(
                                         label: "Searching for opengl32.dll",
