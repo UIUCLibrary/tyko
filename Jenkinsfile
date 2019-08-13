@@ -234,12 +234,12 @@ foreach($file in $opengl32_libraries){
                                 DOCKER_HOST="tcp://lib-docker-win.library.illinois.edu:2376"
                                 DOCKER_CERT_PATH=credentials("lib-docker-win-2019")
                                 DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
-                                PATH = "${DOCKER_PATH}:$PATH"
+//                                PATH = "${DOCKER_PATH}:$PATH"
                             }
                             steps{
                                 dir("scm"){
                                     unstash "opengl32.dll"
-                                    sh "docker --version"
+                                    sh "$DOCKER_PATH --version"
                                 }
                             }
                         }
