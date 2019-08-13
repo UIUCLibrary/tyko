@@ -200,6 +200,7 @@ pipeline {
                     environment{
                         DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
                         PATH = "${DOCKER_PATH};$PATH"
+                        DOCKER_CREDS = credentials("lib-docker-win-2019")
                     }
                     options{
                         timestamps()
