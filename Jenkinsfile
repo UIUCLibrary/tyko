@@ -571,7 +571,7 @@ foreach($file in $opengl32_libraries){
                             unstash "CLIENT_BUILD_DOCKER"
                             bat(
                                 label: "Running build command from CMake on node ${NODE_NAME}",
-                                script: "docker run --isolation=process -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% cpack -G NSIS --verbose"
+                                script: "docker run --isolation=process -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% cpack -G NSIS -G WIX --verbose"
                             )
                             bat "if not exist dist (mkdir dist)  && move build\\*.exe dist\\ "
                     }
