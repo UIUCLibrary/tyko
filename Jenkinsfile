@@ -586,21 +586,19 @@ foreach($file in $opengl32_libraries){
                     }
                     steps{
                             unstash "CLIENT_BUILD_DOCKER"
+                            bat "if not exist dist mkdir dist"
                             bat(
                                 label: "Running build command from CMake on node ${NODE_NAME}",
-                                script: "docker run --isolation=process -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\TEMP\" --rm %DOCKER_IMAGE_TAG% \"mkdir c:\\TEMP\\build && xcopy c:\build c:\\TEMP\\build cd c:\\TEMP\\build && cpack -G NSIS -G WIX && copy *.msi c:\build\\\""
+                                script: "docker run --isolation=process -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\dist:c:\\dist\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\TEMP\" --rm %DOCKER_IMAGE_TAG% \"mkdir c:\\TEMP\\build && xcopy c:\build c:\\TEMP\\build cd c:\\TEMP\\build && cpack -G NSIS -G WIX && copy *.msi c:\\dist\\\""
                             )
-                            bat "if not exist dist (mkdir dist)  && move build\\*.exe dist\\ "
                     }
                     post{
-                        always{
-                            bat "tree /A /F build"
-                        }
                         cleanup{
                             cleanWs(
                                 deleteDirs: true,
                                 patterns: [
                                     [pattern: 'build', type: 'INCLUDE'],
+                                    [pattern: 'dist', type: 'INCLUDE'],
                                     ]
                             )
                         }
@@ -608,7 +606,8 @@ foreach($file in $opengl32_libraries){
                             archiveArtifacts allowEmptyArchive: true, artifacts: 'build/**/*.log'
                         }
                         success{
-                            archiveArtifacts allowEmptyArchive: true, artifacts: 'dist/*.exe'
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'dist/*.exe,dist/*.msi'
+                            stash includes: 'dist/*.exe,dist/*.msi', name: "CLIENT_INSTALLERS"
                         }
                     }
                 }
