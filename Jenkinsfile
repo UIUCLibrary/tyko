@@ -217,7 +217,7 @@ pipeline {
                                 echo "here"
                                 sh(
                                     label: "Doing something",
-                                    script:"ls"
+                                    script:'echo "here"'
                                 )
                              }
                          }
