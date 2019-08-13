@@ -215,9 +215,13 @@ pipeline {
                                 }
                              steps{
                                 echo "here"
-                                sh """ #!/bin/bash
-                                ls
-                                """
+                                sh(
+                                    label: "Doing something",
+                                    script: """ #!/bin/bash
+                                    ls
+                                    """
+
+                                )
                              }
                          }
 
