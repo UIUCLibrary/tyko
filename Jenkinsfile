@@ -239,7 +239,7 @@ foreach($file in $opengl32_libraries){
                             steps{
                                 dir("scm"){
                                     unstash "opengl32.dll"
-                                    sh "which docker"
+                                    sh "docker --version"
                                 }
                             }
                         }
