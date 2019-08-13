@@ -206,6 +206,18 @@ pipeline {
                     }
 
                     stages{
+                        stage("Test Linux"){
+                            agent{
+                                label "Linux"
+                            }
+                            options {
+                                skipDefaultCheckout()
+                                }
+                             steps{
+                                echo "here"
+                             }
+                         }
+
                         stage("Locate files for docker build"){
                             agent{
                                 label "Windows"
