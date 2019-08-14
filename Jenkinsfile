@@ -678,18 +678,14 @@ foreach($file in $opengl32_libraries){
             }
         }
         stage("Deploy"){
-            stages{
+            parallel{
                 stage("Deploy Server"){
                     agent any
-//                    environment{
-//                        TODO: Replace this with the param
-//                        SERVER_CREDS=credentials("henryUserName")
-//                    }
                     options {
                       skipDefaultCheckout true
                     }
                     input {
-                      message 'Deploy to what server'
+                      message 'Deploy to server'
                       parameters {
                         string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
                         credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
@@ -697,7 +693,6 @@ foreach($file in $opengl32_libraries){
                     }
 
                     steps{
-                        echo "params = ${params.SERVER_CREDS}"
                         unstash "PYTHON_PACKAGES"
                         unstash "SERVER_DEPLOY_FILES"
                         script{
