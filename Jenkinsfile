@@ -682,6 +682,9 @@ foreach($file in $opengl32_libraries){
                     options {
                       skipDefaultCheckout true
                     }
+                    when{
+                        equals expected: true, actual: params.DEPLOY_SERVER
+                    }
                     stages{
                         stage("Deploy"){
 
