@@ -688,6 +688,13 @@ foreach($file in $opengl32_libraries){
                     options {
                       skipDefaultCheckout true
                     }
+                    input {
+                      message 'Deploy to what server'
+                      parameters {
+                        credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
+                      }
+                    }
+
                     steps{
                         unstash "PYTHON_PACKAGES"
                         unstash "SERVER_DEPLOY_FILES"
