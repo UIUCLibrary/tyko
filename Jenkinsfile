@@ -666,6 +666,15 @@ foreach($file in $opengl32_libraries){
                 }
             }
         }
+        stage("Deploy"){
+            stages{
+                stage("Deploy Server"){
+                    steps{
+                        echo "dummy"
+                    }
+                }
+            }
+        }
      }
      post {
         cleanup {
