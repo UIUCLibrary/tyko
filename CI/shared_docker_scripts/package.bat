@@ -4,4 +4,5 @@
  cd c:\TEMP\build && cpack -G ZIP;NSIS;WIX
  copy *.msi c:\dist\
  copy *.exe c:\dist\
+ copy *.zip c:\dist\
  endlocal
