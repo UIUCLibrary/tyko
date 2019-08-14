@@ -679,14 +679,13 @@ foreach($file in $opengl32_libraries){
                     steps{
                         unstash "PYTHON_PACKAGES"
                         script{
-                            echo "dummy"
                             def remote = [:]
                             remote.name = 'test'
                             remote.host = params.SERVER_URL
                             remote.user = SERVER_CREDS_USR
                             remote.password = SERVER_CREDS_PSW
                             remote.allowAnyHosts = true
-                            sshPut remote: remote, from: 'dist', into: '.', override: true
+                            sshPut remote: remote, from: 'dist/', into: '.', override: true
                         }
                     }
                 }
