@@ -686,7 +686,7 @@ foreach($file in $opengl32_libraries){
                             remote.password = SERVER_CREDS_PSW
                             remote.allowAnyHosts = true
                             echo "remote = ${remote}"
-                            sshCommand remote: remote, command: "ls -lrt"
+                            sshCommand remote: remote, command: "touch dummy.txt"
                         }
                     }
                 }
