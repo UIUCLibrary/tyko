@@ -198,6 +198,13 @@ pipeline {
                             bat "python setup.py build -b ${WORKSPACE}/build/server"
                         }
                     }
+                    post{
+                        success{
+                            dir("scm"){
+                                stash includes: "deploy/**", name: 'SERVER_DEPLOY_FILES'
+                            }
+                        }
+                    }
                 }
                 stage("Build Client with Docker Container"){
                     agent{
@@ -673,11 +680,16 @@ foreach($file in $opengl32_libraries){
         stage("Deploy"){
             stages{
                 stage("Deploy Server"){
+                    agent any
                     environment{
                         SERVER_CREDS=credentials("henryUserName")
                     }
+                    options {
+                      skipDefaultCheckout true
+                    }
                     steps{
                         unstash "PYTHON_PACKAGES"
+                        unstash "SERVER_DEPLOY_FILES"
                         script{
                             def remote = [:]
                             remote.name = 'test'
