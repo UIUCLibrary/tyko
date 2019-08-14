@@ -681,9 +681,10 @@ foreach($file in $opengl32_libraries){
             stages{
                 stage("Deploy Server"){
                     agent any
-                    environment{
-                        SERVER_CREDS=credentials("henryUserName")
-                    }
+//                    environment{
+//                        TODO: Replace this with the param
+//                        SERVER_CREDS=credentials("henryUserName")
+//                    }
                     options {
                       skipDefaultCheckout true
                     }
@@ -694,8 +695,8 @@ foreach($file in $opengl32_libraries){
                             def remote = [:]
                             remote.name = 'test'
                             remote.host = params.SERVER_URL
-                            remote.user = SERVER_CREDS_USR
-                            remote.password = SERVER_CREDS_PSW
+                            remote.user = params.SERVER_CREDS_USR
+                            remote.password = params.SERVER_CREDS_PSW
                             remote.allowAnyHosts = true
                             sshRemove remote: remote, path: "dist", failOnError: false
                             sshRemove remote: remote, path: "deploy", failOnError: false
