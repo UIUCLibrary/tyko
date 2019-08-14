@@ -679,10 +679,11 @@ foreach($file in $opengl32_libraries){
                             def remote = [:]
                             remote.name = 'test'
                             remote.host = 'test.domain.com'
-                            remote.user = 'root'
-                            remote.password = 'password'
+                            remote.user = SERVER_CREDS_USR
+                            remote.password = SERVER_CREDS_PSW
                             remote.allowAnyHosts = true
                             bat "set"
+                            echo "remote = ${remote}"
                         }
                     }
                 }
