@@ -706,11 +706,10 @@ foreach($file in $opengl32_libraries){
                                 // some block
                                 remote.name = 'test'
                                 remote.host = params.SERVER_URL
-                                remote.user = password
-                                remote.password = username
+                                remote.user = username
+                                remote.password = password
                                 remote.allowAnyHosts = true
                             }
-                            echo "remote = ${remote}"
                             sshRemove remote: remote, path: "dist", failOnError: false
                             sshRemove remote: remote, path: "deploy", failOnError: false
                             sshRemove remote: remote, path: "database", failOnError: false
