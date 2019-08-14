@@ -697,6 +697,9 @@ foreach($file in $opengl32_libraries){
                             remote.user = SERVER_CREDS_USR
                             remote.password = SERVER_CREDS_PSW
                             remote.allowAnyHosts = true
+                            sshRemove remote: remote, path: "dist", failOnError: false
+                            sshRemove remote: remote, path: "deploy", failOnError: false
+                            sshRemove remote: remote, path: "database", failOnError: false
                             sshPut remote: remote, from: 'dist/', into: '.', override: true
                             sshPut remote: remote, from: 'deploy/', into: '.', override: true
                             sshPut remote: remote, from: 'database/', into: '.', override: true
