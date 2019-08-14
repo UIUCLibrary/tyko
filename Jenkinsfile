@@ -126,9 +126,6 @@ pipeline {
         booleanParam(name: "BUILD_CLIENT", defaultValue: false, description: "Build Client program")
 //        TODO: return default for TEST_RUN_TOX to true
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
-
-//        credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
-
     }
     stages {
         stage('Configure Environment') {
@@ -708,7 +705,6 @@ foreach($file in $opengl32_libraries){
                                         remote.password = password
                                         remote.allowAnyHosts = true
                                     }
-                                    echo "remote = ${remote}"
                                     sshRemove remote: remote, path: "dist", failOnError: false
                                     sshRemove remote: remote, path: "deploy", failOnError: false
                                     sshRemove remote: remote, path: "database", failOnError: false
