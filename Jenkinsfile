@@ -677,6 +677,7 @@ foreach($file in $opengl32_libraries){
                         SERVER_CREDS=credentials("henryUserName")
                     }
                     steps{
+                        unstash "PYTHON_PACKAGES"
                         script{
                             echo "dummy"
                             def remote = [:]
@@ -685,8 +686,7 @@ foreach($file in $opengl32_libraries){
                             remote.user = SERVER_CREDS_USR
                             remote.password = SERVER_CREDS_PSW
                             remote.allowAnyHosts = true
-                            echo "remote = ${remote}"
-                            sshCommand remote: remote, command: "touch dummy.txt"
+                            sshPut remote: remote, from: 'dist', into: '.', override: true
                         }
                     }
                 }
