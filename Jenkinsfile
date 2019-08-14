@@ -594,8 +594,8 @@ foreach($file in $opengl32_libraries){
                             archiveArtifacts allowEmptyArchive: true, artifacts: 'build/**/*.log'
                         }
                         success{
-                            archiveArtifacts allowEmptyArchive: true, artifacts: 'dist/*.exe,dist/*.msi'
-                            stash includes: 'dist/*.exe,dist/*.msi', name: "CLIENT_INSTALLERS"
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'dist/*.exe,dist/*.msi,dist/*.zip'
+                            stash includes: 'dist/*.exe,dist/*.msi,dist/*.zip,', name: "CLIENT_INSTALLERS"
                         }
                     }
                 }
