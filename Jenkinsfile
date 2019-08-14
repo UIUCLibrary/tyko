@@ -698,13 +698,13 @@ foreach($file in $opengl32_libraries){
                         script{
                             def remote = [:]
                             withCredentials([usernamePassword(credentialsId: params.SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
-                                // some block
                                 remote.name = 'test'
                                 remote.host = params.SERVER_URL
                                 remote.user = username
                                 remote.password = password
                                 remote.allowAnyHosts = true
                             }
+                            echo "remote = ${remote}"
                             sshRemove remote: remote, path: "dist", failOnError: false
                             sshRemove remote: remote, path: "deploy", failOnError: false
                             sshRemove remote: remote, path: "database", failOnError: false
