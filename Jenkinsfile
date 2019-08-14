@@ -201,7 +201,7 @@ pipeline {
                     post{
                         success{
                             dir("scm"){
-                                stash includes: "deploy/**", name: 'SERVER_DEPLOY_FILES'
+                                stash includes: "deploy/**,deploy/**", name: 'SERVER_DEPLOY_FILES'
                             }
                         }
                     }
