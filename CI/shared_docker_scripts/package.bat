@@ -3,4 +3,5 @@
  xcopy c:\build c:\TEMP\build
  cd c:\TEMP\build && cpack -G NSIS -G WIX
  copy *.msi c:\dist\
+ copy *.exe c:\dist\
  endlocal
