@@ -684,36 +684,44 @@ foreach($file in $opengl32_libraries){
                     options {
                       skipDefaultCheckout true
                     }
-                    input {
-                      message 'Deploy to server'
-                      parameters {
-                        string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
-                        credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
-                      }
-                    }
+                    stages{
+                        stage("Deploy"){
 
-                    steps{
-                        unstash "PYTHON_PACKAGES"
-                        unstash "SERVER_DEPLOY_FILES"
-                        script{
-                            def remote = [:]
-                            withCredentials([usernamePassword(credentialsId: params.SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
-                                remote.name = 'test'
-                                remote.host = params.SERVER_URL
-                                remote.user = username
-                                remote.password = password
-                                remote.allowAnyHosts = true
+                            input {
+                              message 'Deploy to server'
+                              parameters {
+                                string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
+                                credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
+                              }
                             }
-                            echo "remote = ${remote}"
-                            sshRemove remote: remote, path: "dist", failOnError: false
-                            sshRemove remote: remote, path: "deploy", failOnError: false
-                            sshRemove remote: remote, path: "database", failOnError: false
-                            sshPut remote: remote, from: 'dist/', into: '.'
-                            sshPut remote: remote, from: 'deploy/', into: '.'
-                            sshPut remote: remote, from: 'database/', into: '.'
-                            sshCommand remote: remote, command: "docker-compose -f deploy/docker-compose.yml build"
+
+                            steps{
+                                unstash "PYTHON_PACKAGES"
+                                unstash "SERVER_DEPLOY_FILES"
+                                echo "params = ${params}"
+                                script{
+                                    def remote = [:]
+
+                                    withCredentials([usernamePassword(credentialsId: params.SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
+                                        remote.name = 'test'
+                                        remote.host = params.SERVER_URL
+                                        remote.user = username
+                                        remote.password = password
+                                        remote.allowAnyHosts = true
+                                    }
+                                    echo "remote = ${remote}"
+                                    sshRemove remote: remote, path: "dist", failOnError: false
+                                    sshRemove remote: remote, path: "deploy", failOnError: false
+                                    sshRemove remote: remote, path: "database", failOnError: false
+                                    sshPut remote: remote, from: 'dist/', into: '.'
+                                    sshPut remote: remote, from: 'deploy/', into: '.'
+                                    sshPut remote: remote, from: 'database/', into: '.'
+                                    sshCommand remote: remote, command: "docker-compose -f deploy/docker-compose.yml build"
+                                }
+                            }
                         }
                     }
+
                 }
             }
         }
