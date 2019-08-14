@@ -126,6 +126,8 @@ pipeline {
         booleanParam(name: "BUILD_CLIENT", defaultValue: false, description: "Build Client program")
 //        TODO: return default for TEST_RUN_TOX to true
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
+        string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
+
     }
     stages {
         stage('Configure Environment') {
@@ -678,7 +680,7 @@ foreach($file in $opengl32_libraries){
                             echo "dummy"
                             def remote = [:]
                             remote.name = 'test'
-                            remote.host = 'test.domain.com'
+                            remote.host = params.SERVER_URL
                             remote.user = SERVER_CREDS_USR
                             remote.password = SERVER_CREDS_PSW
                             remote.allowAnyHosts = true
