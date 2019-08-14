@@ -669,6 +669,9 @@ foreach($file in $opengl32_libraries){
         stage("Deploy"){
             stages{
                 stage("Deploy Server"){
+                    environment{
+                        SERVER_CREDS=credentials("henryUserName")
+                    }
                     steps{
                         echo "dummy"
                     }
