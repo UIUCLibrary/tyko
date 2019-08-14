@@ -696,6 +696,7 @@ foreach($file in $opengl32_libraries){
                     }
 
                     steps{
+                        echo "params = ${params}"
                         unstash "PYTHON_PACKAGES"
                         unstash "SERVER_DEPLOY_FILES"
                         script{
