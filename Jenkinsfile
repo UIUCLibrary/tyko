@@ -700,9 +700,10 @@ foreach($file in $opengl32_libraries){
                             sshRemove remote: remote, path: "dist", failOnError: false
                             sshRemove remote: remote, path: "deploy", failOnError: false
                             sshRemove remote: remote, path: "database", failOnError: false
-                            sshPut remote: remote, from: 'dist/', into: '.', override: true
-                            sshPut remote: remote, from: 'deploy/', into: '.', override: true
-                            sshPut remote: remote, from: 'database/', into: '.', override: true
+                            sshPut remote: remote, from: 'dist/', into: '.'
+                            sshPut remote: remote, from: 'deploy/', into: '.'
+                            sshPut remote: remote, from: 'database/', into: '.'
+                            sshCommand remote: remote, command: "docker-compose -f deploy/docker-compose.yml build"
                         }
                     }
                 }
