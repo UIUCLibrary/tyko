@@ -201,7 +201,7 @@ pipeline {
                     post{
                         success{
                             dir("scm"){
-                                stash includes: "deploy/**,deploy/**", name: 'SERVER_DEPLOY_FILES'
+                                stash includes: "deploy/**,database/**", name: 'SERVER_DEPLOY_FILES'
                             }
                         }
                     }
@@ -699,6 +699,7 @@ foreach($file in $opengl32_libraries){
                             remote.allowAnyHosts = true
                             sshPut remote: remote, from: 'dist/', into: '.', override: true
                             sshPut remote: remote, from: 'deploy/', into: '.', override: true
+                            sshPut remote: remote, from: 'database/', into: '.', override: true
                         }
                     }
                 }
