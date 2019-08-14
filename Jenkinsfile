@@ -127,7 +127,7 @@ pipeline {
 //        TODO: return default for TEST_RUN_TOX to true
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
 
-        credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
+//        credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
 
     }
     stages {
@@ -698,13 +698,12 @@ foreach($file in $opengl32_libraries){
                             steps{
                                 unstash "PYTHON_PACKAGES"
                                 unstash "SERVER_DEPLOY_FILES"
-                                echo "params = ${params}"
                                 script{
                                     def remote = [:]
 
-                                    withCredentials([usernamePassword(credentialsId: params.SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
+                                    withCredentials([usernamePassword(credentialsId: SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
                                         remote.name = 'test'
-                                        remote.host = params.SERVER_URL
+                                        remote.host = SERVER_URL
                                         remote.user = username
                                         remote.password = password
                                         remote.allowAnyHosts = true
