@@ -674,7 +674,16 @@ foreach($file in $opengl32_libraries){
                         SERVER_CREDS=credentials("henryUserName")
                     }
                     steps{
-                        echo "dummy"
+                        script{
+                            echo "dummy"
+                            def remote = [:]
+                            remote.name = 'test'
+                            remote.host = 'test.domain.com'
+                            remote.user = 'root'
+                            remote.password = 'password'
+                            remote.allowAnyHosts = true
+                            bat "set"
+                        }
                     }
                 }
             }
