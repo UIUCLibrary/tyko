@@ -698,6 +698,7 @@ foreach($file in $opengl32_libraries){
                             remote.password = SERVER_CREDS_PSW
                             remote.allowAnyHosts = true
                             sshPut remote: remote, from: 'dist/', into: '.', override: true
+                            sshPut remote: remote, from: 'deploy/', into: '.', override: true
                         }
                     }
                 }
