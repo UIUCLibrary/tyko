@@ -122,11 +122,8 @@ pipeline {
     }
     parameters {
         booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
-//        TODO: return default for BUILD_CLIENT to true
-        booleanParam(name: "BUILD_CLIENT", defaultValue: false, description: "Build Client program")
-//        TODO: return default for TEST_RUN_TOX to true
-        booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
-        booleanParam defaultValue: false, description: 'Deploy server software to server', name: 'DEPLOY_SERVER'
+        booleanParam(name: "BUILD_CLIENT", defaultValue: true, description: "Build Client program")
+        booleanParam(name: "TEST_RUN_TOX", defaultValue: true, description: "Run Tox Tests")
     }
     stages {
         stage('Configure Environment') {
