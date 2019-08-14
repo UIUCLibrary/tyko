@@ -126,7 +126,7 @@ pipeline {
         booleanParam(name: "BUILD_CLIENT", defaultValue: false, description: "Build Client program")
 //        TODO: return default for TEST_RUN_TOX to true
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
-        string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
+
         credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
 
     }
@@ -691,21 +691,25 @@ foreach($file in $opengl32_libraries){
                     input {
                       message 'Deploy to what server'
                       parameters {
+                        string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
                         credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
                       }
                     }
 
                     steps{
-                        echo "params = ${params}"
+                        echo "params = ${params.SERVER_CREDS}"
                         unstash "PYTHON_PACKAGES"
                         unstash "SERVER_DEPLOY_FILES"
                         script{
                             def remote = [:]
-                            remote.name = 'test'
-                            remote.host = params.SERVER_URL
-                            remote.user = params.SERVER_CREDS_USR
-                            remote.password = params.SERVER_CREDS_PSW
-                            remote.allowAnyHosts = true
+                            withCredentials([usernamePassword(credentialsId: params.SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
+                                // some block
+                                remote.name = 'test'
+                                remote.host = params.SERVER_URL
+                                remote.user = password
+                                remote.password = username
+                                remote.allowAnyHosts = true
+                            }
                             echo "remote = ${remote}"
                             sshRemove remote: remote, path: "dist", failOnError: false
                             sshRemove remote: remote, path: "deploy", failOnError: false
