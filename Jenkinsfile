@@ -685,8 +685,8 @@ foreach($file in $opengl32_libraries){
                             remote.user = SERVER_CREDS_USR
                             remote.password = SERVER_CREDS_PSW
                             remote.allowAnyHosts = true
-                            bat "set"
                             echo "remote = ${remote}"
+                            sshCommand remote: remote, command: "ls -lrt"
                         }
                     }
                 }
