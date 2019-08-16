@@ -240,7 +240,7 @@ foreach($file in $opengl32_libraries){
                                 bat "if not exist build mkdir build"
                                 bat(
                                     label: "Using conan to install dependencies to build directory.",
-                                    script: "docker run --isolation=process -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" --rm %DOCKER_IMAGE_TAG% conan install c:\\source"
+                                    script: 'docker run --isolation=process -v "%WORKSPACE%\\build:c:\\build" -v "%WORKSPACE%\\scm:c:\\source:ro" --workdir="c:\\build" --rm %DOCKER_IMAGE_TAG% conan install c:\\source'
                                     )
                             }
                         }
