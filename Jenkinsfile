@@ -248,7 +248,7 @@ foreach($file in $opengl32_libraries){
                             steps{
                                 bat(
                                     label: "Configuring CMake",
-                                    script: "docker run --isolation=process --rm -v \"${WORKSPACE}\\build:c:\\build\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" --workdir=\"c:\\build\" %DOCKER_IMAGE_TAG% cmake -S c:\\source -B c:\\build -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_GENERATOR_PLATFORM=x64"
+                                    script: 'docker run --isolation=process --rm -v "%WORKSPACE%\\build:c:\\build" -v "%WORKSPACE%\\scm:c:\\source:ro" --workdir="c:\\build" %DOCKER_IMAGE_TAG% cmake -S c:\\source -B c:\\build -DCMAKE_TOOLCHAIN_FILE=conan_paths.cmake -DCMAKE_GENERATOR_PLATFORM=x64'
                                 )
                                 bat(
                                     label: "Running build command from CMake",
