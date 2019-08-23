@@ -1,9 +1,24 @@
 from flask import Flask, jsonify, render_template
 import avforms
 from avforms.data_provider import DataProvider
-
+from dataclasses import dataclass
 the_app = Flask(__name__)
+from typing import Any
 
+
+@dataclass
+class Route:
+    rule: str
+    method: str
+    viewFunction: Any
+
+
+@dataclass
+class FormField:
+    form_type: str
+    form_id: str
+    form_user_text: str
+    required: bool
 
 class Routes:
 
@@ -90,37 +105,34 @@ class Routes:
             )
 
     def init_website_routes(self):
+        # TODO Convert routes to a dataclass
+
+        static_web_routes = [
+            Route("/", "page_index", self.wr.page_index),
+            Route("/about", "page_about", self.wr.page_about),
+            ]
+
+        entity_pages = [
+            Route("/collection", "page_collections", self.wr.page_collections),
+            Route("/project", "page_projects", self.wr.page_projects),
+            Route("/format", "page_formats", self.wr.page_formats),
+
+        ]
+
+        form_pages = [
+            Route("/newproject", "page_new_project", self.wr.page_new_project),
+            Route("/newcollection", "page_new_collection", self.wr.page_new_collection),
+        ]
 
         if self.app:
-            self.app.add_url_rule(
-                "/",
-                "page_index",
-                self.wr.page_index
-            )
+            for rule in static_web_routes:
+                self.app.add_url_rule(rule.rule, rule.method, rule.viewFunction)
 
-            self.app.add_url_rule(
-                "/about",
-                "page_about",
-                self.wr.page_about
-            )
+            for rule in entity_pages:
+                self.app.add_url_rule(rule.rule, rule.method, rule.viewFunction)
 
-            self.app.add_url_rule(
-                "/collection",
-                "page_collections",
-                self.wr.page_collections
-            )
-
-            self.app.add_url_rule(
-                "/project",
-                "page_projects",
-                self.wr.page_projects
-            )
-
-            self.app.add_url_rule(
-                "/format",
-                "page_formats",
-                self.wr.page_formats
-            )
+            for rule in form_pages:
+                self.app.add_url_rule(rule.rule, rule.method, rule.viewFunction)
 
 
 class Routers:
@@ -192,6 +204,32 @@ class WebsiteRoutes(Routers):
             formats=formats
         )
 
+    def page_new_project(self):
+        return render_template(
+            "newentity.html",
+            selected_menu_item="forms",
+            form_title="New Project",
+            api_location="api/project/",
+            form_fields=[
+                FormField("text", "title", "Project Title", True),
+                FormField("text", "project_code", "Project Code", False),
+                FormField("text", "status", "Project Status", False),
+                FormField("text", "current_location", "Current Location", False),
+                FormField("text", "specs", "Specs", False),
+            ]
+        )
+
+    def page_new_collection(self):
+        return render_template(
+            "newentity.html",
+            selected_menu_item="forms",
+            form_title="New Collection",
+            api_location="api/collection/",
+            form_fields=[
+                FormField("text", "collection_name", "Name", True),
+                FormField("text", "department", "Department", True),
+            ]
+        )
 
 def list_routes(app):
     results = []
