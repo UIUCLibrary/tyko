@@ -97,9 +97,9 @@
                         Entities
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarEntitiesDropdown">
-                        <a class="dropdown-item" href="{{url_for('page_collections')}}">Collections</a>
-                        <a class="dropdown-item" href="{{url_for('page_projects')}}">Projects</a>
-                        <a class="dropdown-item" href="{{url_for('page_formats')}}">Formats</a>
+                        {% for entity in entities %}
+                            <a class="dropdown-item" href="{{url_for(entity[1])}}">{{ entity[0] }}</a>
+                        {% endfor %}
                     </div>
                 </li>
                 <li class="nav-item dropdown">

@@ -1,16 +1,30 @@
 from flask import Flask, jsonify, render_template
 import avforms
 from avforms.data_provider import DataProvider
-from dataclasses import dataclass
-the_app = Flask(__name__)
-from typing import Any
+from dataclasses import dataclass,field
+from typing import Any, List
 
+the_app = Flask(__name__)
 
 @dataclass
 class Route:
     rule: str
     method: str
     viewFunction: Any
+    methods: List[str] = field(default_factory=lambda: ["GET"])
+
+
+@dataclass
+class APIEntity:
+    entity_type: str
+    rules: List[Route] = field(default_factory=list)
+
+
+@dataclass
+class EntityPage:
+    entity_type: str
+    entity_list_page: str
+    rules: List[Route] = field(default_factory=list)
 
 
 @dataclass
@@ -19,6 +33,10 @@ class FormField:
     form_id: str
     form_user_text: str
     required: bool
+
+
+all_entities = set()
+
 
 class Routes:
 
@@ -32,68 +50,28 @@ class Routes:
     def init_api_routes(self) -> None:
 
         if self.app:
-            # ###### projects
-            self.app.add_url_rule(
-                "/api/project",
-                "projects",
-                self.ar.get_projects
-            )
+            entities = [
+                APIEntity("Projects", rules=[
+                    Route("/api/project", "projects", self.ar.get_projects),
+                    Route("/api/project/<string:id>", "project_by_id", self.ar.get_project_by_id),
+                    Route("/api/project/", "add_project", self.ar.add_project, methods=["POST"]),
+                    Route("/api/project/<string:id>", "update_project", self.ar.update_project, methods=["PUT"]),
+                    Route("/api/project/<string:id>", "delete_project", self.ar.delete_project, methods=["DELETE"]),
+                  ]),
+                APIEntity("Collection", rules=[
+                    Route("/api/collection", "collection", self.ar.get_collections),
+                    Route("/api/collection/<string:id>", "collection_by_id", self.ar.collection_by_id),
+                    Route("/api/collection/", "add_collection", self.ar.add_collection, methods=["POST"])
+                ]),
+                APIEntity("Formats", rules=[
+                    Route("/api/format", "formats", self.ar.get_formats)
+                ])
 
-            self.app.add_url_rule(
-                "/api/project/<string:id>",
-                "project_by_id",
-                self.ar.get_project_by_id,
-                methods=["GET"]
-            )
+            ]
 
-            self.app.add_url_rule(
-                "/api/project/",
-                "add_project",
-                self.ar.add_project,
-                methods=["POST"]
-            )
-
-            self.app.add_url_rule(
-                "/api/project/<string:id>",
-                "update_project",
-                self.ar.update_project,
-                methods=["PUT"]
-            )
-            self.app.add_url_rule(
-                "/api/project/<string:id>",
-                "delete_project",
-                self.ar.delete_project,
-                methods=["DELETE"]
-            )
-
-            # ###### collections
-            self.app.add_url_rule(
-                "/api/collection/<string:id>",
-                "collection_by_id",
-                self.ar.collection_by_id,
-                methods=["GET"]
-            )
-
-            self.app.add_url_rule(
-                "/api/collection",
-                "collection",
-                self.ar.get_collections,
-                methods=["GET"]
-            )
-
-            self.app.add_url_rule(
-                "/api/collection/",
-                "add_collection",
-                self.ar.add_collection,
-                methods=["POST"]
-            )
-
-            # ###### Formats
-            self.app.add_url_rule(
-                "/api/format",
-                "formats",
-                self.ar.get_formats
-            )
+            for entity in entities:
+                for rule in entity.rules:
+                    self.app.add_url_rule(rule.rule, rule.method, rule.viewFunction, methods=rule.methods)
 
             # ##############
             self.app.add_url_rule(
@@ -113,11 +91,25 @@ class Routes:
             ]
 
         entity_pages = [
-            Route("/collection", "page_collections", self.wr.page_collections),
-            Route("/project", "page_projects", self.wr.page_projects),
-            Route("/format", "page_formats", self.wr.page_formats),
 
+
+            EntityPage("Collection", "page_collections", rules=[
+                    Route("/collection", "page_collections", self.wr.page_collections)
+                ]),
+            EntityPage("Projects", "page_projects", rules=[
+                    Route("/project", "page_projects", self.wr.page_projects),
+                ]),
+            EntityPage("Formats", "page_projects", rules=[
+                    Route("/format", "page_formats", self.wr.page_formats),
+                ]),
         ]
+
+        # entity_pages = [
+        #     Route("/collection", "page_collections", self.wr.page_collections),
+        #     Route("/project", "page_projects", self.wr.page_projects),
+        #     Route("/format", "page_formats", self.wr.page_formats),
+        #
+        # ]
 
         form_pages = [
             Route("/newproject", "page_new_project", self.wr.page_new_project),
@@ -128,8 +120,10 @@ class Routes:
             for rule in static_web_routes:
                 self.app.add_url_rule(rule.rule, rule.method, rule.viewFunction)
 
-            for rule in entity_pages:
-                self.app.add_url_rule(rule.rule, rule.method, rule.viewFunction)
+            for entity in entity_pages:
+                for rule in entity.rules:
+                    all_entities.add((entity.entity_type, entity.entity_list_page))
+                    self.app.add_url_rule(rule.rule, rule.method, rule.viewFunction)
 
             for rule in form_pages:
                 self.app.add_url_rule(rule.rule, rule.method, rule.viewFunction)
@@ -174,18 +168,22 @@ class WebsiteRoutes(Routers):
 
     @staticmethod
     def page_index():
-        return render_template("index.html", selected_menu_item="index")
+        return render_template("index.html", selected_menu_item="index",
+                               entities=all_entities)
 
     @staticmethod
     def page_about():
-        return render_template("about.html", selected_menu_item="about")
+        return render_template("about.html", selected_menu_item="about",
+                               entities=all_entities
+                               )
 
     def page_collections(self):
         collections = self.middleware.get_collections(serialize=False)
         return render_template(
             "collections.html",
             selected_menu_item="collection",
-            collections=collections
+            collections=collections,
+            entities=all_entities
         )
 
     def page_projects(self):
@@ -193,7 +191,8 @@ class WebsiteRoutes(Routers):
         return render_template(
             "projects.html",
             selected_menu_item="projects",
-            projects=projects
+            projects=projects,
+            entities=all_entities
         )
 
     def page_formats(self):
@@ -201,7 +200,8 @@ class WebsiteRoutes(Routers):
         return render_template(
             "formats.html",
             selected_menu_item="formats",
-            formats=formats
+            formats=formats,
+            entities=all_entities
         )
 
     def page_new_project(self):
@@ -216,7 +216,8 @@ class WebsiteRoutes(Routers):
                 FormField("text", "status", "Project Status", False),
                 FormField("text", "current_location", "Current Location", False),
                 FormField("text", "specs", "Specs", False),
-            ]
+            ],
+            entities=all_entities
         )
 
     def page_new_collection(self):
@@ -228,7 +229,8 @@ class WebsiteRoutes(Routers):
             form_fields=[
                 FormField("text", "collection_name", "Name", True),
                 FormField("text", "department", "Department", True),
-            ]
+            ],
+            entities=all_entities
         )
 
 def list_routes(app):
