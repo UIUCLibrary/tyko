@@ -103,3 +103,27 @@ class DataProvider:
         self.session.add(new_collection)
         self.session.commit()
         return new_collection.id
+
+    def get_item(self, id=None, serialize=False):
+        if id:
+            all_collection_item = \
+                self.session.query(scheme.CollectionItem)\
+                    .filter(scheme.CollectionItem.id == id)\
+                    .all()
+        else:
+            all_collection_item = self.session.query(scheme.CollectionItem).all()
+
+        if serialize:
+            return [collection_item.serialize() for collection_item in all_collection_item]
+        else:
+            return all_collection_item
+
+    def add_item(self, name, barcode, file_name):
+        new_item = scheme.CollectionItem(
+            name=name,
+            barcode=barcode,
+            file_name=file_name
+        )
+        self.session.add(new_item)
+        self.session.commit()
+        return new_item.id

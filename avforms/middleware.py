@@ -37,7 +37,6 @@ class Middleware:
         return result
 
     def add_project(self):
-        print(request.form)
         project_code = request.form.get('project_code')
         title = request.form.get('title')
         current_location = request.form.get('current_location')
@@ -107,3 +106,38 @@ class Middleware:
             )
         else:
             abort(404)
+
+    def get_item(self, serialize=True):
+        items = self.data_provider.get_item(serialize=serialize)
+        if serialize:
+            result = jsonify(items)
+        else:
+            result = items
+        return result
+    def item_by_id(self, id):
+        current_item = self.data_provider.get_item(id, serialize=True)
+        if current_item:
+            return jsonify(
+                {
+                    "item": current_item
+                }
+            )
+        else:
+            abort(404)
+
+    def add_item(self):
+        # TODO
+        print(request.form)
+        name = request.form.get('name')
+        barcode = request.form.get('barcode')
+        file_name = request.form.get('file_name')
+        new_item_id = self.data_provider.add_item(
+            name=name,
+            barcode=barcode,
+            file_name=file_name
+        )
+        return jsonify({
+            "id": new_item_id,
+            "url": url_for("item_by_id", id=new_item_id)
+            }
+        )

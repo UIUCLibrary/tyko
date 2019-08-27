@@ -73,14 +73,20 @@ class Routes:
                 ]),
                 APIEntity("Formats", rules=[
                     Route("/api/format", "formats", self.ar.get_formats)
+                ]),
+                APIEntity("Item", rules=[
+                    Route("/api/item", "item", self.ar.get_item, methods=["GET"]),
+                    Route("/api/item/<string:id>", "item_by_id", self.ar.item_by_id, methods=["GET"]),
+                    Route("/api/item/", "add_item", self.ar.add_item, methods=["POST"])
+
                 ])
 
             ]
 
             for entity in entities:
                 for rule in entity.rules:
-                    self.app.add_url_rule(rule.rule,
-                                          rule.method, rule.viewFunction,
+                    self.app.add_url_rule(rule.rule, rule.method,
+                                          rule.viewFunction,
                                           methods=rule.methods)
 
             # ##############
@@ -113,12 +119,16 @@ class Routes:
             EntityPage("Formats", "page_projects", rules=[
                     Route("/format", "page_formats", self.wr.page_formats),
                 ]),
+            EntityPage("Items", "page_item", rules=[
+                    Route("/item", "page_item", self.wr.page_item)
+                ])
         ]
 
         form_pages = [
             Route("/newproject", "page_new_project", self.wr.page_new_project),
             Route("/newcollection", "page_new_collection",
                   self.wr.page_new_collection),
+            Route("/newitem", "page_new_item", self.wr.page_new_item)
         ]
 
         if self.app:
@@ -173,6 +183,15 @@ class APIRoutes(Routers):
     def add_collection(self):
         return self.middleware.add_collection()
 
+    def get_item(self, serialize=True):
+        return self.middleware.get_item(serialize)
+
+    def item_by_id(self, id):
+        return self.middleware.item_by_id(id)
+
+    def add_item(self):
+        return self.middleware.add_item()
+
 
 class WebsiteRoutes(Routers):
 
@@ -214,6 +233,15 @@ class WebsiteRoutes(Routers):
             entities=all_entities
         )
 
+    def page_item(self):
+        items = self.middleware.get_item(serialize=False)
+        return render_template(
+            "items.html",
+            selected_menu_item="item",
+            items=items,
+            entities=all_entities
+        )
+
     def page_new_project(self):
         return render_template(
             "newentity.html",
@@ -240,6 +268,20 @@ class WebsiteRoutes(Routers):
             form_fields=[
                 FormField("text", "collection_name", "Name", True),
                 FormField("text", "department", "Department", True),
+            ],
+            entities=all_entities
+        )
+
+    def page_new_item(self):
+        return render_template(
+            "newentity.html",
+            selected_menu_item="forms",
+            form_title="New Item",
+            api_location="api/item/",
+            form_fields=[
+                FormField("text", "name", "Name", True),
+                FormField("text", "barcode", "Barcode", True),
+                FormField("text", "file_name", "File name", True),
             ],
             entities=all_entities
         )

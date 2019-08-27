@@ -15,6 +15,7 @@ dynamic_page_routes = [
     "/collection",
     "/project",
     "/format",
+    "/item",
 ]
 
 api_routes = [
@@ -22,6 +23,7 @@ api_routes = [
     "/api/format",
     "/api/project",
     "/api/collection",
+    "/api/item",
 
 
 ]
@@ -110,6 +112,13 @@ test_data_read = [
             "department": "my department"
         }
 
+    ),
+    (
+        "item", {
+            "name": "my stupid new item",
+            "barcode": "8umb",
+            "file_name": "stupid.mov"
+        }
     )
 ]
 
