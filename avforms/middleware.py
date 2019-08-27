@@ -1,6 +1,7 @@
 from flask import jsonify, request, url_for, abort, make_response
-
 from avforms.data_provider import DataProvider
+import hashlib
+import json
 
 
 class Middleware:
@@ -31,7 +32,16 @@ class Middleware:
     def get_projects(self, serialize=True):
         projects = self.data_provider.get_project(serialize=serialize)
         if serialize:
-            result = jsonify(projects)
+            data = {
+                "projects": projects,
+                "total": len(projects)
+            }
+            json_data = json.dumps(data)
+            response = make_response(jsonify(data, 200))
+            hash_value = hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
+            response.headers["ETag"] = str(hash_value)
+            response.headers["Cache-Control"] = "private, max-age=300"
+            return response
         else:
             result = projects
         return result
@@ -59,7 +69,17 @@ class Middleware:
     def get_collections(self, serialize=True):
         collections = self.data_provider.get_collection(serialize=serialize)
         if serialize:
-            result = jsonify(collections)
+            data = {
+                "collections": collections,
+                "total": len((collections))
+            }
+
+            json_data = json.dumps(data)
+            response = make_response(jsonify(data, 200))
+            hash_value= hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
+            response.headers["ETag"] = str(hash_value)
+            response.headers["Cache-Control"] = "private, max-age=300"
+            return response
         else:
             result = collections
         return result
@@ -110,10 +130,22 @@ class Middleware:
     def get_item(self, serialize=True):
         items = self.data_provider.get_item(serialize=serialize)
         if serialize:
-            result = jsonify(items)
+            data = {
+                "items": items,
+                "total": len(items)
+            }
+
+            json_data = json.dumps(data)
+            response = make_response(jsonify(data, 200))
+            hash_value= hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
+            response.headers["ETag"] = str(hash_value)
+            response.headers["Cache-Control"] = "private, max-age=300"
+            return response
+
         else:
             result = items
         return result
+
     def item_by_id(self, id):
         current_item = self.data_provider.get_item(id, serialize=True)
         if current_item:
@@ -126,8 +158,6 @@ class Middleware:
             abort(404)
 
     def add_item(self):
-        # TODO
-        print(request.form)
         name = request.form.get('name')
         barcode = request.form.get('barcode')
         file_name = request.form.get('file_name')
