@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template
 import avforms
+from .decorators import authenticate
 from avforms.data_provider import DataProvider
 from dataclasses import dataclass, field
 from typing import Any, List
@@ -262,6 +263,7 @@ class WebsiteRoutes(Routers):
             all_forms=all_forms
         )
 
+    @authenticate
     def page_new_project(self):
         return render_template(
             "newentity.html",
@@ -280,6 +282,7 @@ class WebsiteRoutes(Routers):
             all_forms=all_forms
         )
 
+    @authenticate
     def page_new_collection(self):
         return render_template(
             "newentity.html",
@@ -294,6 +297,7 @@ class WebsiteRoutes(Routers):
             all_forms=all_forms
         )
 
+    @authenticate
     def page_new_item(self):
         return render_template(
             "newentity.html",
