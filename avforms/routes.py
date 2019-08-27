@@ -29,6 +29,13 @@ class EntityPage:
 
 
 @dataclass
+class FormPage:
+    page_name: str
+    page_endpoint: str
+    rule: Route
+
+
+@dataclass
 class FormField:
     form_type: str
     form_id: str
@@ -37,6 +44,7 @@ class FormField:
 
 
 all_entities = set()
+all_forms = set()
 
 
 class Routes:
@@ -99,7 +107,6 @@ class Routes:
             )
 
     def init_website_routes(self):
-        # TODO Convert routes to a dataclass
 
         static_web_routes = [
             Route("/", "page_index", self.wr.page_index),
@@ -125,10 +132,9 @@ class Routes:
         ]
 
         form_pages = [
-            Route("/newproject", "page_new_project", self.wr.page_new_project),
-            Route("/newcollection", "page_new_collection",
-                  self.wr.page_new_collection),
-            Route("/newitem", "page_new_item", self.wr.page_new_item)
+            FormPage("Project", "page_new_project", rule=Route("/newproject", "page_new_project", self.wr.page_new_project)),
+            FormPage("Collection", "page_new_collection", rule=Route("/newcollection", "page_new_collection", self.wr.page_new_collection)),
+            FormPage("Item", "page_new_item", rule=Route("/newitem", "page_new_item", self.wr.page_new_item))
         ]
 
         if self.app:
@@ -144,7 +150,14 @@ class Routes:
                     self.app.add_url_rule(rule.rule, rule.method,
                                           rule.viewFunction)
 
-            for rule in form_pages:
+            for form_page in form_pages:
+                all_forms.add(
+                    (
+                        form_page.page_name,
+                        form_page.page_endpoint
+                    )
+                )
+                rule = form_page.rule
                 self.app.add_url_rule(rule.rule, rule.method,
                                       rule.viewFunction)
 
@@ -198,12 +211,15 @@ class WebsiteRoutes(Routers):
     @staticmethod
     def page_index():
         return render_template("index.html", selected_menu_item="index",
-                               entities=all_entities)
+                               entities=all_entities,
+                               all_forms=all_forms
+                               )
 
     @staticmethod
     def page_about():
         return render_template("about.html", selected_menu_item="about",
-                               entities=all_entities
+                               entities=all_entities,
+                               all_forms=all_forms
                                )
 
     def page_collections(self):
@@ -212,7 +228,8 @@ class WebsiteRoutes(Routers):
             "collections.html",
             selected_menu_item="collection",
             collections=collections,
-            entities=all_entities
+            entities=all_entities,
+            all_forms=all_forms
         )
 
     def page_projects(self):
@@ -221,7 +238,8 @@ class WebsiteRoutes(Routers):
             "projects.html",
             selected_menu_item="projects",
             projects=projects,
-            entities=all_entities
+            entities=all_entities,
+            all_forms=all_forms
         )
 
     def page_formats(self):
@@ -230,7 +248,8 @@ class WebsiteRoutes(Routers):
             "formats.html",
             selected_menu_item="formats",
             formats=formats,
-            entities=all_entities
+            entities=all_entities,
+            all_forms=all_forms
         )
 
     def page_item(self):
@@ -239,7 +258,8 @@ class WebsiteRoutes(Routers):
             "items.html",
             selected_menu_item="item",
             items=items,
-            entities=all_entities
+            entities=all_entities,
+            all_forms=all_forms
         )
 
     def page_new_project(self):
@@ -256,7 +276,8 @@ class WebsiteRoutes(Routers):
                           False),
                 FormField("text", "specs", "Specs", False),
             ],
-            entities=all_entities
+            entities=all_entities,
+            all_forms=all_forms
         )
 
     def page_new_collection(self):
@@ -269,7 +290,8 @@ class WebsiteRoutes(Routers):
                 FormField("text", "collection_name", "Name", True),
                 FormField("text", "department", "Department", True),
             ],
-            entities=all_entities
+            entities=all_entities,
+            all_forms=all_forms
         )
 
     def page_new_item(self):
@@ -283,7 +305,8 @@ class WebsiteRoutes(Routers):
                 FormField("text", "barcode", "Barcode", True),
                 FormField("text", "file_name", "File name", True),
             ],
-            entities=all_entities
+            entities=all_entities,
+            all_forms=all_forms
         )
 
 

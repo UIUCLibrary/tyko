@@ -107,9 +107,9 @@
                         Forms
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarFormsDropdown">
-                        <a class="dropdown-item" href="{{url_for('page_new_project')}}">New Project</a>
-                        <a class="dropdown-item" href="{{url_for('page_new_collection')}}">New Collection</a>
-                        <a class="dropdown-item" href="{{url_for('page_new_item')}}">New Item</a>
+                        {% for form_page in all_forms %}
+                        <a class="dropdown-item" href="{{url_for(form_page[1])}}">{{ form_page[0] }}</a>
+                        {% endfor %}
                     </div>
                 </li>
             </ul>
