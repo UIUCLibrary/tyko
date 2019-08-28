@@ -49,6 +49,8 @@ class Middleware:
     def add_project(self):
         project_code = request.form.get('project_code')
         title = request.form.get('title')
+        if title is None:
+            return make_response("Missing required data", 400)
         current_location = request.form.get('current_location')
         status = request.form.get('status')
         specs = request.form.get('specs')
