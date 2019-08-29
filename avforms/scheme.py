@@ -115,7 +115,6 @@ class CollectionObject(AVTables):
     contact = relationship("Contact", foreign_keys=[contact_id])
 
 
-
 class CollectionItem(AVTables):
     __tablename__ = "item"
 
@@ -154,6 +153,7 @@ class CollectionItem(AVTables):
             "barcode": self.barcode,
             "file_name": self.file_name
         }
+
 
 class Note(AVTables):
     __tablename__ = "notes"

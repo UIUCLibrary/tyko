@@ -111,10 +111,14 @@ class DataProvider:
                     .filter(scheme.CollectionItem.id == id)\
                     .all()
         else:
-            all_collection_item = self.session.query(scheme.CollectionItem).all()
+            all_collection_item = \
+                self.session.query(scheme.CollectionItem).all()
 
         if serialize:
-            return [collection_item.serialize() for collection_item in all_collection_item]
+            return [
+                collection_item.serialize()
+                for collection_item in all_collection_item
+            ]
         else:
             return all_collection_item
 

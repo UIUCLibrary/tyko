@@ -53,40 +53,55 @@ class Routes:
     def __init__(self, db_engine: DataProvider, app) -> None:
         self.db_engine = db_engine
         self.app = app
-        mw = avforms.Middleware(self.db_engine)
-        self.wr = WebsiteRoutes(mw)
-        self.ar = APIRoutes(mw)
+        self.mw = avforms.Middleware(self.db_engine)
+        self.wr = WebsiteRoutes(self.mw)
 
     def init_api_routes(self) -> None:
+        project = self.mw.entities["project"]
+        collection = self.mw.entities["collection"]
+        item = self.mw.entities["item"]
 
         if self.app:
             entities = [
                 APIEntity("Projects", rules=[
-                    Route("/api/project", "projects", self.ar.get_projects),
+                    Route("/api/project", "projects",
+                          lambda serialize=True: project.get(serialize)),
                     Route("/api/project/<string:id>", "project_by_id",
-                          self.ar.get_project_by_id),
+                          lambda id: project.get(id=id)),
                     Route("/api/project/", "add_project",
-                          self.ar.add_project, methods=["POST"]),
+                          project.create,
+                          methods=["POST"]),
                     Route("/api/project/<string:id>", "update_project",
-                          self.ar.update_project, methods=["PUT"]),
+                          lambda id: project.update(id=id),
+                          methods=["PUT"]),
                     Route("/api/project/<string:id>", "delete_project",
-                          self.ar.delete_project, methods=["DELETE"]),
+                          lambda id: project.delete(id=id),
+                          methods=["DELETE"]),
                   ]),
                 APIEntity("Collection", rules=[
                     Route("/api/collection", "collection",
-                          self.ar.get_collections),
+                          lambda serialize=True: collection.get(serialize)),
                     Route("/api/collection/<string:id>", "collection_by_id",
-                          self.ar.collection_by_id),
+                          lambda id: collection.get(id=id)),
                     Route("/api/collection/", "add_collection",
-                          self.ar.add_collection, methods=["POST"])
+                          collection.create,
+                          methods=["POST"])
                 ]),
                 APIEntity("Formats", rules=[
-                    Route("/api/format", "formats", self.ar.get_formats)
+                    Route("/api/format", "formats",
+                          self.mw.get_formats
+                          )
                 ]),
                 APIEntity("Item", rules=[
-                    Route("/api/item", "item", self.ar.get_item, methods=["GET"]),
-                    Route("/api/item/<string:id>", "item_by_id", self.ar.item_by_id, methods=["GET"]),
-                    Route("/api/item/", "add_item", self.ar.add_item, methods=["POST"])
+                    Route("/api/item", "item",
+                          lambda serialize=True: item.get(serialize),
+                          methods=["GET"]),
+                    Route("/api/item/<string:id>", "item_by_id",
+                          lambda id: item.get(id=id),
+                          methods=["GET"]),
+                    Route("/api/item/", "add_item",
+                          item.create,
+                          methods=["POST"])
 
                 ])
 
@@ -124,7 +139,7 @@ class Routes:
             EntityPage("Projects", "page_projects", rules=[
                     Route("/project", "page_projects", self.wr.page_projects),
                 ]),
-            EntityPage("Formats", "page_projects", rules=[
+            EntityPage("Formats", "page_formats", rules=[
                     Route("/format", "page_formats", self.wr.page_formats),
                 ]),
             EntityPage("Items", "page_item", rules=[
@@ -133,9 +148,15 @@ class Routes:
         ]
 
         form_pages = [
-            FormPage("Project", "page_new_project", rule=Route("/newproject", "page_new_project", self.wr.page_new_project)),
-            FormPage("Collection", "page_new_collection", rule=Route("/newcollection", "page_new_collection", self.wr.page_new_collection)),
-            FormPage("Item", "page_new_item", rule=Route("/newitem", "page_new_item", self.wr.page_new_item))
+            FormPage("Project", "page_new_project",
+                     rule=Route("/newproject", "page_new_project",
+                                self.wr.page_new_project)),
+            FormPage("Collection", "page_new_collection",
+                     rule=Route("/newcollection", "page_new_collection",
+                                self.wr.page_new_collection)),
+            FormPage("Item", "page_new_item",
+                     rule=Route("/newitem", "page_new_item",
+                                self.wr.page_new_item))
         ]
 
         if self.app:
@@ -168,43 +189,12 @@ class Routers:
         self.middleware = middleware
 
 
-class APIRoutes(Routers):
+class ProjectRoute:
+    def __init__(self, middleware: avforms.Middleware):
+        self._middleware = middleware.entities["project"]
 
-    def get_projects(self, serialize=True):
-        return self.middleware.get_projects(serialize)
-
-    def get_project_by_id(self, id):
-        return self.middleware.get_project_by_id(id)
-
-    def get_collections(self, serialize=True):
-        return self.middleware.get_collections(serialize)
-
-    def collection_by_id(self, id):
-        return self.middleware.collection_by_id(id)
-
-    def get_formats(self, serialize=True):
-        return self.middleware.get_formats(serialize)
-
-    def add_project(self):
-        return self.middleware.add_project()
-
-    def update_project(self, id):
-        return self.middleware.update_project(id)
-
-    def delete_project(self, id):
-        return self.middleware.delete_project(id)
-
-    def add_collection(self):
-        return self.middleware.add_collection()
-
-    def get_item(self, serialize=True):
-        return self.middleware.get_item(serialize)
-
-    def item_by_id(self, id):
-        return self.middleware.item_by_id(id)
-
-    def add_item(self):
-        return self.middleware.add_item()
+    def get(self, serialize=True):
+        return self._middleware.get(serialize=serialize)
 
 
 class WebsiteRoutes(Routers):
@@ -224,7 +214,9 @@ class WebsiteRoutes(Routers):
                                )
 
     def page_collections(self):
-        collections = self.middleware.get_collections(serialize=False)
+        collections = \
+            self.middleware.entities["collection"].get(serialize=False)
+
         return render_template(
             "collections.html",
             selected_menu_item="collection",
@@ -234,7 +226,8 @@ class WebsiteRoutes(Routers):
         )
 
     def page_projects(self):
-        projects = self.middleware.get_projects(serialize=False)
+
+        projects = self.middleware.entities["project"].get(serialize=False)
         return render_template(
             "projects.html",
             selected_menu_item="projects",
@@ -254,7 +247,7 @@ class WebsiteRoutes(Routers):
         )
 
     def page_item(self):
-        items = self.middleware.get_item(serialize=False)
+        items = self.middleware.entities['item'].get(serialize=False)
         return render_template(
             "items.html",
             selected_menu_item="item",
