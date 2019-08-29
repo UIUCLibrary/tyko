@@ -28,6 +28,61 @@ class AbsEntity(metaclass=abc.ABCMeta):
         """_C_RUD update"""
 
 
+class ObjectEntity(AbsEntity):
+
+    def get(self, serialize=False, *args, **kwargs):
+        if "id" in kwargs:
+            return self.object_by_id(id=kwargs["id"])
+
+        objects = \
+            self._data_provider.entities["object"].get(serialize=serialize)
+
+        if serialize:
+            data = {
+                "objects": objects,
+                "total": len(objects)
+            }
+            json_data = json.dumps(data)
+            response = make_response(jsonify(data, 200))
+
+            hash_value = \
+                hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
+
+            response.headers["ETag"] = str(hash_value)
+            response.headers["Cache-Control"] = "private, max-age=300"
+            return response
+        else:
+            result = projects
+        return result
+
+    def object_by_id(self, id):
+        current_object = \
+            self._data_provider.entities['object'].get(id,
+                                                           serialize=True)
+        if current_object:
+            return jsonify({
+                "object": current_object
+            })
+        else:
+            abort(404)
+
+    def delete(self, id):
+        """TODO"""
+
+    def update(self, id):
+        """TODO"""
+
+    def create(self):
+        """TODO"""
+        object_name = request.form["name"]
+        new_object_id = self._data_provider.entities['object'].create(
+            name=object_name
+        )
+        return jsonify({
+            "id": new_object_id,
+            "url": url_for("object_by_id", id=new_object_id)
+        })
+
 class CollectionEntity(AbsEntity):
 
     def get(self, serialize=False, *args, **kwargs):
@@ -264,12 +319,18 @@ class CollectionFactory(AbsFactory):
     def middleware(self):
         return CollectionEntity(self._data_provider)
 
+class ObjectFactory(AbsFactory):
+
+    def middleware(self):
+        return ObjectEntity(self._data_provider)
+
 
 def load_entity(name, data_provider: DataProvider) -> AbsFactory:
     entities: Mapping[str, Type[AbsFactory]] = {
         "project": ProjectFactory,
         "collection": CollectionFactory,
-        "item": ItemFactory
+        "item": ItemFactory,
+        "object": ObjectFactory
     }
 
     new_entity = entities[name]

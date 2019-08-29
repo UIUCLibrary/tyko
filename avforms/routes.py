@@ -60,6 +60,7 @@ class Routes:
         project = self.mw.entities["project"]
         collection = self.mw.entities["collection"]
         item = self.mw.entities["item"]
+        project_object = self.mw.entities["object"]
 
         if self.app:
             entities = [
@@ -103,6 +104,17 @@ class Routes:
                           item.create,
                           methods=["POST"])
 
+                ]),
+                APIEntity("Object", rules=[
+                    Route("/api/object", "object",
+                          lambda serialize=True: project_object.get(serialize),
+                          methods=["GET"]
+                          ),
+                    Route("/api/object/<string:id>", "object_by_id",
+                          lambda id: project_object.get(id=id)),
+                    Route("/api/object/", "add_object",
+                          project_object.create,
+                          methods=["POST"])
                 ])
 
             ]
@@ -130,8 +142,6 @@ class Routes:
             ]
 
         entity_pages = [
-
-
             EntityPage("Collection", "page_collections", rules=[
                     Route("/collection", "page_collections",
                           self.wr.page_collections)

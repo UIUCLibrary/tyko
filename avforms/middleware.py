@@ -12,7 +12,8 @@ class Middleware:
         entities = [
             "project",
             "collection",
-            "item"
+            "item",
+            "object"
         ]
         self.entities: Mapping[str, AbsEntity] = dict()
         for entity in entities:

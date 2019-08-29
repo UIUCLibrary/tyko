@@ -91,6 +91,45 @@ class ProjectData(AbsDataProvider):
             return items_deleted > 0
         return False
 
+class ObjectData(AbsDataProvider):
+
+    def get(self, id=None, serialize=False):
+        if id:
+            all_collection_object = \
+                self._session.query(scheme.CollectionObject) \
+                    .filter(scheme.CollectionObject.id == id) \
+                    .all()
+        else:
+            all_collection_object = \
+                self._session.query(scheme.CollectionObject).all()
+
+        if serialize:
+            return [
+                collection_object.serialize()
+                for collection_object in all_collection_object
+            ]
+        else:
+            return all_collection_object
+
+    def create(self, *args, **kwargs):
+        # TODO!
+        name = kwargs["name"]
+        new_object = scheme.CollectionObject(
+            name=name,
+        )
+        self._session.add(new_object)
+        self._session.commit()
+
+        return new_object.id
+
+    def update(self, id, changed_data):
+        # TODO!
+        pass
+
+    def delete(self, id):
+        # TODO!
+        pass
+
 
 class ItemData(AbsDataProvider):
 
@@ -186,6 +225,7 @@ class DataProvider:
             "collection": CollectionData(self.session),
             "project": ProjectData(self.session),
             "item": ItemData(self.session),
+            "object": ObjectData(self.session)
         }
 
     def init_database(self):

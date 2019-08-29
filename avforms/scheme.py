@@ -114,6 +114,15 @@ class CollectionObject(AVTables):
 
     contact = relationship("Contact", foreign_keys=[contact_id])
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "collection_id": self.collection_id,
+            "project_id": self.project_id,
+            "last_updated_id": self.last_updated_id,
+            "contact_id": self.contact_id
+        }
 
 class CollectionItem(AVTables):
     __tablename__ = "item"
