@@ -34,7 +34,9 @@ class CollectionEntity(AbsEntity):
         if "id" in kwargs:
             return self.collection_by_id(id=kwargs["id"])
 
-        collections = self._data_provider.get_collection(serialize=serialize)
+        collections = \
+            self._data_provider.entities['collection'].get(serialize=serialize)
+
         if serialize:
             data = {
                 "collections": collections,
@@ -56,8 +58,8 @@ class CollectionEntity(AbsEntity):
 
     def collection_by_id(self, id):
         current_collection = \
-            self._data_provider.get_collection(id, serialize=True)
-
+            self._data_provider.entities['collection'].get(id,
+                                                           serialize=True)
         if current_collection:
             return jsonify({
                 "collection": current_collection
@@ -75,10 +77,12 @@ class CollectionEntity(AbsEntity):
         collection_name = request.form["collection_name"]
         department = request.form.get("department")
         record_series = request.form.get("record_series")
-        new_collection_id = self._data_provider.add_collection(
-            collection_name=collection_name,
-            department=department,
-            record_series=record_series)
+        new_collection_id = \
+            self._data_provider.entities['collection'].create(
+                collection_name=collection_name,
+                department=department,
+                record_series=record_series)
+
         return jsonify({
             "id": new_collection_id,
             "url": url_for("collection_by_id", id=new_collection_id)
@@ -91,7 +95,9 @@ class ProjectEntity(AbsEntity):
         if "id" in kwargs:
             return self.get_project_by_id(kwargs["id"])
 
-        projects = self._data_provider.get_project(serialize=serialize)
+        projects = \
+            self._data_provider.entities['project'].get(serialize=serialize)
+
         if serialize:
             data = {
                 "projects": projects,
@@ -111,7 +117,9 @@ class ProjectEntity(AbsEntity):
         return result
 
     def get_project_by_id(self, id):
-        current_project = self._data_provider.get_project(id, serialize=True)
+        current_project = \
+            self._data_provider.entities['project'].get(id, serialize=True)
+
         if current_project:
             return jsonify(
                 {
@@ -122,7 +130,7 @@ class ProjectEntity(AbsEntity):
             abort(404)
 
     def delete(self, id):
-        if self._data_provider.delete_project(id):
+        if self._data_provider.entities['project'].delete(id):
             return make_response("", 204)
         else:
             make_response("", 404)
@@ -134,7 +142,10 @@ class ProjectEntity(AbsEntity):
             "status": request.form["status"],
             "title": request.form["title"]
         }
-        updated_project = self._data_provider.update_project(id, new_project)
+        updated_project = \
+            self._data_provider.entities['project'].update(
+                id, changed_data=new_project)
+
         if not updated_project:
             return make_response("", 204)
         else:
@@ -150,13 +161,15 @@ class ProjectEntity(AbsEntity):
         current_location = request.form.get('current_location')
         status = request.form.get('status')
         specs = request.form.get('specs')
-        new_project_id = self._data_provider.add_project(
-            title=title,
-            project_code=project_code,
-            current_location=current_location,
-            status=status,
-            specs=specs
-        )
+        new_project_id = \
+            self._data_provider.entities['project'].create(
+                title=title,
+                project_code=project_code,
+                current_location=current_location,
+                status=status,
+                specs=specs
+            )
+
         return jsonify(
             {
                 "id": new_project_id,
@@ -171,7 +184,7 @@ class ItemEntity(AbsEntity):
         if "id" in kwargs:
             return self.item_by_id(kwargs["id"])
 
-        items = self._data_provider.get_item(serialize=serialize)
+        items = self._data_provider.entities['item'].get(serialize=serialize)
         if serialize:
             data = {
                 "items": items,
@@ -193,7 +206,9 @@ class ItemEntity(AbsEntity):
         return result
 
     def item_by_id(self, id):
-        current_item = self._data_provider.get_item(id, serialize=True)
+        current_item = \
+            self._data_provider.entities['item'].get(id, serialize=True)
+
         if current_item:
             return jsonify(
                 {
@@ -213,7 +228,7 @@ class ItemEntity(AbsEntity):
         name = request.form.get('name')
         barcode = request.form.get('barcode')
         file_name = request.form.get('file_name')
-        new_item_id = self._data_provider.add_item(
+        new_item_id = self._data_provider.entities['item'].create(
             name=name,
             barcode=barcode,
             file_name=file_name
