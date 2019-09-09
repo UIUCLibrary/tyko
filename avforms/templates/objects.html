@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h3>Items</h3>
+<div class="row onePadding">
+    <div class="col-md-12 col-sm-12">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <tr>
+                    <th>Name</th>
+                </tr>
+                {% for object in objects %}
+                    <tr>
+                        <td>{{object['name']}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
