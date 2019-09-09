@@ -57,10 +57,17 @@ class Routes:
         self.wr = WebsiteRoutes(self.mw)
 
     def init_api_routes(self) -> None:
-        project = self.mw.entities["project"]
-        collection = self.mw.entities["collection"]
-        item = self.mw.entities["item"]
-        project_object = self.mw.entities["object"]
+        project = \
+            avforms.ENTITIES["project"].factory(self.db_engine).middleware()
+
+        collection = \
+            avforms.ENTITIES["collection"].factory(self.db_engine).middleware()
+
+        item = \
+            avforms.ENTITIES["item"].factory(self.db_engine).middleware()
+
+        project_object = \
+            avforms.ENTITIES["object"].factory(self.db_engine).middleware()
 
         if self.app:
             entities = [
@@ -154,7 +161,10 @@ class Routes:
                 ]),
             EntityPage("Items", "page_item", rules=[
                     Route("/item", "page_item", self.wr.page_item)
-                ])
+                ]),
+            EntityPage("Objects", "page_object", rules=[
+                    Route("/object", "page_object", self.wr.page_object)
+                ]),
         ]
 
         form_pages = [
@@ -262,6 +272,16 @@ class WebsiteRoutes(Routers):
             "items.html",
             selected_menu_item="item",
             items=items,
+            entities=all_entities,
+            all_forms=all_forms
+        )
+
+    def page_object(self):
+        objects = self.middleware.entities['object'].get(serialize=False)
+        return render_template(
+            "objects.html",
+            selected_menu_item="object",
+            objects=objects,
             entities=all_entities,
             all_forms=all_forms
         )

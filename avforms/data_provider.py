@@ -1,8 +1,7 @@
 import sqlalchemy
 from sqlalchemy import orm
 import abc
-from avforms import database, scheme
-
+import avforms
 
 class AbsDataProvider(metaclass=abc.ABCMeta):
 
@@ -30,12 +29,12 @@ class ProjectData(AbsDataProvider):
 
     def get(self, id=None, serialize=False):
         if id:
-            all_projects = self._session.query(scheme.Project)\
-                .filter(scheme.Project.id == id)\
+            all_projects = self._session.query(avforms.scheme.Project)\
+                .filter(avforms.scheme.Project.id == id)\
                 .all()
 
         else:
-            all_projects = self._session.query(scheme.Project).all()
+            all_projects = self._session.query(avforms.scheme.Project).all()
         if serialize:
             return [project.serialize() for project in all_projects]
         else:
@@ -47,7 +46,7 @@ class ProjectData(AbsDataProvider):
         current_location = kwargs.get("current_location")
         status = kwargs.get("status")
         specs = kwargs.get("specs")
-        new_project = scheme.Project(
+        new_project = avforms.scheme.Project(
             title=title,
             project_code=project_code,
             current_location=current_location,
@@ -85,8 +84,8 @@ class ProjectData(AbsDataProvider):
     def delete(self, id):
         if id:
             items_deleted = \
-                self.session.query(scheme.Project)\
-                    .filter(scheme.Project.id == id)\
+                self.session.query(avforms.scheme.Project)\
+                    .filter(avforms.scheme.Project.id == id)\
                     .delete()
             return items_deleted > 0
         return False
@@ -96,12 +95,12 @@ class ObjectData(AbsDataProvider):
     def get(self, id=None, serialize=False):
         if id:
             all_collection_object = \
-                self._session.query(scheme.CollectionObject) \
-                    .filter(scheme.CollectionObject.id == id) \
+                self._session.query(avforms.scheme.CollectionObject) \
+                    .filter(avforms.scheme.CollectionObject.id == id) \
                     .all()
         else:
             all_collection_object = \
-                self._session.query(scheme.CollectionObject).all()
+                self._session.query(avforms.scheme.CollectionObject).all()
 
         if serialize:
             return [
@@ -114,7 +113,7 @@ class ObjectData(AbsDataProvider):
     def create(self, *args, **kwargs):
         # TODO!
         name = kwargs["name"]
-        new_object = scheme.CollectionObject(
+        new_object = avforms.scheme.CollectionObject(
             name=name,
         )
         self._session.add(new_object)
@@ -136,12 +135,12 @@ class ItemData(AbsDataProvider):
     def get(self, id=None, serialize=False):
         if id:
             all_collection_item = \
-                self._session.query(scheme.CollectionItem)\
-                    .filter(scheme.CollectionItem.id == id)\
+                self._session.query(avforms.scheme.CollectionItem)\
+                    .filter(avforms.scheme.CollectionItem.id == id)\
                     .all()
         else:
             all_collection_item = \
-                self._session.query(scheme.CollectionItem).all()
+                self._session.query(avforms.scheme.CollectionItem).all()
 
         if serialize:
             return [
@@ -155,7 +154,7 @@ class ItemData(AbsDataProvider):
         name = kwargs["name"]
         barcode = kwargs.get("barcode")
         file_name = kwargs.get("file_name")
-        new_item = scheme.CollectionItem(
+        new_item = avforms.scheme.CollectionItem(
             name=name,
             barcode=barcode,
             file_name=file_name
@@ -178,11 +177,11 @@ class CollectionData(AbsDataProvider):
     def get(self, id=None, serialize=False):
         if id:
             all_collections = \
-                self._session.query(scheme.Collection)\
-                    .filter(scheme.Collection.id == id)\
+                self._session.query(avforms.scheme.Collection)\
+                    .filter(avforms.scheme.Collection.id == id)\
                     .all()
         else:
-            all_collections = self._session.query(scheme.Collection).all()
+            all_collections = self._session.query(avforms.scheme.Collection).all()
 
         if serialize:
             return [collection.serialize() for collection in all_collections]
@@ -194,7 +193,7 @@ class CollectionData(AbsDataProvider):
         department = kwargs.get("department")
         record_series = kwargs.get("record_series")
 
-        new_collection = scheme.Collection(
+        new_collection = avforms.scheme.Collection(
             collection_name=collection_name,
             department=department,
             record_series=record_series
@@ -221,19 +220,16 @@ class DataProvider:
         db_session = orm.sessionmaker(bind=self.db_engine)
         self.session = db_session()
 
-        self.entities = {
-            "collection": CollectionData(self.session),
-            "project": ProjectData(self.session),
-            "item": ItemData(self.session),
-            "object": ObjectData(self.session)
-        }
+        self.entities = dict()
+        for k, v in avforms.ENTITIES.items():
+            self.entities[k] = v[1](self.session)
 
     def init_database(self):
         db_engine = sqlalchemy.create_engine(self.engine)
-        database.init_database(db_engine)
+        avforms.database.init_database(db_engine)
 
     def get_formats(self, serialize=False):
-        all_formats = self.session.query(scheme.FormatTypes).all()
+        all_formats = self.session.query(avforms.scheme.FormatTypes).all()
         if serialize:
             return [format_.serialize() for format_ in all_formats]
         else:
