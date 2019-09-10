@@ -148,24 +148,44 @@ class Routes:
             Route("/about", "page_about", self.wr.page_about),
             ]
 
+        simple_pages = []
+        for entity in ["project",
+                       "item",
+                       "object",
+                       "collection"
+                       ]:
+
+            simple_pages.append(
+                avforms.ENTITIES[entity].factory(self.db_engine)
+                    .web_frontend())
+
+
         entity_pages = [
-            EntityPage("Collection", "page_collections", rules=[
-                    Route("/collection", "page_collections",
-                          self.wr.page_collections)
-                ]),
-            EntityPage("Projects", "page_projects", rules=[
-                    Route("/project", "page_projects", self.wr.page_projects),
-                ]),
-            EntityPage("Formats", "page_formats", rules=[
-                    Route("/format", "page_formats", self.wr.page_formats),
-                ]),
-            EntityPage("Items", "page_item", rules=[
-                    Route("/item", "page_item", self.wr.page_item)
-                ]),
-            EntityPage("Objects", "page_object", rules=[
-                    Route("/object", "page_object", self.wr.page_object)
+            EntityPage(
+                "Formats",
+                "page_formats",
+                rules=[
+                    Route(
+                        "/format",
+                        "page_formats",
+                        self.wr.page_formats),
                 ]),
         ]
+
+        for simple_page in simple_pages:
+            entity_pages.append(
+                EntityPage(
+                    simple_page.entity_title,
+                    simple_page.entity_list_page_name,
+                    rules=[
+                        Route(
+                            simple_page.entity_rule,
+                            simple_page.entity_list_page_name,
+                            simple_page.list
+                        )
+                    ]
+                )
+            )
 
         form_pages = [
             FormPage("Project", "page_new_project",
@@ -234,6 +254,7 @@ class WebsiteRoutes(Routers):
                                )
 
     def page_collections(self):
+
         collections = \
             self.middleware.entities["collection"].get(serialize=False)
 

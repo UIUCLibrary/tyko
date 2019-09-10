@@ -35,20 +35,24 @@
 
             <ul class="navbar-nav mr-auto">
                 {% if selected_menu_item == "index" %}
-                <li class="nav-item active">
-                {% else %}
-                <li class="nav-item">
-                    {% endif %}
-                    <a class="nav-link" href="{{url_for('page_index')}}">Home</a>
-                </li>
-                {% if selected_menu_item == "about" %}
                     <li class="nav-item active">
                 {% else %}
-                <li class="nav-item">
+                    <li class="nav-item">
                 {% endif %}
-                    <a class="nav-link" href="{{url_for('page_about')}}">About</a>
+                    <a class="nav-link" href="{{url_for('page_index')}}">Home</a>
                 </li>
+                    {% if selected_menu_item == "about" %}
+                        <li class="nav-item active">
+                    {% else %}
+                        <li class="nav-item">
+                    {% endif %}
+                        <a class="nav-link" href="{{url_for('page_about')}}">About</a>
+                </li>
+                {% if selected_menu_item == "Item" %}
+                    <li class="nav-item dropdown active">
+                {% else %}
                 <li class="nav-item dropdown">
+                {% endif %}
                     <a class="nav-link dropdown-toggle" href="#" id="navbarEntitiesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Entities
                     </a>

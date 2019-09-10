@@ -1,15 +1,21 @@
 import abc
 from typing import NamedTuple, Type
+from avforms import middleware, frontend
 import avforms.data_provider
-from avforms import middleware
+
 
 class AbsFactory(metaclass=abc.ABCMeta):
     def __init__(self, provider: avforms.data_provider.DataProvider) -> None:
         self._data_provider = provider
 
     @abc.abstractmethod
-    def middleware(self) -> middleware.AbsMiddlwareEntity:
+    def middleware(self):
         pass
+
+    @abc.abstractmethod
+    def web_frontend(self) -> frontend.AbsFrontendEntity:
+        pass
+
 
 class EntityComponent(NamedTuple):
     factory: Type[AbsFactory]
@@ -20,10 +26,16 @@ class ProjectFactory(AbsFactory):
     def middleware(self) -> middleware.AbsMiddlwareEntity:
         return middleware.ProjectMiddlwareEntity(self._data_provider)
 
+    def web_frontend(self) -> frontend.AbsFrontendEntity:
+        return frontend.ProjectFrontend(self._data_provider)
+
 
 class ItemFactory(AbsFactory):
     def middleware(self) -> middleware.AbsMiddlwareEntity:
         return middleware.ItemMiddlwareEntity(self._data_provider)
+
+    def web_frontend(self) -> frontend.AbsFrontendEntity:
+        return frontend.ItemFrontend(self._data_provider)
 
 
 class CollectionFactory(AbsFactory):
@@ -31,10 +43,18 @@ class CollectionFactory(AbsFactory):
     def middleware(self):
         return middleware.CollectionMiddlwareEntity(self._data_provider)
 
+    def web_frontend(self) -> frontend.AbsFrontendEntity:
+        return frontend.CollectiontFrontend(self._data_provider)
+
+
 class ObjectFactory(AbsFactory):
 
     def middleware(self):
         return middleware.ObjectMiddlwareEntity(self._data_provider)
+
+    def web_frontend(self) -> frontend.AbsFrontendEntity:
+        return frontend.ObjectFrontend(self._data_provider)
+
 
 
 def load_entity(name, data_provider: avforms.data_provider.DataProvider) -> AbsFactory:
