@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, render_template
 import avforms
-from .decorators import authenticate
+
 from avforms.data_provider import DataProvider
 from dataclasses import dataclass, field
 from typing import Any, List
+import warnings
 
 the_app = Flask(__name__)
 
@@ -28,20 +29,6 @@ class EntityPage:
     entity_list_page: str
     rules: List[Route] = field(default_factory=list)
 
-
-@dataclass
-class FormPage:
-    page_name: str
-    page_endpoint: str
-    rule: Route
-
-
-@dataclass
-class FormField:
-    form_type: str
-    form_id: str
-    form_user_text: str
-    required: bool
 
 
 all_entities = set()
@@ -187,18 +174,6 @@ class Routes:
                 )
             )
 
-        form_pages = [
-            FormPage("Project", "page_new_project",
-                     rule=Route("/newproject", "page_new_project",
-                                self.wr.page_new_project)),
-            FormPage("Collection", "page_new_collection",
-                     rule=Route("/newcollection", "page_new_collection",
-                                self.wr.page_new_collection)),
-            FormPage("Item", "page_new_item",
-                     rule=Route("/newitem", "page_new_item",
-                                self.wr.page_new_item))
-        ]
-
         if self.app:
             for rule in static_web_routes:
                 self.app.add_url_rule(rule.rule, rule.method,
@@ -211,31 +186,15 @@ class Routes:
 
                     self.app.add_url_rule(rule.rule, rule.method,
                                           rule.viewFunction)
-
-            for form_page in form_pages:
-                all_forms.add(
-                    (
-                        form_page.page_name,
-                        form_page.page_endpoint
-                    )
-                )
-                rule = form_page.rule
-                self.app.add_url_rule(rule.rule, rule.method,
-                                      rule.viewFunction)
-
+            for form_page in avforms.frontend.all_forms:
+                all_forms.add((form_page.form_title, form_page.form_page_name))
+                self.app.add_url_rule(form_page.form_page_rule,
+                                      form_page.form_page_name,
+                                      form_page.create)
 
 class Routers:
     def __init__(self, middleware: avforms.Middleware) -> None:
         self.middleware = middleware
-
-
-class ProjectRoute:
-    def __init__(self, middleware: avforms.Middleware):
-        self._middleware = middleware.entities["project"]
-
-    def get(self, serialize=True):
-        return self._middleware.get(serialize=serialize)
-
 
 class WebsiteRoutes(Routers):
 
@@ -253,31 +212,8 @@ class WebsiteRoutes(Routers):
                                all_forms=all_forms
                                )
 
-    def page_collections(self):
-
-        collections = \
-            self.middleware.entities["collection"].get(serialize=False)
-
-        return render_template(
-            "collections.html",
-            selected_menu_item="collection",
-            collections=collections,
-            entities=all_entities,
-            all_forms=all_forms
-        )
-
-    def page_projects(self):
-
-        projects = self.middleware.entities["project"].get(serialize=False)
-        return render_template(
-            "projects.html",
-            selected_menu_item="projects",
-            projects=projects,
-            entities=all_entities,
-            all_forms=all_forms
-        )
-
     def page_formats(self):
+
         formats = self.middleware.get_formats(serialize=False)
         return render_template(
             "formats.html",
@@ -286,77 +222,6 @@ class WebsiteRoutes(Routers):
             entities=all_entities,
             all_forms=all_forms
         )
-
-    def page_item(self):
-        items = self.middleware.entities['item'].get(serialize=False)
-        return render_template(
-            "items.html",
-            selected_menu_item="item",
-            items=items,
-            entities=all_entities,
-            all_forms=all_forms
-        )
-
-    def page_object(self):
-        objects = self.middleware.entities['object'].get(serialize=False)
-        return render_template(
-            "objects.html",
-            selected_menu_item="object",
-            objects=objects,
-            entities=all_entities,
-            all_forms=all_forms
-        )
-
-    @authenticate
-    def page_new_project(self):
-        return render_template(
-            "newentity.html",
-            selected_menu_item="forms",
-            form_title="New Project",
-            api_location="api/project/",
-            form_fields=[
-                FormField("text", "title", "Project Title", True),
-                FormField("text", "project_code", "Project Code", False),
-                FormField("text", "status", "Project Status", False),
-                FormField("text", "current_location", "Current Location",
-                          False),
-                FormField("text", "specs", "Specs", False),
-            ],
-            entities=all_entities,
-            all_forms=all_forms
-        )
-
-    @authenticate
-    def page_new_collection(self):
-        return render_template(
-            "newentity.html",
-            selected_menu_item="forms",
-            form_title="New Collection",
-            api_location="api/collection/",
-            form_fields=[
-                FormField("text", "collection_name", "Name", True),
-                FormField("text", "department", "Department", True),
-            ],
-            entities=all_entities,
-            all_forms=all_forms
-        )
-
-    @authenticate
-    def page_new_item(self):
-        return render_template(
-            "newentity.html",
-            selected_menu_item="forms",
-            form_title="New Item",
-            api_location="api/item/",
-            form_fields=[
-                FormField("text", "name", "Name", True),
-                FormField("text", "barcode", "Barcode", True),
-                FormField("text", "file_name", "File name", True),
-            ],
-            entities=all_entities,
-            all_forms=all_forms
-        )
-
 
 def list_routes(app):
     results = []
