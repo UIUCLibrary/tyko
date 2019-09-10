@@ -124,6 +124,7 @@ class CollectionObject(AVTables):
             "contact_id": self.contact_id
         }
 
+
 class CollectionItem(AVTables):
     __tablename__ = "item"
 

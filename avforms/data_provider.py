@@ -3,6 +3,7 @@ from sqlalchemy import orm
 import abc
 import avforms
 
+
 class AbsDataProvider(metaclass=abc.ABCMeta):
 
     def __init__(self, session) -> None:
@@ -89,6 +90,7 @@ class ProjectData(AbsDataProvider):
                     .delete()
             return items_deleted > 0
         return False
+
 
 class ObjectData(AbsDataProvider):
 
@@ -181,7 +183,8 @@ class CollectionData(AbsDataProvider):
                     .filter(avforms.scheme.Collection.id == id)\
                     .all()
         else:
-            all_collections = self._session.query(avforms.scheme.Collection).all()
+            all_collections = \
+                self._session.query(avforms.scheme.Collection).all()
 
         if serialize:
             return [collection.serialize() for collection in all_collections]

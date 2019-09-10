@@ -56,8 +56,9 @@ class ObjectFactory(AbsFactory):
         return frontend.ObjectFrontend(self._data_provider)
 
 
+def load_entity(name, data_provider: avforms.data_provider.DataProvider) \
+        -> AbsFactory:
 
-def load_entity(name, data_provider: avforms.data_provider.DataProvider) -> AbsFactory:
     new_entity = entities[name][0]
     return new_entity(data_provider)
 

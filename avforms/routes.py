@@ -4,7 +4,6 @@ import avforms
 from avforms.data_provider import DataProvider
 from dataclasses import dataclass, field
 from typing import Any, List
-import warnings
 
 the_app = Flask(__name__)
 
@@ -28,7 +27,6 @@ class EntityPage:
     entity_type: str
     entity_list_page: str
     rules: List[Route] = field(default_factory=list)
-
 
 
 all_entities = set()
@@ -143,9 +141,8 @@ class Routes:
                        ]:
 
             simple_pages.append(
-                avforms.ENTITIES[entity].factory(self.db_engine)
-                    .web_frontend())
-
+                avforms.ENTITIES[entity].factory(self.db_engine).web_frontend()
+            )
 
         entity_pages = [
             EntityPage(
@@ -192,9 +189,11 @@ class Routes:
                                       form_page.form_page_name,
                                       form_page.create)
 
+
 class Routers:
     def __init__(self, middleware: avforms.Middleware) -> None:
         self.middleware = middleware
+
 
 class WebsiteRoutes(Routers):
 
@@ -222,6 +221,7 @@ class WebsiteRoutes(Routers):
             entities=all_entities,
             all_forms=all_forms
         )
+
 
 def list_routes(app):
     results = []

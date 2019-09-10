@@ -6,6 +6,7 @@ from typing import Tuple, Set
 from dataclasses import dataclass
 from .decorators import authenticate
 
+
 @dataclass
 class FormField:
     form_type: str
@@ -20,15 +21,15 @@ class AbsFrontend(metaclass=abc.ABCMeta):
         context["entities"] = FrontendEntity.all_entities()
         form_list = set()
 
-        for form  in all_forms:
+        for form in all_forms:
             form_list.add((form.form_title, form.form_page_name))
 
         context["all_forms"] = sorted(form_list)
 
-
     @abc.abstractmethod
     def _render_page(self, tempate, **context):
         pass
+
 
 class FrontendEntity(AbsFrontend):
     _entities: Set[Tuple[str, str]] = {("Formats", "page_formats")}
@@ -51,7 +52,6 @@ class FrontendEntity(AbsFrontend):
 
         return render_template(tempate, **context)
 
-
     @property
     @abc.abstractmethod
     def entity_title(self) -> str:
@@ -62,7 +62,6 @@ class FrontendEntity(AbsFrontend):
     def entity_rule(self) -> str:
         pass
 
-
     @property
     @abc.abstractmethod
     def entity_list_page_name(self) -> str:
@@ -71,6 +70,7 @@ class FrontendEntity(AbsFrontend):
     @classmethod
     def all_entities(cls):
         return sorted(cls._entities)
+
 
 class ProjectFrontend(FrontendEntity):
 
@@ -91,12 +91,10 @@ class ProjectFrontend(FrontendEntity):
         return "page_projects"
 
 
-
 class ItemFrontend(FrontendEntity):
     def list(self):
         items = self._data_provider.entities['item'].get(serialize=False)
         return self._render_page(tempate="items.html", items=items)
-
 
     @property
     def entity_title(self) -> str:
@@ -109,7 +107,6 @@ class ItemFrontend(FrontendEntity):
     @property
     def entity_list_page_name(self) -> str:
         return "page_item"
-
 
 
 class ObjectFrontend(FrontendEntity):
@@ -172,7 +169,6 @@ class NewEntityForm(AbsFrontend):
     def form_page_rule(self) -> str:
         pass
 
-
     def __init__(self):
         NewEntityForm._forms.add(
             (self.form_title, self.form_page_name)
@@ -201,13 +197,11 @@ class NewProjectForm(NewEntityForm):
     def form_page_name(self) -> str:
         return "page_new_project"
 
-
-
     def create(self):
         return self._render_page(
             form_title="New Project",
             api_location="api/project/",
-            form_fields= [
+            form_fields=[
                     FormField("text", "title", "Project Title", True),
                     FormField("text", "project_code", "Project Code", False),
                     FormField("text", "status", "Project Status", False),
@@ -216,7 +210,6 @@ class NewProjectForm(NewEntityForm):
                     FormField("text", "specs", "Specs", False),
                 ],
         )
-
 
     @property
     def form_page_rule(self) -> str:
@@ -257,6 +250,7 @@ class NewItem(NewEntityForm):
     @property
     def form_page_name(self) -> str:
         return "page_new_item"
+
     @property
     def form_page_rule(self) -> str:
         return "/newitem"

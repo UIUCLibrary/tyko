@@ -9,8 +9,10 @@ import avforms.entities
 import avforms.data_provider
 from avforms.data_provider import DataProvider
 
+
 class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
-    def __init__(self, data_provider: avforms.data_provider.DataProvider) -> None:
+    def __init__(self,
+                 data_provider: avforms.data_provider.DataProvider) -> None:
         self._data_provider = data_provider
 
     @abc.abstractmethod
@@ -29,6 +31,7 @@ class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
     def create(self):
         """_C_RUD update"""
 
+
 class Middleware:
     def __init__(self, data_provider: DataProvider) -> None:
         self.data_provider = data_provider
@@ -36,7 +39,8 @@ class Middleware:
         self.entities: Mapping[str, AbsMiddlwareEntity] = dict()
         for entity in avforms.ENTITIES.keys():
             self.entities[entity] = \
-                avforms.entities.load_entity(entity, self.data_provider).middleware()
+                avforms.entities.load_entity(
+                    entity, self.data_provider).middleware()
 
     def get_formats(self, serialize=True):
         formats = self.data_provider.get_formats(serialize=serialize)
@@ -76,8 +80,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
 
     def object_by_id(self, id):
         current_object = \
-            self._data_provider.entities['object'].get(id,
-                                                           serialize=True)
+            self._data_provider.entities['object'].get(id, serialize=True)
         if current_object:
             return jsonify({
                 "object": current_object
