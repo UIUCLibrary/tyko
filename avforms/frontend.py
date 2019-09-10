@@ -241,7 +241,7 @@ class NewCollectionForm(NewEntityForm):
         )
 
 
-class NewItem(NewEntityForm):
+class NewItemForm(NewEntityForm):
 
     @property
     def form_title(self) -> str:
@@ -267,10 +267,33 @@ class NewItem(NewEntityForm):
         )
 
 
-# INIT the forms
+class NewObjectForm(NewEntityForm):
+
+    @property
+    def form_title(self) -> str:
+        return "New Object"
+
+    @property
+    def form_page_name(self) -> str:
+        return "page_new_object"
+
+    @property
+    def form_page_rule(self) -> str:
+        return "/newobject"
+
+    def create(self):
+        return self._render_page(
+            form_title="New Object",
+            api_location="api/object/",
+            form_fields=[
+                FormField("text", "name", "Name", True),
+            ]
+        )
+
 
 all_forms = {
     NewProjectForm(),
     NewCollectionForm(),
-    NewItem()
+    NewItemForm(),
+    NewObjectForm()
 }
