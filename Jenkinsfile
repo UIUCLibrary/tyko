@@ -385,7 +385,7 @@ foreach($file in $opengl32_libraries){
                                     catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
                                         bat(
                                             label: "Running bandit",
-                                            script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}\\scm\\avforms || bandit -f html --recursive ${WORKSPACE}\\scm\\avforms > ${WORKSPACE}/reports/bandit-report.html"
+                                            script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}\\scm\\avforms || bandit -f txt --recursive ${WORKSPACE}\\scm\\avforms --ouput ${WORKSPACE}/reports/bandit-report.txt"
                                             )
 
 
@@ -395,10 +395,10 @@ foreach($file in $opengl32_libraries){
                             }
                             post {
                                 always {
-                                    archiveArtifacts "reports/bandit-report.json,reports/bandit-report.html"
+                                    archiveArtifacts "reports/bandit-report.json,reports/bandit-report.txt"
                                 }
                                 unstable{
-                                    parseBanditReport("reports/bandit-report.json", "${currentBuild.absoluteUrl}/artifact/reports/bandit-report.html")
+                                    parseBanditReport("reports/bandit-report.json", "${currentBuild.absoluteUrl}/artifact/reports/bandit-report.txt")
                                 }
                             }
                         }
