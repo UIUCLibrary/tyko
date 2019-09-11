@@ -4,20 +4,20 @@ def parseBanditReport(jsonFile, fullReport){
         try{
             def jsonData = readJSON file: jsonFile
             def summary = createSummary icon: 'warning.gif', text: "Bandit Security Issues Detected"
-
-            summary.appendText("<ul>")
-
-            jsonData['results'].each {
-
-                def code = it['code'].replaceAll("\n", "<br />")
-
-                summary.appendText("<li>")
-                summary.appendText("${it['filename']}:")
-                summary.appendText("<br /><br />${it['issue_text']}")
-                summary.appendText("<p><code>${code}</code></p>")
-                summary.appendText("</li>")
-            }
-            summary.appendText("</ul>")
+            summary.appendText(readFile(fullReport))
+//            summary.appendText("<ul>")
+//
+//            jsonData['results'].each {
+//
+//                def code = it['code'].replaceAll("\n", "<br />")
+//
+//                summary.appendText("<li>")
+//                summary.appendText("${it['filename']}:")
+//                summary.appendText("<br /><br />${it['issue_text']}")
+//                summary.appendText("<p><code>${code}</code></p>")
+//                summary.appendText("</li>")
+//            }
+//            summary.appendText("</ul>")
 
             addWarningBadge text: "Bandit security issues detected", link: "${fullReport}"
 
