@@ -385,13 +385,9 @@ foreach($file in $opengl32_libraries){
                                     catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
                                         bat(
                                             label: "Running bandit",
-                                            script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}\\scm\\avforms"
+                                            script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}\\scm\\avforms || bandit -f html --recursive ${WORKSPACE}\\scm\\avforms > ${WORKSPACE}/reports/bandit-report.html"
                                             )
 
-                                        bat(
-                                            label: "Creating bandit HTML report ",
-                                            script: "bandit -f html --recursive ${WORKSPACE}\\scm\\avforms > ${WORKSPACE}/reports/bandit-report.html"
-                                            )
 
                                     }
 
