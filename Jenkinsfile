@@ -4,7 +4,7 @@ def parseBanditReport(jsonFile, fullReport){
         try{
             def jsonData = readJSON file: jsonFile
             def summary = createSummary icon: 'warning.gif', text: "Bandit Security Issues Detected"
-            summary.appendText(readFile(fullReport))
+            summary.appendText(readFile("reports/bandit-report.html"))
 //            summary.appendText("<ul>")
 //
 //            jsonData['results'].each {
