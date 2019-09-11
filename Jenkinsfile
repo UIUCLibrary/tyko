@@ -1,10 +1,14 @@
 @Library(["devpi", "PythonHelpers"]) _
 
 def parseBanditReport(jsonFile){
-    echo "Reading ${jsonFile}"
     script {
-        def jsonData = readJSON file: jsonFile
-        echo "jsonData results = ${jsonData['results']}"
+        try{
+            echo "Reading ${jsonFile}"
+            def jsonData = readJSON file: jsonFile
+            echo "jsonData results = ${jsonData['results']}"
+        } catch (Exception e){
+            echo "Failed to reading ${jsonFile}"
+        }
     }
 }
 
