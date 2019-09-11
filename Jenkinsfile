@@ -439,6 +439,9 @@ foreach($file in $opengl32_libraries){
                                 always {
                                     archiveArtifacts "reports/bandit-report.json"
                                 }
+                                failure{
+                                    parseBanditReport("reports/bandit-report.json")
+                                }
                             }
                         }
                         stage("Run Flake8 Static Analysis") {
