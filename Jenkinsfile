@@ -6,7 +6,7 @@ def parseBanditReport(jsonFile, fullReport){
             def summary = createSummary icon: 'warning.gif', text: "Bandit security issues detected <ul>"
             jsonData['results'].each {
 
-                def code = it['code']
+                def code = it['code'].replaceAll("\n", "<br />")
 
                 summary.appendText("<li>")
                 summary.appendText("${it['filename']}:${it['line_number']}: ${it['issue_text']}")
