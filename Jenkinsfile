@@ -2,6 +2,10 @@
 
 def parseBanditReport(jsonFile){
     echo "Reading ${jsonFile}"
+    script {
+        def jsonData = readJSON file: jsonFile
+        echo "jsonData = ${jsonData}"
+    }
 }
 
 def get_sonarqube_unresolved_issues(report_task_file){
