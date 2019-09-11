@@ -387,16 +387,22 @@ foreach($file in $opengl32_libraries){
                                             label: "Running bandit",
                                             script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}\\scm\\avforms"
                                             )
+
+                                        bat(
+                                            label: "Creating bandit HTML report ",
+                                            script: "bandit -f html --recursive ${WORKSPACE}\\scm\\avforms > ${WORKSPACE}/reports/bandit-report.html"
+                                            )
+
                                     }
 
                                 }
                             }
                             post {
                                 always {
-                                    archiveArtifacts "reports/bandit-report.json"
+                                    archiveArtifacts "reports/bandit-report.json,reports/bandit-report.html"
                                 }
                                 unstable{
-                                    parseBanditReport("reports/bandit-report.json", "${currentBuild.absoluteUrl}/artifact/reports/bandit-report.json")
+                                    parseBanditReport("reports/bandit-report.json", "${currentBuild.absoluteUrl}/artifact/reports/bandit-report.html")
                                 }
                             }
                         }
