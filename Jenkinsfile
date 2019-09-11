@@ -5,7 +5,7 @@ def parseBanditReport(jsonFile){
         try{
             echo "Reading ${jsonFile}"
             def jsonData = readJSON file: jsonFile
-            jsonData.each {
+            jsonData['results'].each {
                 echo "${it}"
             }
 //            echo "jsonData results = ${jsonData['results']}"
