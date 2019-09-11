@@ -6,9 +6,8 @@ def parseBanditReport(jsonFile){
             echo "Reading ${jsonFile}"
             def jsonData = readJSON file: jsonFile
             jsonData['results'].each {
-                addWarningBadge text: "${it['issue_text']}"
+                addWarningBadge text: "${it['issue_text']}", link: "${currentBuild.absoluteUrl}"
             }
-//            echo "jsonData results = ${jsonData['results']}"
         } catch (Exception e){
             echo "Failed to reading ${jsonFile}"
         }
