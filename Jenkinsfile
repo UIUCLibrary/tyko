@@ -5,7 +5,10 @@ def parseBanditReport(jsonFile){
         try{
             echo "Reading ${jsonFile}"
             def jsonData = readJSON file: jsonFile
-            echo "jsonData results = ${jsonData['results']}"
+            jsonData.each {
+                echo "${it}"
+            }
+//            echo "jsonData results = ${jsonData['results']}"
         } catch (Exception e){
             echo "Failed to reading ${jsonFile}"
         }
