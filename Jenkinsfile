@@ -3,11 +3,12 @@ def parseBanditReport(jsonFile, fullReport){
     script {
         try{
             def jsonData = readJSON file: jsonFile
+            def summary = createSummary icon: 'warning.gif', text: "Bandit security issues detected"
             jsonData['results'].each {
-                echo "${it['filename']}:${it['line_number']}: ${it['issue_text']}\n\n${it['code']}"
+                summary.appendText("${it['filename']}:${it['line_number']}: ${it['issue_text']}\n\n${it['code']}")
             }
             addWarningBadge text: "Bandit security issues detected", link: "${fullReport}"
-            createSummary icon: 'warning.gif', text: "Bandit security issues detected"
+
         } catch (Exception e){
             echo "Failed to reading ${jsonFile}"
         }
