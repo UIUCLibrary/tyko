@@ -3,7 +3,7 @@ def parseBanditReport(jsonFile, fullReport){
     script {
         try{
             def jsonData = readJSON file: jsonFile
-            def summary = createSummary icon: 'warning.gif', text: "Bandit security issues detected"
+            def summary = createSummary icon: 'warning.gif', text: "Bandit Security Issues Detected"
 
             summary.appendText("<ul>")
 
@@ -13,7 +13,7 @@ def parseBanditReport(jsonFile, fullReport){
 
                 summary.appendText("<li>")
                 summary.appendText("${it['filename']}:")
-                summary.appendText("<br />${it['issue_text']}")
+                summary.appendText("<br /><br />${it['issue_text']}")
                 summary.appendText("<p><code>${code}</code></p>")
                 summary.appendText("</li>")
             }
