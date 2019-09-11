@@ -7,6 +7,7 @@ def parseBanditReport(jsonFile, fullReport){
                 echo "${it['filename']}:${it['line_number']}: ${it['issue_text']}\n\n${it['code']}"
             }
             addWarningBadge text: "Bandit security issues detected", link: "${fullReport}"
+            createSummary icon: 'warning.gif', text: "Bandit security issues detected"
         } catch (Exception e){
             echo "Failed to reading ${jsonFile}"
         }
