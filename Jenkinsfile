@@ -1,12 +1,12 @@
 @Library(["devpi", "PythonHelpers"]) _
 
-def parseBanditReport(jsonFile){
+def parseBanditReport(jsonFile, fullReport){
     script {
         try{
             echo "Reading ${jsonFile}"
             def jsonData = readJSON file: jsonFile
             jsonData['results'].each {
-                addWarningBadge text: "${it['issue_text']}", link: "${currentBuild.absoluteUrl}/artifact/${jsonFile}"
+                addWarningBadge text: "${it['issue_text']}", link: "${fullReport}"
             }
         } catch (Exception e){
             echo "Failed to reading ${jsonFile}"
@@ -396,7 +396,7 @@ foreach($file in $opengl32_libraries){
                                     archiveArtifacts "reports/bandit-report.json"
                                 }
                                 unstable{
-                                    parseBanditReport("reports/bandit-report.json")
+                                    parseBanditReport("reports/bandit-report.json", "${currentBuild.absoluteUrl}/artifact/reports/bandit-report.json")
                                 }
                             }
                         }
