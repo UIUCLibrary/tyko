@@ -373,7 +373,11 @@ foreach($file in $opengl32_libraries){
                         }
                          stage("Run Pylint Static Analysis") {
                             steps{
-                                echo "running pylint"
+                                dir("scm"){
+                                    catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
+                                        echo "running pylint"
+                                    }
+                                }
                             }
                         }
                     }
