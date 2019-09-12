@@ -3,13 +3,15 @@ from tyko import routes, database
 from tyko.data_provider import DataProvider, DataError
 import sys
 
-def create_app(app=None, init_db=False):
+def create_app(db_src=None, app=None, init_db=False):
     if app is None:
         app = Flask(__name__)
 
     app.config.from_object("tyko.config.Config")
     app.config.from_envvar("TYKO_SETTINGS", True)
-    db_src = app.config["DB_ENGINE"]
+
+    if db_src is None:
+        db_src = app.config["DB_ENGINE"]
 
     app.register_error_handler(DataError, handle_error)
 
