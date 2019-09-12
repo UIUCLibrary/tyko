@@ -371,6 +371,11 @@ foreach($file in $opengl32_libraries){
                                 }
                             }
                         }
+                         stage("Run Pylint Static Analysis") {
+                            steps{
+                                echo "running pylint"
+                            }
+                        }
                     }
                     post{
                         always{
