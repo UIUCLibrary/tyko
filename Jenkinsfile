@@ -382,6 +382,11 @@ foreach($file in $opengl32_libraries){
                                     }
                                 }
                             }
+                            post{
+                                always{
+                                    archiveArtifacts allowEmptyArchive: true, artifacts: "reports\\pylint.txt"
+                                }
+                            }
                         }
                     }
                     post{
