@@ -2,18 +2,20 @@ import sqlalchemy
 from sqlalchemy import orm
 import abc
 import tyko
-import sys
 
 
 class DataError(Exception):
     status_code = 500
 
-    def __init__(self, message, status_code=None, payload=None, *args, **kwargs):
+    def __init__(self, message, status_code=None, payload=None,
+                 *args, **kwargs):
+
         super().__init__(*args, **kwargs)
         self.message = message
         if status_code is not None:
             self.status_code = status_code
         self.payload = payload
+
 
 class AbsDataProvider(metaclass=abc.ABCMeta):
 

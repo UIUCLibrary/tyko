@@ -1,7 +1,7 @@
 from flask import Flask, make_response
 from tyko import routes, database
 from tyko.data_provider import DataProvider, DataError
-import sys
+
 
 def create_app(db_src=None, app=None, init_db=False):
     if app is None:
@@ -30,6 +30,7 @@ def main() -> None:
 
     my_app = create_app()
     my_app.run()
+
 
 def handle_error(error):
     return make_response(error.message, error.status_code)

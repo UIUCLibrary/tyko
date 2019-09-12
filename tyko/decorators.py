@@ -5,7 +5,8 @@ from flask import current_app as app
 
 
 def validate_users(username, password):
-    return username == app.config['USERNAME'] and password == app.config['PASSWORD']
+    return username == app.config['USERNAME'] and \
+           password == app.config['PASSWORD']
 
 
 def authenticate(func):
