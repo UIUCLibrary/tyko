@@ -7,7 +7,7 @@ def create_app(app=None, init_db=False):
     if app is None:
         app = Flask(__name__)
 
-    app.config.from_object("tyko.config")
+    app.config.from_object("tyko.config.Config")
     app.config.from_envvar("TYKO_SETTINGS", True)
     db_src = app.config["DB_ENGINE"]
 
