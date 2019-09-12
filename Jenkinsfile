@@ -375,7 +375,10 @@ foreach($file in $opengl32_libraries){
                             steps{
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
-                                        echo "running pylint"
+                                        bat(
+                                            script: "pylint tyko",
+                                            label: "Running pylint"
+                                        )
                                     }
                                 }
                             }
