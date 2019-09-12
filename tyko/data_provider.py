@@ -2,7 +2,18 @@ import sqlalchemy
 from sqlalchemy import orm
 import abc
 import tyko
+import sys
 
+
+class DataError(Exception):
+    status_code = 500
+
+    def __init__(self, message, status_code=None, payload=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
 
 class AbsDataProvider(metaclass=abc.ABCMeta):
 
@@ -232,7 +243,11 @@ class DataProvider:
         tyko.database.init_database(db_engine)
 
     def get_formats(self, serialize=False):
-        all_formats = self.session.query(tyko.scheme.FormatTypes).all()
+        try:
+            all_formats = self.session.query(tyko.scheme.FormatTypes).all()
+        except sqlalchemy.exc.DatabaseError as e:
+            raise DataError("Enable to get all format. Reason: {}".format(e))
+
         if serialize:
             return [format_.serialize() for format_ in all_formats]
         else:
