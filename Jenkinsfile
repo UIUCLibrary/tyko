@@ -442,6 +442,7 @@ foreach($file in $opengl32_libraries){
 -Dsonar.analysis.buildNumber=${env.BUILD_NUMBER} \
 -Dsonar.analysis.scmRevision=${env.GIT_COMMIT} \
 -Dsonar.working.directory=${WORKSPACE}\\.scannerwork \
+-Dsonar.python.pylint.reportPath=${WORKSPACE}\\reports\\pylint.txt \
 -Dsonar.projectDescription=\"%PROJECT_DESCRIPTION%\" \
 "
                                     )
