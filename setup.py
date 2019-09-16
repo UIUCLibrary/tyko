@@ -12,7 +12,7 @@ setup(
     packages=[
         'tyko',
         'tyko.pbcore',
-        'tyko.pbcore.template',
+        'tyko.pbcore.templates',
     ],
     package_data={
         "": [
