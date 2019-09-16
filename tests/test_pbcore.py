@@ -33,25 +33,20 @@ def test_pbcore_fail_invalid_id():
         pbcore.create_pbcore_from_object(object_id=1, data_provider=empty_data_provider)
 
 
-def test_pbcore_valid_id():
-    TEMP_DATABASE = "sqlite:///testdata.sqlite"
+def test_pbcore_valid_id(tmpdir):
+    temp_db_dir = str(tmpdir.mkdir("db"))
+    TEMP_DATABASE = "sqlite:///{}/testdata.sqlite".format(temp_db_dir)
 
-    try:
-        app = flask.Flask(__name__, template_folder="../tyko/templates")
-        tyko.create_app(TEMP_DATABASE, app, init_db=True)
-        app.config["TESTING"] = True
-        with app.test_client() as server:
-            my_db = data_provider.DataProvider(TEMP_DATABASE)
-            my_mw = data_provider.ObjectDataConnector(my_db.session)
-            new_object_id = my_mw.create(name="my object")
-            assert new_object_id == 1
+    app = flask.Flask(__name__, template_folder="../tyko/templates")
+    tyko.create_app(TEMP_DATABASE, app, init_db=True)
+    app.config["TESTING"] = True
+    with app.test_client() as server:
+        my_db = data_provider.DataProvider(TEMP_DATABASE)
+        my_mw = data_provider.ObjectDataConnector(my_db.session)
+        new_object_id = my_mw.create(name="my object")
+        assert new_object_id == 1
 
-            pbcore_data = pbcore.create_pbcore_from_object(object_id=new_object_id, data_provider=my_db)
+        pbcore_data = pbcore.create_pbcore_from_object(object_id=new_object_id, data_provider=my_db)
 
-            doc = etree.fromstring(pbcore_data)
-            assert PBCORE_SCHEMA.validate(doc) is True, "Invalid Pbcore data. \n {}".format(pbcore_data)
-
-
-
-    finally:
-        os.remove("testdata.sqlite")
+        doc = etree.fromstring(pbcore_data)
+        assert PBCORE_SCHEMA.validate(doc) is True, "Invalid Pbcore data. \n {}".format(pbcore_data)
