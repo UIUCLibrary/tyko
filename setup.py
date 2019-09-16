@@ -25,7 +25,8 @@ setup(
     install_requires=[
         "sqlalchemy",
         # "mysqlclient",
-        "flask"
+        "flask",
+        "lxml"
         ],
     python_requires='>3.7',
     entry_points={
