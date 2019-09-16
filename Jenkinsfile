@@ -340,8 +340,12 @@ foreach($file in $opengl32_libraries){
                                     archiveArtifacts "reports/bandit-report.json,reports/bandit-report.html"
                                 }
                                 unstable{
-                                    parseBanditReport("reports/bandit-report.html")
-                                    addWarningBadge text: "Bandit security issues detected", link: "${currentBuild.absoluteUrl}"
+                                    script{
+                                        if(fileExists('reports/bandit-report.html')){
+                                            parseBanditReport("reports/bandit-report.html")
+                                            addWarningBadge text: "Bandit security issues detected", link: "${currentBuild.absoluteUrl}"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -364,6 +368,24 @@ foreach($file in $opengl32_libraries){
                                 }
                                 cleanup{
                                     cleanWs(patterns: [[pattern: 'logs/flake8.log', type: 'INCLUDE']])
+                                }
+                            }
+                        }
+                         stage("Run Pylint Static Analysis") {
+                            steps{
+                                dir("scm"){
+                                    catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
+                                        bat(
+                                            script: 'pylint tyko  -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > %WORKSPACE%\\reports\\pylint.txt & pylint tyko  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > %WORKSPACE%\\reports\\pylint_issues.txt',
+                                            label: "Running pylint"
+                                        )
+                                    }
+                                }
+                            }
+                            post{
+                                always{
+                                    archiveArtifacts allowEmptyArchive: true, artifacts: "reports/pylint.txt"
+                                    recordIssues(tools: [pyLint(pattern: 'reports/pylint_issues.txt')])
                                 }
                             }
                         }
@@ -421,6 +443,7 @@ foreach($file in $opengl32_libraries){
 -Dsonar.analysis.buildNumber=${env.BUILD_NUMBER} \
 -Dsonar.analysis.scmRevision=${env.GIT_COMMIT} \
 -Dsonar.working.directory=${WORKSPACE}\\.scannerwork \
+-Dsonar.python.pylint.reportPath=${WORKSPACE}\\reports\\pylint.txt \
 -Dsonar.projectDescription=\"%PROJECT_DESCRIPTION%\" \
 "
                                     )

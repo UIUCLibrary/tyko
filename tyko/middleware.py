@@ -1,22 +1,19 @@
+# pylint: disable=redefined-builtin, invalid-name
+
 import abc
 import hashlib
 import json
 
 from flask import jsonify, make_response, abort, request, url_for
-from typing import Mapping
-
-import tyko.entities
-import tyko.data_provider
-from tyko.data_provider import DataProvider
+from . import data_provider as dp
 
 
 class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
-    def __init__(self,
-                 data_provider: tyko.data_provider.DataProvider) -> None:
+    def __init__(self, data_provider) -> None:
         self._data_provider = data_provider
 
     @abc.abstractmethod
-    def get(self, serialize=False, *args, **kwargs):
+    def get(self, serialize=False, **kwargs):
         """Add a new entity"""
 
     @abc.abstractmethod
@@ -33,14 +30,8 @@ class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
 
 
 class Middleware:
-    def __init__(self, data_provider: DataProvider) -> None:
+    def __init__(self, data_provider: dp.DataProvider) -> None:
         self.data_provider = data_provider
-
-        self.entities: Mapping[str, AbsMiddlwareEntity] = dict()
-        for entity in tyko.ENTITIES.keys():
-            self.entities[entity] = \
-                tyko.entities.load_entity(
-                    entity, self.data_provider).middleware()
 
     def get_formats(self, serialize=True):
         formats = self.data_provider.get_formats(serialize=serialize)
@@ -53,40 +44,44 @@ class Middleware:
 
 class ObjectMiddlwareEntity(AbsMiddlwareEntity):
 
-    def get(self, serialize=False, *args, **kwargs):
+    def __init__(self, data_provider: dp.DataProvider) -> None:
+        super().__init__(data_provider)
+
+        self._data_connector = dp.ObjectDataConnector(data_provider.session)
+
+    def get(self, serialize=False, **kwargs):
         if "id" in kwargs:
             return self.object_by_id(id=kwargs["id"])
 
-        objects = \
-            self._data_provider.entities["object"].get(serialize=serialize)
+        objects = self._data_connector.get(serialize=serialize)
 
         if serialize:
             data = {
                 "objects": objects,
                 "total": len(objects)
             }
-            json_data = json.dumps(data)
             response = make_response(jsonify(data, 200))
 
+            json_data = json.dumps(data)
             hash_value = \
                 hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
 
             response.headers["ETag"] = str(hash_value)
             response.headers["Cache-Control"] = "private, max-age=300"
             return response
-        else:
-            result = objects
+
+        result = objects
         return result
 
     def object_by_id(self, id):
-        current_object = \
-            self._data_provider.entities['object'].get(id, serialize=True)
+        current_object = self._data_connector.get(id, serialize=True)
+
         if current_object:
             return jsonify({
                 "object": current_object
             })
-        else:
-            abort(404)
+
+        abort(404)
 
     def delete(self, id):
         """TODO"""
@@ -97,7 +92,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
     def create(self):
         """TODO"""
         object_name = request.form["name"]
-        new_object_id = self._data_provider.entities['object'].create(
+        new_object_id = self._data_connector.create(
             name=object_name
         )
         return jsonify({
@@ -108,12 +103,17 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
 
 class CollectionMiddlwareEntity(AbsMiddlwareEntity):
 
-    def get(self, serialize=False, *args, **kwargs):
+    def __init__(self, data_provider) -> None:
+        super().__init__(data_provider)
+
+        self._data_connector = \
+            dp.CollectionDataConnector(data_provider.session)
+
+    def get(self, serialize=False, **kwargs):
         if "id" in kwargs:
             return self.collection_by_id(id=kwargs["id"])
 
-        collections = \
-            self._data_provider.entities['collection'].get(serialize=serialize)
+        collections = self._data_connector.get(serialize=serialize)
 
         if serialize:
             data = {
@@ -130,20 +130,18 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
             response.headers["ETag"] = str(hash_value)
             response.headers["Cache-Control"] = "private, max-age=300"
             return response
-        else:
-            result = collections
+
+        result = collections
         return result
 
     def collection_by_id(self, id):
-        current_collection = \
-            self._data_provider.entities['collection'].get(id,
-                                                           serialize=True)
+        current_collection = self._data_connector.get(id, serialize=True)
         if current_collection:
             return jsonify({
                 "collection": current_collection
             })
-        else:
-            abort(404)
+
+        abort(404)
 
     def delete(self, id):
         """TODO"""
@@ -156,7 +154,7 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
         department = request.form.get("department")
         record_series = request.form.get("record_series")
         new_collection_id = \
-            self._data_provider.entities['collection'].create(
+            self._data_connector.create(
                 collection_name=collection_name,
                 department=department,
                 record_series=record_series)
@@ -169,12 +167,15 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
 
 class ProjectMiddlwareEntity(AbsMiddlwareEntity):
 
-    def get(self, serialize=False, *args, **kwargs):
+    def __init__(self, data_provider) -> None:
+        super().__init__(data_provider)
+        self._data_connector = dp.ProjectDataConnector(data_provider.session)
+
+    def get(self, serialize=False, **kwargs):
         if "id" in kwargs:
             return self.get_project_by_id(kwargs["id"])
 
-        projects = \
-            self._data_provider.entities['project'].get(serialize=serialize)
+        projects = self._data_connector.get(serialize=serialize)
 
         if serialize:
             data = {
@@ -190,13 +191,12 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             response.headers["ETag"] = str(hash_value)
             response.headers["Cache-Control"] = "private, max-age=300"
             return response
-        else:
-            result = projects
+
+        result = projects
         return result
 
     def get_project_by_id(self, id):
-        current_project = \
-            self._data_provider.entities['project'].get(id, serialize=True)
+        current_project = self._data_connector.get(id, serialize=True)
 
         if current_project:
             return jsonify(
@@ -204,14 +204,14 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
                     "project": current_project
                 }
             )
-        else:
-            abort(404)
+
+        abort(404)
 
     def delete(self, id):
-        if self._data_provider.entities['project'].delete(id):
+        if self._data_connector.delete(id):
             return make_response("", 204)
-        else:
-            make_response("", 404)
+
+        return make_response("", 404)
 
     def update(self, id):
         new_project = {
@@ -221,15 +221,15 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             "title": request.form["title"]
         }
         updated_project = \
-            self._data_provider.entities['project'].update(
+            self._data_connector.update(
                 id, changed_data=new_project)
 
         if not updated_project:
             return make_response("", 204)
-        else:
-            return jsonify(
-                {"project": updated_project}
-            )
+
+        return jsonify(
+            {"project": updated_project}
+        )
 
     def create(self):
         project_code = request.form.get('project_code')
@@ -240,7 +240,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         status = request.form.get('status')
         specs = request.form.get('specs')
         new_project_id = \
-            self._data_provider.entities['project'].create(
+            self._data_connector.create(
                 title=title,
                 project_code=project_code,
                 current_location=current_location,
@@ -257,12 +257,15 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
 
 
 class ItemMiddlwareEntity(AbsMiddlwareEntity):
+    def __init__(self, data_provider) -> None:
+        super().__init__(data_provider)
+        self._data_connector = dp.ItemDataConnector(data_provider.session)
 
-    def get(self, serialize=False, *args, **kwargs):
+    def get(self, serialize=False, **kwargs):
         if "id" in kwargs:
             return self.item_by_id(kwargs["id"])
 
-        items = self._data_provider.entities['item'].get(serialize=serialize)
+        items = self._data_connector.get(serialize=serialize)
         if serialize:
             data = {
                 "items": items,
@@ -279,13 +282,11 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             response.headers["Cache-Control"] = "private, max-age=300"
             return response
 
-        else:
-            result = items
+        result = items
         return result
 
     def item_by_id(self, id):
-        current_item = \
-            self._data_provider.entities['item'].get(id, serialize=True)
+        current_item = self._data_connector.get(id, serialize=True)
 
         if current_item:
             return jsonify(
@@ -293,8 +294,8 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
                     "item": current_item
                 }
             )
-        else:
-            abort(404)
+
+        abort(404)
 
     def delete(self, id):
         pass
@@ -306,13 +307,15 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
         name = request.form.get('name')
         barcode = request.form.get('barcode')
         file_name = request.form.get('file_name')
-        new_item_id = self._data_provider.entities['item'].create(
+        new_item_id = self._data_connector.create(
             name=name,
             barcode=barcode,
             file_name=file_name
         )
-        return jsonify({
-            "id": new_item_id,
-            "url": url_for("item_by_id", id=new_item_id)
+
+        return jsonify(
+            {
+                "id": new_item_id,
+                "url": url_for("item_by_id", id=new_item_id)
             }
         )

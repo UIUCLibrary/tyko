@@ -1,58 +1,49 @@
+# pylint: disable=redefined-builtin, invalid-name
+import abc
 import sqlalchemy
 from sqlalchemy import orm
-import abc
-import tyko
+from .exceptions import DataError
+from . import scheme
+from . import database
 
 
-class DataError(Exception):
-    status_code = 500
-
-    def __init__(self, message, status_code=None, payload=None,
-                 *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-        self.message = message
-        if status_code is not None:
-            self.status_code = status_code
-        self.payload = payload
-
-
-class AbsDataProvider(metaclass=abc.ABCMeta):
+class AbsDataProviderConnector(metaclass=abc.ABCMeta):
 
     def __init__(self, session) -> None:
         self._session = session
 
     @abc.abstractmethod
     def get(self, id=None, serialize=False):
-        pass
+        """Perform the get command"""
 
     @abc.abstractmethod
     def create(self, *args, **kwargs):
-        pass
+        """Create a new entity"""
 
     @abc.abstractmethod
     def update(self, id, changed_data):
-        pass
+        """Update an existing entity"""
 
     @abc.abstractmethod
     def delete(self, id):
-        pass
+        """Delete an existing entity"""
 
 
-class ProjectData(AbsDataProvider):
+class ProjectDataConnector(AbsDataProviderConnector):
 
     def get(self, id=None, serialize=False):
         if id:
-            all_projects = self._session.query(tyko.scheme.Project)\
-                .filter(tyko.scheme.Project.id == id)\
+            all_projects = self._session.query(scheme.Project)\
+                .filter(scheme.Project.id == id)\
                 .all()
 
         else:
-            all_projects = self._session.query(tyko.scheme.Project).all()
+            all_projects = self._session.query(scheme.Project).all()
+
         if serialize:
             return [project.serialize() for project in all_projects]
-        else:
-            return all_projects
+
+        return all_projects
 
     def create(self, *args, **kwargs):
         title = kwargs["title"]
@@ -60,7 +51,7 @@ class ProjectData(AbsDataProvider):
         current_location = kwargs.get("current_location")
         status = kwargs.get("status")
         specs = kwargs.get("specs")
-        new_project = tyko.scheme.Project(
+        new_project = scheme.Project(
             title=title,
             project_code=project_code,
             current_location=current_location,
@@ -82,8 +73,8 @@ class ProjectData(AbsDataProvider):
 
         if len(projects) != 1:
             return updated_project
-        else:
-            project = projects[0]
+
+        project = projects[0]
 
         if project:
             project.title = changed_data['title']
@@ -98,37 +89,37 @@ class ProjectData(AbsDataProvider):
     def delete(self, id):
         if id:
             items_deleted = \
-                self.session.query(tyko.scheme.Project)\
-                    .filter(tyko.scheme.Project.id == id)\
+                self._session.query(scheme.Project)\
+                    .filter(scheme.Project.id == id)\
                     .delete()
             return items_deleted > 0
         return False
 
 
-class ObjectData(AbsDataProvider):
+class ObjectDataConnector(AbsDataProviderConnector):
 
     def get(self, id=None, serialize=False):
         if id:
             all_collection_object = \
-                self._session.query(tyko.scheme.CollectionObject) \
-                    .filter(tyko.scheme.CollectionObject.id == id) \
+                self._session.query(scheme.CollectionObject) \
+                    .filter(scheme.CollectionObject.id == id) \
                     .all()
         else:
             all_collection_object = \
-                self._session.query(tyko.scheme.CollectionObject).all()
+                self._session.query(scheme.CollectionObject).all()
 
         if serialize:
             return [
                 collection_object.serialize()
                 for collection_object in all_collection_object
             ]
-        else:
-            return all_collection_object
+
+        return all_collection_object
 
     def create(self, *args, **kwargs):
         # TODO!
         name = kwargs["name"]
-        new_object = tyko.scheme.CollectionObject(
+        new_object = scheme.CollectionObject(
             name=name,
         )
         self._session.add(new_object)
@@ -145,31 +136,31 @@ class ObjectData(AbsDataProvider):
         pass
 
 
-class ItemData(AbsDataProvider):
+class ItemDataConnector(AbsDataProviderConnector):
 
     def get(self, id=None, serialize=False):
         if id:
             all_collection_item = \
-                self._session.query(tyko.scheme.CollectionItem)\
-                    .filter(tyko.scheme.CollectionItem.id == id)\
+                self._session.query(scheme.CollectionItem)\
+                    .filter(scheme.CollectionItem.id == id)\
                     .all()
         else:
             all_collection_item = \
-                self._session.query(tyko.scheme.CollectionItem).all()
+                self._session.query(scheme.CollectionItem).all()
 
         if serialize:
             return [
                 collection_item.serialize()
                 for collection_item in all_collection_item
             ]
-        else:
-            return all_collection_item
+
+        return all_collection_item
 
     def create(self, *args, **kwargs):
         name = kwargs["name"]
         barcode = kwargs.get("barcode")
         file_name = kwargs.get("file_name")
-        new_item = tyko.scheme.CollectionItem(
+        new_item = scheme.CollectionItem(
             name=name,
             barcode=barcode,
             file_name=file_name
@@ -187,29 +178,29 @@ class ItemData(AbsDataProvider):
         pass
 
 
-class CollectionData(AbsDataProvider):
+class CollectionDataConnector(AbsDataProviderConnector):
 
     def get(self, id=None, serialize=False):
         if id:
             all_collections = \
-                self._session.query(tyko.scheme.Collection)\
-                    .filter(tyko.scheme.Collection.id == id)\
+                self._session.query(scheme.Collection)\
+                    .filter(scheme.Collection.id == id)\
                     .all()
         else:
             all_collections = \
-                self._session.query(tyko.scheme.Collection).all()
+                self._session.query(scheme.Collection).all()
 
         if serialize:
             return [collection.serialize() for collection in all_collections]
-        else:
-            return all_collections
+
+        return all_collections
 
     def create(self, *args, **kwargs):
         collection_name = kwargs.get("collection_name")
         department = kwargs.get("department")
         record_series = kwargs.get("record_series")
 
-        new_collection = tyko.scheme.Collection(
+        new_collection = scheme.Collection(
             collection_name=collection_name,
             department=department,
             record_series=record_series
@@ -236,21 +227,17 @@ class DataProvider:
         db_session = orm.sessionmaker(bind=self.db_engine)
         self.session = db_session()
 
-        self.entities = dict()
-        for k, v in tyko.ENTITIES.items():
-            self.entities[k] = v[1](self.session)
-
     def init_database(self):
         db_engine = sqlalchemy.create_engine(self.engine)
-        tyko.database.init_database(db_engine)
+        database.init_database(db_engine)
 
     def get_formats(self, serialize=False):
         try:
-            all_formats = self.session.query(tyko.scheme.FormatTypes).all()
+            all_formats = self.session.query(scheme.FormatTypes).all()
         except sqlalchemy.exc.DatabaseError as e:
             raise DataError("Enable to get all format. Reason: {}".format(e))
 
         if serialize:
             return [format_.serialize() for format_ in all_formats]
-        else:
-            return all_formats
+
+        return all_formats

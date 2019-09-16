@@ -1,10 +1,13 @@
-from flask import Flask, jsonify, render_template
-import tyko
+# pylint: disable=invalid-name, not-an-iterable
 
-from tyko.data_provider import DataProvider
 from dataclasses import dataclass, field
 from typing import Any, List
+from flask import Flask, jsonify, render_template
 
+from . import middleware
+from .data_provider import DataProvider
+from .frontend import all_forms as front_forms
+from . import entities
 the_app = Flask(__name__)
 
 
@@ -29,7 +32,7 @@ class EntityPage:
     rules: List[Route] = field(default_factory=list)
 
 
-all_entities = set()
+_all_entities = set()
 all_forms = set()
 
 
@@ -38,24 +41,22 @@ class Routes:
     def __init__(self, db_engine: DataProvider, app) -> None:
         self.db_engine = db_engine
         self.app = app
-        self.mw = tyko.Middleware(self.db_engine)
-        self.wr = WebsiteRoutes(self.mw)
+        self.mw = middleware.Middleware(self.db_engine)
+        self.wr = WebsiteRoutes()
 
     def init_api_routes(self) -> None:
-        project = \
-            tyko.ENTITIES["project"].factory(self.db_engine).middleware()
+        project = entities.load_entity("project", self.db_engine).middleware()
 
         collection = \
-            tyko.ENTITIES["collection"].factory(self.db_engine).middleware()
+            entities.load_entity("collection", self.db_engine).middleware()
 
-        item = \
-            tyko.ENTITIES["item"].factory(self.db_engine).middleware()
+        item = entities.load_entity("item", self.db_engine).middleware()
 
         project_object = \
-            tyko.ENTITIES["object"].factory(self.db_engine).middleware()
+            entities.load_entity("object", self.db_engine).middleware()
 
         if self.app:
-            entities = [
+            api_entities = [
                 APIEntity("Projects", rules=[
                     Route("/api/project", "projects",
                           lambda serialize=True: project.get(serialize)),
@@ -70,7 +71,7 @@ class Routes:
                     Route("/api/project/<string:id>", "delete_project",
                           lambda id: project.delete(id=id),
                           methods=["DELETE"]),
-                  ]),
+                    ]),
                 APIEntity("Collection", rules=[
                     Route("/api/collection", "collection",
                           lambda serialize=True: collection.get(serialize)),
@@ -79,12 +80,12 @@ class Routes:
                     Route("/api/collection/", "add_collection",
                           collection.create,
                           methods=["POST"])
-                ]),
+                    ]),
                 APIEntity("Formats", rules=[
                     Route("/api/format", "formats",
                           self.mw.get_formats
                           )
-                ]),
+                    ]),
                 APIEntity("Item", rules=[
                     Route("/api/item", "item",
                           lambda serialize=True: item.get(serialize),
@@ -96,7 +97,7 @@ class Routes:
                           item.create,
                           methods=["POST"])
 
-                ]),
+                    ]),
                 APIEntity("Object", rules=[
                     Route("/api/object", "object",
                           lambda serialize=True: project_object.get(serialize),
@@ -107,11 +108,11 @@ class Routes:
                     Route("/api/object/", "add_object",
                           project_object.create,
                           methods=["POST"])
-                ])
+                    ])
 
             ]
 
-            for entity in entities:
+            for entity in api_entities:
                 for rule in entity.rules:
                     self.app.add_url_rule(rule.rule, rule.method,
                                           rule.viewFunction,
@@ -141,7 +142,7 @@ class Routes:
                        ]:
 
             simple_pages.append(
-                tyko.ENTITIES[entity].factory(self.db_engine).web_frontend()
+                entities.load_entity(entity, self.db_engine).web_frontend()
             )
 
         entity_pages = [
@@ -152,7 +153,8 @@ class Routes:
                     Route(
                         "/format",
                         "page_formats",
-                        self.wr.page_formats),
+                        lambda: page_formats(self.mw)
+                    ),
                 ]),
         ]
 
@@ -178,49 +180,44 @@ class Routes:
 
             for entity in entity_pages:
                 for rule in entity.rules:
-                    all_entities.add((entity.entity_type,
-                                      entity.entity_list_page))
+                    _all_entities.add((entity.entity_type,
+                                       entity.entity_list_page))
 
                     self.app.add_url_rule(rule.rule, rule.method,
                                           rule.viewFunction)
-            for form_page in tyko.frontend.all_forms:
+            for form_page in front_forms:
                 all_forms.add((form_page.form_title, form_page.form_page_name))
                 self.app.add_url_rule(form_page.form_page_rule,
                                       form_page.form_page_name,
                                       form_page.create)
 
 
-class Routers:
-    def __init__(self, middleware: tyko.Middleware) -> None:
-        self.middleware = middleware
-
-
-class WebsiteRoutes(Routers):
+class WebsiteRoutes:
 
     @staticmethod
     def page_index():
         return render_template("index.html", selected_menu_item="index",
-                               entities=all_entities,
+                               entities=_all_entities,
                                all_forms=all_forms
                                )
 
     @staticmethod
     def page_about():
         return render_template("about.html", selected_menu_item="about",
-                               entities=all_entities,
+                               entities=_all_entities,
                                all_forms=all_forms
                                )
 
-    def page_formats(self):
 
-        formats = self.middleware.get_formats(serialize=False)
-        return render_template(
-            "formats.html",
-            selected_menu_item="formats",
-            formats=formats,
-            entities=all_entities,
-            all_forms=all_forms
-        )
+def page_formats(middleware):
+    formats = middleware.get_formats(serialize=False)
+    return render_template(
+        "formats.html",
+        selected_menu_item="formats",
+        formats=formats,
+        entities=_all_entities,
+        all_forms=all_forms
+    )
 
 
 def list_routes(app):
