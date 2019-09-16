@@ -1,5 +1,5 @@
-from jinja2 import Template
 from importlib.resources import read_text
+from jinja2 import Template
 from tyko.data_provider import DataProvider, ObjectDataConnector
 
 
