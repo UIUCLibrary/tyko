@@ -30,7 +30,8 @@ setup(
         "sqlalchemy",
         # "mysqlclient",
         "flask",
-        "lxml"
+        "lxml",
+        "Jinja2"
         ],
     python_requires='>3.7',
     entry_points={
