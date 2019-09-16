@@ -21,7 +21,9 @@ setup(
             "static/css/*.css.map",
             "static/js/*.js",
             "static/js/*.js.map",
-
+        ],
+        "tyko.pbcore.templates":[
+            "*.xml"
         ]
     },
     setup_requires=["pytest-runner"],
