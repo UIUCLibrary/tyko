@@ -8,6 +8,7 @@ from flask import jsonify, make_response, abort, request, url_for
 from . import data_provider as dp
 from . import pbcore
 
+
 class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
     def __init__(self, data_provider) -> None:
         self._data_provider = data_provider
