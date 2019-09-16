@@ -9,7 +9,11 @@ setup(
            'Champaign: Preservation Services',
     author_email='prescons@library.illinois.edu',
     description='Database for handling entering metadata for AV content',
-    packages=['tyko'],
+    packages=[
+        'tyko',
+        'tyko.pbcore',
+        'tyko.pbcore.template',
+    ],
     package_data={
         "": [
             "templates/*.html",
