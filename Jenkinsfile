@@ -652,7 +652,7 @@ foreach($file in $opengl32_libraries){
         docker-compose -f deploy/docker-compose.yml -p avdatabase build &&
         docker-compose -f deploy/docker-compose.yml -p avdatabase up -d"""
                                 }
-                                addBadge(icon: 'success.gif', id: '', link: 'http://avdatabase.library.illinois.edu:8000/', text: 'Server Application Deployed')
+                                addBadge(icon: 'success.gif', id: '', link: "http://${SERVER_URL}:8000/", text: 'Server Application Deployed')
                             }
                         }
                     }
