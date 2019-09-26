@@ -597,7 +597,7 @@ foreach($file in $opengl32_libraries){
 
                                     withCredentials([usernamePassword(credentialsId: "henryUserName", passwordVariable: 'password', usernameVariable: 'username')]) {
                                         remote.name = 'test'
-                                        remote.host = SERVER_URL
+                                        remote.host = "avdatabase.library.illinois.edu"
                                         remote.user = username
                                         remote.password = password
                                         remote.allowAnyHosts = true
