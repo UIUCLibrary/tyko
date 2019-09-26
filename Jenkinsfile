@@ -588,24 +588,40 @@ foreach($file in $opengl32_libraries){
                     options {
                       skipDefaultCheckout true
                     }
-                    when{
-                        equals expected: true, actual: params.DEPLOY_SERVER
-                        beforeInput true
-                    }
-                    input {
-                      message 'Deploy to server'
-                      parameters {
-                        string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
-                        credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
-                      }
-                    }
+
                     stages{
                         stage("Backing up database"){
                             steps{
-                                echo "backing up"
+                                script{
+                                    def remote = [:]
+
+                                    withCredentials([usernamePassword(credentialsId: SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
+                                        remote.name = 'test'
+                                        remote.host = SERVER_URL
+                                        remote.user = username
+                                        remote.password = password
+                                        remote.allowAnyHosts = true
+                                    }
+                                    sshCommand(
+                                        remote: remote,
+                                        command: 'docker exec -i avdatabase_db_1 mysqldump av_preservation --user="avuser" --password="avpsw" > /tmp/backup.sql'
+                                        )
+                                }
+
                             }
                         }
                         stage("Deploying New Server"){
+                            when{
+                                equals expected: true, actual: params.DEPLOY_SERVER
+                                beforeInput true
+                            }
+                            input {
+                              message 'Deploy to server'
+                              parameters {
+                                string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
+                                credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
+                              }
+                            }
                             steps{
                                 unstash "PYTHON_PACKAGES"
                                 unstash "SERVER_DEPLOY_FILES"
