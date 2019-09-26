@@ -605,7 +605,7 @@ foreach($file in $opengl32_libraries){
                     stages{
                         stage("Backing up database"){
                             when{
-                                equals expected: true, actual: BACKUP_DATABASE
+                                equals expected: true, actual: params.BACKUP_DATABASE
                             }
                             steps{
                                 script{
