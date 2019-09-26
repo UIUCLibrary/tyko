@@ -604,7 +604,7 @@ foreach($file in $opengl32_libraries){
                                     }
                                     sshCommand(
                                         remote: remote,
-                                        command: "docker exec -i avdatabase_db_1 mysqldump av_preservation --user='avuser' --password='avpsw'"
+                                        command: "docker exec  avdatabase_db_1 /bin/bash -c \"mysqldump av_preservation --user='avuser' --password='avpsw' > /tmp/backup.sql\" && ls /tmp"
                                         )
 //                                    sshCommand(
 //                                        remote: remote,
