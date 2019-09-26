@@ -588,41 +588,48 @@ foreach($file in $opengl32_libraries){
                     options {
                       skipDefaultCheckout true
                     }
-
+                    when{
+                        equals expected: true, actual: params.DEPLOY_SERVER
+                        beforeInput true
+                    }
+                    input {
+                      message 'Deploy to server'
+                      parameters {
+                        string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
+                        string(defaultValue: 'avdatabase_db_1', description: 'Name of the container with the database', name: 'CONTAINER_NAME_DATABASE', trim: false)
+                        credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
+                        booleanParam defaultValue: true, description: 'Create a dump of the database prior to deployment', name: 'BACKUP_DATABASE'
+                        credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'TYKO_DB_CREDS', description: '', name: 'DATABASE_CREDS', required: false
+                      }
+                    }
                     stages{
                         stage("Backing up database"){
+                            when{
+                                equals expected: true, actual: BACKUP_DATABASE
+                            }
                             steps{
                                 script{
                                     def remote = [:]
 
-                                    withCredentials([usernamePassword(credentialsId: "henryUserName", passwordVariable: 'password', usernameVariable: 'username')]) {
+                                    withCredentials([usernamePassword(credentialsId: SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
                                         remote.name = 'test'
-                                        remote.host = "avdatabase.library.illinois.edu"
+                                        remote.host = SERVER_URL
                                         remote.user = username
                                         remote.password = password
                                         remote.allowAnyHosts = true
                                     }
+
                                     def backup_file_name = "tyko-${BRANCH_NAME}-${BUILD_NUMBER}-backup.sql"
                                     sshCommand(
                                         remote: remote,
-                                        command: "docker exec avdatabase_db_1 /bin/bash -c \"mysqldump av_preservation --user='avuser' --password='avpsw' > /tmp/${backup_file_name}\" && ls /tmp/ && docker cp avdatabase_db_1:/tmp/${backup_file_name} ~/backups/"
+                                        command: "docker exec ${CONTAINER_NAME_DATABASE} /bin/bash -c \"mysqldump av_preservation --user='avuser' --password='avpsw' > /tmp/${backup_file_name}\" && docker cp avdatabase_db_1:/tmp/${backup_file_name} ~/backups/"
                                         )
                                 }
 
                             }
                         }
                         stage("Deploying New Server"){
-                            when{
-                                equals expected: true, actual: params.DEPLOY_SERVER
-                                beforeInput true
-                            }
-                            input {
-                              message 'Deploy to server'
-                              parameters {
-                                string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
-                                credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
-                              }
-                            }
+
                             steps{
                                 unstash "PYTHON_PACKAGES"
                                 unstash "SERVER_DEPLOY_FILES"
