@@ -598,15 +598,11 @@ foreach($file in $opengl32_libraries){
                         string(defaultValue: 'avdatabase.library.illinois.edu', description: 'Location where to install the server application', name: 'SERVER_URL', trim: false)
                         string(defaultValue: 'avdatabase_db_1', description: 'Name of the container with the database', name: 'CONTAINER_NAME_DATABASE', trim: false)
                         credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
-                        booleanParam defaultValue: true, description: 'Create a dump of the database prior to deployment', name: 'BACKUP_DATABASE'
                         credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'TYKO_DB_CREDS', description: '', name: 'DATABASE_CREDS', required: false
                       }
                     }
                     stages{
                         stage("Backing up database"){
-                            when{
-                                equals expected: true, actual: params.BACKUP_DATABASE
-                            }
                             steps{
                                 script{
                                     def remote = [:]
