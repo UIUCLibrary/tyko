@@ -595,7 +595,7 @@ foreach($file in $opengl32_libraries){
                                 script{
                                     def remote = [:]
 
-                                    withCredentials([usernamePassword(credentialsId: SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
+                                    withCredentials([usernamePassword(credentialsId: "henryUserName", passwordVariable: 'password', usernameVariable: 'username')]) {
                                         remote.name = 'test'
                                         remote.host = SERVER_URL
                                         remote.user = username
@@ -604,7 +604,7 @@ foreach($file in $opengl32_libraries){
                                     }
                                     sshCommand(
                                         remote: remote,
-                                        command: 'docker exec -i avdatabase_db_1 mysqldump av_preservation --user="avuser" --password="avpsw" > /tmp/backup.sql'
+                                        command: "docker exec -i avdatabase_db_1 mysqldump av_preservation --user='avuser' --password='avpsw' > /tmp/backup.sql"
                                         )
                                 }
 
