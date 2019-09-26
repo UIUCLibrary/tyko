@@ -602,9 +602,10 @@ foreach($file in $opengl32_libraries){
                                         remote.password = password
                                         remote.allowAnyHosts = true
                                     }
+                                    def backup_file_name = "tyko-backup.sql"
                                     sshCommand(
                                         remote: remote,
-                                        command: "docker exec  avdatabase_db_1 /bin/bash -c \"mysqldump av_preservation --user='avuser' --password='avpsw' > /tmp/backup.sql\" && ls /tmp/ && docker cp avdatabase_db_1:/tmp/backup.sql ~/backups/"
+                                        command: "docker exec  avdatabase_db_1 /bin/bash -c \"mysqldump av_preservation --user='avuser' --password='avpsw' > /tmp/${backup_file_name}\" && ls /tmp/ && docker cp avdatabase_db_1:/tmp/${backup_file_name} ~/backups/"
                                         )
 //                                    sshCommand(
 //                                        remote: remote,
