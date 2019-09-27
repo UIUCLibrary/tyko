@@ -12,13 +12,15 @@
          <thead>
             <th data-sortable="true">Title</th>
             <th data-sortable="true">Status</th>
+            <th>Details</th>
 
          </thead>
          <tbody>
             {% for project in projects %}
-                <tr id="tr-id-1" class="tr-class-1" data-tile="bootstap table" data-object='{"key":"value"}'>
-                    <td><a href="{{ url_for('page_projects')}}/{{project['project_id'] }}">{{project['title']}}</a></td>
+                <tr>
+                    <td>{{project['title']}}</td>
                     <td>{{project['status']}}</td>
+                    <td><a href="{{ url_for('page_projects')}}/{{project['project_id'] }}">Details</a></td>
                 </tr>
             {% endfor %}
             </tr>
