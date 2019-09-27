@@ -528,7 +528,7 @@ foreach($file in $opengl32_libraries){
                 }
                 stage("Packaging Client in Docker Container"){
                     agent{
-                        label "Docker"
+                        label "Docker && Windows && 1903"
 
                     }
                     when {
