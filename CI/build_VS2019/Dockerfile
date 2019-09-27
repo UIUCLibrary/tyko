@@ -1,6 +1,6 @@
 # escape=`
 
-ARG FROM_IMAGE=microsoft/dotnet-framework:3.5-sdk-windowsservercore-1709
+ARG FROM_IMAGE=mcr.microsoft.com/dotnet/framework/sdk:4.8
 FROM ${FROM_IMAGE}
 
 # Reset the shell.
@@ -12,6 +12,8 @@ ADD https://aka.ms/vscollect.exe C:/TEMP/collect.exe
 # Download channel for fixed install.
 ARG CHANNEL_URL=https://aka.ms/vs/16/release/channel
 ADD ${CHANNEL_URL} C:/TEMP/VisualStudio.chman
+
+RUN mkdir c:\\TEMP
 
 # Download and install Build Tools for Visual Studio 2017 for native desktop workload.
 ADD https://aka.ms/vs/16/release/vs_buildtools.exe C:/TEMP/vs_buildtools.exe
