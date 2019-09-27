@@ -184,7 +184,7 @@ foreach($file in $opengl32_libraries){
     break
 }'''
                                 )
-                                    bat("docker build . -f CI/build_VS2019/Dockerfile -m 10GB -t %DOCKER_IMAGE_TAG%")
+                                    bat("docker build . -f CI/build_VS2019/Dockerfile -m 2GB -t %DOCKER_IMAGE_TAG%")
                                 }
                             }
                         }
