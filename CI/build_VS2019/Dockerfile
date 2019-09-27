@@ -5,7 +5,7 @@ FROM ${FROM_IMAGE}
 
 # Reset the shell.
 SHELL ["cmd", "/S", "/C"]
-
+RUN mkdir c:\\TEMP
 #COPY Install.cmd C:/TEMP/
 ADD https://aka.ms/vscollect.exe C:/TEMP/collect.exe
 
@@ -13,7 +13,7 @@ ADD https://aka.ms/vscollect.exe C:/TEMP/collect.exe
 ARG CHANNEL_URL=https://aka.ms/vs/16/release/channel
 ADD ${CHANNEL_URL} C:/TEMP/VisualStudio.chman
 
-RUN mkdir c:\\TEMP
+
 
 # Download and install Build Tools for Visual Studio 2017 for native desktop workload.
 ADD https://aka.ms/vs/16/release/vs_buildtools.exe C:/TEMP/vs_buildtools.exe
