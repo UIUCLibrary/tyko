@@ -175,15 +175,19 @@ pipeline {
                             steps{
 
                                 dir("scm"){
-                                     powershell(
-                                        label: "Searching for opengl32.dll",
-                                        script: '''
-$opengl32_libraries = Get-ChildItem -Path c:\\Windows -Recurse -Include opengl32.dll
-foreach($file in $opengl32_libraries){
-    Copy-Item $file.FullName
-    break
-}'''
-                                )
+                                    script{
+                                     if (!fileExists('opengl32.dll')){
+                                         powershell(
+                                            label: "Searching for opengl32.dll",
+                                            script: '''
+        $opengl32_libraries = Get-ChildItem -Path c:\\Windows -Recurse -Include opengl32.dll
+        foreach($file in $opengl32_libraries){
+            Copy-Item $file.FullName
+            break
+        }'''
+                                    )
+                                     }
+}
                                     bat("docker build . -f CI/build_VS2019/Dockerfile -m 2GB -t %DOCKER_IMAGE_TAG%")
                                 }
                             }
