@@ -157,7 +157,7 @@ pipeline {
                 }
                 stage("Build Client with Docker Container"){
                     agent{
-                        label "Docker"
+                        label "Docker && Windows && 1903"
                     }
                     when {
                         equals expected: true, actual: params.BUILD_CLIENT
