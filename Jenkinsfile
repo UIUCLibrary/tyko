@@ -157,7 +157,7 @@ pipeline {
                 }
                 stage("Build Client with Docker Container"){
                     agent{
-                        label "Docker"
+                        label "Docker && !aws"
                     }
                     when {
                         equals expected: true, actual: params.BUILD_CLIENT
@@ -528,7 +528,7 @@ foreach($file in $opengl32_libraries){
                 }
                 stage("Packaging Client in Docker Container"){
                     agent{
-                        label "Docker"
+                        label "Docker && !aws"
 
                     }
                     when {
