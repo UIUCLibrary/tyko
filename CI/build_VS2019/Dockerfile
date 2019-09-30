@@ -43,9 +43,11 @@ RUN powershell.exe -Command `
       $ErrorActionPreference = 'Stop'; `
       [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
       $Env:PYTHONUNBUFFERED = 0 ; `
-      python c:\scripts\deps.py ; `
       python -m pip install pip --no-cache-dir --upgrade ; `
-      pip install --no-cache-dir conan
+      python c:\scripts\deps.py ; `
+      Write-Output "Finished installing deps with python script" ; `
+      pip install --no-cache-dir conan ;`
+      Write-Output "Finished installing Conan"
 
 
 RUN powershell.exe -Command `	
