@@ -53,14 +53,17 @@ RUN powershell.exe -Command `
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `	
   Invoke-WebRequest https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2-win64-x64.msi -OutFile C:\TEMP\cmake.msi ; `	
   Start-Process msiexec -ArgumentList '/i C:\TEMP\cmake.msi /q ADD_CMAKE_TO_PATH=System' -Wait ; `	
-  Remove-Item C:\TEMP\cmake.msi -Force
+  Remove-Item C:\TEMP\cmake.msi -Force ; `
+  Write-Output "Finished installing WiX Toolset"
+
 
 RUN powershell.exe -Command `
   $ErrorActionPreference = 'Stop'; `
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
   Invoke-WebRequest https://iweb.dl.sourceforge.net/project/nsis/NSIS%203/3.04/nsis-3.04-setup.exe -OutFile C:\TEMP\nsis-3.04-setup.exe ; `
   Start-Process C:\TEMP\nsis-3.04-setup.exe -ArgumentList "/S" -Wait; `
-  Remove-Item C:\TEMP\nsis-3.04-setup.exe -Force
+  Remove-Item C:\TEMP\nsis-3.04-setup.exe -Force ; `
+  Write-Output "Finished installing Nullsoft Scriptable Install System"
 
 COPY conanfile.txt C:/TEMP/
 ENV CONAN_COLOR_DISPLAY=0
