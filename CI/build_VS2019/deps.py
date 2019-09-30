@@ -34,7 +34,7 @@ def main():
             cmd += cli_args
             print("Installing {}".format(save_name), flush=True)
             subprocess.run(cmd)
-            installed_programs.add(installed_programs)
+            installed_programs.add(program_name)
 
             
         for program_name, url, save_name, cli_args in MSI_DEPS:
