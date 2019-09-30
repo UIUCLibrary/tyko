@@ -73,5 +73,15 @@ ENV CONAN_NON_INTERACTIVE=1
 RUN conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 RUN conan install C:/TEMP/ --build  missing --no-import && conan remove * -b --src -f
 
+
+RUN powershell.exe -Command `
+  $ErrorActionPreference = 'Stop'; `
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
+  Invoke-WebRequest https://github.com/wixtoolset/wix3/releases/download/wix3111rtm/wix311.exe -OutFile C:\TEMP\wix311.exe ; `
+  Start-Process C:\TEMP\wix311.exe -ArgumentList "/quiet" -Wait; `
+  Remove-Item C:\TEMP\wix311.exe -Force ; `
+  Write-Output "Finished installing Wix Toolset"
+
+
 ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat &&
 CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
