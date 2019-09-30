@@ -155,7 +155,7 @@ if(WIN32)
             list(APPEND lib_paths ${CURL_PARENT_DIR}/bin)
             list(APPEND lib_paths $<TARGET_FILE_DIR:Qt5::Core>)
             include(BundleUtilities)
-            fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>" "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>" "${lib_paths}")
+            fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>" "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>" "${lib_paths}" IGNORE_ITEM "opengl32.dll")
         ]])
 
 endif()
