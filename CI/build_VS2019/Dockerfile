@@ -54,7 +54,7 @@ RUN powershell.exe -Command `
   Invoke-WebRequest https://github.com/Kitware/CMake/releases/download/v3.15.2/cmake-3.15.2-win64-x64.msi -OutFile C:\TEMP\cmake.msi ; `	
   Start-Process msiexec -ArgumentList '/i C:\TEMP\cmake.msi /q ADD_CMAKE_TO_PATH=System' -Wait ; `	
   Remove-Item C:\TEMP\cmake.msi -Force ; `
-  Write-Output "Finished installing CMake Toolset"
+  Write-Output "Finished installing CMake"
 
 
 RUN powershell.exe -Command `
