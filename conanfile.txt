@@ -9,6 +9,7 @@ cmake_paths
 [options]
 qt:qtquickcontrols=True
 qt:qtquickcontrols2=True
+qt:opengl=dynamic
 qt:with_mysql=False
 qt:with_sqlite3=False
 libcurl:shared=True
