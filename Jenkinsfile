@@ -534,7 +534,7 @@ pipeline {
                             bat "if not exist dist mkdir dist"
                             bat(
                                 label: "Running build command from CMake on node ${NODE_NAME}",
-                                script: "docker run --rm -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\dist:c:\\dist\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" -v \"${WORKSPACE}\\scm\\CI\\shared_docker_scripts:c:\\ci_scripts:ro\" --workdir=\"c:\\TEMP\" %DOCKER_IMAGE_TAG% C:\\ci_scripts\\package.bat"
+                                script: "docker run --rm -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\dist:c:\\dist\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" -v \"${WORKSPACE}\\scm\\CI\\shared_docker_scripts:c:\\ci_scripts:ro\" --workdir=\"c:\\TEMP\" %DOCKER_IMAGE_TAG% C:\\ci_scripts\\package.bat || EXIT \"%ERRORLEVEL%\""
                             )
                     }
                     post{
