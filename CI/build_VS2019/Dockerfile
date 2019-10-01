@@ -15,7 +15,7 @@ ADD ${CHANNEL_URL} C:/TEMP/VisualStudio.chman
 
 # Download and install Build Tools for Visual Studio 2017 for native desktop workload.
 ADD https://aka.ms/vs/16/release/vs_buildtools.exe C:/TEMP/vs_buildtools.exe
-RUN C:\\TEMP\\vs_buildtools.exe `
+RUN (C:\\TEMP\\vs_buildtools.exe `
     --quiet --wait --norestart --nocache `
     --channelUri C:\\TEMP\\VisualStudio.chman `
     --installChannelUri C:\\TEMP\\VisualStudio.chman `
@@ -26,14 +26,19 @@ RUN C:\\TEMP\\vs_buildtools.exe `
     --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64	 `
     --includeRecommended `
     --installPath C:\BuildTools `
-  || IF "%ERRORLEVEL%"=="3010" EXIT 0
+  || IF "%ERRORLEVEL%"=="3010" EXIT 0 )`
+  && @echo Cleaning up temp files`
+  && del /S /F /Q %temp% `
+  && del /S /F /Q %Windir%\Temp `
+  && @echo Done cleaning up files in temp directories
 
-RUN @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && `
-    SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
+RUN @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" `
+    && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
 
-RUN choco install -y git python nsis wixtoolset && `
-    choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System' && `
-    rmdir C:\ProgramData\chocolatey /s /q
+RUN choco install -y git python nsis wixtoolset `
+    && choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System' `
+    && del /S /F /Q %ChocolateyInstall%
+#    rmdir C:\ProgramData\chocolatey /s /q
 
 RUN powershell.exe -Command `
       $ErrorActionPreference = 'Stop'; `
@@ -46,9 +51,9 @@ RUN powershell.exe -Command `
 COPY conanfile.txt C:/TEMP/
 ENV CONAN_COLOR_DISPLAY=0 CONAN_NON_INTERACTIVE=1
 
-RUN conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan && `
-    conan install C:/TEMP/ --build  missing --no-import && `
-    conan remove * -b --src -f
+RUN conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan `
+    && conan install C:/TEMP/ --build  missing --no-import `
+    && conan remove * -b --src -f
 
 ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat &&
 CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
