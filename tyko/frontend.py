@@ -151,14 +151,17 @@ class ProjectFrontend(FrontendEntity):
             serialize=True, id=entity_id)[0]
 
         return self.render_page(template="project_details.html",
-                                project=selected_project)
+                                project=selected_project,
+                                edit=False
+                                )
 
     def edit_details(self, entity_id):
         selected_project = self._data_connector.get(
             serialize=True, id=entity_id)[0]
 
-        return self.render_page(template="project_edit.html",
-                                project=selected_project)
+        return self.render_page(template="project_details.html",
+                                project=selected_project,
+                                edit=True)
 
 
 
