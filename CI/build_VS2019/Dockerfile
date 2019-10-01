@@ -14,7 +14,9 @@ ARG CHANNEL_URL=https://aka.ms/vs/16/release/channel
 ADD ${CHANNEL_URL} C:/TEMP/VisualStudio.chman
 
 # Download and install Build Tools for Visual Studio 2017 for native desktop workload.
+
 ADD https://aka.ms/vs/16/release/vs_buildtools.exe C:/TEMP/vs_buildtools.exe
+
 RUN (C:\\TEMP\\vs_buildtools.exe `
     --quiet --wait --norestart --nocache `
     --channelUri C:\\TEMP\\VisualStudio.chman `
