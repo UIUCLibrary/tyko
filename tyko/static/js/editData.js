@@ -12,11 +12,18 @@ function editData(apiPath) {
 
     xhr.open("PUT", apiPath);
     xhr.onload = function(){
-        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-            $('#success').modal('show');
-
-            let changeLog =  this.responseText;
-            document.getElementById("changelog").innerText = changeLog
+        if (this.readyState === XMLHttpRequest.DONE) {
+            if(this.status === 200){
+                $('#success').modal('show');
+                document.getElementById("status_report_title").innerText = "Success";
+                let changeLog =  this.responseText;
+                document.getElementById("changelog").innerText = changeLog
+            } else {
+                $('#success').modal('show');
+                document.getElementById("status_report_title").innerText = "Error";
+                let changeLog =  this.responseText;
+                document.getElementById("changelog").innerText = changeLog
+            }
         }
 
     };
