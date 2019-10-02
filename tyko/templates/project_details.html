@@ -28,14 +28,14 @@
                 </div>
                 <div class="container">
                     <div class="table-responsive">
-                    <form  id="new-content-form" onsubmit="return editData('{{ url_for('.page_index') }}api/project')">
+                    <form  id="new-content-form" onsubmit="return editData('{{ url_for('.page_index') }}api/project/{{ project['project_id']}}')">
                         <table class="table ">
                          <thead class="thead-light"/>
                             <tr>
                                 <th style="width: 16.66%">Title </th>
                                 <td>
                                     {%- if edit == True -%}
-                                        <input type="text" class="form-control" id="title" value="{{project['title']}}">
+                                        <input type="text" class="form-control" id="title" name="title" value="{{project['title']}}">
                                     {%- else -%}
                                     {{project['title']}}
                                     {%- endif -%}
@@ -45,7 +45,7 @@
                                 <th>Project Code</th>
                                 <td>
                                     {%- if edit == True -%}
-                                        <input type="text" class="form-control" id="project_code" value="{{project['project_code']}}">
+                                        <input type="text" class="form-control" id="project_code" name="project_code" value="{{project['project_code']}}" disabled>
                                     {%- else -%}
                                         {{project['project_code']}}
                                     {%- endif -%}
@@ -55,7 +55,7 @@
                                 <th>Status</th>
                                 <td>
                                      {%- if edit == True -%}
-                                        <input type="text" class="form-control" id="status" value="{{project['status']}}">
+                                        <input type="text" class="form-control" id="status" name="status" value="{{project['status']}}">
                                     {%- else -%}
                                         {{project['status']}}
                                     {%- endif -%}
@@ -66,7 +66,7 @@
                                 <th>Current Location</th>
                                 <td>
                                     {%- if edit == True -%}
-                                        <input type="text" class="form-control" id="current_location" value="{{project['current_location']}}">
+                                        <input type="text" class="form-control" id="current_location" name="current_location" value="{{project['current_location']}}">
                                     {%- else -%}
                                         {{project['current_location']}}
                                     {%- endif -%}
@@ -100,7 +100,7 @@
                                 <div class="modal-dialog modal-sm" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h1>Success</h1>
+                                            <h1 id="status">Success</h1>
                                         </div>
                                         <div class="modal-body">
                                             <p id="changelog">Record Updated</p>

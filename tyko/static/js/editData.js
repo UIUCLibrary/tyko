@@ -1,10 +1,27 @@
-function editData(apiRoot) {
-    console.log("HERE");
-    console.log("form = " + document.forms["new-content-form"]["title"].value);
-    $('#success').modal('show');
+function editData(apiPath) {
 
-    let changeLog =  "Changed title to " + document.forms["new-content-form"]["title"].value
-    document.getElementById("changelog").innerText = changeLog
+    var data = new FormData(document.forms["new-content-form"]);
+    var xhr = new XMLHttpRequest();
+    xhr.withCredentials = true;
+
+    xhr.addEventListener("readystatechange", function () {
+      if (this.readyState === 4) {
+        console.log(this.responseText);
+      }
+    });
+
+    xhr.open("PUT", apiPath);
+    xhr.onload = function(){
+        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            $('#success').modal('show');
+
+            let changeLog =  this.responseText;
+            document.getElementById("changelog").innerText = changeLog
+        }
+
+    };
+    xhr.send(data);
+
 
 
     return false;
