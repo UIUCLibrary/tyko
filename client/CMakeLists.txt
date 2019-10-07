@@ -148,6 +148,8 @@ if(WIN32)
                 $<TARGET_FILE:Qt5::QuickControls2>
             DESTINATION bin
         )
+
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
     include(InstallRequiredSystemLibraries)
     install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
                     DESTINATION bin
