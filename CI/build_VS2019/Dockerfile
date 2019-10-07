@@ -21,7 +21,8 @@ RUN (C:\\TEMP\\vs_buildtools.exe `
     --quiet --wait --norestart --nocache `
     --channelUri C:\\TEMP\\VisualStudio.chman `
     --installChannelUri C:\\TEMP\\VisualStudio.chman `
-    --add Microsoft.VisualStudio.Workload.VCTools `
+    --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended `
+    --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest `
     --add Microsoft.VisualStudio.Component.VC.140 `
     --add Microsoft.VisualStudio.Component.VC.ATL `
     --add Microsoft.VisualStudio.Component.VC.CLI.Support `
