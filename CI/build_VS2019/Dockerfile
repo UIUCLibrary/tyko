@@ -42,7 +42,8 @@ RUN choco install -y git python nsis wixtoolset ninja`
     && choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System' `
     && del /S /F /Q %ChocolateyInstall%
 #    rmdir C:\ProgramData\chocolatey /s /q
-
+ADD CI/build_VS2019/conan/profiles/default C:\Users\ContainerAdministrator\.conan\profiles\default
+ADD CI/build_VS2019/conan/remotes.json C:\Users\ContainerAdministrator\.conan\remotes.json
 RUN powershell.exe -Command `
       $ErrorActionPreference = 'Stop'; `
       [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
@@ -54,8 +55,7 @@ RUN powershell.exe -Command `
 COPY conanfile.txt C:/TEMP/
 ENV CONAN_COLOR_DISPLAY=0 CONAN_NON_INTERACTIVE=1
 
-RUN conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/public-conan `
-    && conan install C:/TEMP/ --build  missing --no-import `
+RUN conan install C:/TEMP/ --build  missing --no-import `
     && conan remove * -b --src -f
 
 ADD opengl32.dll c:\windows\system32
