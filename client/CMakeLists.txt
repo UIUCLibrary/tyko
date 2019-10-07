@@ -148,12 +148,16 @@ if(WIN32)
                 $<TARGET_FILE:Qt5::QuickControls2>
             DESTINATION bin
         )
-
+    include(InstallRequiredSystemLibraries)
+    install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+                    DESTINATION bin
+                    )
     install(CODE [[
             get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
             list(APPEND lib_paths $<TARGET_FILE_DIR:avdatabaseEditor>)
             list(APPEND lib_paths ${CURL_PARENT_DIR}/bin)
             list(APPEND lib_paths $<TARGET_FILE_DIR:Qt5::Core>)
+
             include(BundleUtilities)
             fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>" "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>" "${lib_paths}" IGNORE_ITEM "OPENGL32.dll")
         ]])
