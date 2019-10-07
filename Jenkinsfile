@@ -173,8 +173,20 @@ pipeline {
                     stages{
                         stage("Build Docker Container"){
                             steps{
-
+                                node('Windows&&opengl32') {
+                                    powershell(
+                                        label: "Searching for opengl32.dll",
+                                        script: '''
+$opengl32_libraries = Get-ChildItem -Path c:\\Windows -Recurse -Include opengl32.dll
+foreach($file in $opengl32_libraries){
+    Copy-Item $file.FullName
+    break
+}'''
+                                    )
+                                    stash includes: 'opengl32.dll', name: 'OPENGL'
+                                }
                                 dir("scm"){
+                                    unstash 'OPENGL'
                                     bat("docker build . -f CI/build_VS2019/Dockerfile -m 2GB -t %DOCKER_IMAGE_TAG%")
                                 }
                             }
