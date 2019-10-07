@@ -57,5 +57,7 @@ RUN conan remote add -f bincrafters https://api.bintray.com/conan/bincrafters/pu
     && conan install C:/TEMP/ --build  missing --no-import `
     && conan remove * -b --src -f
 
+ADD opengl32.dll c:\windows\system32
+
 ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat &&
 CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
