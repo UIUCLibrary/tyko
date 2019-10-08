@@ -246,15 +246,23 @@ foreach($file in $opengl32_libraries){
                 stage("Running Tests"){
                     parallel {
                         stage("PyTest"){
-                            environment{
-                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                            environment{
+//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                            }
+                            agent {
+                              dockerfile {
+                                filename 'CI/server_testing/Dockerfile'
+                                label "linux && docker"
+                                dir 'scm'
+                              }
                             }
                             steps{
+                                sh "mkdir -p reports/pytest"
                                 dir("scm"){
                                     catchError(buildResult: 'UNSTABLE', message: 'Did not pass all pytest tests', stageResult: 'UNSTABLE') {
-                                        bat(
+                                        sh(
                                             label: "Run PyTest",
-                                            script: "coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=${WORKSPACE}/reports/pytest/junit-${env.NODE_NAME}-pytest.xml --junit-prefix=${env.NODE_NAME}-pytest"
+                                            script: "coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=../reports/pytest/junit-${env.NODE_NAME}-pytest.xml --junit-prefix=${env.NODE_NAME}-pytest"
                                         )
                                     }
                                 }
