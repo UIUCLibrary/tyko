@@ -454,6 +454,9 @@ foreach($file in $opengl32_libraries){
                                         recordIssues(tools: [pyLint(pattern: 'reports/pylint_issues.txt')])
                                     }
                                 }
+                                cleanup{
+                                    cleanWs()
+                                }
                             }
                         }
                     }
