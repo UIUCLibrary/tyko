@@ -309,7 +309,7 @@ foreach($file in $opengl32_libraries){
                         stage("Run MyPy Static Analysis") {
                             agent {
                               dockerfile {
-                                filename 'CI/server_testing/Dockerfile'
+                                filename 'scm/CI/server_testing/Dockerfile'
                               }
                             }
 //                            environment{
