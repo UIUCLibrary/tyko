@@ -305,7 +305,7 @@ foreach($file in $opengl32_libraries){
 //                                            [pattern: 'logs/rox_report.json', type: 'INCLUDE']
 //                                        ]
 //                                    )
-                                }
+//                                }
                             }
                         }
                         stage("Run MyPy Static Analysis") {
