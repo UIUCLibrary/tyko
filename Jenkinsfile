@@ -382,10 +382,8 @@ foreach($file in $opengl32_libraries){
                                 dir 'scm'
                               }
                             }
-//                            environment{
-//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-//                            }
                             steps{
+                                sh "mkdir -p logs"
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'Flake8 found issues', stageResult: 'UNSTABLE') {
 
