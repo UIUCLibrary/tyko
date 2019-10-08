@@ -341,24 +341,31 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                         stage("Run Bandit Static Analysis") {
-                            environment{
-                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                            environment{
+//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                            }
+                            agent {
+                              dockerfile {
+                                filename 'CI/server_testing/Dockerfile'
+                                label "linux && docker"
+                                dir 'scm'
+                              }
                             }
                             steps{
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
-                                        bat(
+                                        sh(
                                             label: "Running bandit",
-                                            script: "bandit --format json --output ${WORKSPACE}/reports/bandit-report.json --recursive ${WORKSPACE}\\scm\\tyko || bandit -f html --recursive ${WORKSPACE}\\scm\\tyko --output ${WORKSPACE}/reports/bandit-report.html"
+                                            script: "bandit --format json --output ../reports/bandit-report.json --recursive ../scm/tyko
                                             )
                                     }
 
                                 }
                             }
                             post {
-                                always {
-                                    archiveArtifacts "reports/bandit-report.json,reports/bandit-report.html"
-                                }
+//                                always {
+//                                    archiveArtifacts "reports/bandit-report.json,reports/bandit-report.html"
+//                                }
                                 unstable{
                                     script{
                                         if(fileExists('reports/bandit-report.html')){
