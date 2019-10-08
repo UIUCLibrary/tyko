@@ -352,20 +352,23 @@ foreach($file in $opengl32_libraries){
                               }
                             }
                             steps{
+                                sh "mkdir -p reports"
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
                                         sh(
                                             label: "Running bandit",
-                                            script: "bandit --format json --output ../reports/bandit-report.json --recursive ../scm/tyko
+                                            script: """if bandit --format json --output ../reports/bandit-report.json --recursive ../scm/tyko ; then
+                                             else bandit -f html --recursive ../scm/tyko --output ../reports/bandit-report.html
+                                            """
                                             )
                                     }
 
                                 }
                             }
                             post {
-//                                always {
-//                                    archiveArtifacts "reports/bandit-report.json,reports/bandit-report.html"
-//                                }
+                                always {
+                                    archiveArtifacts "reports/bandit-report.json,reports/bandit-report.html"
+                                }
                                 unstable{
                                     script{
                                         if(fileExists('reports/bandit-report.html')){
