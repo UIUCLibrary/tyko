@@ -268,6 +268,16 @@ foreach($file in $opengl32_libraries){
                                 always{
                                     stash includes: "scm/.coverage.*,reports/pytest/junit-*.xml", name: 'PYTEST_COVERAGE_DATA'
                                     junit "reports/pytest/junit-*.xml"
+                                    dir("scm"){
+                                        sh "coverage combine"
+                                        sh "coverage xml -o ../reports/coverage.xml
+                                    }
+                                    publishCoverage(
+                                        adapters: [
+                                                coberturaAdapter('reports/coverage.xml')
+                                                ],
+                                        sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
+                                        )
                                 }
                             }
                         }
@@ -455,30 +465,30 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                     }
-                    post{
-                        always{
-                            script{
-                                try{
-                                    unstash "PYTEST_COVERAGE_DATA"
-                                    dir("scm"){
-                                        bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe combine"
-                                        bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe xml -o ${WORKSPACE}\\reports\\coverage.xml"
-                                        bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe html -d ${WORKSPACE}\\reports\\coverage"
-                                    }
-                                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/coverage", reportFiles: 'index.html', reportName: 'Coverage', reportTitles: ''])
-                                    publishCoverage adapters: [
-                                                    coberturaAdapter('reports/coverage.xml')
-                                                    ],
-                                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
-
-                                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'reports/coverage', reportFiles: 'index.html', reportName: 'Coverage', reportTitles: ''])
-                                } catch(exec){
-                                    echo "No Coverage data collected"
-                                }
-                            }
-                        }
-
-                    }
+//                    post{
+//                        always{
+//                            script{
+//                                try{
+//                                    unstash "PYTEST_COVERAGE_DATA"
+//                                    dir("scm"){
+//                                        bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe combine"
+//                                        bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe xml -o ${WORKSPACE}\\reports\\coverage.xml"
+//                                        bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe html -d ${WORKSPACE}\\reports\\coverage"
+//                                    }
+//                                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/coverage", reportFiles: 'index.html', reportName: 'Coverage', reportTitles: ''])
+//                                    publishCoverage adapters: [
+//                                                    coberturaAdapter('reports/coverage.xml')
+//                                                    ],
+//                                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
+//
+//                                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'reports/coverage', reportFiles: 'index.html', reportName: 'Coverage', reportTitles: ''])
+//                                } catch(exec){
+//                                    echo "No Coverage data collected"
+//                                }
+//                            }
+//                        }
+//
+//                    }
                 }
                 stage("Run SonarQube Analysis"){
                     when{
