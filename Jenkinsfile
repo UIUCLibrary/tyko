@@ -414,12 +414,18 @@ foreach($file in $opengl32_libraries){
                             steps{
                                 sh "mkdir -p reports"
                                 dir("scm"){
+
                                     catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
                                         sh(
-                                            script: 'pylint tyko  -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > ../reports/pylint.txt & pylint tyko  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > ../reports/pylint_issues.txt',
+                                            script: 'pylint tyko  -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > ../reports/pylint.txt,
                                             label: "Running pylint"
                                         )
                                     }
+                                    sh(
+                                        script:"pylint tyko  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > ../reports/pylint_issues.txt'",
+                                        label: "Running pylint for sonarqube",
+                                        returnStatus: true
+                                    )
                                 }
                             }
                             post{
