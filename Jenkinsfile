@@ -311,6 +311,7 @@ foreach($file in $opengl32_libraries){
                               dockerfile {
                                 filename 'scm/CI/server_testing/Dockerfile'
                                 label "linux && docker"
+                                dir 'scm'
                               }
                             }
 //                            environment{
