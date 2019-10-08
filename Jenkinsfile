@@ -293,22 +293,30 @@ foreach($file in $opengl32_libraries){
                             when {
                                 equals expected: true, actual: params.TEST_RUN_TOX
                             }
-                            environment {
-                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;${tool 'CPython-3.6'};${tool 'CPython-3.7'};$PATH"
+                            agent {
+                              dockerfile {
+                                filename 'CI/server_testing/Dockerfile'
+                                label "linux && docker"
+                                dir 'scm'
+                              }
                             }
+//                            environment {
+//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;${tool 'CPython-3.6'};${tool 'CPython-3.7'};$PATH"
+//                            }
                             steps {
+                                sh "mkdir -p logs"
                                 dir("scm"){
                                     script{
                                         try{
-                                            bat (
+                                            sh (
                                                 label: "Run Tox",
-                                                script: "tox --parallel=auto --parallel-live --workdir ${WORKSPACE}\\.tox -vv --result-json=${WORKSPACE}\\logs\\tox_report.json"
+                                                script: "tox --parallel=auto --parallel-live --workdir ../.tox -vv --result-json=../logs/tox_report.json"
                                             )
 
                                         } catch (exc) {
-                                            bat(
+                                            sh(
                                                 label: "Run Tox with new environments",
-                                                script: "tox --recreate --parallel=auto --parallel-live --workdir ${WORKSPACE}\\.tox -vv --result-json=${WORKSPACE}\\logs\\tox_report.json"
+                                                script: "tox --recreate --parallel=auto --parallel-live --workdir ../.tox -vv --result-json=../logs/tox_report.json"
                                             )
                                         }
                                     }
