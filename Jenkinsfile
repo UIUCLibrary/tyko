@@ -558,15 +558,16 @@ foreach($file in $opengl32_libraries){
             }
         }
         stage("Packaging") {
-            environment{
-                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-            }
+
             options{
                 timeout(10)
             }
             failFast true
             parallel{
                 stage("Creating Python Packages"){
+                    environment{
+                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                    }
 
                     steps{
                         dir("scm"){
