@@ -314,14 +314,9 @@ foreach($file in $opengl32_libraries){
                                 dir 'scm'
                               }
                             }
-//                            environment{
-//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-//                            }
-
                             steps{
                                 sh "mkdir -p reports/mypy/html"
                                 sh "mkdir -p logs"
-//                                bat "if not exist reports\\mypy\\html mkdir reports\\mypy\\html"
                                 tee('logs/mypy.log') {
                                     dir("scm"){
                                         catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
@@ -338,14 +333,10 @@ foreach($file in $opengl32_libraries){
                                 always {
                                     stash includes: "logs/mypy.log", name: 'MYPY_LOGS'
                                     publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/mypy/html/", reportFiles: 'index.html', reportName: 'MyPy HTML Report', reportTitles: ''])
-//                                    node('Windows') {
-//                                        checkout scm
                                         dir("scm"){
                                             unstash "MYPY_LOGS"
                                             recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
                                         }
-//                                    }
-
                                 }
                             }
                         }
