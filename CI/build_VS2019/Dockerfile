@@ -60,5 +60,5 @@ RUN conan install C:/TEMP/ --build  missing --no-import `
 
 ADD opengl32.dll c:\windows\system32
 RUN C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat /help
-ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat -arch=architecture=amd64 -host_arch=amd64 &&
+ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat -arch=amd64 -host_arch=amd64 &&
 CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
