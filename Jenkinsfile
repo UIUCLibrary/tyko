@@ -266,7 +266,7 @@ foreach($file in $opengl32_libraries){
                             }
                             post {
                                 always{
-                                    stash includes: ".coverage.*,reports/pytest/junit-*.xml", name: 'PYTEST_COVERAGE_DATA'
+                                    stash includes: "scm/.coverage.*,reports/pytest/junit-*.xml", name: 'PYTEST_COVERAGE_DATA'
                                     junit "reports/pytest/junit-*.xml"
                                 }
                             }
