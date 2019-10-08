@@ -5,6 +5,7 @@ RUN pip install --no-cache-dir \
     tox \
     pytest \
     pytest-bdd \
+    bandit \
     mypy \
     flake8 \
     coverage \
