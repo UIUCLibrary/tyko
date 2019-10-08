@@ -135,7 +135,7 @@ if(WIN32)
     #    ##############################
 
     set_target_properties(avdatabaseEditor PROPERTIES
-            WIN32_EXECUTABLE ON
+            WIN32_EXECUTABLE OFF
         )
 
     set_property(INSTALL "bin/$<TARGET_FILE_NAME:avdatabaseEditor>"
