@@ -146,9 +146,6 @@ pipeline {
                         dir 'scm'
                       }
                     }
-//                    environment{
-//                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-//                    }
                     steps{
                         dir("scm"){
                             sh "python setup.py build -b ../build/server"
@@ -241,15 +238,15 @@ foreach($file in $opengl32_libraries){
                 timeout(10)
             }
             stages{
-                stage("Installing Python Testing Packages"){
-                    environment{
-                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-                    }
-                    steps{
-                        // Bandit version 1.6 exclude the directories doesn't work
-                        bat 'pip install "tox<3.10" lxml pylint sqlalchemy-stubs "bandit<1.6'
-                    }
-                }
+//                stage("Installing Python Testing Packages"){
+//                    environment{
+//                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                    }
+//                    steps{
+//                        // Bandit version 1.6 exclude the directories doesn't work
+//                        bat 'pip install "tox<3.10" lxml pylint sqlalchemy-stubs "bandit<1.6'
+//                    }
+//                }
                 stage("Running Tests"){
                     parallel {
                         stage("PyTest"){
