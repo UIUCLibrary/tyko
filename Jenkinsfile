@@ -375,15 +375,22 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                         stage("Run Flake8 Static Analysis") {
-                            environment{
-                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                            agent {
+                              dockerfile {
+                                filename 'CI/server_testing/Dockerfile'
+                                label "linux && docker"
+                                dir 'scm'
+                              }
                             }
+//                            environment{
+//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                            }
                             steps{
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'Flake8 found issues', stageResult: 'UNSTABLE') {
 
-                                        bat(
-                                            script: "flake8 tyko --tee --output-file=${WORKSPACE}\\logs\\flake8.log",
+                                        sh(
+                                            script: "flake8 tyko --tee --output-file=../logs/flake8.log",
                                             label: "Running Flake8"
                                         )
                                     }
@@ -393,8 +400,7 @@ foreach($file in $opengl32_libraries){
                                 always {
                                     stash includes: "logs/flake8.log", name: 'FLAKE8_LOGS'
                                     archiveArtifacts 'logs/flake8.log'
-                                    node('Windows') {
-                                        checkout scm
+                                    dir('scm') {
                                         unstash "FLAKE8_LOGS"
                                         recordIssues(tools: [flake8(pattern: 'logs/flake8.log')])
                                     }
