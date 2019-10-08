@@ -298,14 +298,6 @@ foreach($file in $opengl32_libraries){
                                 cleanup{
                                     cleanWs()
                                 }
-//                                    cleanWs(
-//                                        patterns: [
-//                                            [pattern: '.tox/py*/log/*.log', type: 'INCLUDE'],
-//                                            [pattern: '.tox/log/*.log', type: 'INCLUDE'],
-//                                            [pattern: 'logs/rox_report.json', type: 'INCLUDE']
-//                                        ]
-//                                    )
-//                                }
                             }
                         }
                         stage("Run MyPy Static Analysis") {
@@ -570,7 +562,8 @@ foreach($file in $opengl32_libraries){
                         }
 
                         cleanup{
-                            cleanWs deleteDirs: true, patterns: [[pattern: 'dist/*.whl,dist/*.tar.gz,dist/*.zip', type: 'INCLUDE']]
+                            cleanWs()
+//                            cleanWs deleteDirs: true, patterns: [[pattern: 'dist/*.whl,dist/*.tar.gz,dist/*.zip', type: 'INCLUDE']]
                         }
                     }
                 }
