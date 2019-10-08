@@ -270,8 +270,9 @@ foreach($file in $opengl32_libraries){
                                     junit "reports/pytest/junit-*.xml"
                                     dir("scm"){
                                         sh "coverage combine"
-                                        sh "coverage xml -o ../reports/coverage.xml
+                                        sh "coverage xml -o ../reports/coverage.xml"
                                     }
+
                                     publishCoverage(
                                         adapters: [
                                                 coberturaAdapter('reports/coverage.xml')
