@@ -139,12 +139,19 @@ pipeline {
             failFast true
             parallel{
                 stage("Building Server"){
-                    environment{
-                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                    agent {
+                      dockerfile {
+                        filename 'CI/server_testing/Dockerfile'
+                        label "linux && docker"
+                        dir 'scm'
+                      }
                     }
+//                    environment{
+//                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                    }
                     steps{
                         dir("scm"){
-                            bat "python setup.py build -b ${WORKSPACE}/build/server"
+                            sh "python setup.py build -b ../build/server"
                         }
                     }
                     post{
