@@ -229,14 +229,15 @@ foreach($file in $opengl32_libraries){
             }
         }
         stage('Testing') {
-            environment{
-                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-            }
+
             options{
                 timeout(10)
             }
             stages{
                 stage("Installing Python Testing Packages"){
+                    environment{
+                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                    }
                     steps{
                         // Bandit version 1.6 exclude the directories doesn't work
                         bat 'pip install "tox<3.10" pytest pytest-bdd mypy flake8 coverage lxml pylint sqlalchemy-stubs "bandit<1.6'
@@ -245,6 +246,9 @@ foreach($file in $opengl32_libraries){
                 stage("Running Tests"){
                     parallel {
                         stage("PyTest"){
+                            environment{
+                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                            }
                             steps{
                                 dir("scm"){
                                     catchError(buildResult: 'UNSTABLE', message: 'Did not pass all pytest tests', stageResult: 'UNSTABLE') {
@@ -266,7 +270,7 @@ foreach($file in $opengl32_libraries){
                                 equals expected: true, actual: params.TEST_RUN_TOX
                             }
                             environment {
-                                PATH = "${tool 'CPython-3.6'};${tool 'CPython-3.7'};$PATH"
+                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;${tool 'CPython-3.6'};${tool 'CPython-3.7'};$PATH"
                             }
                             steps {
                                 dir("scm"){
@@ -303,6 +307,10 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                         stage("Run MyPy Static Analysis") {
+                            environment{
+                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                            }
+
                             steps{
                                 bat "if not exist reports\\mypy\\html mkdir reports\\mypy\\html"
                                 dir("scm"){
@@ -330,6 +338,9 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                         stage("Run Bandit Static Analysis") {
+                            environment{
+                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                            }
                             steps{
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
@@ -356,6 +367,9 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                         stage("Run Flake8 Static Analysis") {
+                            environment{
+                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                            }
                             steps{
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'Flake8 found issues', stageResult: 'UNSTABLE') {
@@ -384,6 +398,9 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                          stage("Run Pylint Static Analysis") {
+                            environment{
+                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                            }
                             steps{
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
