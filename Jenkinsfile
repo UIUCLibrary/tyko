@@ -324,9 +324,9 @@ foreach($file in $opengl32_libraries){
 //                                bat "if not exist reports\\mypy\\html mkdir reports\\mypy\\html"
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
-
+                                        sh "ls"
                                         sh(
-                                            script: "mypy -p tyko --cache-dir= ../mypy_cache --html-report ../reports/mypy/html | tee ../logs/mypy.log",
+                                            script: "mypy -p tyko --cache-dir= ../mypy_cache --html-report ../reports/mypy/html",
                                             label: "Running MyPy"
                                             )
                                     }
