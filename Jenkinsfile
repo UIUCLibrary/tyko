@@ -246,9 +246,6 @@ foreach($file in $opengl32_libraries){
                 stage("Running Tests"){
                     parallel {
                         stage("PyTest"){
-//                            environment{
-//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-//                            }
                             agent {
                               dockerfile {
                                 filename 'CI/server_testing/Dockerfile'
@@ -269,6 +266,7 @@ foreach($file in $opengl32_libraries){
                             }
                             post {
                                 always{
+                                    stash includes: ".coverage.*,reports/pytest/junit-*.xml", name: 'PYTEST_COVERAGE_DATA'
                                     junit "reports/pytest/junit-*.xml"
                                 }
                             }
@@ -461,6 +459,7 @@ foreach($file in $opengl32_libraries){
                         always{
                             script{
                                 try{
+                                    unstash "PYTEST_COVERAGE_DATA"
                                     dir("scm"){
                                         bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe combine"
                                         bat "${WORKSPACE}\\venv\\37\\Scripts\\coverage.exe xml -o ${WORKSPACE}\\reports\\coverage.xml"
