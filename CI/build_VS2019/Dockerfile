@@ -59,6 +59,6 @@ RUN conan install C:/TEMP/ --build  missing --no-import `
     && conan remove * -b --src -f
 
 ADD opengl32.dll c:\windows\system32
-
+RUN C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat -h
 ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat &&
 CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
