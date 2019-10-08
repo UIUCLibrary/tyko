@@ -563,7 +563,6 @@ foreach($file in $opengl32_libraries){
 
                         cleanup{
                             cleanWs()
-//                            cleanWs deleteDirs: true, patterns: [[pattern: 'dist/*.whl,dist/*.tar.gz,dist/*.zip', type: 'INCLUDE']]
                         }
                     }
                 }
