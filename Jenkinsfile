@@ -319,6 +319,8 @@ foreach($file in $opengl32_libraries){
 //                            }
 
                             steps{
+                                sh "mkdir -p reports/mypy/html"
+                                sh "mkdir -p logs"
 //                                bat "if not exist reports\\mypy\\html mkdir reports\\mypy\\html"
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
