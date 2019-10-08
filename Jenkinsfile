@@ -411,6 +411,9 @@ foreach($file in $opengl32_libraries){
                                 dir 'scm'
                               }
                             }
+                            environment{
+                                PYLINTHOME="."
+                            }
                             steps{
                                 sh "mkdir -p reports"
                                 dir("scm"){
