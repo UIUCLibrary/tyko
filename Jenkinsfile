@@ -341,9 +341,6 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                         stage("Run Bandit Static Analysis") {
-//                            environment{
-//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-//                            }
                             agent {
                               dockerfile {
                                 filename 'CI/server_testing/Dockerfile'
