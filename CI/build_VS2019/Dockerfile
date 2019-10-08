@@ -16,14 +16,13 @@ ADD ${CHANNEL_URL} C:/TEMP/VisualStudio.chman
 # Download and install Build Tools for Visual Studio 2017 for native desktop workload.
 
 ADD https://aka.ms/vs/16/release/vs_buildtools.exe C:/TEMP/vs_buildtools.exe
-
+#--add Microsoft.VisualStudio.Component.VC.140 `
 RUN (C:\\TEMP\\vs_buildtools.exe `
     --quiet --wait --norestart --nocache `
     --channelUri C:\\TEMP\\VisualStudio.chman `
     --installChannelUri C:\\TEMP\\VisualStudio.chman `
     --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended `
     --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest `
-    --add Microsoft.VisualStudio.Component.VC.140 `
     --add Microsoft.VisualStudio.Component.VC.ATL `
     --add Microsoft.VisualStudio.Component.VC.CLI.Support `
     --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64	 `
