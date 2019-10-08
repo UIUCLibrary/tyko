@@ -578,7 +578,7 @@ foreach($file in $opengl32_libraries){
 
                     steps{
                         dir("scm"){
-                            sh script: "python setup.py sdist -d ../dist --format zip bdist_wheel -d ..}/dist"
+                            sh script: "python setup.py sdist -d ../dist --format zip bdist_wheel -d ../dist"
                         }
                     }
                 }
