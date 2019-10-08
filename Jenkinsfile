@@ -310,6 +310,7 @@ foreach($file in $opengl32_libraries){
                             agent {
                               dockerfile {
                                 filename 'scm/CI/server_testing/Dockerfile'
+                                label "linux && docker"
                               }
                             }
 //                            environment{
