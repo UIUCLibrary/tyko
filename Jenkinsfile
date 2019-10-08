@@ -565,13 +565,20 @@ foreach($file in $opengl32_libraries){
             failFast true
             parallel{
                 stage("Creating Python Packages"){
-                    environment{
-                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                    agent {
+                      dockerfile {
+                        filename 'CI/server_testing/Dockerfile'
+                        label "linux && docker"
+                        dir 'scm'
+                      }
                     }
+//                    environment{
+//                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                    }
 
                     steps{
                         dir("scm"){
-                            bat script: "python setup.py build -b ${WORKSPACE}/build/server sdist -d ${WORKSPACE}/dist --format zip bdist_wheel -d ${WORKSPACE}/dist"
+                            sh script: "python setup.py sdist -d ../dist --format zip bdist_wheel -d ..}/dist"
                         }
                     }
                 }
