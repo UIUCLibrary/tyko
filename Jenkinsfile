@@ -581,6 +581,20 @@ foreach($file in $opengl32_libraries){
                             sh script: "python setup.py sdist -d ../dist --format zip bdist_wheel -d ../dist"
                         }
                     }
+                    post {
+                        success {
+                            archiveArtifacts artifacts: "dist/*.whl,dist/*.zip", fingerprint: true
+                            stash includes: "dist/*.whl,dist/*.zip", name: 'PYTHON_PACKAGES'
+                        }
+                        unstable {
+                            archiveArtifacts artifacts: "dist/*.whl,dist/*.zip", fingerprint: true
+                            stash includes: "dist/*.whl,dist/*.zip", name: 'PYTHON_PACKAGES'
+                        }
+
+                        cleanup{
+                            cleanWs deleteDirs: true, patterns: [[pattern: 'dist/*.whl,dist/*.tar.gz,dist/*.zip', type: 'INCLUDE']]
+                        }
+                    }
                 }
                 stage("Packaging Client in Docker Container"){
                     agent{
@@ -622,20 +636,7 @@ foreach($file in $opengl32_libraries){
                     }
                 }
             }
-            post {
-                success {
-                    archiveArtifacts artifacts: "dist/*.whl,dist/*.zip", fingerprint: true
-                    stash includes: "dist/*.whl,dist/*.zip", name: 'PYTHON_PACKAGES'
-                }
-                unstable {
-                    archiveArtifacts artifacts: "dist/*.whl,dist/*.zip", fingerprint: true
-                    stash includes: "dist/*.whl,dist/*.zip", name: 'PYTHON_PACKAGES'
-                }
 
-                cleanup{
-                    cleanWs deleteDirs: true, patterns: [[pattern: 'dist/*.whl,dist/*.tar.gz,dist/*.zip', type: 'INCLUDE']]
-                }
-            }
         }
         stage("Deploy"){
             parallel{
