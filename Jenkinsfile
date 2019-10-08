@@ -115,7 +115,6 @@ pipeline {
                             }
                         }
                         bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel sqlalchemy  -r scm/requirements.txt --upgrade-strategy only-if-needed"
-//                        bat "venv36\\Scripts\\pip.exe install pytest-cov lxml flake8 mypy -r source\\requirements.txt --upgrade-strategy only-if-needed"
                     }
                     post{
                         success{
@@ -238,15 +237,6 @@ foreach($file in $opengl32_libraries){
                 timeout(10)
             }
             stages{
-//                stage("Installing Python Testing Packages"){
-//                    environment{
-//                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-//                    }
-//                    steps{
-//                        // Bandit version 1.6 exclude the directories doesn't work
-//                        bat 'pip install "tox<3.10" lxml pylint sqlalchemy-stubs "bandit<1.6'
-//                    }
-//                }
                 stage("Running Tests"){
                     parallel {
                         stage("PyTest"){
@@ -297,9 +287,6 @@ foreach($file in $opengl32_libraries){
                                 dir 'scm'
                               }
                             }
-//                            environment {
-//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;${tool 'CPython-3.6'};${tool 'CPython-3.7'};$PATH"
-//                            }
                             steps {
                                 sh "mkdir -p logs"
                                 dir("scm"){
@@ -572,10 +559,6 @@ foreach($file in $opengl32_libraries){
                         dir 'scm'
                       }
                     }
-//                    environment{
-//                        PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
-//                    }
-
                     steps{
                         dir("scm"){
                             sh script: "python setup.py sdist -d ../dist --format zip bdist_wheel -d ../dist"
