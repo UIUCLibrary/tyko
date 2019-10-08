@@ -135,7 +135,7 @@ pipeline {
                             }
                         }
                         cleanup{
-                            deleteDir()
+                            cleanWs()
                         }
                     }
                 }
@@ -255,6 +255,9 @@ foreach($file in $opengl32_libraries){
                                         sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
                                         )
                                 }
+                                cleanup{
+                                    cleanWs()
+                                }
                             }
                         }
                         stage("Tox") {
@@ -293,13 +296,15 @@ foreach($file in $opengl32_libraries){
                                     recordIssues(tools: [pep8(id: 'tox', name: 'Tox', pattern: '.tox/py*/log/*.log,.tox/log/*.log')])
                                 }
                                 cleanup{
-                                    cleanWs(
-                                        patterns: [
-                                            [pattern: '.tox/py*/log/*.log', type: 'INCLUDE'],
-                                            [pattern: '.tox/log/*.log', type: 'INCLUDE'],
-                                            [pattern: 'logs/rox_report.json', type: 'INCLUDE']
-                                        ]
-                                    )
+                                    cleanWs()
+                                }
+//                                    cleanWs(
+//                                        patterns: [
+//                                            [pattern: '.tox/py*/log/*.log', type: 'INCLUDE'],
+//                                            [pattern: '.tox/log/*.log', type: 'INCLUDE'],
+//                                            [pattern: 'logs/rox_report.json', type: 'INCLUDE']
+//                                        ]
+//                                    )
                                 }
                             }
                         }
@@ -335,6 +340,9 @@ foreach($file in $opengl32_libraries){
                                             recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
                                         }
                                 }
+                                cleanup{
+                                    cleanWs()
+                                }
                             }
                         }
                         stage("Run Bandit Static Analysis") {
@@ -368,6 +376,9 @@ foreach($file in $opengl32_libraries){
                                             addWarningBadge text: "Bandit security issues detected", link: "${currentBuild.absoluteUrl}"
                                         }
                                     }
+                                }
+                                cleanup{
+                                    cleanWs()
                                 }
                             }
                         }
