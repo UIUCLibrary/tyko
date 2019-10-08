@@ -102,28 +102,6 @@ pipeline {
                         }
                     }
                 }
-//                stage("Creating Python Virtualenv for Building"){
-//                    steps{
-//                        bat "if not exist venv\\37 mkdir venv\\37 && python -m venv venv\\37"
-//                        script {
-//                            try {
-//                                bat "venv\\37\\Scripts\\python.exe -m pip install -U pip"
-//                            }
-//                            catch (exc) {
-//                                bat "python -m venv venv\\37"
-//                                bat "venv\\37\\Scripts\\python.exe -m pip install -U pip --no-cache-dir"
-//                            }
-//                        }
-//                        bat "venv\\37\\Scripts\\pip.exe install -U setuptools wheel sqlalchemy  -r scm/requirements.txt --upgrade-strategy only-if-needed"
-//                    }
-//                    post{
-//                        success{
-//                            bat "if not exist logs mkdir logs"
-//                            bat "venv\\37\\Scripts\\pip.exe list > ${WORKSPACE}\\logs\\pippackages_venv_${NODE_NAME}.log"
-//                            archiveArtifacts artifacts: "logs/pippackages_venv_${NODE_NAME}.log"
-//                        }
-//                    }
-//                }
             }
             post{
                 failure {
@@ -155,6 +133,9 @@ pipeline {
                             dir("scm"){
                                 stash includes: "deploy/**,database/**", name: 'SERVER_DEPLOY_FILES'
                             }
+                        }
+                        cleanup{
+                            deleteDir()
                         }
                     }
                 }
