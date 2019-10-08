@@ -326,7 +326,7 @@ foreach($file in $opengl32_libraries){
                                     catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
 
                                         sh(
-                                            script: "mypy -p tyko --cache-dir=${WORKSPACE}/mypy_cache --html-report ${WORKSPACE}/reports/mypy/html > ${WORKSPACE}/logs/mypy.log && cat ${WORKSPACE}/logs/mypy.log",
+                                            script: "mypy -p tyko --cache-dir= ../mypy_cache --html-report ../reports/mypy/html | tee ../logs/mypy.log",
                                             label: "Running MyPy"
                                             )
                                     }
