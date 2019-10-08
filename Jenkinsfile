@@ -357,12 +357,8 @@ foreach($file in $opengl32_libraries){
                                     catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
                                         sh(
                                             label: "Running bandit",
-                                            script: """if bandit --format json --output ../reports/bandit-report.json --recursive ../scm/tyko ; then
-                                            echo "success"
-                                             else bandit -f html --recursive ../scm/tyko --output ../reports/bandit-report.html
-                                             fi
-                                            """
-                                            )
+                                            script: "bandit --format json --output ../reports/bandit-report.json --recursive ../scm/tyko ||  bandit -f html --recursive ../scm/tyko --output ../reports/bandit-report.html"
+                                        )
                                     }
 
                                 }
