@@ -338,11 +338,11 @@ foreach($file in $opengl32_libraries){
                                 always {
                                     stash includes: "logs/mypy.log", name: 'MYPY_LOGS'
                                     publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/mypy/html/", reportFiles: 'index.html', reportName: 'MyPy HTML Report', reportTitles: ''])
-                                    node('Windows') {
-                                        checkout scm
-                                        unstash "MYPY_LOGS"
-                                        recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
-                                    }
+//                                    node('Windows') {
+//                                        checkout scm
+//                                        unstash "MYPY_LOGS"
+                                    recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
+//                                    }
 
                                 }
                             }
