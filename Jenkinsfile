@@ -401,14 +401,22 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                          stage("Run Pylint Static Analysis") {
-                            environment{
-                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                            environment{
+//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                            }
+                            agent {
+                              dockerfile {
+                                filename 'CI/server_testing/Dockerfile'
+                                label "linux && docker"
+                                dir 'scm'
+                              }
                             }
                             steps{
+                                sh "mkdir -p reports"
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
-                                        bat(
-                                            script: 'pylint tyko  -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > %WORKSPACE%\\reports\\pylint.txt & pylint tyko  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > %WORKSPACE%\\reports\\pylint_issues.txt',
+                                        sh(
+                                            script: 'pylint tyko  -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > ../reports/pylint.txt & pylint tyko  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > ../reports/pylint_issues.txt',
                                             label: "Running pylint"
                                         )
                                     }
