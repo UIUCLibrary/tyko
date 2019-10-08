@@ -435,8 +435,7 @@ foreach($file in $opengl32_libraries){
                                 always{
                                     stash includes: "reports/pylint_issues.txt", name: 'PYLINT_REPORT'
                                     archiveArtifacts allowEmptyArchive: true, artifacts: "reports/pylint.txt"
-                                    node('Windows') {
-                                        checkout scm
+                                    dir("scm"){
                                         unstash "PYLINT_REPORT"
                                         recordIssues(tools: [pyLint(pattern: 'reports/pylint_issues.txt')])
                                     }
