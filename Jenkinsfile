@@ -80,38 +80,38 @@ pipeline {
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
-        stage('Configure Environment') {
-            environment{
-                PATH = "${tool 'CPython-3.7'};$PATH"
-            }
-            options{
-                timeout(5)
-            }
-            stages{
-                stage("Purge All Existing Data in Workspace"){
-                    when{
-                        anyOf{
-                            equals expected: true, actual: params.FRESH_WORKSPACE
-                            triggeredBy "TimerTriggerCause"
-                        }
-                    }
-                    steps{
-                        deleteDir()
-                        dir("scm"){
-                            checkout scm
-                        }
-                    }
-                }
-            }
-            post{
-                failure {
-                    deleteDir()
-                }
-                success{
-                    echo "Configured ${env.PKG_NAME}, version ${env.PKG_VERSION}, for testing."
-                }
-            }
-        }
+//        stage('Configure Environment') {
+//            environment{
+//                PATH = "${tool 'CPython-3.7'};$PATH"
+//            }
+//            options{
+//                timeout(5)
+//            }
+//            stages{
+//                stage("Purge All Existing Data in Workspace"){
+//                    when{
+//                        anyOf{
+//                            equals expected: true, actual: params.FRESH_WORKSPACE
+//                            triggeredBy "TimerTriggerCause"
+//                        }
+//                    }
+//                    steps{
+//                        deleteDir()
+//                        dir("scm"){
+//                            checkout scm
+//                        }
+//                    }
+//                }
+//            }
+//            post{
+//                failure {
+//                    deleteDir()
+//                }
+//                success{
+//                    echo "Configured ${env.PKG_NAME}, version ${env.PKG_VERSION}, for testing."
+//                }
+//            }
+//        }
         stage("Building"){
             failFast true
             parallel{
