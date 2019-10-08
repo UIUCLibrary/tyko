@@ -307,16 +307,21 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                         stage("Run MyPy Static Analysis") {
-                            environment{
-                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+                            agent {
+                              dockerfile {
+                                filename 'CI/server_testing/Dockerfile'
+                              }
                             }
+//                            environment{
+//                                PATH = "${WORKSPACE}\\venv\\37\\Scripts;$PATH"
+//                            }
 
                             steps{
-                                bat "if not exist reports\\mypy\\html mkdir reports\\mypy\\html"
+//                                bat "if not exist reports\\mypy\\html mkdir reports\\mypy\\html"
                                 dir("scm"){
                                     catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
 
-                                        bat(
+                                        sh(
                                             script: "mypy -p tyko --cache-dir=${WORKSPACE}/mypy_cache --html-report ${WORKSPACE}\\reports\\mypy\\html > ${WORKSPACE}\\logs\\mypy.log && type ${WORKSPACE}\\logs\\mypy.log",
                                             label: "Running MyPy"
                                             )
