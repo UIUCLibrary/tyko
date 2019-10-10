@@ -551,8 +551,9 @@ foreach($file in $opengl32_libraries){
                             bat "if not exist dist mkdir dist"
                             bat(
                                 label: "Running build command from CMake on node ${NODE_NAME}",
-                                script: "docker run --rm -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\dist:c:\\dist\" -v \"${WORKSPACE}\\scm:c:\\source:ro\" -v \"${WORKSPACE}\\scm\\CI\\shared_docker_scripts:c:\\ci_scripts:ro\" --workdir=\"c:\\TEMP\" %DOCKER_IMAGE_TAG% C:\\ci_scripts\\package.bat || EXIT \"%ERRORLEVEL%\""
+                                script: "docker run --rm -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\dist:c:\\dist\" -v \"${WORKSPACE}\\scm:c:\\source:rw\" -v \"${WORKSPACE}\\scm\\CI\\shared_docker_scripts:c:\\ci_scripts:ro\" --workdir=\"c:\\build\" %DOCKER_IMAGE_TAG% cpack -G NSIS;WIX;ZIP -C Release --verbose"
                             )
+
                     }
                     post{
                         cleanup{
@@ -568,8 +569,8 @@ foreach($file in $opengl32_libraries){
                             archiveArtifacts allowEmptyArchive: true, artifacts: 'build/**/*.log'
                         }
                         success{
-                            archiveArtifacts allowEmptyArchive: true, artifacts: 'dist/*.exe,dist/*.msi,dist/*.zip'
-                            stash includes: 'dist/*.exe,dist/*.msi,dist/*.zip,', name: "CLIENT_INSTALLERS"
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/*.exe,build/*.msi,build/*.zip'
+                            stash includes: 'build/*.exe,build/*.msi,build/*.zip,', name: "CLIENT_INSTALLERS"
                         }
                     }
                 }

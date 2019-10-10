@@ -41,8 +41,11 @@ RUN choco install -y git python nsis wixtoolset ninja`
     && choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System' `
     && del /S /F /Q %ChocolateyInstall%
 #    rmdir C:\ProgramData\chocolatey /s /q
-ADD CI/build_VS2019/conan/profiles/default C:\Users\ContainerAdministrator\.conan\profiles\default
-ADD CI/build_VS2019/conan/remotes.json C:\Users\ContainerAdministrator\.conan\remotes.json
+ARG CONAN_USER_HOME=C:\\conan
+ENV CONAN_COLOR_DISPLAY=0 CONAN_NON_INTERACTIVE=1 CONAN_USER_HOME=${CONAN_USER_HOME}
+
+ADD CI/build_VS2019/conan/profiles/default ${CONAN_USER_HOME}\.conan\profiles\default
+ADD CI/build_VS2019/conan/remotes.json ${CONAN_USER_HOME}\.conan\remotes.json
 RUN powershell.exe -Command `
       $ErrorActionPreference = 'Stop'; `
       [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
@@ -52,11 +55,11 @@ RUN powershell.exe -Command `
       Write-Output "Finished installing Conan"
 
 COPY conanfile.txt C:/TEMP/
+# THIS is needed for CPack to not fail at the fixup stage. This DLL shouldn't actually be included in distributions
 ADD opengl32.dll c:\windows\system32
-ENV CONAN_COLOR_DISPLAY=0 CONAN_NON_INTERACTIVE=1
+ADD ["CI/build_VS2019/vcvarsall.bat", "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Auxiliary/Build/vcvarsall.bat"]
 RUN conan install C:/TEMP/ --build  missing --no-import `
     && conan remove * -b --src -f
 
-RUN C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat /help
-ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat -arch=amd64 -host_arch=amd64 -vcvars_ver=14.2 &&
+ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat -no_logo -arch=amd64 -host_arch=amd64 -vcvars_ver=14.2 &&
 CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
