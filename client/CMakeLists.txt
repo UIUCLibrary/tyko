@@ -5,8 +5,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-#find_package(CURL REQUIRED)
-#find_package(OpenSSL REQUIRED)
+find_package(CURL REQUIRED)
+find_package(OpenSSL REQUIRED)
 #find_package(ZLIB REQUIRED)
 find_package(Qt5 REQUIRED
         COMPONENTS
@@ -17,27 +17,27 @@ find_package(Qt5 REQUIRED
         OPTIONAL_COMPONENTS
             QuickTest
     )
-#add_library(PostCurl OBJECT
-#        CurlPostBehavior.cpp
-#        )
+add_library(PostCurl OBJECT
+        CurlPostBehavior.cpp
+        )
 
-#target_link_libraries(PostCurl
-#    PRIVATE
-#        CURL::libcurl
-#        )
-#
-#add_library(ProjectAdder
-#        projectadder.cpp
-#        qtPostBehavior.cpp qtPostBehavior.h
-#    )
-#
-#target_link_libraries(ProjectAdder
-#    PUBLIC
-#        Qt5::Core
-#        Qt5::Quick
-#    PRIVATE
-#        PostCurl
-#    )
+target_link_libraries(PostCurl
+    PRIVATE
+        CURL::libcurl
+        )
+
+add_library(ProjectAdder
+        projectadder.cpp
+        qtPostBehavior.cpp qtPostBehavior.h
+    )
+
+target_link_libraries(ProjectAdder
+    PUBLIC
+        Qt5::Core
+        Qt5::Quick
+    PRIVATE
+        PostCurl
+    )
 
 
 add_executable(avdatabaseEditor
