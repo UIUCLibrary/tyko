@@ -155,7 +155,7 @@ if(WIN32)
     install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
                     DESTINATION bin
                     )
-    #            get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
+    get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
 
     get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
     get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
