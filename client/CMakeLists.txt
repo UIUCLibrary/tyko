@@ -162,10 +162,10 @@ if(WIN32)
     find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
     install(CODE [[
             find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS $<TARGET_FILE_DIR:Qt5::qmake>)
-            get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
+#            get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
             list(APPEND lib_paths "$<TARGET_FILE_DIR:avdatabaseEditor>")
-            list(APPEND lib_paths "${CURL_PARENT_DIR}/bin")
-            list(APPEND lib_paths "$<TARGET_FILE_DIR:Qt5::Core>")
+#            list(APPEND lib_paths "${CURL_PARENT_DIR}/bin")
+#            list(APPEND lib_paths "$<TARGET_FILE_DIR:Qt5::Core>")
             set(QML_PATH $<TARGET_PROPERTY:avdatabaseEditor,SOURCE_DIR>)
             execute_process(
                 COMMAND "${CMAKE_COMMAND}" -E
@@ -190,11 +190,11 @@ if(WIN32)
             endwhile()
             include(BundleUtilities)
             set(EXE_TO_FIXUP "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>")
-#            message("Fixing up ${EXE_TO_FIXUP}")
-#            fixup_bundle("${EXE_TO_FIXUP}"
+            message("Fixing up ${EXE_TO_FIXUP}")
+            fixup_bundle("${EXE_TO_FIXUP}"
 #                         "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>"
-#                         "${lib_paths}"
-#                         IGNORE_ITEM "OPENGL32.dll")
+                         "${lib_paths}"
+                         IGNORE_ITEM "OPENGL32.dll")
         ]])
 
 endif()
