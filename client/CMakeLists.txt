@@ -163,9 +163,9 @@ if(WIN32)
     install(CODE [[
             find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS $<TARGET_FILE_DIR:Qt5::qmake>)
             get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
-            list(APPEND lib_paths $<TARGET_FILE_DIR:avdatabaseEditor>)
-            list(APPEND lib_paths ${CURL_PARENT_DIR}/bin)
-            list(APPEND lib_paths $<TARGET_FILE_DIR:Qt5::Core>)
+            list(APPEND lib_paths "$<TARGET_FILE_DIR:avdatabaseEditor>")
+            list(APPEND lib_paths "${CURL_PARENT_DIR}/bin")
+            list(APPEND lib_paths "$<TARGET_FILE_DIR:Qt5::Core>")
             set(QML_PATH $<TARGET_PROPERTY:avdatabaseEditor,SOURCE_DIR>)
             execute_process(
                 COMMAND "${CMAKE_COMMAND}" -E
