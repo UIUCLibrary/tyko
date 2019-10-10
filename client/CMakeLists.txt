@@ -5,7 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(CURL REQUIRED)
+#find_package(CURL REQUIRED)
 #find_package(OpenSSL REQUIRED)
 #find_package(ZLIB REQUIRED)
 find_package(Qt5 REQUIRED
@@ -17,27 +17,27 @@ find_package(Qt5 REQUIRED
         OPTIONAL_COMPONENTS
             QuickTest
     )
-add_library(PostCurl OBJECT
-        CurlPostBehavior.cpp
-        )
+#add_library(PostCurl OBJECT
+#        CurlPostBehavior.cpp
+#        )
 
-target_link_libraries(PostCurl
-    PRIVATE
-        CURL::libcurl
-        )
-
-add_library(ProjectAdder
-        projectadder.cpp
-        qtPostBehavior.cpp qtPostBehavior.h
-    )
-
-target_link_libraries(ProjectAdder
-    PUBLIC
-        Qt5::Core
-        Qt5::Quick
-    PRIVATE
-        PostCurl
-    )
+#target_link_libraries(PostCurl
+#    PRIVATE
+#        CURL::libcurl
+#        )
+#
+#add_library(ProjectAdder
+#        projectadder.cpp
+#        qtPostBehavior.cpp qtPostBehavior.h
+#    )
+#
+#target_link_libraries(ProjectAdder
+#    PUBLIC
+#        Qt5::Core
+#        Qt5::Quick
+#    PRIVATE
+#        PostCurl
+#    )
 
 
 add_executable(avdatabaseEditor
@@ -53,7 +53,7 @@ target_link_libraries(avdatabaseEditor
         PRIVATE
             Qt5::Core
             Qt5::Quick
-            ProjectAdder
+#            ProjectAdder
             Qt5::Qml
             Qt5::QuickControls2
             Qt5::Widgets
@@ -90,8 +90,8 @@ if(WIN32)
             ${Qt_root_path}/plugins/platforms
             )
 
-    message(STATUS "Using ${platform_plugin} for the qt platform plugin")
-    install(FILES ${platform_plugin} DESTINATION bin/platforms)
+#    message(STATUS "Using ${platform_plugin} for the qt platform plugin")
+#    install(FILES ${platform_plugin} DESTINATION bin/platforms)
 
 #    FIND QML PATHS:
     find_path(QML_QtQuick
@@ -124,13 +124,13 @@ if(WIN32)
             QtQML
         )
 
-    install(DIRECTORY
-                ${QML_QtQuick}
-                ${QML_QtQuick.2}
-                ${QML_QtQML}
-            DESTINATION
-                bin
-        )
+#    install(DIRECTORY
+#                ${QML_QtQuick.2}
+#                ${QML_QtQuick}
+#                ${QML_QtQML}
+#            DESTINATION
+#                bin
+#        )
 
     #    ##############################
 
@@ -140,44 +140,74 @@ if(WIN32)
 
     set_property(INSTALL "bin/$<TARGET_FILE_NAME:avdatabaseEditor>"
             PROPERTY
-                CPACK_START_MENU_SHORTCUTS "AV Database"
+                CPACK_START_MENU_SHORTCUTS "Tyko"
         )
 
-    install(FILES
-                $<TARGET_FILE:Qt5::Widgets>
-                $<TARGET_FILE:Qt5::QuickControls2>
-            DESTINATION bin
-        )
+#    install(FILES
+##                $<TARGET_FILE:Qt5::Widgets>
+#                $<TARGET_FILE:Qt5::QuickControls2>
+#            DESTINATION bin
+#        )
 
 #     set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+    set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
     include(InstallRequiredSystemLibraries)
     install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
                     DESTINATION bin
                     )
+    #            get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
+
+    get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
+    get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
     install(CODE [[
-            get_filename_component(CURL_PARENT_DIR $<TARGET_FILE_DIR:CURL::libcurl> DIRECTORY)
+            find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS $<TARGET_FILE_DIR:Qt5::qmake>)
             list(APPEND lib_paths $<TARGET_FILE_DIR:avdatabaseEditor>)
             list(APPEND lib_paths ${CURL_PARENT_DIR}/bin)
             list(APPEND lib_paths $<TARGET_FILE_DIR:Qt5::Core>)
-
+            set(QML_PATH $<TARGET_PROPERTY:avdatabaseEditor,SOURCE_DIR>)
+            execute_process(
+                COMMAND "${CMAKE_COMMAND}" -E
+                    env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
+                        --qmldir ${QML_PATH}
+                        --dry-run
+                        --no-compiler-runtime
+                        --list mapping
+                        $<TARGET_FILE:avdatabaseEditor>
+                OUTPUT_VARIABLE _output
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+            )
+            separate_arguments(_files WINDOWS_COMMAND ${_output})
+            while(_files)
+                list(GET _files 0 _src)
+                list(GET _files 1 _dest)
+                execute_process(
+                    COMMAND "${CMAKE_COMMAND}" -E
+                        copy_if_different ${_src} "${CMAKE_INSTALL_PREFIX}/bin/${_dest}"
+                )
+                list(REMOVE_AT _files 0 1)
+            endwhile()
             include(BundleUtilities)
-            fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>" "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>" "${lib_paths}" IGNORE_ITEM "OPENGL32.dll")
+            fixup_bundle("${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>"
+#                         "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>"
+                         "${lib_paths}"
+                         IGNORE_ITEM "OPENGL32.dll")
         ]])
 
 endif()
-
-enable_testing()
-
-add_executable(tst_editor "tst_editor.cpp" "tests.qrc")
-target_link_libraries(tst_editor
-        PRIVATE
-            Qt5::QuickTest
-            Qt5::Quick
-            Qt5::Qml
-            ProjectAdder
-
-    )
-
-
-add_dependencies(tst_editor avdatabaseEditor)
-add_test(tst_editor tst_editor -input ${CMAKE_CURRENT_SOURCE_DIR})
+#
+#enable_testing()
+#
+#add_executable(tst_editor "tst_editor.cpp" "tests.qrc")
+#target_link_libraries(tst_editor
+#        PRIVATE
+#            Qt5::QuickTest
+#            Qt5::Quick
+#            Qt5::Qml
+##            ProjectAdder
+#
+#    )
+#
+#
+#add_dependencies(tst_editor avdatabaseEditor)
+#add_test(tst_editor tst_editor -input ${CMAKE_CURRENT_SOURCE_DIR})
