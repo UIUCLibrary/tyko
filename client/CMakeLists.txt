@@ -188,8 +188,10 @@ if(WIN32)
                 list(REMOVE_AT _files 0 1)
             endwhile()
             include(BundleUtilities)
-            fixup_bundle("${CMAKE_INSTALL_PREFIX}bin/$<TARGET_FILE_NAME:avdatabaseEditor>"
-#                         "${CMAKE_INSTALL_PREFIX}bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>"
+            set(EXE_TO_FIXUP "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>")
+            message("Fixing up "${EXE_TO_FIXUP}")
+            fixup_bundle("${EXE_TO_FIXUP}"
+#                         "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>"
                          "${lib_paths}"
                          IGNORE_ITEM "OPENGL32.dll")
         ]])
