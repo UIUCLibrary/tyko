@@ -53,7 +53,7 @@ target_link_libraries(avdatabaseEditor
         PRIVATE
             Qt5::Core
             Qt5::Quick
-#            ProjectAdder
+            ProjectAdder
             Qt5::Qml
             Qt5::QuickControls2
             Qt5::Widgets
