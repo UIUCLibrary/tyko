@@ -55,11 +55,11 @@ RUN powershell.exe -Command `
       Write-Output "Finished installing Conan"
 
 COPY conanfile.txt C:/TEMP/
+# THIS is needed for CPack to not fail at the fixup stage. This DLL shouldn't actually be included in distributions
 ADD opengl32.dll c:\windows\system32
-
+ADD ["CI/build_VS2019/vcvarsall.bat", "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Auxiliary/Build/vcvarsall.bat"]
 RUN conan install C:/TEMP/ --build  missing --no-import `
     && conan remove * -b --src -f
 
-RUN C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat /help
-ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat -arch=amd64 -host_arch=amd64 -vcvars_ver=14.2 &&
+ENTRYPOINT C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat -no_logo -arch=amd64 -host_arch=amd64 -vcvars_ver=14.2 &&
 CMD ["powershell.exe", "-NoLogo", "-ExecutionPolicy", "Bypass"]
