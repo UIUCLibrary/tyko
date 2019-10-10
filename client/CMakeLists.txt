@@ -189,7 +189,7 @@ if(WIN32)
             endwhile()
             include(BundleUtilities)
             set(EXE_TO_FIXUP "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>")
-            message("Fixing up "${EXE_TO_FIXUP}")
+            message("Fixing up ${EXE_TO_FIXUP}")
             fixup_bundle("${EXE_TO_FIXUP}"
 #                         "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>"
                          "${lib_paths}"
