@@ -193,7 +193,7 @@ if(WIN32)
             message("Fixing up ${EXE_TO_FIXUP}")
             fixup_bundle("${EXE_TO_FIXUP}"
 #                         "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:Qt5::QuickControls2>"
-                         "${lib_paths}"
+                         ""
                          IGNORE_ITEM "OPENGL32.dll")
         ]])
 
