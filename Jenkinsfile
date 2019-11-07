@@ -476,6 +476,7 @@ foreach($file in $opengl32_libraries){
                     }
                     when{
                         equals expected: "master", actual: env.BRANCH_NAME
+                        beforeAgent true
                     }
 
                     steps{
