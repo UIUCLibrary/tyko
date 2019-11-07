@@ -714,21 +714,21 @@ foreach($file in $opengl32_libraries){
             }
         }
      }
-     post {
-        cleanup {
-          cleanWs(
-                deleteDirs: true,
-                patterns: [
-                    [pattern: 'dist', type: 'INCLUDE'],
-                    [pattern: 'reports', type: 'INCLUDE'],
-                    [pattern: 'logs', type: 'INCLUDE'],
-                    [pattern: 'certs', type: 'INCLUDE'],
-                    [pattern: 'mypy_stubs', type: 'INCLUDE'],
-                    [pattern: '*tmp', type: 'INCLUDE'],
-                    [pattern: "scm", type: 'INCLUDE'],
-                    ]
-                )
-        }
-      }
+//     post {
+//        cleanup {
+//          cleanWs(
+//                deleteDirs: true,
+//                patterns: [
+//                    [pattern: 'dist', type: 'INCLUDE'],
+//                    [pattern: 'reports', type: 'INCLUDE'],
+//                    [pattern: 'logs', type: 'INCLUDE'],
+//                    [pattern: 'certs', type: 'INCLUDE'],
+//                    [pattern: 'mypy_stubs', type: 'INCLUDE'],
+//                    [pattern: '*tmp', type: 'INCLUDE'],
+//                    [pattern: "scm", type: 'INCLUDE'],
+//                    ]
+//                )
+//        }
+//      }
 
 }
