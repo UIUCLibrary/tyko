@@ -54,9 +54,7 @@ def get_sonarqube_project_analysis(report_task_file, buildString){
 }
 
 pipeline {
-    agent {
-        label 'Windows && Python3'
-    }
+    agent none
     triggers {
         cron('@daily')
     }
