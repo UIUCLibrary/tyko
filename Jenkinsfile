@@ -536,20 +536,20 @@ foreach($file in $opengl32_libraries){
                     }
                 }
             }
-            post{
-                cleanup{
-                    cleanWs(patterns:
-                        [
-                            [pattern: 'reports/coverage.xml', type: 'INCLUDE'],
-                            [pattern: 'reports/coverage', type: 'INCLUDE'],
-                            [pattern: 'scm/.coverage', type: 'INCLUDE'],
-                            [pattern: 'scm/**/__pycache__', type: 'INCLUDE'],
-                            [pattern: 'reports/pytest/junit-*.xml', type: 'INCLUDE']
-                        ]
-                    )
-
-                }
-            }
+//            post{
+//                cleanup{
+//                    cleanWs(patterns:
+//                        [
+//                            [pattern: 'reports/coverage.xml', type: 'INCLUDE'],
+//                            [pattern: 'reports/coverage', type: 'INCLUDE'],
+//                            [pattern: 'scm/.coverage', type: 'INCLUDE'],
+//                            [pattern: 'scm/**/__pycache__', type: 'INCLUDE'],
+//                            [pattern: 'reports/pytest/junit-*.xml', type: 'INCLUDE']
+//                        ]
+//                    )
+//
+//                }
+//            }
         }
         stage("Packaging") {
 
