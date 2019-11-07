@@ -146,6 +146,7 @@ pipeline {
                     }
                     when {
                         equals expected: true, actual: params.BUILD_CLIENT
+                        beforeAgent true
                     }
                     environment{
                         DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
