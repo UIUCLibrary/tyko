@@ -273,19 +273,30 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         return make_response("", 404)
 
     def update(self, id):
+        updatable_fields = [
+            "title",
+            "project_code",
+            "status",
+            "current_location"
+        ]
         new_project = dict()
-        if "project_code" in request.form:
-            new_project["project_code"] = request.form.get("project_code")
 
-        if "current_location" in request.form:
+        for k, v in request.json.items():
+            if k not in updatable_fields:
+                return make_response("Cannot update field: {}".format(k), 400)
+
+        if "project_code" in request.json:
+            new_project["project_code"] = request.json.get("project_code")
+
+        if "current_location" in request.json:
             new_project["current_location"] = \
-                request.form.get("current_location")
+                request.json.get("current_location")
 
-        if "status" in request.form:
-            new_project["status"] = request.form.get("status")
+        if "status" in request.json:
+            new_project["status"] = request.json.get("status")
 
-        if "title" in request.form:
-            new_project["title"] = request.form.get("title")
+        if "title" in request.json:
+            new_project["title"] = request.json.get("title")
 
         updated_project = \
             self._data_connector.update(

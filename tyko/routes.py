@@ -199,6 +199,12 @@ class Routes:
                         lambda object_id: frontend.ObjectFrontend(
                             self.mw.data_provider).display_details(object_id)
                     ),
+                    Route(
+                        "/object/<string:object_id>/edit",
+                        "page_object_edit",
+                        lambda object_id: frontend.ObjectFrontend(
+                            self.mw.data_provider).edit_details(object_id)
+                    ),
                 ]),
             EntityPage(
                 "Items",
