@@ -10,6 +10,12 @@ from . import pbcore
 
 
 class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
+    WRITABLE_FIELDS = []
+
+    @classmethod
+    def field_can_edit(cls, field) -> bool:
+        return field in cls.WRITABLE_FIELDS
+
     def __init__(self, data_provider) -> None:
         self._data_provider = data_provider
 
@@ -48,6 +54,10 @@ class Middleware:
 
 
 class ObjectMiddlwareEntity(AbsMiddlwareEntity):
+    WRITABLE_FIELDS = [
+        "name"
+    ]
+
     def __init__(self, data_provider: dp.DataProvider) -> None:
         super().__init__(data_provider)
 
@@ -99,6 +109,10 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
 
     def update(self, id):
         new_object = dict()
+
+        for k, v in request.json.items():
+            if not self.field_can_edit(k):
+                return make_response("Cannot update field: {}".format(k), 400)
 
         if "name" in request.form:
             new_object["name"] = request.form.get("name")
@@ -216,6 +230,12 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
 
 
 class ProjectMiddlwareEntity(AbsMiddlwareEntity):
+    WRITABLE_FIELDS = [
+        "title",
+        "project_code",
+        "status",
+        "current_location"
+    ]
 
     def __init__(self, data_provider) -> None:
         super().__init__(data_provider)
@@ -273,16 +293,11 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         return make_response("", 404)
 
     def update(self, id):
-        updatable_fields = [
-            "title",
-            "project_code",
-            "status",
-            "current_location"
-        ]
+
         new_project = dict()
 
         for k, v in request.json.items():
-            if k not in updatable_fields:
+            if not self.field_can_edit(k):
                 return make_response("Cannot update field: {}".format(k), 400)
 
         if "project_code" in request.json:

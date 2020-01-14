@@ -1,7 +1,7 @@
 # pylint: disable=invalid-name
 
 import abc
-from typing import Tuple, Set, NamedTuple, Optional
+from typing import Tuple, Set, NamedTuple, Optional, List
 from dataclasses import dataclass
 
 from flask import make_response, render_template, url_for
@@ -22,7 +22,9 @@ class Details:
     name: str
     value: Optional[str] = None
     key: Optional[str] = None
+    key_branch: Optional[str] = None
     editable: bool = False
+
 
 
 class AbsFrontend(metaclass=abc.ABCMeta):
@@ -230,7 +232,19 @@ class ItemFrontend(FrontendEntity):
                                 row_table="items"
                                 )
 
+    def render_page(self, template="items.html", **context):
+        context['itemType'] = "Item"
+        return super().render_page(template, **context)
+
     def display_details(self, entity_id):
+        fields = [
+            Details(name="Name", key="name"),
+            # FIXME: use format name isntead of ID
+            Details(name="Format", key="format_type_id"),
+            Details(name="File Name", key="file_name"),
+            Details(name="Medusa UUID", key="medusa_uuid"),
+            Details(name="Object Sequence", key="obj_sequence"),
+        ]
         selected_item = self._data_connector.get(
             serialize=True, id=entity_id)[0]
 
@@ -239,6 +253,7 @@ class ItemFrontend(FrontendEntity):
                 selected_item['format_type'] = k
                 break
         return self.render_page(template="item_details.html",
+                                fields=fields,
                                 item=selected_item)
 
     @property
@@ -290,6 +305,7 @@ class ObjectFrontend(FrontendEditable):
                                 view_details_path=view_details_path,
                                 edit_link=edit_link,
                                 edit=True)
+
     @property
     def entity_title(self) -> str:
         return "Objects"
@@ -303,12 +319,28 @@ class ObjectFrontend(FrontendEditable):
         return "page_object"
 
     def display_details(self, entity_id):
+        fields = [
+            Details(name="Name", key="name"),
+            Details(name="Collection",
+                    key_branch="collection",
+                    key="collection_name"),
+            Details(name="Project", key_branch="project",
+                    key="title"),
+            Details(name="Barcode", key="barcode"),
+            Details(name="Originals Received Date", key="originals_rec_date"),
+            Details(name="Originals Returned Date", key="originals_return_date"),
+            Details(name="Contact", key="contact"),
+            # Details(name="Project Code", key="project_code", editable=True),
+            # Details(name="Status", key="status", editable=True),
+            # Details(name="Current Location", key="current_location", editable=True),
+        ]
 
         selected_object = self._data_connector.get(serialize=True,
                                                    id=entity_id)[0]
         edit_link = f"{url_for('page_object')}/{entity_id}/edit"
         return self.render_page(template="object_details.html",
                                 edit=False,
+                                fields=fields,
                                 edit_link=edit_link,
                                 object=selected_object)
 

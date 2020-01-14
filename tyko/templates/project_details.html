@@ -82,14 +82,14 @@
                     {%- for child_object in project['objects'] -%}
                         <tr>
                             <td><a href="{{ url_for('page_object')}}/{{ child_object[0] }}"> {{ child_object[1] }}</a></td>
-                            <td><button class="float-right btn btn-danger btn-sm">Remove</button></td>
+                            <td><button class="float-right btn btn-danger btn-sm" disabled>Remove</button></td>
                         </tr>
                     {%- endfor -%}
                         <tr>
                             <td></td>
                             <td>
                                 <div class="btn-group float-right" role="group">
-                                    <button class="btn btn-primary">Add</button>
+                                    <button class="btn btn-primary btn-sm" disabled>Add</button>
                                 </div>
                             </td>
                         </tr>
@@ -107,9 +107,18 @@
                     {%- for note in project['notes'] -%}
                         <tr>
                             <td>{{ note['text'] }}</td>
-                            <td><button class="float-right btn btn-secondary btn-sm">Edit</button></td>
+                            <td><button class="float-right btn btn-secondary btn-sm" disabled>Edit</button></td>
+
                         </tr>
                     {%- endfor -%}
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="btn-group float-right" role="group">
+                                <button class="btn btn-primary btn-sm" disabled>Add</button>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>

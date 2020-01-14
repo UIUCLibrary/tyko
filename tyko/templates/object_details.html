@@ -12,9 +12,7 @@
         <button class="btn btn-outline-primary"
                 type="button"
                 onclick="location.href='{{ edit_link }}'"
-        {%-if edit == True%}
             disabled
-        {%- endif -%}
             >Edit</button>
     </div>
     <div class="mx-1">
@@ -25,62 +23,107 @@
 </nav>
 {% endblock %}
 {% block detail_table %}
-<table class="table">
-    <thead class="thead-light"/>
-    <tr>
-        <th style="width: 16.66%">Name</th>
-        <td>
-        {%- if edit == True -%}
-            <input type="text" class="form-control" id="name" name="name" value="{{object['name']}}">
-        {%- else -%}
-            {{object['name']}}
-        {%- endif -%}
+    <div class="card my-1">
+        <div class="card-body">
+            <table class="table">
+                <tbody>
+                    {%- for field in fields -%}
+                        <tr>
+                            <td style="width: 16.66%" class="font-weight-bold">{{field.name}}</td>
+                            <td>
+                                <div id="{{field.name}}Label">
 
-        </td>
-    </tr>
-    <tr>
-        <th>Collection</th>
-        <td><a href="{{url_for('page_collections')}}/{{ object['collection']['collection_id']}}">{{object['collection']['collection_name']}}</a></td>
-    </tr>
-    <tr>
-        <th>Project</th>
-        <td>
-            {{object['project']["title"]}}
-        </td>
-    </tr>
-    <tr>
-        <th>Barcode</th>
-        <td>
-             {%- if edit == True -%}
-                <input type="text" class="form-control"
-                       id="barcode"
-                       name="barcode"
-                       value="{{object['barcode']}}"
-                >
-            {%- else -%}
-                {{object['barcode']}}
-            {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <th>Originals Received Date</th>
-        <td>{{object['originals_rec_date']}}</td>
-    </tr>
-    <tr>
-        <th>Originals Returned Date</th>
-        <td>{{object['originals_return_date']}}</td>
-    </tr>
-    <tr>
-        <th>Contact</th>
-        <td>{{object['contact']}}</td>
-    </tr>
-    <tr>
-        <th rowspan="{{object['items']|length + 1}}">Items</th>
-         {% for item in object['items'] %}
-             <tr><td><a href="{{ url_for('.page_index')}}item/{{ item['item_id'] }}">{{ item['name'] }}</a></td></tr>
-        {% endfor %}
-    </tr>
+                                    {% if field.key_branch is not none and field.key_branch in object %}
+                                        {{ object[field.key_branch][field.key]}}
+                                    {% else %}
+                                        {{- object[field.key] -}}
+                                    {% endif %}
+                                </div>
+                                <div id="{{field.key}}InputGroup" class="input-group" hidden>
+                                    {% if field.editable %}
+                                        <input id="{{field.key}}Input" type="text" class="form-control" value="{{-field.key or ""-}}">
+                                        <div class="input-group-append">
+                                        <button id="{{field.key}}Confirm"
+                                                class="btn btn-outline-secondary"
+                                        >Confirm</button>
+                                        <script>
+                                        document.getElementById("{{field.key}}Confirm").onclick = function () {
+                                            editDataValue(
+                                                '{{ api_path }}',
+                                                '{{field.key}}',
+                                                document.getElementById('{{field.key}}Input').value,
+                                                function () {
+                                                    location.reload()
+                                                },
+                                                function () {
+                                                    alert("Failed to update {{ field.key }}");
 
-</table>
+                                                }
+                                            );
+                                        }
+                                        </script>
+                                    {% endif %}
+
+                                  </div>
+                                </div>
+                            </td>
+                            <td style="width: 5%">
+                                {% if field.editable %}
+                                <button id="editButton{{loop.index}}" class="btn btn-secondary float-right btn-sm">Edit</button>
+                                {% endif %}
+                            </td>
+                        {% if field.editable %}
+                            <script>
+                                document.getElementById("editButton{{loop.index}}").onclick = function (){
+                                    flipMode(
+                                        "{{field.name}}Label",
+                                        "{{field.key}}InputGroup",
+                                        "{{field.key}}Input",
+                                        "{{-object.get(field.key) or ""-}}",
+                                        "editButton{{loop.index}}"
+
+                                    )
+                                };
+                                document.getElementById("{{field.key}}Input").addEventListener('keypress', (e) => {
+                                    if (e.key === "Enter") {
+                                        document.getElementById("{{field.key}}Confirm").click();
+                                    }
+                                });
+                            </script>
+                         {% endif %}
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <div class="card my-1">
+        <div class="card-header">
+            <h5 class="card-title">Items</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <tbody>
+                    {% for item in object['items'] %}
+                        <tr>
+                            <td><a href="{{ url_for('.page_index')}}item/{{ item['item_id'] }}">{{ item['name'] }}</a></td>
+                        <td></td>
+                        </tr>
+                    {%- endfor -%}
+                        <tr>
+                            <td></td>
+                            <td>
+                                <div class="btn-group float-right" role="group">
+                                    <button class="btn btn-primary" disabled>Add</button>
+                                </div>
+                            </td>
+                        </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
 
 {% endblock %}
