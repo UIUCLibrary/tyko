@@ -1,7 +1,7 @@
 # pylint: disable=invalid-name
 
 import abc
-from typing import Tuple, Set, NamedTuple, Optional, List
+from typing import Tuple, Set, Optional
 from dataclasses import dataclass
 
 from flask import make_response, render_template, url_for
@@ -24,7 +24,6 @@ class Details:
     key: Optional[str] = None
     key_branch: Optional[str] = None
     editable: bool = False
-
 
 
 class AbsFrontend(metaclass=abc.ABCMeta):
@@ -179,15 +178,20 @@ class ProjectFrontend(FrontendEditable):
             Details(name="Title", key="title", editable=True),
             Details(name="Project Code", key="project_code", editable=True),
             Details(name="Status", key="status", editable=True),
-            Details(name="Current Location", key="current_location", editable=True),
+            Details(
+                name="Current Location",
+                key="current_location",
+                editable=True
+            ),
         ]
 
-        return self.render_page(template="project_details.html",
-                                project=selected_project,
-                                api_path=f"{url_for('.page_index')}api/project/{entity_id}",
-                                edit_link=edit_link,
-                                fields=fields
-                                )
+        return self.render_page(
+            template="project_details.html",
+            project=selected_project,
+            api_path=f"{url_for('.page_index')}api/project/{entity_id}",
+            edit_link=edit_link,
+            fields=fields
+            )
 
     def edit_details(self, entity_id):
         selected_project = self._data_connector.get(
@@ -328,11 +332,10 @@ class ObjectFrontend(FrontendEditable):
                     key="title"),
             Details(name="Barcode", key="barcode"),
             Details(name="Originals Received Date", key="originals_rec_date"),
-            Details(name="Originals Returned Date", key="originals_return_date"),
+            Details(
+                name="Originals Returned Date",
+                key="originals_return_date"),
             Details(name="Contact", key="contact"),
-            # Details(name="Project Code", key="project_code", editable=True),
-            # Details(name="Status", key="status", editable=True),
-            # Details(name="Current Location", key="current_location", editable=True),
         ]
 
         selected_object = self._data_connector.get(serialize=True,
