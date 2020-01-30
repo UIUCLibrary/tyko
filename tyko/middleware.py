@@ -58,7 +58,8 @@ class Middleware:
 
 class ObjectMiddlwareEntity(AbsMiddlwareEntity):
     WRITABLE_FIELDS = [
-        "name"
+        "name",
+        "barcode"
     ]
 
     def __init__(self, data_provider: dp.DataProvider) -> None:

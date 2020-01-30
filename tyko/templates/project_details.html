@@ -32,11 +32,9 @@
 
                                                 }
                                             );
-
                                         }
                                         </script>
                                     {% endif %}
-
                                   </div>
                                 </div>
                             </td>
@@ -54,7 +52,6 @@
                                         "{{field.key}}Input",
                                         "{{-project.get(field.key) or ""-}}",
                                         "editButton{{loop.index}}"
-
                                     )
                                 };
                                 document.getElementById("{{field.key}}Input").addEventListener('keypress', (e) => {
@@ -66,10 +63,8 @@
                          {% endif %}
                         </tr>
                     {% endfor %}
-
                 </tbody>
             </table>
-
         </div>
     </div>
     <div class="card my-1">

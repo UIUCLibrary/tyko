@@ -1,25 +1,26 @@
 {% extends "details_table.html" %}
 {% block entity_navbar %}
-<nav class="navbar navbar-expand-lg  navbar-light justify-content-start bg-light">
-    <div class="mx-1">
-        <button class="btn btn-outline-primary"
-                type="button"
-                onclick="location.href='{{ url_for("page_project_new") }}'" disabled>New</button>
-    </div>
-    <div class="mx-1">
-        <button class="btn btn-outline-primary"
-                type="button"
-                onclick="location.href='{{ edit_link }}'"
-                disabled>Edit</button>
-    </div>
-    <div class="mx-1">
-        <button class="btn btn-outline-primary"
-                        type="button"
-                        onclick="location.href='{{ url_for('.page_index')}}api/object/{{object['object_id']}}-pbcore.xml'">PBCore Record</button>
-    </div>
-</nav>
+{#<nav class="navbar navbar-expand-lg  navbar-light justify-content-start bg-light">#}
+{#    <div class="mx-1">#}
+{#        <button class="btn btn-outline-primary"#}
+{#                type="button"#}
+{#                onclick="location.href='{{ url_for("page_project_new") }}'" disabled>New</button>#}
+{#    </div>#}
+{#    <div class="mx-1">#}
+{#        <button class="btn btn-outline-primary"#}
+{#                type="button"#}
+{#                onclick="location.href='{{ edit_link }}'"#}
+{#                disabled>Edit</button>#}
+{#    </div>#}
+{#    <div class="mx-1">#}
+{#        <button class="btn btn-outline-primary"#}
+{#                        type="button"#}
+{#                        onclick="location.href='{{ url_for('.page_index')}}api/object/{{object['object_id']}}-pbcore.xml'">PBCore Record</button>#}
+{#    </div>#}
+{#</nav>#}
 {% endblock %}
 {% block detail_table %}
+
     <div class="card my-1">
         <div class="card-body">
             <table class="table">
@@ -29,42 +30,38 @@
                             <td style="width: 16.66%" class="font-weight-bold">{{field.name}}</td>
                             <td>
                                 <div id="{{field.name}}Label">
-                                    {%- if field.key_branch is not none and field.key_branch in object -%}
-                                        {{ object[field.key_branch][field.key] -}}
-                                    {% else %}
-                                        {{- object[field.key] -}}
-                                    {% endif -%}
+                                    {{-object.get(field.key) or ""-}}
                                 </div>
                                 <div id="{{field.key}}InputGroup" class="input-group" hidden>
-                                    {%- if field.editable %}
-                                        <input id="{{field.key}}Input" type="text" class="form-control" value="{{-field.key or ""-}}">
+                                    {% if field.editable %}
+                                        <input id="{{field.key}}Input" type="text" class="form-control" value="{{-object.get(field.key) or ""-}}">
                                         <div class="input-group-append">
-                                        <button id="{{field.key}}Confirm"
-                                                class="btn btn-outline-secondary"
-                                                >Confirm</button>
-                                        <script>
-                                        document.getElementById("{{field.key}}Confirm").onclick = function () {
-                                            editDataValue(
-                                                '{{ api_path }}',
-                                                '{{field.key}}',
-                                                document.getElementById('{{field.key}}Input').value,
-                                                function () {
-                                                    location.reload()
-                                                },
-                                                function () {
-                                                    alert("Failed to update {{ field.key }}");
+                                            <button id="{{field.key}}Confirm"
+                                                    class="btn btn-outline-secondary">Confirm</button>
+                                            <script>
+                                            document.getElementById("{{field.key}}Confirm").onclick = function () {
+                                                editDataValue(
+                                                    '{{ api_path }}',
+                                                    '{{field.key}}',
+                                                    document.getElementById('{{field.key}}Input').value,
+                                                    function () {
+                                                        location.reload()
+                                                    },
+                                                    function () {
+                                                        alert("Failed to update {{ field.key }}");
 
-                                                }
-                                            );
-                                        }
-                                        </script>
-                                    {% endif -%}
-                                  </div>
+                                                    }
+                                                );
+                                            }
+                                            </script>
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </td>
                             <td style="width: 5%">
-                                {%- if field.editable %}
+                                {% if field.editable %}
                                 <button id="editButton{{loop.index}}" class="btn btn-secondary float-right btn-sm">Edit</button>
-                                {% endif -%}
+                                {% endif %}
                             </td>
                         {% if field.editable %}
                             <script>
@@ -75,7 +72,6 @@
                                         "{{field.key}}Input",
                                         "{{-object.get(field.key) or ""-}}",
                                         "editButton{{loop.index}}"
-
                                     )
                                 };
                                 document.getElementById("{{field.key}}Input").addEventListener('keypress', (e) => {
@@ -87,7 +83,6 @@
                          {% endif %}
                         </tr>
                     {% endfor %}
-
                 </tbody>
             </table>
 
@@ -117,6 +112,29 @@
                 </tbody>
             </table>
 
+        </div>
+    </div>
+    <div class="card">
+        <h5 class="card-header">Notes</h5>
+        <div class="card-body">
+            <table class="table">
+                <tbody>
+                    {%- for note in object['notes'] -%}
+                        <tr>
+                            <td>{{ note['text'] }}</td>
+                            <td><button class="float-right btn btn-secondary btn-sm" disabled>Edit</button></td>
+                        </tr>
+                    {%- endfor -%}
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="btn-group float-right" role="group">
+                                <button class="btn btn-primary btn-sm" disabled>Add</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 

@@ -120,7 +120,7 @@ class Routes:
                     Route("/api/object/<string:id>", "object_by_id",
                           lambda id: project_object.get(id=id)),
                     Route("/api/object/<string:id>", "object_update",
-                          lambda id: project_object.update(id=id),
+                          project_object.update,
                           methods=["PUT"]
                           ),
                     Route("/api/object/<string:id>-pbcore.xml",

@@ -320,13 +320,13 @@ class ObjectFrontend(FrontendEditable):
 
     def display_details(self, entity_id):
         fields = [
-            Details(name="Name", key="name"),
+            Details(name="Name", key="name", editable=True),
             Details(name="Collection",
                     key_branch="collection",
                     key="collection_name"),
             Details(name="Project", key_branch="project",
                     key="title"),
-            Details(name="Barcode", key="barcode"),
+            Details(name="Barcode", key="barcode", editable=True),
             Details(name="Originals Received Date", key="originals_rec_date"),
             Details(
                 name="Originals Returned Date",
@@ -336,11 +336,13 @@ class ObjectFrontend(FrontendEditable):
 
         selected_object = self._data_connector.get(serialize=True,
                                                    id=entity_id)[0]
+        api_path = f"{url_for('.page_index')}api/object/{entity_id}"
         edit_link = f"{url_for('page_object')}/{entity_id}/edit"
         return self.render_page(template="object_details.html",
                                 edit=False,
                                 fields=fields,
                                 edit_link=edit_link,
+                                api_path=api_path,
                                 object=selected_object)
 
     def render_page(self, template="object_details.html", **context):
@@ -349,7 +351,6 @@ class ObjectFrontend(FrontendEditable):
             current_item=self.entity_title,
             context=context
         )
-
         return render_template(template, **new_context)
 
 
