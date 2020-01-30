@@ -293,10 +293,6 @@ class ObjectFrontend(FrontendEditable):
                                 on_success_redirect_base="/object/",
                                 )
 
-    def render_page(self, template="object_details.html", **context):
-        context['itemType'] = "Object"
-        return super().render_page(template, **context)
-
     def edit_details(self, entity_id):
         selected_object = self._data_connector.get(
             serialize=True, id=entity_id)[0]
@@ -348,6 +344,7 @@ class ObjectFrontend(FrontendEditable):
                                 object=selected_object)
 
     def render_page(self, template="object_details.html", **context):
+        context['itemType'] = "Object"
         new_context = self.build_header_context(
             current_item=self.entity_title,
             context=context
