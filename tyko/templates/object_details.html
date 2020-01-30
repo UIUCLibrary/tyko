@@ -2,18 +2,15 @@
 {% block entity_navbar %}
 <nav class="navbar navbar-expand-lg  navbar-light justify-content-start bg-light">
     <div class="mx-1">
-        <button class="btn btn-outline-primary "
+        <button class="btn btn-outline-primary"
                 type="button"
-                onclick="location.href='{{url_for("page_project_new")}}'"
-                disabled
-                >New</button>
+                onclick="location.href='{{ url_for("page_project_new") }}'" disabled>New</button>
     </div>
     <div class="mx-1">
         <button class="btn btn-outline-primary"
                 type="button"
                 onclick="location.href='{{ edit_link }}'"
-            disabled
-            >Edit</button>
+                disabled>Edit</button>
     </div>
     <div class="mx-1">
         <button class="btn btn-outline-primary"
@@ -32,20 +29,19 @@
                             <td style="width: 16.66%" class="font-weight-bold">{{field.name}}</td>
                             <td>
                                 <div id="{{field.name}}Label">
-
-                                    {% if field.key_branch is not none and field.key_branch in object %}
-                                        {{ object[field.key_branch][field.key]}}
+                                    {%- if field.key_branch is not none and field.key_branch in object -%}
+                                        {{ object[field.key_branch][field.key] -}}
                                     {% else %}
                                         {{- object[field.key] -}}
-                                    {% endif %}
+                                    {% endif -%}
                                 </div>
                                 <div id="{{field.key}}InputGroup" class="input-group" hidden>
-                                    {% if field.editable %}
+                                    {%- if field.editable %}
                                         <input id="{{field.key}}Input" type="text" class="form-control" value="{{-field.key or ""-}}">
                                         <div class="input-group-append">
                                         <button id="{{field.key}}Confirm"
                                                 class="btn btn-outline-secondary"
-                                        >Confirm</button>
+                                                >Confirm</button>
                                         <script>
                                         document.getElementById("{{field.key}}Confirm").onclick = function () {
                                             editDataValue(
@@ -62,15 +58,13 @@
                                             );
                                         }
                                         </script>
-                                    {% endif %}
-
+                                    {% endif -%}
                                   </div>
-                                </div>
                             </td>
                             <td style="width: 5%">
-                                {% if field.editable %}
+                                {%- if field.editable %}
                                 <button id="editButton{{loop.index}}" class="btn btn-secondary float-right btn-sm">Edit</button>
-                                {% endif %}
+                                {% endif -%}
                             </td>
                         {% if field.editable %}
                             <script>
