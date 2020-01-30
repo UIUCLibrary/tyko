@@ -3,6 +3,7 @@
 import abc
 import hashlib
 import json
+from typing import List
 
 from flask import jsonify, make_response, abort, request, url_for
 from . import data_provider as dp
@@ -12,7 +13,7 @@ CACHE_HEADER = "private, max-age=0"
 
 
 class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
-    WRITABLE_FIELDS = []
+    WRITABLE_FIELDS: List[str] = []
 
     @classmethod
     def field_can_edit(cls, field) -> bool:
