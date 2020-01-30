@@ -273,7 +273,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
                 hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
 
             response.headers["ETag"] = str(hash_value)
-            response.headers["Cache-Control"] = "private, max-age=0"
+            response.headers["Cache-Control"] = CACHE_HEADER
             return response
 
         result = projects
