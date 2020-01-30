@@ -114,7 +114,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
         new_object = dict()
 
         json_request = request.json
-        for k, v in json_request.items():
+        for k, _ in json_request.items():
             if not self.field_can_edit(k):
                 return make_response("Cannot update field: {}".format(k), 400)
 
@@ -301,7 +301,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         new_project = dict()
 
         json_request = request.json
-        for k, v in json_request.items():
+        for k, _ in json_request.items():
             if not self.field_can_edit(k):
                 return make_response("Cannot update field: {}".format(k), 400)
 
