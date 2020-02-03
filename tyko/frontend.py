@@ -260,8 +260,7 @@ class ItemFrontend(FrontendEntity):
         def get_format():
             if selected_item['format'] is not None:
                 return selected_item['format']['name'].title()
-            else:
-                return None
+            return None
 
         fields = [
             Details(name="Name", key="name", editable=True),
