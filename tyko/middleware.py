@@ -431,7 +431,8 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             try:
                 item["obj_sequence"] = int(obj_sequence)
             except ValueError:
-                return make_response("Invalid data type {}".format(obj_sequence), 400)
+                return make_response(
+                    "Invalid data type {}".format(obj_sequence), 400)
 
         replacement_item = self._data_connector.update(
             id, changed_data=item
