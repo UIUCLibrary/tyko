@@ -474,7 +474,8 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         self._data_connector = \
             dp.NotesDataConnector(data_provider.db_session_maker)
 
-    def resolve_parents(self, source: dict) -> dict:
+    @staticmethod
+    def resolve_parents(source: dict) -> dict:
         newone = source.copy()
         parent_routes = []
 
