@@ -5,6 +5,8 @@ from typing import Tuple, Set, Optional, Callable, List
 from dataclasses import dataclass
 
 from flask import make_response, render_template, url_for
+
+import scheme
 from . import data_provider
 from .decorators import authenticate
 
@@ -203,18 +205,23 @@ class ProjectFrontend(FrontendEditable):
                 editable=True
             ),
         ]
+        valid_note_types = []
+        for k, v in scheme.note_types.items():
+            valid_note_types.append((k, v[0]))
 
         return self.render_page(
             template="project_details.html",
             project=selected_project,
             api_path=f"{url_for('.page_index')}api/project/{entity_id}",
             edit_link=edit_link,
+            valid_note_types=valid_note_types,
             fields=fields
             )
 
     def edit_details(self, entity_id):
         selected_project = self._data_connector.get(
             serialize=True, id=entity_id)[0]
+
         api_path = f"{url_for('.page_index')}api/project/{entity_id}"
         view_details_path = f"{url_for('page_projects')}/{entity_id}"
 

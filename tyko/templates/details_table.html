@@ -116,8 +116,9 @@
               const button = $(event.relatedTarget);
               const message = button.data('text');
               const apiRoute = button.data('destination');
-              console.log("apiRoute = " + apiRoute);
               const modal = $(this);
+              const title = button.data("title");
+              modal.find('.modal-title').text(title);
               modal.find('#message-text').val(message);
               modal.find('#saveNoteButton').attr('onclick', "updateNote('" + apiRoute + "')");
         })

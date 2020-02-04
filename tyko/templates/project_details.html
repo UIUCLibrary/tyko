@@ -86,6 +86,7 @@
                             <button class="float-right btn btn-secondary btn-sm"
                                     data-toggle="modal"
                                     data-target="#noteEditor"
+                                    data-title="Edit Note"
                                     data-text="{{ note['text'] }}"
                                     data-destination="{{ url_for('notes') }}/{{ note['note_id'] }}">Edit</button>
                         </td>
@@ -95,15 +96,31 @@
                         <td></td>
                         <td>
                             <div class="btn-group float-right" role="group">
-                                <button class="btn btn-primary btn-sm" disabled>Add</button>
+                                <button class="btn btn-primary btn-sm"
+                                        data-toggle="modal"
+                                        data-target="#noteEditor"
+                                        data-title="Create New Note"
+                                        data-source="{{ api_path }}"
+                                        data-notetype="{{ note_type_id }}"
+{#                                        data-text="{{ note['text'] }}"#}
+{#                                        data-destination="{{ url_for('notes') }}/{{ note['note_id'] }}"#}
+                                        >Add</button>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
-
         </div>
     </div>
 </div>
 
 {%- endblock -%}
+{% block scripts %}
+    {{ super() }}
+    <script type="application/javascript">
+        {%- for note_name, note_id in valid_note_types %}
+            $("#noteTypeSelect").append(new Option("{{ note_name }}", "{{note_id}}"));
+        {% endfor %}
+    </script>
+{%- endblock -%}
+
