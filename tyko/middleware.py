@@ -492,7 +492,8 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
 
     def get(self, serialize=False, **kwargs):
         if "id" in kwargs:
-            note_data = self.resolve_parents(self.note_by_id(kwargs["id"])[0])
+            note = self._data_connector.get(kwargs['id'], serialize=True)
+            note_data = self.resolve_parents(note[0])
             del note_data['parent_project_ids']
             del note_data['parent_object_ids']
             del note_data['parent_item_ids']
@@ -559,10 +560,10 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
             {
                 "id": new_note_id,
                 "url": url_for("note_by_id", id=new_note_id)
-             }
+            }
         )
 
-    def note_by_id(self, id):
-        current_note = self._data_connector.get(id, serialize=True)
-        if current_note:
-            return current_note
+    # def note_by_id(self, id):
+    #     current_note =
+    #     if current_note:
+    #         return current_note
