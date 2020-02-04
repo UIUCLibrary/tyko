@@ -385,7 +385,24 @@ class NotesDataConnector(AbsDataProviderConnector):
         if serialize:
             serialized_notes = []
             for note in all_notes:
-                serialized_notes.append(note.serialize())
+                note_data = note.serialize()
+
+                projects_mentioned = [
+                    project.id for project in note.project_sources
+                ]
+                note_data['parent_project_ids'] = projects_mentioned
+
+                objects_mentioned = [
+                    obj.id for obj in note.object_sources
+                ]
+                note_data['parent_object_ids'] = objects_mentioned
+
+                items_mentioned = [
+                    obj.id for obj in note.item_sources
+                ]
+                note_data['parent_item_ids'] = items_mentioned
+
+                serialized_notes.append(note_data)
             all_notes = serialized_notes
 
         session.close()
@@ -428,7 +445,6 @@ class NotesDataConnector(AbsDataProviderConnector):
                 .filter(scheme.Note.id == id) \
                 .one()
         return updated_note.serialize()
-
 
     def delete(self, id):
         pass

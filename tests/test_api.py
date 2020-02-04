@@ -163,7 +163,7 @@ def test_note_update(app):
         post_resp = server.post(
             "/api/notes/",
             data={
-                "note_types_id": "3",
+                "note_type_id": "3",
                 "text": "MY dumb note",
                 }
             )
@@ -185,7 +185,7 @@ def test_note_update(app):
         newly_created_data = json.loads(put_resp.data)
         created_collection = newly_created_data["note"]
         assert created_collection["text"] == "My Note has changed"
-        assert created_collection["note_types_id"] == 3
+        assert created_collection["note_type_id"] == 3
 
 
 def test_collection_update(app):

@@ -467,21 +467,52 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
     WRITABLE_FIELDS = [
         "text"
     ]
+
     def __init__(self, data_provider) -> None:
         super().__init__(data_provider)
 
         self._data_connector = \
             dp.NotesDataConnector(data_provider.db_session_maker)
 
+    def resolve_parents(self, source: dict) -> dict:
+        newone = source.copy()
+        parent_routes = []
+
+        for pid in source.get('parent_project_ids', []):
+            parent_routes.append(f"{url_for('projects')}/{pid}")
+
+        for pid in source.get('parent_object_ids', []):
+            parent_routes.append(f"{url_for('object')}/{pid}")
+
+        for pid in source.get('parent_item_ids', []):
+            parent_routes.append(f"{url_for('item')}/{pid}")
+
+        newone['parents'] = parent_routes
+        return newone
+
     def get(self, serialize=False, **kwargs):
         if "id" in kwargs:
-            return self.note_by_id(kwargs["id"])
+            note_data = self.resolve_parents(self.note_by_id(kwargs["id"])[0])
+            del note_data['parent_project_ids']
+            del note_data['parent_object_ids']
+            del note_data['parent_item_ids']
 
-        notes  = self._data_connector.get(serialize=serialize)
+            return jsonify({
+                "note": note_data
+            })
+
+        notes = self._data_connector.get(serialize=serialize)
         if serialize:
+            note_data = []
+            for n in notes:
+                new_data = n.copy()
+                del new_data['parent_project_ids']
+                del new_data['parent_object_ids']
+                del new_data['parent_item_ids']
+                note_data.append(new_data)
             data = {
-                "notes": notes,
-                "total": len(notes)
+                "notes": note_data,
+                "total": len(note_data)
             }
             json_data = json.dumps(data)
             response = make_response(jsonify(data), 200)
@@ -492,30 +523,7 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
             response.headers["ETag"] = str(hash_value)
             response.headers["Cache-Control"] = "private, max-age=0"
             return response
-        # if serialize:
-        #     data = {
-        #         "items": items,
-        #         "total": len(items)
-        #     }
-        #
-        #     json_data = json.dumps(data)
-        #     response = make_response(jsonify(data), 200)
-        #
-        #     hash_value = \
-        #         hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
-        #
-        #     response.headers["ETag"] = str(hash_value)
-        #     response.headers["Cache-Control"] = "private, max-age=0"
-        #     return response
-        #
-        # result = items
-        # return result
-        # TODO:
-        return jsonify(
-            {
-                "item": "replacement_item"
-            }
-        )
+        return notes
 
     def delete(self, id):
         pass
@@ -542,7 +550,7 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         )
 
     def create(self):
-        note_type = int(request.form.get('note_types_id'))
+        note_type = int(request.form.get('note_type_id'))
         text = request.form.get('text')
         new_note_id = self._data_connector.create(
             text=text, note_types_id=note_type
@@ -557,7 +565,4 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
     def note_by_id(self, id):
         current_note = self._data_connector.get(id, serialize=True)
         if current_note:
-            return jsonify({
-                "note": current_note
-            })
-
+            return current_note
