@@ -169,11 +169,14 @@ def test_note_create(app):
             )
         assert post_resp.status_code == 200
         new_record_id = json.loads(post_resp.data)["id"]
-        pass
+
+        get_all_notes = server.get(f"/api/notes")
+        note_data = json.loads(get_all_notes.data)
+        assert note_data['total'] == 1
+
         get_resp = server.get(f"/api/notes/{new_record_id}")
         note_data = json.loads(get_resp.data)
         assert note_data['note']["text"] == "MY dumb note"
-        print(get_resp)
 
 
 def test_note_update(app):
