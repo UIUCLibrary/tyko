@@ -563,8 +563,3 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
                 "url": url_for("note_by_id", id=new_note_id)
             }
         )
-
-    # def note_by_id(self, id):
-    #     current_note =
-    #     if current_note:
-    #         return current_note

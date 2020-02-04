@@ -157,6 +157,25 @@ def test_object_delete(app):
         assert delete_resp.status_code == 204
 
 
+def test_note_create(app):
+
+    with app.test_client() as server:
+        post_resp = server.post(
+            "/api/notes/",
+            data={
+                "note_type_id": "3",
+                "text": "MY dumb note",
+                }
+            )
+        assert post_resp.status_code == 200
+        new_record_id = json.loads(post_resp.data)["id"]
+        pass
+        get_resp = server.get(f"/api/notes/{new_record_id}")
+        note_data = json.loads(get_resp.data)
+        assert note_data['note']["text"] == "MY dumb note"
+        print(get_resp)
+
+
 def test_note_update(app):
 
     with app.test_client() as server:
