@@ -528,7 +528,11 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         return notes
 
     def delete(self, id):
-        pass
+        res = self._data_connector.delete(id)
+
+        if res is True:
+            return make_response("", 204)
+        return make_response("", 404)
 
     def update(self, id):
         new_object = dict()

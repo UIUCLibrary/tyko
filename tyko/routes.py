@@ -152,6 +152,9 @@ class Routes:
                     Route("/api/notes/<string:id>", "update_note",
                           notes.update,
                           methods=["PUT"]),
+                    Route("/api/notes/<string:id>", "delete_note",
+                          notes.delete,
+                          methods=["DELETE"]),
                     ])
 
             ]

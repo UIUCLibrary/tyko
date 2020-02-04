@@ -447,7 +447,15 @@ class NotesDataConnector(AbsDataProviderConnector):
         return updated_note.serialize()
 
     def delete(self, id):
-        pass
+        if id:
+            session = self.session_maker()
+            items_deleted = session.query(scheme.Note) \
+                .filter(scheme.Note.id == id) \
+                .delete()
+            session.commit()
+            session.close()
+            return items_deleted > 0
+        return False
 
 
 class DataProvider:

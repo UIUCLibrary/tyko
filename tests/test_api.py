@@ -179,6 +179,32 @@ def test_note_create(app):
         assert note_data['note']["text"] == "MY dumb note"
 
 
+def test_note_create_and_delete(app):
+
+    with app.test_client() as server:
+        post_resp = server.post(
+            "/api/notes/",
+            data={
+                "note_type_id": "3",
+                "text": "MY dumb note",
+                }
+            )
+        assert post_resp.status_code == 200
+        new_record_url = json.loads(post_resp.data)["url"]
+
+        get_all_notes = server.get(f"/api/notes")
+        note_data = json.loads(get_all_notes.data)
+        assert note_data['total'] == 1
+
+        delete_resp=server.delete(new_record_url)
+        assert delete_resp.status_code == 204
+
+        get_all_notes_again = server.get(f"/api/notes")
+        new_note_data = json.loads(get_all_notes_again.data)
+        assert new_note_data['total'] == 0
+
+
+
 def test_note_update(app):
 
     with app.test_client() as server:
