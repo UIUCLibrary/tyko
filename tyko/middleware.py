@@ -461,3 +461,103 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
                 "url": url_for("item_by_id", id=new_item_id)
             }
         )
+
+
+class NotestMiddlwareEntity(AbsMiddlwareEntity):
+    WRITABLE_FIELDS = [
+        "text"
+    ]
+    def __init__(self, data_provider) -> None:
+        super().__init__(data_provider)
+
+        self._data_connector = \
+            dp.NotesDataConnector(data_provider.db_session_maker)
+
+    def get(self, serialize=False, **kwargs):
+        if "id" in kwargs:
+            return self.note_by_id(kwargs["id"])
+
+        notes  = self._data_connector.get(serialize=serialize)
+        if serialize:
+            data = {
+                "notes": notes,
+                "total": len(notes)
+            }
+            json_data = json.dumps(data)
+            response = make_response(jsonify(data), 200)
+
+            hash_value = \
+                hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
+
+            response.headers["ETag"] = str(hash_value)
+            response.headers["Cache-Control"] = "private, max-age=0"
+            return response
+        # if serialize:
+        #     data = {
+        #         "items": items,
+        #         "total": len(items)
+        #     }
+        #
+        #     json_data = json.dumps(data)
+        #     response = make_response(jsonify(data), 200)
+        #
+        #     hash_value = \
+        #         hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
+        #
+        #     response.headers["ETag"] = str(hash_value)
+        #     response.headers["Cache-Control"] = "private, max-age=0"
+        #     return response
+        #
+        # result = items
+        # return result
+        # TODO:
+        return jsonify(
+            {
+                "item": "replacement_item"
+            }
+        )
+
+    def delete(self, id):
+        pass
+
+    def update(self, id):
+        new_object = dict()
+        json_request = request.json
+        for k, _ in json_request.items():
+            if not self.field_can_edit(k):
+                return make_response("Cannot update field: {}".format(k), 400)
+
+        if "text" in request.json:
+            new_object["text"] = request.json.get("text")
+
+        updated_note = \
+            self._data_connector.update(
+                id, changed_data=new_object)
+
+        if not updated_note:
+            return make_response("", 204)
+
+        return jsonify(
+            {"note": updated_note}
+        )
+
+    def create(self):
+        note_type = int(request.form.get('note_types_id'))
+        text = request.form.get('text')
+        new_note_id = self._data_connector.create(
+            text=text, note_types_id=note_type
+        )
+        return jsonify(
+            {
+                "id": new_note_id,
+                "url": url_for("note_by_id", id=new_note_id)
+             }
+        )
+
+    def note_by_id(self, id):
+        current_note = self._data_connector.get(id, serialize=True)
+        if current_note:
+            return jsonify({
+                "note": current_note
+            })
+

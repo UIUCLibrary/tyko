@@ -157,6 +157,36 @@ def test_object_delete(app):
         assert delete_resp.status_code == 204
 
 
+def test_note_update(app):
+
+    with app.test_client() as server:
+        post_resp = server.post(
+            "/api/notes/",
+            data={
+                "note_types_id": "3",
+                "text": "MY dumb note",
+                }
+            )
+        assert post_resp.status_code == 200
+        new_record_url = json.loads(post_resp.data)["url"]
+
+        put_resp = server.put(
+            new_record_url,
+            data=json.dumps(
+                {
+                    "text": "My Note has changed"
+                }
+            ),
+            content_type='application/json'
+
+        )
+
+        assert put_resp.status_code == 200
+        newly_created_data = json.loads(put_resp.data)
+        created_collection = newly_created_data["note"]
+        assert created_collection["text"] == "My Note has changed"
+        assert created_collection["note_types_id"] == 3
+
 
 def test_collection_update(app):
 
@@ -178,7 +208,6 @@ def test_collection_update(app):
         created_collection = newly_created_data["collection"][0]
         assert created_collection['collection_name'] == "My dummy collection"
         assert created_collection["department"] == "preservation"
-
 
         put_resp = server.put(
             new_record_url,

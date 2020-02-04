@@ -370,6 +370,70 @@ class CollectionDataConnector(AbsDataProviderConnector):
         return False
 
 
+class NotesDataConnector(AbsDataProviderConnector):
+
+    def get(self, id=None, serialize=False):
+        session = self.session_maker()
+        if id:
+            all_notes = session.query(scheme.Note) \
+                .filter(scheme.Note.id == id) \
+                .all()
+        else:
+            all_notes = \
+                session.query(scheme.Note).all()
+
+        if serialize:
+            serialized_notes = []
+            for note in all_notes:
+                serialized_notes.append(note.serialize())
+            all_notes = serialized_notes
+
+        session.close()
+        return all_notes
+
+    def create(self, *args, **kwargs):
+        note_types_id = kwargs.get("note_types_id")
+        text = kwargs.get("text")
+
+        new_note = scheme.Note(
+            text=text,
+            note_type_id=note_types_id
+
+        )
+        session = self.session_maker()
+        session.add(new_note)
+        session.commit()
+        new_note_id = new_note.id
+        session.close()
+        return new_note_id
+
+    def update(self, id, changed_data):
+        updated_note = None
+        notes = self.get(id, serialize=False)
+
+        if len(notes) != 1:
+            return updated_note
+
+        note = notes[0]
+        if note:
+            if "text" in changed_data:
+                note.text = changed_data['text']
+
+            session = self.session_maker()
+            session.add(note)
+            session.commit()
+            session.close()
+
+            updated_note = session.query(scheme.Note) \
+                .filter(scheme.Note.id == id) \
+                .one()
+        return updated_note.serialize()
+
+
+    def delete(self, id):
+        pass
+
+
 class DataProvider:
     def __init__(self, engine):
         self.engine = engine
