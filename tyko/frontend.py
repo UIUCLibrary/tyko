@@ -205,6 +205,8 @@ class ProjectFrontend(FrontendEditable):
                 editable=True
             ),
         ]
+
+        # FIXME: This should be from the database, not the setup document
         valid_note_types = []
         for k, v in scheme.note_types.items():
             valid_note_types.append((k, v[0]))

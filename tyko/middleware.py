@@ -354,6 +354,24 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             }
         )
 
+    def add_note(self, project_id):
+
+        # note_id = int(request.form.get('note_id'))
+        data = request.get_json()
+        note_type_id = data.get("note_type_id")
+        note_text = data.get("text")
+        updated_project = \
+            self._data_connector.include_note(
+                project_id=project_id,
+                note_type_id=note_type_id,
+                note_text=note_text)
+        return jsonify(
+            {
+                "project": updated_project
+            }
+        )
+        # return make_response("not ready", 501)
+
 
 class ItemMiddlwareEntity(AbsMiddlwareEntity):
     WRITABLE_FIELDS = [
@@ -556,7 +574,8 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         )
 
     def create(self):
-        note_type = int(request.form.get('note_type_id'))
+        data = request.form
+        note_type = int(data['note_type_id'])
         text = request.form.get('text')
         new_note_id = self._data_connector.create(
             text=text, note_types_id=note_type

@@ -87,8 +87,10 @@
                                     data-toggle="modal"
                                     data-target="#noteEditor"
                                     data-title="Edit Note"
+                                    data-dialogtype="edit"
                                     data-text="{{ note['text'] }}"
-                                    data-destination="{{ url_for('notes') }}/{{ note['note_id'] }}">Edit</button>
+                                    data-notetype="{{ note['note_type_id'] }}"
+                                    data-apiroute="{{ url_for('notes') }}/{{ note['note_id'] }}">Edit</button>
                         </td>
                     </tr>
                     {% endfor -%}
@@ -100,6 +102,7 @@
                                         data-toggle="modal"
                                         data-target="#noteEditor"
                                         data-title="Create New Note"
+                                        data-dialogtype="new"
                                         data-source="{{ api_path }}"
                                         data-notetype="{{ note_type_id }}"
 {#                                        data-text="{{ note['text'] }}"#}

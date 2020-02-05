@@ -167,6 +167,13 @@ class Routes:
 
             # ##############
             self.app.add_url_rule(
+                "/api/project/<string:project_id>/notes",
+                "project_add_note",
+                project.add_note,
+                methods=["POST"]
+            )
+
+            self.app.add_url_rule(
                 "/api",
                 "list_routes",
                 list_routes,

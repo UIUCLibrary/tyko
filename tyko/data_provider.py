@@ -71,6 +71,54 @@ class ProjectDataConnector(AbsDataProviderConnector):
         session.close()
         return new_project_id
 
+    def include_note(self, project_id, note_type_id, note_text):
+        new_project_data = None
+        session = self.session_maker()
+        try:
+            projects = session.query(scheme.Project) \
+                .filter(scheme.Project.id == project_id) \
+                .all()
+            if len(projects) == 0:
+                raise ValueError("Not a valid project")
+
+            project = projects[0]
+
+            note_types = session.query(scheme.NoteTypes) \
+                .filter(scheme.NoteTypes.id == note_type_id) \
+                .all()
+
+            if len(note_types) == 0:
+                raise ValueError("Not a valid note_type")
+
+            note_type = note_types[0]
+
+            new_note = scheme.Note(
+                text=note_text,
+                note_type=note_type
+            )
+            session.add(new_note)
+            project.notes.append(new_note)
+            # assert len(projects) == 1
+            # project = projects[0]
+            #
+            # notes = session.query(scheme.Note)\
+            #     .filter(scheme.Project.id == note_id)\
+            #     .all()
+            #
+            # if len(notes) == 0:
+            #     raise ValueError("Not a valid note")
+            # assert len(notes) == 1
+            # note = notes[0]
+            # project.notes.append(note)
+            session.commit()
+            new_project = \
+                session.query(scheme.Project).\
+                    filter(scheme.Project.id == project_id).one()
+            new_project_data = new_project.serialize()
+        finally:
+            session.close()
+        return new_project_data
+
     def get_project(self, id=None, serialize=False):
         return self.get(id, serialize)
 

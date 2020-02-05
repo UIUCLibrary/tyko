@@ -1,7 +1,7 @@
 {% block note_modal %}
 
 <div class="modal fade" id="noteEditor" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Edit Note</h5>
@@ -12,15 +12,16 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <select class="custom-select" id="noteTypeSelect"></select>
-            <label for="message-text" class="col-form-label">Note:</label>
-            <textarea class="form-control" id="message-text"></textarea>
+              <label for="noteTypeSelect" class="col-form-label">Type:</label>
+              <select class="custom-select" id="noteTypeSelect"></select>
+              <label for="message-text" class="col-form-label">Note:</label>
+              <textarea class="form-control" id="message-text"></textarea>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="saveNoteButton" data-dismiss="modal" onclick="updateNote()">Save</button>
+        <button type="button" class="btn btn-primary" id="saveNoteButton" data-dismiss="modal">Save</button>
       </div>
     </div>
   </div>
@@ -28,13 +29,21 @@
 <script type="application/javascript">
     function updateNote(api_route){
         const noteContent = $("#message-text").val();
+        {#TODO: update note type#}
         editDataValue(api_route, "text", noteContent, function () {
             location.reload();
         });
     }
 
-    function newNote(api_route, noteTypeId ){
-
+    function newNote(apiRoute){
+        const noteContent = $("#message-text").val();
+        const noteType = $("#noteTypeSelect").val();
+        add_data(apiRoute, noteContent, noteType, function () {
+            location.reload();
+        },
+        function () {
+            alert("Creating a new Note Failed")
+        });
     }
 </script>
 {% endblock %}
