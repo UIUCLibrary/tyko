@@ -433,7 +433,7 @@ foreach($file in $opengl32_libraries){
                                 }
                             }
                         }
-                         stage("Run Pylint Static Analysis") {
+                        stage("Run Pylint Static Analysis") {
                             agent {
                               dockerfile {
                                 filename 'CI/server_testing/Dockerfile'
@@ -472,6 +472,46 @@ foreach($file in $opengl32_libraries){
                                 }
                                 cleanup{
                                     cleanWs()
+                                }
+                            }
+                        }
+                        stage("Testing Javascript with Jest"){
+                            agent {
+                                dockerfile {
+                                    filename 'CI/testing_javascript/Dockerfile'
+                                    label "linux && docker"
+                                    additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
+                                    dir 'scm'
+                                }
+                            }
+                            environment{
+                                JEST_JUNIT_OUTPUT_NAME="js-junit.xml"
+                                JEST_JUNIT_ADD_FILE_ATTRIBUTE="true"
+                            }
+                            steps{
+                                sh "mkdir -p reports"
+                                dir("scm"){
+                                    sh("npm install  -y")
+                                    withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
+                                        sh(
+                                            label:  "Running Jest",
+                                            script: "npm test --  --ci --reporters=default --reporters=jest-junit"
+                                        )
+                                    }
+                                }
+                            }
+                            post{
+                                always{
+                                    junit "reports/*.xml"
+                                }
+                                cleanup{
+                                    cleanWs(
+                                        deleteDirs: true,
+                                        patterns: [
+                                            [pattern: 'scm/node_modules', type: 'INCLUDE'],
+                                            [pattern: 'reports', type: 'INCLUDE'],
+                                            ]
+                                    )
                                 }
                             }
                         }
