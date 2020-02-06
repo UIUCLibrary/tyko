@@ -9,4 +9,5 @@ ARG GROUP_ID=1000
 
 RUN groupadd -g $GROUP_ID user && \
     useradd -u $USER_ID -s /bin/sh -m -d /home/user  -g user user
-#RUN chown -R 1001:1001 "/.npm"
+
+VOLUME /home/user/.npm
