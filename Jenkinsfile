@@ -487,7 +487,7 @@ foreach($file in $opengl32_libraries){
                                 dir("scm"){
                                     sh(
                                         label:  "Running Jest",
-                                        script: "jest --ci --testResultsProcessor=\"jest-junit\""
+                                        script: "jest --ci --testResultsProcessor='jest-junit'"
                                     )
                                 }
                             }
