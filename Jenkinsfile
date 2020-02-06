@@ -501,8 +501,9 @@ foreach($file in $opengl32_libraries){
                             }
                             post{
                                 always{
-                                    sh "ls -la reports"
-                                    junit 'reports/js-junit.xml'
+                                    dir("scm"){
+                                        junit '../reports/js-junit.xml'
+                                    }
                                 }
                                 failure{
                                     sh("npm list -g --depth 0")
