@@ -477,16 +477,17 @@ foreach($file in $opengl32_libraries){
                         }
                         stage("Testing Javascript with Jest"){
                             agent {
-                                docker {
-                                    image 'node:7-alpine'
-                                    label 'linux && docker'
+                                dockerfile {
+                                    filename 'CI/testing_javascript/Dockerfile'
+                                    label "linux && docker"
+                                    dir 'scm'
                                 }
                             }
                             steps{
                                 dir("scm"){
                                     sh(
                                         label:  "Running Jest",
-                                        script: "npm install && npm test"
+                                        script: "npm test --prefix /"
                                     )
                                 }
                             }
