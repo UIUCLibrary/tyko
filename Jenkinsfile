@@ -502,7 +502,7 @@ foreach($file in $opengl32_libraries){
                             post{
                                 always{
                                     dir("scm"){
-                                        junit '../reports/js-junit.xml'
+                                        junit "${WORKSPACE}/reports/js-junit.xml"
                                     }
                                 }
                                 failure{
