@@ -493,7 +493,7 @@ foreach($file in $opengl32_libraries){
                             }
                             post{
                                 failure{
-                                    sh("npm list -g")
+                                    sh("npm list -g --depth 0")
                                 }
                             }
                         }
