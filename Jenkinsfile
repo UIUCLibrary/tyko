@@ -476,6 +476,12 @@ foreach($file in $opengl32_libraries){
                             }
                         }
                         stage("Testing Javascript with Jest"){
+                            agent {
+                                docker {
+                                    image 'node:7-alpine'
+                                    label 'linux && docker'
+                                }
+                            }
                             steps{
                                 echo "Running Jest"
                             }
