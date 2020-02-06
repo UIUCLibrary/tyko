@@ -433,7 +433,7 @@ foreach($file in $opengl32_libraries){
                                 }
                             }
                         }
-                         stage("Run Pylint Static Analysis") {
+                        stage("Run Pylint Static Analysis") {
                             agent {
                               dockerfile {
                                 filename 'CI/server_testing/Dockerfile'
@@ -473,6 +473,11 @@ foreach($file in $opengl32_libraries){
                                 cleanup{
                                     cleanWs()
                                 }
+                            }
+                        }
+                        stage("Testing Javascript with Jest"){
+                            steps{
+                                echo "Running Jest"
                             }
                         }
                     }
