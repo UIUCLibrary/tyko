@@ -488,12 +488,15 @@ foreach($file in $opengl32_libraries){
                                 JEST_JUNIT_OUTPUT_NAME="js-junit.xml"
                             }
                             steps{
+                                sh "mkdir -p reports"
                                 dir("scm"){
                                     sh("npm install  -y")
-                                    sh(
-                                        label:  "Running Jest",
-                                        script: "npm test --  --ci --reporters=default --reporters=jest-junit"
-                                    )
+                                    withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
+                                        sh(
+                                            label:  "Running Jest",
+                                            script: "npm test --  --ci --reporters=default --reporters=jest-junit"
+                                        )
+                                    }
                                 }
                             }
                             post{
