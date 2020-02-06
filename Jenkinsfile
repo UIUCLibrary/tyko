@@ -485,13 +485,17 @@ foreach($file in $opengl32_libraries){
                             }
                             steps{
                                 dir("scm"){
+                                    sh("npm install  -y")
                                     sh(
                                         label:  "Running Jest",
-                                        script: "jest --ci --testResultsProcessor='jest-junit'"
+                                        script: "npm test --  --ci --reporters=default --reporters=jest-junit"
                                     )
                                 }
                             }
                             post{
+                                always{
+                                    sh "ls -la"
+                                }
                                 failure{
                                     sh("npm list -g --depth 0")
                                 }
