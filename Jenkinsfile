@@ -486,6 +486,7 @@ foreach($file in $opengl32_libraries){
                             }
                             environment{
                                 JEST_JUNIT_OUTPUT_NAME="js-junit.xml"
+                                JEST_JUNIT_ADD_FILE_ATTRIBUTE="true"
                             }
                             steps{
                                 sh "mkdir -p reports"
@@ -502,9 +503,7 @@ foreach($file in $opengl32_libraries){
                             post{
                                 always{
                                     sh "ls -la ${WORKSPACE}/reports"
-                                    dir("scm"){
-                                        junit "${WORKSPACE}/reports/*.xml"
-                                    }
+                                    junit "reports/*.xml"
                                 }
                                 failure{
                                     sh("npm list -g --depth 0")
