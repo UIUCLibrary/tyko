@@ -501,7 +501,7 @@ foreach($file in $opengl32_libraries){
                             }
                             post{
                                 always{
-                                    sh "ls -la scm"
+                                    sh "ls -la reports"
                                 }
                                 failure{
                                     sh("npm list -g --depth 0")
