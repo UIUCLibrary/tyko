@@ -484,6 +484,9 @@ foreach($file in $opengl32_libraries){
                                     dir 'scm'
                                 }
                             }
+                            environment{
+                                JEST_JUNIT_OUTPUT_NAME="js-junit.xml"
+                            }
                             steps{
                                 dir("scm"){
                                     sh("npm install  -y")
