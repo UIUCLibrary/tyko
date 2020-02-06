@@ -483,7 +483,12 @@ foreach($file in $opengl32_libraries){
                                 }
                             }
                             steps{
-                                echo "Running Jest"
+                                dir("scm"){
+                                    sh(
+                                        label:  "Running Jest",
+                                        script: "npm test"
+                                    )
+                                }
                             }
                         }
                     }
