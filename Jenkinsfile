@@ -509,6 +509,7 @@ foreach($file in $opengl32_libraries){
                                         deleteDirs: true,
                                         patterns: [
                                             [pattern: 'scm/node_modules', type: 'INCLUDE'],
+                                            [pattern: 'reports', type: 'INCLUDE'],
                                             ]
                                     )
                                 }
