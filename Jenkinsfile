@@ -502,11 +502,15 @@ foreach($file in $opengl32_libraries){
                             }
                             post{
                                 always{
-                                    sh "ls -la ${WORKSPACE}/reports"
                                     junit "reports/*.xml"
                                 }
-                                failure{
-                                    sh("npm list -g --depth 0")
+                                cleanup{
+                                    cleanWs(
+                                        deleteDirs: true,
+                                        patterns: [
+                                            [pattern: 'scm/node_modules', type: 'INCLUDE'],
+                                            ]
+                                    )
                                 }
                             }
                         }
