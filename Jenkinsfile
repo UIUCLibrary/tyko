@@ -480,6 +480,7 @@ foreach($file in $opengl32_libraries){
                                 dockerfile {
                                     filename 'CI/testing_javascript/Dockerfile'
                                     label "linux && docker"
+                                    additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
                                     dir 'scm'
                                 }
                             }
