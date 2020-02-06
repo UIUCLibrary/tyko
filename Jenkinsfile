@@ -487,7 +487,7 @@ foreach($file in $opengl32_libraries){
                                 dir("scm"){
                                     sh(
                                         label:  "Running Jest",
-                                        script: "npm test"
+                                        script: "npm test -- --json --outputFile=jest.json"
                                     )
                                 }
                             }
