@@ -320,7 +320,8 @@ class Note(AVTables):
         return {
             "note_id": self.id,
             "text": self.text,
-            "note_type_id": self.note_type_id
+            "note_type_id": self.note_type_id,
+            "note_type": self.note_type.name
         }
 
 

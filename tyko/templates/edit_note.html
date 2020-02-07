@@ -26,24 +26,4 @@
     </div>
   </div>
 </div>
-<script type="application/javascript">
-    function updateNote(api_route){
-        const noteContent = $("#message-text").val();
-        {#TODO: update note type#}
-        editDataValue(api_route, "text", noteContent, function () {
-            location.reload();
-        });
-    }
-
-    function newNote(apiRoute){
-        const noteContent = $("#message-text").val();
-        const noteType = $("#noteTypeSelect").val();
-        add_data(apiRoute, noteContent, noteType, function () {
-            location.reload();
-        },
-        function () {
-            alert("Creating a new Note Failed")
-        });
-    }
-</script>
 {% endblock %}

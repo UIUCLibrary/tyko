@@ -69,6 +69,13 @@ class AbsFrontend(metaclass=abc.ABCMeta):
         """Create a webpage based on the template"""
 
 
+# # TODO: REMOVE class DummyPage
+# class DummyPage(AbsFrontend):
+#
+#     def render_page(self, template="makenote.html", **context):
+#         return render_template(template)
+#
+
 class IndexPage(AbsFrontend):
 
     def render_page(self, template="index.html", **context):
@@ -108,6 +115,11 @@ class FrontendEntity(AbsFrontend):
         ("Objects", "page_object"),
         ("Collections", "page_collections"),
     }
+
+    @classmethod
+    def all_note_types(cls):
+        # TODO return all valid note types
+        pass
 
     def __init__(self, provider: data_provider.DataProvider) -> None:
         self._data_provider = provider
@@ -208,6 +220,7 @@ class ProjectFrontend(FrontendEditable):
 
         # FIXME: This should be from the database, not the setup document
         valid_note_types = []
+        notes = scheme.NoteTypes()
         for k, v in scheme.note_types.items():
             valid_note_types.append((k, v[0]))
 

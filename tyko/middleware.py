@@ -3,6 +3,8 @@
 import abc
 import hashlib
 import json
+import sys
+import traceback
 from typing import List
 
 from flask import jsonify, make_response, abort, request, url_for
@@ -354,22 +356,40 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             }
         )
 
+    def update_note(self, project_id, note_id):
+
+        data = request.get_json()
+        note_id_value = int(note_id)
+        updated_project = \
+            self._data_connector.update_note(
+                project_id=project_id, note_id=note_id_value, changed_data=data)
+        if not updated_project:
+            return make_response("", 204)
+
+        return jsonify(
+            {"project": updated_project}
+        )
+
     def add_note(self, project_id):
 
         # note_id = int(request.form.get('note_id'))
         data = request.get_json()
-        note_type_id = data.get("note_type_id")
-        note_text = data.get("text")
-        updated_project = \
-            self._data_connector.include_note(
-                project_id=project_id,
-                note_type_id=note_type_id,
-                note_text=note_text)
-        return jsonify(
-            {
-                "project": updated_project
-            }
-        )
+        try:
+            note_type_id = data.get("note_type_id")
+            note_text = data.get("text")
+            updated_project = \
+                self._data_connector.include_note(
+                    project_id=project_id,
+                    note_type_id=note_type_id,
+                    note_text=note_text)
+            return jsonify(
+                {
+                    "project": updated_project
+                }
+            )
+        except AttributeError:
+            traceback.print_exc(file=sys.stderr)
+            return make_response("Invalid data", 400)
         # return make_response("not ready", 501)
 
 
@@ -482,8 +502,9 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
 
 
 class NotestMiddlwareEntity(AbsMiddlwareEntity):
+    # TODO: Make ID type a writable field
     WRITABLE_FIELDS = [
-        "text"
+        "text",
     ]
 
     def __init__(self, data_provider) -> None:

@@ -45,7 +45,9 @@ class ProjectDataConnector(AbsDataProviderConnector):
         if serialize is True:
             serialized_projects = []
             for project in all_projects:
-                serialized_projects.append(project.serialize())
+                serialized_project = project.serialize()
+                serialized_projects.append(serialized_project)
+
             all_projects = serialized_projects
         session.close()
         return all_projects
@@ -119,7 +121,43 @@ class ProjectDataConnector(AbsDataProviderConnector):
             session.close()
         return new_project_data
 
+    def update_note(self, project_id, note_id, changed_data):
+        session = self.session_maker()
+        update_project_data = None
+        try:
+            projects = session.query(scheme.Project) \
+                .filter(scheme.Project.id == project_id) \
+                .all()
+            if len(projects) == 0:
+                raise ValueError("Not a valid project")
+
+            project = projects[0]
+
+            note = self.find_note(project, note_id)
+            print(note)
+            if "text" in changed_data:
+                note.text = changed_data['text']
+            if "note_type_id" in changed_data:
+                note_type = session.query(scheme.NoteTypes).filter(scheme.NoteTypes.id ==  changed_data['note_type_id']).one()
+                if note_type is not None:
+                    note.note_type = note_type
+            session.commit()
+            new_project = \
+                session.query(scheme.Project). \
+                    filter(scheme.Project.id == project_id).one()
+            update_project_data = new_project.serialize()
+        finally:
+            session.close()
+        return update_project_data
+
+    def find_note(self, project, note_id):
+        for note in project.notes:
+            if note.id == note_id:
+                return note
+        raise ValueError("no matching note for project")
+
     def get_project(self, id=None, serialize=False):
+
         return self.get(id, serialize)
 
     def update(self, id, changed_data):
