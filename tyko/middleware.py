@@ -8,6 +8,8 @@ import traceback
 from typing import List
 
 from flask import jsonify, make_response, abort, request, url_for
+
+from exceptions import DataError
 from . import data_provider as dp
 from . import pbcore
 
@@ -370,6 +372,22 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             {"project": updated_project}
         )
 
+    def remove_note(self, project_id, note_id):
+        updated_project = self._data_connector.remove_note(
+            project_id=project_id,
+            note_id=note_id
+        )
+
+        # except DataError:
+        #     return make_response("Unable to remove note from project", 400)
+
+        return make_response(
+                jsonify({
+                    "project": updated_project
+                }),
+                202
+        )
+
     def add_note(self, project_id):
 
         # note_id = int(request.form.get('note_id'))
@@ -502,9 +520,9 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
 
 
 class NotestMiddlwareEntity(AbsMiddlwareEntity):
-    # TODO: Make ID type a writable field
     WRITABLE_FIELDS = [
         "text",
+        "note_type_id"
     ]
 
     def __init__(self, data_provider) -> None:
@@ -580,8 +598,10 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
             if not self.field_can_edit(k):
                 return make_response("Cannot update field: {}".format(k), 400)
 
-        if "text" in request.json:
-            new_object["text"] = request.json.get("text")
+        if "text" in json_request:
+            new_object["text"] = json_request.get("text")
+        if 'note_type_id' in json_request:
+            new_object['note_type_id'] = int(json_request['note_type_id'])
 
         updated_note = \
             self._data_connector.update(

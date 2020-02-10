@@ -139,8 +139,35 @@ function editNote(apiRoute, noteTypeId, text){
   }));
 }
 
+function removeNote(apiRoute) {
+  console.log(`Removing note at ${apiRoute}`);
+
+  let xhr = new XMLHttpRequest();
+  xhr.withCredentials = false;
+
+  return new Promise(((resolve, reject) => {
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) {
+        return;
+      }
+      if (xhr.status >= 200 && xhr.status < 300){
+        resolve(xhr.response);
+      } else {
+        reject({
+          status: xhr.status,
+          statusText: xhr.statusText,
+          responseText: xhr.responseText
+        })
+      }
+    };
+    xhr.open("DELETE", apiRoute, true);
+    xhr.send();
+  }));
+}
+
 export const notes = {
   "getNotes": getNotes,
   "addNote": addNote,
-  "editNote": editNote
+  "editNote": editNote,
+  "removeNote": removeNote
 };

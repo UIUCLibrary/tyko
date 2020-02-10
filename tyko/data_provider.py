@@ -205,6 +205,47 @@ class ProjectDataConnector(AbsDataProviderConnector):
             return items_deleted > 0
         return False
 
+    def get_note_types(self):
+        session = self.session_maker()
+        try:
+            return session.query(scheme.NoteTypes).all()
+        finally:
+            session.close()
+
+    def remove_note(self, project_id, note_id):
+        session = self.session_maker()
+        try:
+            projects = session.query(scheme.Project).filter(scheme.Project.id == project_id).all()
+            if len(projects) == 0:
+                raise DataError("Unable to locate project with ID: {}".format(project_id))
+
+            if len(projects) > 1:
+                raise DataError("Found multiple projects with ID: {}".format(project_id))
+
+            project = projects[0]
+
+            if len(project.notes) == 0:
+                raise DataError(
+                    "Project with ID: {} has no notes".format(project_id))
+
+            # Find note that matches the note ID
+            for note in project.notes:
+                if note.id == note_id:
+                    project.notes.remove(note)
+                    break
+            else:
+                raise DataError(
+                    message="Project id {} contains no note with an id {}".format(project_id, note_id),
+                    status_code=404
+                )
+
+            session.commit()
+            return session.query(scheme.Project) \
+                .filter(scheme.Project.id == project_id) \
+                .one().serialize()
+        finally:
+            session.close()
+
 
 class ObjectDataConnector(AbsDataProviderConnector):
 
@@ -520,10 +561,17 @@ class NotesDataConnector(AbsDataProviderConnector):
 
         note = notes[0]
         if note:
+            session = self.session_maker()
             if "text" in changed_data:
                 note.text = changed_data['text']
 
-            session = self.session_maker()
+            if 'note_type_id' in changed_data:
+                note_types = session.query(scheme.NoteTypes).filter(scheme.NoteTypes.id == changed_data['note_type_id'])
+                note_type = note_types.one()
+                note.note_type = note_type
+                # new_object['note_type_id'] = int(json_request['note_type_id'])
+
+
             session.add(note)
             session.commit()
             session.close()
