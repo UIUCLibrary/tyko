@@ -9,7 +9,6 @@ from typing import List
 
 from flask import jsonify, make_response, abort, request, url_for
 
-from exceptions import DataError
 from . import data_provider as dp
 from . import pbcore
 
@@ -363,8 +362,9 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         data = request.get_json()
         note_id_value = int(note_id)
         updated_project = \
-            self._data_connector.update_note(
-                project_id=project_id, note_id=note_id_value, changed_data=data)
+            self._data_connector.update_note(project_id=project_id,
+                                             note_id=note_id_value,
+                                             changed_data=data)
         if not updated_project:
             return make_response("", 204)
 
@@ -377,9 +377,6 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             project_id=project_id,
             note_id=note_id
         )
-
-        # except DataError:
-        #     return make_response("Unable to remove note from project", 400)
 
         return make_response(
                 jsonify({

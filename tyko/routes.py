@@ -178,7 +178,6 @@ class Routes:
                 methods=["DELETE"]
             )
 
-            # Route("/api/notes/<string:id>", "note_by_id", methods=["DELETE"]),
             self.app.add_url_rule(
                 "/api/project/<string:project_id>/notes/<string:note_id>",
                 "project_update_note",
@@ -197,23 +196,14 @@ class Routes:
         about_page = frontend.AboutPage()
         index_page = frontend.IndexPage()
         more_page = frontend.MoreMenuPage()
-        # TODO: REMOVE dummy_page
-        dummy_page = frontend.DummyPage()
 
         static_web_routes = [
-            # TODO: REMOVE /dummy
-            Route("/dummy", "page_dummy", dummy_page.render_page),
             Route("/", "page_index", index_page.render_page),
             Route("/about", "page_about", about_page.render_page),
             Route("/more", "page_more", more_page.render_page),
             ]
 
         simple_pages = []
-        # for entity in ["collection"]:
-        #
-        #     simple_pages.append(
-        #         entities.load_entity(entity, self.db_engine).web_frontend()
-        #     )
 
         entity_pages = [
             EntityPage(

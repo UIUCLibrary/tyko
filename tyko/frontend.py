@@ -6,7 +6,6 @@ from dataclasses import dataclass
 
 from flask import make_response, render_template, url_for
 
-import scheme
 from . import data_provider
 from .decorators import authenticate
 
