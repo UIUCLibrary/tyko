@@ -230,7 +230,7 @@ foreach($file in $opengl32_libraries){
                     post{
                         success{
                             script{
-                                def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi")
+                                def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi,build/tyko-*-win64.exe")
                                 bat "if not exist dist mkdir dist"
                                 install_files.each{
                                     powershell "Move-Item -Path ${it.path} -Destination .\\dist\\${it.name}"
