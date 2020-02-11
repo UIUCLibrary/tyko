@@ -180,18 +180,10 @@ foreach($file in $opengl32_libraries){
                         dir 'scm'
                       }
                     }
-                    //agent{
-                    //    label "Docker && Windows"
-                   //     //label "Docker && Windows && 1903"
-                   // }
                     when {
                         equals expected: true, actual: params.BUILD_CLIENT
                         beforeAgent true
                     }
-                    //environment{
-                    //    DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
-                    //    PATH = "${DOCKER_PATH};$PATH"
-                    //}
                     options{
                         timestamps()
                     }
@@ -237,6 +229,14 @@ foreach($file in $opengl32_libraries){
                         }
                         failure{
                             bat "tree /A /F build"
+                        }
+                        cleanup{
+                            cleanWs(
+                                deleteDirs: true,
+                                patterns: [
+                                    [pattern: 'build/', type: 'INCLUDE']
+                                ]
+                            )
                         }
                     }
                 }
