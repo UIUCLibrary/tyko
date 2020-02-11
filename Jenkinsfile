@@ -191,7 +191,7 @@ pipeline {
                                     )
                                 bat(
                                     label: "Building project",
-                                    script: "cmake --build build"
+                                    script: "cmake --build build --config Release"
                                     )
                             }
                         }
