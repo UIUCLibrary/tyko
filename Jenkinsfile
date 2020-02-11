@@ -172,7 +172,7 @@ foreach($file in $opengl32_libraries){
                         }
                     }
                 }
-                stage("Build Client with Docker Container"){
+                stage("Build Client Software"){
                     agent {
                       dockerfile {
                         filename 'CI/build_VS2019/Dockerfile'
@@ -223,6 +223,7 @@ foreach($file in $opengl32_libraries){
                         stage("Package Client"){
                             steps{
                                 unstash "OPENGL"
+                                // ONLY DO THIS IN A DOCKER CONTAINER!!
                                 powershell "Move-Item -Path OPENGL32.dll -Destination c:\\Windows\\System32\\OPENGL32.dll"
                                 dir("build"){
                                     bat(script: "cpack -G WIX;ZIP --verbose")
@@ -231,6 +232,9 @@ foreach($file in $opengl32_libraries){
                         }
                     }
                     post{
+                        success{
+                            stash includes: "build/tyko-*-win64.zip,build/tyko-*-win64.msi", name: 'CLIENT_BUILD_PACKAGES'
+                        }
                         failure{
                             bat "tree /A /F build"
                         }
@@ -664,6 +668,7 @@ foreach($file in $opengl32_libraries){
                         }
                     }
                 }
+
 //                stage("Creating Package Installers for Client"){
 //                    agent{
 //                        label "Docker && Windows && 1903"
@@ -707,6 +712,22 @@ foreach($file in $opengl32_libraries){
 //                }
             }
 
+        }
+        stage("Testing Package Installers"){
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/windows/servercore:ltsc2019'
+                    label 'windows && docker'
+                }
+            }
+            when {
+                equals expected: true, actual: params.BUILD_CLIENT
+                beforeAgent true
+            }
+            steps{
+                echo "here"
+                unstash "CLIENT_BUILD_PACKAGES"
+            }
         }
         stage("Deploy"){
             parallel{
