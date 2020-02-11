@@ -3,7 +3,7 @@ import {notes} from "../tyko/static/js/api.js";
 jest.mock("../tyko/static/js/request");
 describe('Testing api', ()=>{
     test("get notes", ()=> {
-    const sample_notes_data = `
+        const sample_notes_data = `
 {
   "notes": [
     {
@@ -20,9 +20,12 @@ describe('Testing api', ()=>{
     }
   ]
 }`;
+    console.log("data");
     return notes.getNotes()
         .then(function (data){
+
             expect(data).toBe(sample_notes_data)
         });
-});
+    });
+    test("get notes", ()=> {})
 });
