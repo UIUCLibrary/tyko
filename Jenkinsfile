@@ -631,47 +631,47 @@ pipeline {
                         }
                     }
                 }
-                stage("Creating Package Installers for Client"){
-                    agent{
-                        label "Docker && Windows && 1903"
-
-                    }
-                    when {
-                        equals expected: true, actual: params.BUILD_CLIENT
-                        beforeAgent true
-                    }
-                    environment{
-                        DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
-                        PATH = "${DOCKER_PATH};$PATH"
-                    }
-                    steps{
-                            unstash "CLIENT_BUILD_DOCKER"
-                            bat "if not exist dist mkdir dist"
-                            bat(
-                                label: "Running build command from CMake on node ${NODE_NAME}",
-                                script: "docker run --rm -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\dist:c:\\dist\" -v \"${WORKSPACE}\\scm:c:\\source:rw\" -v \"${WORKSPACE}\\scm\\CI\\shared_docker_scripts:c:\\ci_scripts:ro\" --workdir=\"c:\\build\" %DOCKER_IMAGE_TAG% cpack -G NSIS;WIX;ZIP -C Release --verbose"
-                            )
-
-                    }
-                    post{
-                        cleanup{
-                            cleanWs(
-                                deleteDirs: true,
-                                patterns: [
-                                    [pattern: 'build', type: 'INCLUDE'],
-                                    [pattern: 'dist', type: 'INCLUDE'],
-                                    ]
-                            )
-                        }
-                        failure{
-                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/**/*.log'
-                        }
-                        success{
-                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/*.exe,build/*.msi,build/*.zip'
-                            stash includes: 'build/*.exe,build/*.msi,build/*.zip,', name: "CLIENT_INSTALLERS"
-                        }
-                    }
-                }
+//                stage("Creating Package Installers for Client"){
+//                    agent{
+//                        label "Docker && Windows && 1903"
+//
+//                    }
+//                    when {
+//                        equals expected: true, actual: params.BUILD_CLIENT
+//                        beforeAgent true
+//                    }
+//                    environment{
+//                        DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
+//                        PATH = "${DOCKER_PATH};$PATH"
+//                    }
+//                    steps{
+//                            unstash "CLIENT_BUILD_DOCKER"
+//                            bat "if not exist dist mkdir dist"
+//                            bat(
+//                                label: "Running build command from CMake on node ${NODE_NAME}",
+//                                script: "docker run --rm -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\dist:c:\\dist\" -v \"${WORKSPACE}\\scm:c:\\source:rw\" -v \"${WORKSPACE}\\scm\\CI\\shared_docker_scripts:c:\\ci_scripts:ro\" --workdir=\"c:\\build\" %DOCKER_IMAGE_TAG% cpack -G NSIS;WIX;ZIP -C Release --verbose"
+//                            )
+//
+//                    }
+//                    post{
+//                        cleanup{
+//                            cleanWs(
+//                                deleteDirs: true,
+//                                patterns: [
+//                                    [pattern: 'build', type: 'INCLUDE'],
+//                                    [pattern: 'dist', type: 'INCLUDE'],
+//                                    ]
+//                            )
+//                        }
+//                        failure{
+//                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/**/*.log'
+//                        }
+//                        success{
+//                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/*.exe,build/*.msi,build/*.zip'
+//                            stash includes: 'build/*.exe,build/*.msi,build/*.zip,', name: "CLIENT_INSTALLERS"
+//                        }
+//                    }
+//                }
             }
 
         }
