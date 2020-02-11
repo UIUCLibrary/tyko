@@ -1,8 +1,8 @@
 import {notes} from "../tyko/static/js/api.js";
 
 jest.mock("../tyko/static/js/request");
-
-test("get notes", ()=> {
+describe('Testing api', ()=>{
+    test("get notes", ()=> {
     const sample_notes_data = `
 {
   "notes": [
@@ -24,4 +24,5 @@ test("get notes", ()=> {
         .then(function (data){
             expect(data).toBe(sample_notes_data)
         });
+});
 });
