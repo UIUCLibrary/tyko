@@ -502,11 +502,8 @@ foreach($file in $opengl32_libraries){
                             }
                             post{
                                 always{
-                                    stash includes: "reports/*.xml", name: 'JEST_REPORT'
-                                    dir("scm"){
-                                        unstash "JEST_REPORT"
-                                        junit "reports/*.xml"
-                                    }
+                                    checkout scm
+                                    junit "reports/*.xml"
                                     archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
                                 }
                                 cleanup{
