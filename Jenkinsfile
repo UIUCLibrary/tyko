@@ -131,14 +131,18 @@ pipeline {
                 label "Windows&&opengl32"
             }
             steps{
-                powershell(
-                    label: "Searching for opengl32.dll",
-                    script: '''
+                script{
+                    if(!fileExists('opengl32.dll')){
+                        powershell(
+                            label: "Searching for opengl32.dll",
+                            script: '''
 $opengl32_libraries = Get-ChildItem -Path c:\\Windows\\System32 -Recurse -Include opengl32.dll
 foreach($file in $opengl32_libraries){
     Copy-Item $file.FullName
     break
 }''')
+                    }
+                }
                 stash includes: 'opengl32.dll', name: 'OPENGL'
             }
         }
