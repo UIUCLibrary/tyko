@@ -122,6 +122,26 @@ pipeline {
 //                }
 //            }
 //        }
+        stage("Getting build required files"){
+            when {
+                equals expected: true, actual: params.BUILD_CLIENT
+                beforeAgent true
+            }
+            agent{
+                label "Windows&&opengl32"
+            }
+            steps{
+                powershell(
+                    label: "Searching for opengl32.dll",
+                    script: '''
+$opengl32_libraries = Get-ChildItem -Path c:\\Windows\\System32 -Recurse -Include opengl32.dll
+foreach($file in $opengl32_libraries){
+    Copy-Item $file.FullName
+    break
+}''')
+                stash includes: 'opengl32.dll', name: 'OPENGL'
+            }
+        }
         stage("Building"){
             failFast true
             parallel{
@@ -203,8 +223,7 @@ pipeline {
                         stage("Package Client"){
                             steps{
                                 dir("build"){
-                                    // Write a fake OPENGL32.dll file to fake cpack packaging
-                                    writeFile file: 'OPENGL32.dll', text: ''
+                                    unstash "OPENGL"
                                     bat(script: "cpack -G WIX;ZIP --verbose")
                                 }
                             }
