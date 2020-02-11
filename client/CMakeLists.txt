@@ -136,7 +136,7 @@ install(CODE [[
                     "${PLUGIN_LIBRARIES}"
                     ""
                      "${lib_paths}"
-                     IGNORE_ITEM "OPENGL32.dll")
+                     IGNORE_ITEM "OPENGL32.dll;opengl32.dll")
 ]])
 #
 
