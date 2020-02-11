@@ -744,6 +744,16 @@ foreach($file in $opengl32_libraries){
                     archiveArtifacts allowEmptyArchive: true, artifacts: "logs\\msiexec.log"
                     bat 'dir "C:\\Program Files\\"'
                 }
+                cleanup{
+                    cleanWs(
+                        deleteDirs: true,
+                        patterns: [
+                            [pattern: 'build', type: 'INCLUDE'],
+                            [pattern: 'dist', type: 'INCLUDE'],
+                            [pattern: 'logs', type: 'INCLUDE'],
+                        ]
+                    )
+                }
             }
         }
         stage("Deploy"){
