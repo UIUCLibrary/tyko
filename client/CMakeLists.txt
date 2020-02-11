@@ -57,7 +57,7 @@ target_link_libraries(avdatabaseEditor
 
         )
 #get_target_property(editor_apple_bundle avdatabaseEditor MACOSX_BUNDLE)
-#install(TARGETS avdatabaseEditor)
+install(TARGETS avdatabaseEditor RUNTIME DESTINATION bin)
 #
 #
 #if(editor_apple_bundle)
