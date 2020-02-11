@@ -752,15 +752,15 @@ foreach($file in $opengl32_libraries){
                     bat 'dir "C:\\Program Files\\"'
                 }
                 success{
-                    archiveArtifacts artifacts: "dist/*.*"
+                    archiveArtifacts artifacts: "dist/*.msi,dist/*.exe,dist/*.zip"
                 }
                 cleanup{
                     cleanWs(
                         deleteDirs: true,
                         patterns: [
-                            [pattern: 'build', type: 'INCLUDE'],
-                            [pattern: 'dist', type: 'INCLUDE'],
-                            [pattern: 'logs', type: 'INCLUDE'],
+                            [pattern: 'build/', type: 'INCLUDE'],
+                            [pattern: 'dist/', type: 'INCLUDE'],
+                            [pattern: 'logs/', type: 'INCLUDE'],
                         ]
                     )
                 }
