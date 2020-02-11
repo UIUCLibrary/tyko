@@ -317,12 +317,15 @@ class Note(AVTables):
     note_type = relationship("NoteTypes", foreign_keys=[note_type_id])
 
     def serialize(self):
-        return {
+        data = {
             "note_id": self.id,
             "text": self.text,
             "note_type_id": self.note_type_id,
-            "note_type": self.note_type.name
+
         }
+        if self.note_type is not None:
+            data["note_type"] = self.note_type.name
+        return data
 
 
 class NoteTypes(AVTables):
