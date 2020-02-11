@@ -751,6 +751,9 @@ foreach($file in $opengl32_libraries){
                     archiveArtifacts allowEmptyArchive: true, artifacts: "logs\\msiexec.log"
                     bat 'dir "C:\\Program Files\\"'
                 }
+                success{
+                    archiveArtifacts artifacts: "dist/*.*"
+                }
                 cleanup{
                     cleanWs(
                         deleteDirs: true,
