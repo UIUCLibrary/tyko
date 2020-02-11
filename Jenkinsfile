@@ -730,6 +730,13 @@ foreach($file in $opengl32_libraries){
                     def msi_file = findFiles(glob: "build/*.msi")[0].path
                     powershell "New-Item -ItemType Directory -Force -Path ${WORKSPACE}\\logs; Write-Host \"Installing ${msi_file}\"; msiexec /i ${msi_file} /qn /norestart /L*v! ${WORKSPACE}\\logs\\msiexec.log"
                 }
+
+            }
+            post{
+                always{
+                    archiveArtifacts allowEmptyArchive: true, artifacts: "logs\\msiexec.log"
+                    bat 'dir "C:\\Program Files\\"'
+                }
             }
         }
         stage("Deploy"){
