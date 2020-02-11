@@ -741,8 +741,12 @@ foreach($file in $opengl32_libraries){
             steps{
                 unstash "CLIENT_BUILD_PACKAGES"
                 script{
-                    def msi_file = findFiles(glob: "dist/*.msi")[0].path
-                    powershell "New-Item -ItemType Directory -Force -Path ${WORKSPACE}\\logs; Write-Host \"Installing ${msi_file}\"; msiexec /i ${msi_file} /qn /norestart /L*v! ${WORKSPACE}\\logs\\msiexec.log"
+                    findFiles(glob: "dist/*.msi").each{
+                        powershell (
+                            label: "Installing ${it.name}",
+                            script:"New-Item -ItemType Directory -Force -Path ${WORKSPACE}\\logs; msiexec /i ${it.path} /qn /norestart /L*v! ${WORKSPACE}\\logs\\msiexec.log"
+                        )
+                    }
                 }
 
             }
