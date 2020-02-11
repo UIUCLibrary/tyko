@@ -190,6 +190,11 @@ pipeline {
                             }
                         }
                     }
+                    post{
+                        failure{
+                            bat "tree /A /F build"
+                        }
+                    }
                 }
 
 //                        stage("Build Docker Container"){
