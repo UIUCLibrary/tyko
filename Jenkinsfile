@@ -193,7 +193,13 @@ pipeline {
                                     label: "Building project",
                                     script: "cmake --build build"
                                     )
-//                                echo "building"
+                            }
+                        }
+                        stage("Package Client"){
+                            steps{
+                                dir("build"){
+                                    bat(script: "cpack -G WIX;ZIP")
+                                }
                             }
                         }
                     }
