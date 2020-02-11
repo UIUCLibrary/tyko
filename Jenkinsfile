@@ -503,6 +503,7 @@ foreach($file in $opengl32_libraries){
                             post{
                                 always{
                                     junit "reports/*.xml"
+                                    archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
                                 }
                                 cleanup{
                                     cleanWs(
