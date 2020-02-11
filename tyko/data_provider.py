@@ -134,7 +134,7 @@ class ProjectDataConnector(AbsDataProviderConnector):
 
             project = projects[0]
 
-            note = self.find_note(project, note_id)
+            note = self._find_note(project, note_id)
             print(note)
             if "text" in changed_data:
                 note.text = changed_data['text']
@@ -156,7 +156,8 @@ class ProjectDataConnector(AbsDataProviderConnector):
             session.close()
         return update_project_data
 
-    def find_note(self, project, note_id):
+    @staticmethod
+    def _find_note(project, note_id):
         for note in project.notes:
             if note.id == note_id:
                 return note

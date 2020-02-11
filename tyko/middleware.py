@@ -379,10 +379,10 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         )
 
         return make_response(
-                jsonify({
-                    "project": updated_project
-                }),
-                202
+            jsonify({
+                "project": updated_project
+            }),
+            202
         )
 
     def add_note(self, project_id):
