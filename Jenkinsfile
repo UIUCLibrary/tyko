@@ -327,6 +327,7 @@ foreach($file in $opengl32_libraries){
                                     cleanWs(
                                         deleteDirs: true,
                                         patterns: [
+                                            [pattern: 'logs/', type: 'INCLUDE'],
                                             [pattern: '.tox/', type: 'INCLUDE'],
                                             ]
                                     )
@@ -533,8 +534,6 @@ foreach($file in $opengl32_libraries){
                             post{
                                 always{
                                     stash includes: "reports/*.xml", name: 'JEST_REPORT'
-                                    checkout scm
-                                    unstash 'JEST_REPORT'
                                     junit "reports/*.xml"
                                     archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
                                 }
