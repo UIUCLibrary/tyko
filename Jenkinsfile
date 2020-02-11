@@ -725,8 +725,8 @@ foreach($file in $opengl32_libraries){
                 beforeAgent true
             }
             steps{
-                echo "here"
                 unstash "CLIENT_BUILD_PACKAGES"
+                bat "dir build"
             }
         }
         stage("Deploy"){
