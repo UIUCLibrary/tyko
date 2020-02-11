@@ -198,7 +198,7 @@ pipeline {
                         stage("Package Client"){
                             steps{
                                 dir("build"){
-                                    bat(script: "cpack -G WIX;ZIP")
+                                    bat(script: "cpack -G WIX;ZIP --verbose")
                                 }
                             }
                         }
