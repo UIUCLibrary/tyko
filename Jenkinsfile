@@ -228,11 +228,11 @@ foreach($file in $opengl32_libraries){
                             script{
                                 def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64")
                                 install_files.each{
-                                    powershell "Move-Item -Path ${it.path} -Destination .\\dist"
+                                    powershell "Move-Item -Path ${it.path} -Destination .\\dist\\"
                                 }
 
                             }
-                            stash includes: "dist/tyko-*-win64.zip,dist/tyko-*-win64.msi", name: 'CLIENT_BUILD_PACKAGES'
+                            stash includes: "dist/*", name: 'CLIENT_BUILD_PACKAGES'
                         }
                         failure{
                             bat "tree /A /F build"
@@ -241,6 +241,8 @@ foreach($file in $opengl32_libraries){
                             cleanWs(
                                 deleteDirs: true,
                                 patterns: [
+                                    [pattern: 'dist', type: 'INCLUDE'],
+                                    [pattern: 'dist/', type: 'INCLUDE'],
                                     [pattern: 'build/', type: 'INCLUDE']
                                 ]
                             )
