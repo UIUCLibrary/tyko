@@ -88,11 +88,14 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
 ADD CI/build_VS2019/conan/profiles/default ${CONAN_USER_HOME}\.conan\profiles\default
 ADD CI/build_VS2019/conan/remotes.json ${CONAN_USER_HOME}\.conan\remotes.json
 ADD CI/build_VS2019/startup.bat c:\temp\startup.bat
+
+# This is to redirect anything that might require that visual studio vcvarsall.bat be in fixed spot
+ADD ["CI/build_VS2019/vcvarsall.bat", "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Auxiliary/Build/vcvarsall.bat"]
+
 RUN Set-ItemProperty -Path 'HKLM:\Software\Microsoft\Command Processor' -Name 'AutoRun' -Value "c:\temp\startup.bat"
 RUN certutil -generateSSTFromWU roots.sst ; `
     certutil -addstore -f root roots.sst ; `
     del roots.sst
-
 COPY conanfile.txt C:/TEMP/
 RUN conan install C:/TEMP/ --build  missing --no-import ;`
     conan remove * -b --src -f
