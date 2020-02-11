@@ -179,7 +179,13 @@ pipeline {
                     stages{
                         stage("Build Client"){
                             steps{
-                                echo "building"
+                                bat "if not exist build mkdir build"
+
+                                bat(
+                                    label: "installing dependencies",
+                                    script: "cd build && conan install ../scm//"
+                                    )
+//                                echo "building"
                             }
                         }
                     }
