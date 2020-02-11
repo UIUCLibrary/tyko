@@ -279,7 +279,12 @@ foreach($file in $opengl32_libraries){
                                         )
                                 }
                                 cleanup{
-                                    cleanWs()
+                                    cleanWs(
+                                        deleteDirs: true,
+                                        patterns: [
+                                            [pattern: 'reports/', type: 'INCLUDE'],
+                                        ]
+                                    )
                                 }
                             }
                         }
@@ -319,7 +324,12 @@ foreach($file in $opengl32_libraries){
                                     recordIssues(tools: [pep8(id: 'tox', name: 'Tox', pattern: '.tox/py*/log/*.log,.tox/log/*.log')])
                                 }
                                 cleanup{
-                                    cleanWs()
+                                    cleanWs(
+                                        deleteDirs: true,
+                                        patterns: [
+                                            [pattern: '.tox/', type: 'INCLUDE'],
+                                            ]
+                                    )
                                 }
                             }
                         }
@@ -356,7 +366,12 @@ foreach($file in $opengl32_libraries){
                                         }
                                 }
                                 cleanup{
-                                    cleanWs()
+                                    cleanWs(
+                                        deleteDirs: true,
+                                        patterns: [
+                                            [pattern: 'logs/', type: 'INCLUDE'],
+                                            ]
+                                    )
                                 }
                             }
                         }
@@ -394,7 +409,12 @@ foreach($file in $opengl32_libraries){
                                     }
                                 }
                                 cleanup{
-                                    cleanWs()
+                                    cleanWs(
+                                        deleteDirs: true,
+                                        patterns: [
+                                            [pattern: 'reports/', type: 'INCLUDE'],
+                                            ]
+                                    )
                                 }
                             }
                         }
@@ -429,7 +449,12 @@ foreach($file in $opengl32_libraries){
 
                                 }
                                 cleanup{
-                                    cleanWs(patterns: [[pattern: 'logs/flake8.log', type: 'INCLUDE']])
+                                    cleanWs(
+                                        deleteDirs: true,
+                                        patterns: [
+                                            [pattern: 'logs/', type: 'INCLUDE'],
+                                            ]
+                                    )
                                 }
                             }
                         }
@@ -471,7 +496,12 @@ foreach($file in $opengl32_libraries){
                                     }
                                 }
                                 cleanup{
-                                    cleanWs()
+                                    cleanWs(
+                                        deleteDirs: true,
+                                        patterns: [
+                                            [pattern: 'reports/', type: 'INCLUDE'],
+                                            ]
+                                    )
                                 }
                             }
                         }
@@ -513,7 +543,7 @@ foreach($file in $opengl32_libraries){
                                         deleteDirs: true,
                                         patterns: [
                                             [pattern: 'scm/node_modules', type: 'INCLUDE'],
-                                            [pattern: 'reports', type: 'INCLUDE'],
+                                            [pattern: 'reports/', type: 'INCLUDE'],
                                             ]
                                     )
                                 }
