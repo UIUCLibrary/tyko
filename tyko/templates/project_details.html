@@ -78,6 +78,7 @@
         <h5 class="card-header">Notes</h5>
         <div class="card-body">
             <table class="table">
+                {% if project['notes']|length > 0 %}
                 <thead>
                     <tr>
                         <th scope="col">Type</th>
@@ -86,9 +87,10 @@
                         <th scope="col"></th>
                     </tr>
                 </thead>
+            {% endif %}
                 <tbody>
                     {%- for note in project['notes'] %}
-                    <tr scope="row">
+                    <tr>
                         <td >{{ note['note_type'] }}</td>
                         <td>{{ note['text'] }}</td>
                         <td>
