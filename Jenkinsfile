@@ -185,6 +185,7 @@ pipeline {
                                     label: "installing dependencies",
                                     script: "cd build && conan install ../scm//"
                                     )
+                                bat "cmake -S scm -B build -DCMAKE_TOOLCHAIN_FILE:FILE=build/conan_paths.cmake"
 //                                echo "building"
                             }
                         }
