@@ -70,7 +70,7 @@ install(TARGETS avdatabaseEditor RUNTIME DESTINATION bin)
 #endif()
 #
 if(WIN32)
-
+    include(InstallRequiredSystemLibraries)
 #
 #    #========================================================================
 #    #    the root for QT should be one directory up from the Qt5 core runtime
