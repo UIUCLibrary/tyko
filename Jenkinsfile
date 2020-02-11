@@ -194,6 +194,11 @@ pipeline {
                                     script: "cmake --build build --config Release"
                                     )
                             }
+                            post{
+                                success{
+                                    bat "dumpbin /DEPENDENTS build\\Release\\avdatabaseEditor.exe"
+                                }
+                            }
                         }
                         stage("Package Client"){
                             steps{
