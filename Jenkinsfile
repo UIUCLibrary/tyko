@@ -726,7 +726,10 @@ foreach($file in $opengl32_libraries){
             }
             steps{
                 unstash "CLIENT_BUILD_PACKAGES"
-                bat "dir build"
+                script{
+                    def msi_file = findFiles(glob: "build/*.msi")[0].path
+                    powershell "New-Item -ItemType Directory -Force -Path ${WORKSPACE}\\logs; Write-Host \"Installing ${msi_file}\"; msiexec /i ${msi_file} /qn /norestart /L*v! ${WORKSPACE}\\logs\\msiexec.log"
+                }
             }
         }
         stage("Deploy"){
