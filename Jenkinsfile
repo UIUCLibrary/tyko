@@ -222,7 +222,7 @@ foreach($file in $opengl32_libraries){
                                 // ONLY DO THIS IN A DOCKER CONTAINER!!
                                 powershell "Move-Item -Path OPENGL32.dll -Destination c:\\Windows\\System32\\OPENGL32.dll"
                                 dir("build"){
-                                    bat(script: "cpack -G WIX;ZIP --verbose")
+                                    bat(script: "cpack -G WIX;ZIP;NSIS --verbose")
                                 }
                             }
                         }
