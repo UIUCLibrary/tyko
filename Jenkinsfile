@@ -203,6 +203,8 @@ pipeline {
                         stage("Package Client"){
                             steps{
                                 dir("build"){
+                                    // Write a fake OPENGL32.dll file to fake cpack packaging
+                                    writeFile file: 'OPENGL32.dll', text: ''
                                     bat(script: "cpack -G WIX;ZIP --verbose")
                                 }
                             }
