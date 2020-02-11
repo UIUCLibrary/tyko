@@ -225,7 +225,14 @@ foreach($file in $opengl32_libraries){
                     }
                     post{
                         success{
-                            stash includes: "build/tyko-*-win64.zip,build/tyko-*-win64.msi", name: 'CLIENT_BUILD_PACKAGES'
+                            script{
+                                def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64")
+                                install_files.each{
+                                    powershell "Move-Item -Path ${it.path} -Destination .\\dist"
+                                }
+
+                            }
+                            stash includes: "dist/tyko-*-win64.zip,dist/tyko-*-win64.msi", name: 'CLIENT_BUILD_PACKAGES'
                         }
                         failure{
                             bat "tree /A /F build"
@@ -727,7 +734,7 @@ foreach($file in $opengl32_libraries){
             steps{
                 unstash "CLIENT_BUILD_PACKAGES"
                 script{
-                    def msi_file = findFiles(glob: "build/*.msi")[0].path
+                    def msi_file = findFiles(glob: "dist/*.msi")[0].path
                     powershell "New-Item -ItemType Directory -Force -Path ${WORKSPACE}\\logs; Write-Host \"Installing ${msi_file}\"; msiexec /i ${msi_file} /qn /norestart /L*v! ${WORKSPACE}\\logs\\msiexec.log"
                 }
 
