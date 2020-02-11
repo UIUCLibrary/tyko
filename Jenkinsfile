@@ -222,8 +222,9 @@ foreach($file in $opengl32_libraries){
                         }
                         stage("Package Client"){
                             steps{
+                                unstash "OPENGL"
+                                powershell "Move-Item -Path OPENGL32.dll -Destination c:\\Windows\\System32\\OPENGL32.dll"
                                 dir("build"){
-                                    unstash "OPENGL"
                                     bat(script: "cpack -G WIX;ZIP --verbose")
                                 }
                             }
