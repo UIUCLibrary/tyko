@@ -543,6 +543,25 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             }
         )
 
+    def add_note(self, item_id):
+        data = request.get_json()
+        try:
+            note_type_id = int(data.get("note_type_id"))
+            note_text = data.get("text")
+            update_item = \
+                self._data_connector.add_note(
+                    item_id=item_id,
+                    note_type_id=note_type_id,
+                    note_text=note_text)
+            return jsonify(
+                {
+                    "item": update_item
+                }
+            )
+        except AttributeError:
+            traceback.print_exc(file=sys.stderr)
+            return make_response("Invalid data", 400)
+
     def create(self):
         name = request.form.get('name')
         file_name = request.form.get('file_name')
@@ -558,6 +577,32 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
                 "id": new_item_id,
                 "url": url_for("item_by_id", id=new_item_id)
             }
+        )
+
+    def remove_note(self, item_id, note_id):
+        updated_item = self._data_connector.remove_note(
+            item_id=item_id,
+            note_id=note_id
+        )
+
+        return make_response(
+            jsonify({
+                "item": updated_item
+            }),
+            202
+        )
+
+    def update_note(self, item_id, note_id):
+        data = request.get_json()
+        updated_object = \
+            self._data_connector.update_note(item_id=item_id,
+                                             note_id=note_id,
+                                             changed_data=data)
+        if not updated_object:
+            return make_response("", 204)
+
+        return jsonify(
+            {"item": updated_object}
         )
 
 

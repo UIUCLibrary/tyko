@@ -68,6 +68,17 @@ class ProjectObjectNotesAPI(views.MethodView):
         return self._project_object.update_note(object_id, note_id)
 
 
+class ObjectItemNotesAPI(views.MethodView):
+    def __init__(self, item: middleware.ItemMiddlwareEntity) -> None:
+        self._item = item
+
+    def put(self, project_id, object_id, item_id, note_id):  # noqa: E501 pylint: disable=W0613,C0301
+        return self._item.update_note(item_id, note_id)
+
+    def delete(self, project_id, object_id, item_id, note_id):  # noqa: E501  pylint: disable=W0613,C0301
+        return self._item.remove_note(item_id, note_id)
+
+
 class Routes:
 
     def __init__(self, db_engine: DataProvider, app) -> None:
@@ -223,6 +234,20 @@ class Routes:
                     project_object=project_object),
                 methods=["PUT", "DELETE"]
             )
+            self.app.add_url_rule(
+                "/api/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>/notes",  # noqa: E501 pylint: disable=C0301
+                "project_object_item_add_note",
+                lambda project_id, object_id, item_id: item.add_note(item_id),
+                methods=["POST"]
+            )
+
+            self.app.add_url_rule(
+                "/api/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>/notes/<int:note_id>",  # noqa: E501 pylint: disable=C0301
+                view_func=ObjectItemNotesAPI.as_view(
+                    "item_notes",
+                    item=item),
+                methods=["PUT", "DELETE"]
+            )
 
             self.app.add_url_rule(
                 "/api",
@@ -352,11 +377,14 @@ class Routes:
                         self.mw.data_provider).display_details(object_id)
                 ),
                 Route(
-                    "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>",
+                    "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>",  # noqa: E501 pylint: disable=C0301
                     "page_project_object_item_details",
                     lambda project_id, object_id, item_id:
                     frontend.ItemFrontend(
-                        self.mw.data_provider).display_details(item_id)
+                        self.mw.data_provider).display_details(
+                            item_id,
+                            project_id=project_id,
+                            object_id=object_id)
                 ),
                 Route(
                     "/project/<string:project_id>/edit",
