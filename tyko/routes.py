@@ -352,6 +352,13 @@ class Routes:
                         self.mw.data_provider).display_details(object_id)
                 ),
                 Route(
+                    "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>",
+                    "page_project_object_item_details",
+                    lambda project_id, object_id, item_id:
+                    frontend.ItemFrontend(
+                        self.mw.data_provider).display_details(item_id)
+                ),
+                Route(
                     "/project/<string:project_id>/edit",
                     "page_project_edit",
                     lambda project_id: frontend.ProjectFrontend(

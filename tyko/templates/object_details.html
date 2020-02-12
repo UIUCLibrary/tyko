@@ -72,7 +72,7 @@
                 <tbody>
                     {% for item in object['items'] %}
                         <tr>
-                            <td><a href="{{ url_for('.page_index')}}item/{{ item['item_id'] }}">{{ item['name'] }}</a></td>
+                            <td><a href="{{ url_for('page_projects')}}/{{ object['project_id'] }}/object/{{ object['object_id'] }}/item/{{ item['item_id'] }}">{{ item['name'] }}</a></td>
                         <td></td>
                         </tr>
                     {%- endfor -%}
