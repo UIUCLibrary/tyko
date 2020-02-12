@@ -49,7 +49,7 @@ class ProjectDataConnector(AbsDataProviderConnector):
         if serialize is True:
             serialized_projects = []
             for project in all_projects:
-                serialized_project = project.serialize()
+                serialized_project = project.serialize(recurse=True)
                 serialized_projects.append(serialized_project)
 
             all_projects = serialized_projects

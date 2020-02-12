@@ -118,8 +118,8 @@ class Project(AVTables):
             notes.append(note.serialize())
         data["notes"] = notes
 
-        child_objects = []
         if recurse is True:
+            child_objects = []
             for project_object in self.objects:
                 project_object_data = project_object.serialize(recurse=False)
                 del project_object_data['parent_project']
