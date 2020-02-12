@@ -1,12 +1,13 @@
 # pylint: disable=too-few-public-methods, invalid-name
 import abc
-from typing import List, Optional, Any, Union, Dict
+from typing import List, Optional, Union, Dict, Mapping
 import datetime
 import sqlalchemy as db
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 
-SerializedData = Union[int, str, List[Any], None, Dict[str, 'SerializedData']]
+SerializedData = \
+    Union[int, str, List['SerializedData'], None, Dict[str, 'SerializedData']]
 
 Session = scoped_session(sessionmaker(expire_on_commit=False))
 
@@ -67,7 +68,7 @@ class Contact(AVTables):
     last_name = db.Column("last_name", db.Text)
     email_address = db.Column("email_address", db.Text)
 
-    def serialize(self, recurse=False) -> dict:
+    def serialize(self, recurse=False) -> Dict[str, SerializedData]:
         return {
             "contact_id": self.id,
             "first_name": self.first_name,
@@ -102,9 +103,9 @@ class Project(AVTables):
         backref="object_source"
     )
 
-    def serialize(self, recurse=True):
+    def serialize(self, recurse=False) -> Dict[str, SerializedData]:
 
-        data = {
+        data: Dict[str, SerializedData] = {
             "project_id": self.id,
             "project_code": self.project_code,
             "current_location": self.current_location,
@@ -141,7 +142,7 @@ class Collection(AVTables):
     contact = relationship("Contact")
     contact_id = db.Column(db.Integer, db.ForeignKey("contact.contact_id"))
 
-    def serialize(self, recurse=False) -> dict:
+    def serialize(self, recurse=False) -> Dict[str, SerializedData]:
         if self.contact is not None:
             contact = self.contact.serialize()
         else:
@@ -187,7 +188,7 @@ class CollectionObject(AVTables):
 
     contact = relationship("Contact", foreign_keys=[contact_id])
 
-    def serialize(self, recurse=False):
+    def serialize(self, recurse=False) -> Dict[str, SerializedData]:
 
         def sorter(collection_items: List[CollectionItem]):
             no_sequence = set()
@@ -204,13 +205,13 @@ class CollectionObject(AVTables):
             resulting_sorted_list += list(no_sequence)
             return resulting_sorted_list
 
-        data = {
+        data: Dict[str, SerializedData] = {
             "object_id": self.id,
             "name": self.name,
             "barcode": self.barcode,
             }
 
-        items = []
+        items: List[SerializedData] = []
         for item in sorter(self.items):
             if recurse is True:
                 item_data = item.serialize()
@@ -322,8 +323,8 @@ class Note(AVTables):
 
     note_type = relationship("NoteTypes", foreign_keys=[note_type_id])
 
-    def serialize(self, recurse=False) -> dict:
-        data = {
+    def serialize(self, recurse=False) -> Dict[str, SerializedData]:
+        data: Dict[str, SerializedData] = {
             "note_id": self.id,
             "text": self.text,
             "note_type_id": self.note_type_id,
@@ -341,7 +342,7 @@ class NoteTypes(AVTables):
 
     name = db.Column("type_name", db.Text)
 
-    def serialize(self, recurse=False) -> dict:
+    def serialize(self, recurse=False) -> Dict[str, SerializedData]:
         return {
             "note_types_id": self.id,
             "name": self.name
@@ -358,7 +359,7 @@ class Treatment(AVTables):
     date = db.Column("date", db.Date)
     item_id = db.Column(db.Integer, db.ForeignKey("item.item_id"))
 
-    def serialize(self, recurse=False) -> dict:
+    def serialize(self, recurse=False) -> Dict[str, SerializedData]:
         return {
             "treatment_id": self.id,
             "needed": self.needed,
@@ -556,8 +557,10 @@ class Vendor(AVTables):
                             )
 
     def serialize(self, recurse=False) -> Dict[str, SerializedData]:
-        contacts = [contact.serialize() for contact in self.contacts]
-        return {
+        contacts: List[Mapping[str, SerializedData]] = [
+            contact.serialize() for contact in self.contacts
+        ]
+        data: Dict[str, SerializedData] = {
             "vendor_id": self.id,
             "name": self.name,
             "address": self.address,
@@ -565,8 +568,8 @@ class Vendor(AVTables):
             "state": self.state,
             "zipcode": self.zipcode,
             "contacts": contacts,
-
         }
+        return data
 
 
 vendor_transfer_has_an_object = db.Table(
