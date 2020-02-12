@@ -151,14 +151,13 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
             "url": url_for("object_by_id", id=new_object_id)
         })
 
-    def add_note(self, project_id, object_id):
+    def add_note(self, project_id, object_id):  # pylint: disable=W0613
         data = request.get_json()
         try:
             note_type_id = int(data.get("note_type_id"))
             note_text = data.get("text")
             update_object = \
                 self._data_connector.add_note(
-                    project_id=project_id,
                     object_id=object_id,
                     note_type_id=note_type_id,
                     note_text=note_text)
@@ -170,7 +169,32 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
         except AttributeError:
             traceback.print_exc(file=sys.stderr)
             return make_response("Invalid data", 400)
-        return make_response("Invalid data", 400)
+
+    def remove_note(self, object_id, note_id):
+        updated_object = self._data_connector.remove_note(
+            object_id=object_id,
+            note_id=note_id
+        )
+
+        return make_response(
+            jsonify({
+                "object": updated_object
+            }),
+            202
+        )
+
+    def update_note(self, object_id, note_id):
+        data = request.get_json()
+        updated_object = \
+            self._data_connector.update_note(object_id=object_id,
+                                             note_id=note_id,
+                                             changed_data=data)
+        if not updated_object:
+            return make_response("", 204)
+
+        return jsonify(
+            {"object": updated_object}
+        )
 
 
 class CollectionMiddlwareEntity(AbsMiddlwareEntity):

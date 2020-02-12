@@ -53,6 +53,21 @@ class ObjectAPI(views.MethodView):
     def __init__(self, project_object: middleware.ObjectMiddlwareEntity):
         self._project_object = project_object
 
+
+class ProjectObjectNotesAPI(views.MethodView):
+
+    def __init__(self,
+                 project_object: middleware.ObjectMiddlwareEntity) -> None:
+
+        self._project_object = project_object
+
+    def delete(self, project_id, object_id, note_id):  # pylint: disable=W0613
+        return self._project_object.remove_note(object_id, note_id)
+
+    def put(self, project_id, object_id, note_id):  # pylint: disable=W0613
+        return self._project_object.update_note(object_id, note_id)
+
+
 class Routes:
 
     def __init__(self, db_engine: DataProvider, app) -> None:
@@ -201,19 +216,13 @@ class Routes:
                 project_object.add_note,
                 methods=["POST"]
             )
-            # self.app.add_url_rule(
-            #     "/api/project/<int:project_id>/object/<int:object_id>",
-            #     view_func=ObjectAPI.as_view("project_notes",
-            #                                 project_object=project_object),
-            #     methods=["GET", "DELETE"]
-            # )
-
-            # self.app.add_url_rule(
-            #     "/api/project/<int:object>/notes",
-            #     "project_object_add_note",
-            #     ob.add_note,
-            #     methods=["POST"]
-            # )
+            self.app.add_url_rule(
+                "/api/project/<int:project_id>/object/<int:object_id>/notes/<int:note_id>",  # noqa: E501 pylint: disable=C0301
+                view_func=ProjectObjectNotesAPI.as_view(
+                    "object_notes",
+                    project_object=project_object),
+                methods=["PUT", "DELETE"]
+            )
 
             self.app.add_url_rule(
                 "/api",

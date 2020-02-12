@@ -116,7 +116,7 @@
                                         data-dialogtype="edit"
                                         data-text="{{ note['text'] }}"
                                         data-notetype="{{ note['note_type_id'] }}"
-                                        data-apiroute="{{ api_path }}/notes/{{ note['note_id'] }}">Edit</button>
+                                        data-apiroute="/api/project/{{ object['project_id'] }}/object/{{ object['object_id'] }}/notes/{{ note['note_id'] }}">Edit</button>
                             </td>
                             <td>
                                 <button class="btn btn-secondary btn-danger btn-sm"
@@ -124,7 +124,7 @@
                                         data-target="#noteRemoveConfirm"
                                         data-title="Remove Note"
                                         data-text="{{ note['text'] }}"
-                                        data-apiroute="{{ api_path }}/notes/{{ note['note_id'] }}">Remove</button>
+                                        data-apiroute="/api/project/{{ object['project_id'] }}/object/{{ object['object_id'] }}/notes/{{ note['note_id'] }}">Remove</button>
                             </td>
                         </tr>
                     {%- endfor -%}

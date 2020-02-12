@@ -30,6 +30,10 @@ class AbsDataProviderConnector(metaclass=abc.ABCMeta):
         """Delete an existing entity"""
 
 
+class DataConnectorWitHNotes:
+    pass
+
+
 class ProjectDataConnector(AbsDataProviderConnector):
 
     def get(self, id=None, serialize=False):
@@ -51,7 +55,6 @@ class ProjectDataConnector(AbsDataProviderConnector):
             all_projects = serialized_projects
         session.close()
         return all_projects
-
 
     def create(self, *args, **kwargs):
         title = kwargs["title"]
@@ -113,7 +116,6 @@ class ProjectDataConnector(AbsDataProviderConnector):
 
     def update_note(self, project_id, note_id, changed_data):
         session = self.session_maker()
-        update_project_data = None
         try:
             projects = session.query(scheme.Project) \
                 .filter(scheme.Project.id == project_id) \
@@ -124,7 +126,6 @@ class ProjectDataConnector(AbsDataProviderConnector):
             project = projects[0]
 
             note = self._find_note(project, note_id)
-            print(note)
             if "text" in changed_data:
                 note.text = changed_data['text']
             if "note_type_id" in changed_data:
@@ -140,10 +141,9 @@ class ProjectDataConnector(AbsDataProviderConnector):
                 session.query(scheme.Project).filter(
                     scheme.Project.id == project_id).one()
 
-            update_project_data = new_project.serialize()
+            return new_project.serialize()
         finally:
             session.close()
-        return update_project_data
 
     @staticmethod
     def _find_note(project, note_id):
@@ -344,15 +344,12 @@ class ObjectDataConnector(AbsDataProviderConnector):
         finally:
             session.close()
 
-    def add_note(self, project_id, object_id, note_type_id:int, note_text):
+    def add_note(self, object_id: int,
+                 note_type_id: int, note_text) -> None:
+
         session = self.session_maker()
         try:
-            collection_objects = session.query(scheme.CollectionObject) \
-                .filter(scheme.CollectionObject.id == object_id) \
-                .all()
-            if len(collection_objects) == 0:
-                raise ValueError("Not a valid Object")
-            collection_object =collection_objects[0]
+            collection_object = self._get_object(object_id, session=session)
 
             note_types = session.query(scheme.NoteTypes) \
                 .filter(scheme.NoteTypes.id == note_type_id) \
@@ -375,11 +372,95 @@ class ObjectDataConnector(AbsDataProviderConnector):
                 .filter(scheme.CollectionObject.id == object_id) \
                 .one()
 
-            new_object_data = new_object.serialize()
-            return new_object_data
+            return new_object.serialize()
 
         finally:
             session.close()
+
+    def remove_note(self, object_id, note_id):
+        session = self.session_maker()
+        try:
+            objects = session.query(scheme.CollectionObject).filter(
+                scheme.CollectionObject.id == object_id).all()
+
+            if len(objects) == 0:
+                raise DataError(
+                    message="Unable to locate collection object "
+                            "with ID: {}".format(object_id),
+                    status_code=404
+                )
+
+            if len(objects) > 1:
+                raise DataError(
+                    message="Found multiple objects with ID: {}".format(
+                        object_id))
+
+            collection_object = objects[0]
+
+            if len(collection_object.notes) == 0:
+                raise DataError(
+                    "Object with ID: {} has no notes".format(object_id))
+
+            # Find note that matches the note ID
+            for note in collection_object.notes:
+                if note.id == note_id:
+                    collection_object.notes.remove(note)
+                    break
+            else:
+                raise DataError(
+                    message="Collection id {} contains no note with an"
+                            " id {}".format(object_id, note_id),
+                    status_code=404
+                )
+
+            session.commit()
+            return session.query(scheme.CollectionObject) \
+                .filter(scheme.CollectionObject.id == object_id) \
+                .one().serialize()
+        finally:
+            session.close()
+
+    def update_note(self, object_id, note_id, changed_data):
+        session = self.session_maker()
+        try:
+            collection_object = self._get_object(object_id, session=session)
+
+            note = self._find_note(collection_object, note_id)
+            if "text" in changed_data:
+                note.text = changed_data['text']
+            if "note_type_id" in changed_data:
+
+                note_type = session.query(scheme.NoteTypes).filter(
+                    scheme.NoteTypes.id == changed_data['note_type_id']).one()
+
+                if note_type is not None:
+                    note.note_type = note_type
+
+            session.commit()
+            new_object = \
+                session.query(scheme.CollectionObject).filter(
+                    scheme.CollectionObject.id == object_id).one()
+
+            return new_object.serialize()
+        finally:
+            session.close()
+
+    @staticmethod
+    def _get_object(object_id, session):
+        collection_object = session.query(scheme.CollectionObject) \
+            .filter(scheme.CollectionObject.id == object_id) \
+            .all()
+        if len(collection_object) == 0:
+            raise ValueError("Not a valid project")
+        collection_object = collection_object[0]
+        return collection_object
+
+    @staticmethod
+    def _find_note(collection_object, note_id):
+        for note in collection_object.notes:
+            if note.id == note_id:
+                return note
+        raise ValueError("No matching note for object")
 
 
 class ItemDataConnector(AbsDataProviderConnector):
