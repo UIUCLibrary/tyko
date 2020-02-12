@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 from typing import Any, List
-from flask import jsonify, render_template
+from flask import jsonify, render_template, views
 
 from . import middleware
 from .data_provider import DataProvider
@@ -35,6 +35,23 @@ class EntityPage:
 _all_entities = set()
 all_forms = set()
 
+
+class ProjectNotesAPI(views.MethodView):
+
+    def __init__(self, project: middleware.ProjectMiddlwareEntity) -> None:
+        super().__init__()
+        self._project = project
+
+    def put(self, project_id, note_id):
+        return self._project.update_note(project_id, note_id)
+
+    def delete(self, project_id, note_id):
+        return self._project.remove_note(project_id, note_id)
+
+
+class ObjectAPI(views.MethodView):
+    def __init__(self, project_object: middleware.ObjectMiddlwareEntity):
+        self._project_object = project_object
 
 class Routes:
 
@@ -171,19 +188,33 @@ class Routes:
                 project.add_note,
                 methods=["POST"]
             )
-            self.app.add_url_rule(
-                "/api/project/<int:project_id>/notes/<int:note_id>",
-                "project_remove_note",
-                project.remove_note,
-                methods=["DELETE"]
-            )
 
             self.app.add_url_rule(
-                "/api/project/<string:project_id>/notes/<string:note_id>",
-                "project_update_note",
-                project.update_note,
-                methods=["PUT"]
+                "/api/project/<int:project_id>/notes/<int:note_id>",
+                view_func=ProjectNotesAPI.as_view("project_notes",
+                                                  project=project),
+                methods=["PUT", "DELETE"]
             )
+            self.app.add_url_rule(
+                "/api/project/<int:project_id>/object/<int:object_id>/notes",
+                "project_object_add_note",
+                project_object.add_note,
+                methods=["POST"]
+            )
+            # self.app.add_url_rule(
+            #     "/api/project/<int:project_id>/object/<int:object_id>",
+            #     view_func=ObjectAPI.as_view("project_notes",
+            #                                 project_object=project_object),
+            #     methods=["GET", "DELETE"]
+            # )
+
+            # self.app.add_url_rule(
+            #     "/api/project/<int:object>/notes",
+            #     "project_object_add_note",
+            #     ob.add_note,
+            #     methods=["POST"]
+            # )
+
             self.app.add_url_rule(
                 "/api",
                 "list_routes",
@@ -304,6 +335,12 @@ class Routes:
                     "page_project_details",
                     lambda project_id: frontend.ProjectFrontend(
                         self.mw.data_provider).display_details(project_id)
+                ),
+                Route(
+                    "/project/<int:project_id>/object/<int:object_id>",
+                    "page_project_object_details",
+                    lambda project_id, object_id: frontend.ObjectFrontend(
+                        self.mw.data_provider).display_details(object_id)
                 ),
                 Route(
                     "/project/<string:project_id>/edit",

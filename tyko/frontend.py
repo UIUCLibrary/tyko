@@ -214,6 +214,7 @@ class ProjectFrontend(FrontendEditable):
             project=selected_project,
             api_path=f"{url_for('.page_index')}api/project/{entity_id}",
             edit_link=edit_link,
+            project_id=entity_id,
             valid_note_types=valid_note_types,
             fields=fields
             )
@@ -379,14 +380,22 @@ class ObjectFrontend(FrontendEditable):
             if collection_name is not None:
                 selected_object['collection_name'] = collection_name
 
+        valid_note_types = []
+        for note_type in self._data_connector.get_note_types():
+            valid_note_types.append((note_type.name, note_type.id))
+
         project = selected_object.get('project')
         if project is not None:
             project_name = project['title']
+            project_id = project['project_id']
             selected_object['project_name'] = project_name
+            selected_object['project_id'] = project_id
+
         return self.render_page(template="object_details.html",
                                 edit=False,
                                 fields=fields,
                                 api_path=api_path,
+                                valid_note_types=valid_note_types,
                                 object=selected_object)
 
     def render_page(self, template="object_details.html", **context):

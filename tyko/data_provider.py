@@ -52,6 +52,7 @@ class ProjectDataConnector(AbsDataProviderConnector):
         session.close()
         return all_projects
 
+
     def create(self, *args, **kwargs):
         title = kwargs["title"]
         project_code = kwargs.get("project_code")
@@ -100,18 +101,6 @@ class ProjectDataConnector(AbsDataProviderConnector):
             )
             session.add(new_note)
             project.notes.append(new_note)
-            # assert len(projects) == 1
-            # project = projects[0]
-            #
-            # notes = session.query(scheme.Note)\
-            #     .filter(scheme.Project.id == note_id)\
-            #     .all()
-            #
-            # if len(notes) == 0:
-            #     raise ValueError("Not a valid note")
-            # assert len(notes) == 1
-            # note = notes[0]
-            # project.notes.append(note)
             session.commit()
             new_project = \
                 session.query(scheme.Project).filter(
@@ -347,6 +336,50 @@ class ObjectDataConnector(AbsDataProviderConnector):
             session.commit()
             return success
         return False
+
+    def get_note_types(self):
+        session = self.session_maker()
+        try:
+            return session.query(scheme.NoteTypes).all()
+        finally:
+            session.close()
+
+    def add_note(self, project_id, object_id, note_type_id:int, note_text):
+        session = self.session_maker()
+        try:
+            collection_objects = session.query(scheme.CollectionObject) \
+                .filter(scheme.CollectionObject.id == object_id) \
+                .all()
+            if len(collection_objects) == 0:
+                raise ValueError("Not a valid Object")
+            collection_object =collection_objects[0]
+
+            note_types = session.query(scheme.NoteTypes) \
+                .filter(scheme.NoteTypes.id == note_type_id) \
+                .all()
+
+            if len(note_types) == 0:
+                raise ValueError("Not a valid note_type")
+
+            note_type = note_types[0]
+
+            new_note = scheme.Note(
+                text=note_text,
+                note_type=note_type
+            )
+            session.add(new_note)
+            collection_object.notes.append(new_note)
+            session.commit()
+
+            new_object = session.query(scheme.CollectionObject) \
+                .filter(scheme.CollectionObject.id == object_id) \
+                .one()
+
+            new_object_data = new_object.serialize()
+            return new_object_data
+
+        finally:
+            session.close()
 
 
 class ItemDataConnector(AbsDataProviderConnector):
