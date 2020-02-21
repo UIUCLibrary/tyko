@@ -264,6 +264,16 @@ class Routes:
                 defaults={"app": self.app}
             )
 
+            def dummy():
+                return render_template("new_object.html")
+
+            self.app.add_url_rule(
+                "/dummy",
+                "dummy",
+                dummy,
+                methods=["get"]
+            )
+
     def init_website_routes(self):
         about_page = frontend.AboutPage()
         index_page = frontend.IndexPage()
