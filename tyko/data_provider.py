@@ -311,7 +311,9 @@ class ObjectDataConnector(AbsDataProviderConnector):
             new_object.barcode = barcode
         session = self.session_maker()
         if "collection_id" in kwargs:
-            collection = session.query(scheme.Collection).filter(scheme.Collection.id == kwargs['collection_id']).one()
+            collection = session.query(scheme.Collection).filter(
+                scheme.Collection.id == kwargs['collection_id']).one()
+
             if collection is None:
                 raise ValueError("Not a Valid colleciton")
             new_object.collection = collection
