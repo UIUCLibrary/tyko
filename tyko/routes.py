@@ -264,7 +264,6 @@ class Routes:
                 defaults={"app": self.app}
             )
 
-
     def init_website_routes(self):
         about_page = frontend.AboutPage()
         index_page = frontend.IndexPage()
