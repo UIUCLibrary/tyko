@@ -315,7 +315,7 @@ class ObjectDataConnector(AbsDataProviderConnector):
                 scheme.Collection.id == kwargs['collection_id']).one()
 
             if collection is None:
-                raise ValueError("Not a Valid colleciton")
+                raise ValueError("Not a valid collection")
             new_object.collection = collection
         session.add(new_object)
         session.commit()
