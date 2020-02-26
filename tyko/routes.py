@@ -56,6 +56,7 @@ class ObjectAPI(views.MethodView):
     def delete(self, project_id, object_id):
         return self._project.remove_object(project_id, object_id)
 
+
 class ProjectObjectNotesAPI(views.MethodView):
 
     def __init__(self,

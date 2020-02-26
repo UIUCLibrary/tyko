@@ -261,16 +261,16 @@ class ProjectDataConnector(AbsDataProviderConnector):
                     return session.query(scheme.Project) \
                         .filter(scheme.Project.id == project_id) \
                         .one().serialize()
-            else:
-                raise DataError(
-                    message="Project id {} contains no object with an"
-                            " id {}".format(project_id, object_id),
-                    status_code=404
-                )
+            raise DataError(
+                message="Project id {} contains no object with an"
+                        " id {}".format(project_id, object_id),
+                status_code=404
+            )
         finally:
             session.close()
 
-    def _get_project(self, session, project_id):
+    @staticmethod
+    def _get_project(session, project_id):
         projects = session.query(scheme.Project).filter(
             scheme.Project.id == project_id).all()
 
@@ -287,6 +287,7 @@ class ProjectDataConnector(AbsDataProviderConnector):
                     project_id))
 
         return projects[0]
+
 
 class ObjectDataConnector(AbsDataProviderConnector):
 
