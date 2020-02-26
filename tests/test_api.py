@@ -374,6 +374,7 @@ def test_add_object_to_project(server_with_project):
     assert data['objects'][0]['barcode'] == "12345"
 #
 #
+
 def test_add_and_delete_object_to_project(server_with_project):
     project_api_url = "/api/project/1"
     object_api_url = f"{project_api_url}/object"
@@ -395,8 +396,9 @@ def test_add_and_delete_object_to_project(server_with_project):
     assert project_resp.status_code == 200
     data = json.loads(project_resp.data)['project']
     assert len(data['objects']) == 1
+
     new_object_id = new_object_data['object_id']
     new_object_api_url = f"{object_api_url}/{new_object_id}"
 
     delete_resp = server_with_project.delete(new_object_api_url)
-    assert delete_resp.status_code == 204
+    assert delete_resp.status_code == 202

@@ -206,22 +206,7 @@ class ProjectDataConnector(AbsDataProviderConnector):
     def remove_note(self, project_id, note_id):
         session = self.session_maker()
         try:
-            projects = session.query(scheme.Project).filter(
-                scheme.Project.id == project_id).all()
-
-            if len(projects) == 0:
-                raise DataError(
-                    message="Unable to locate project "
-                            "with ID: {}".format(project_id),
-                    status_code=404
-                )
-
-            if len(projects) > 1:
-                raise DataError(
-                    message="Found multiple projects with ID: {}".format(
-                        project_id))
-
-            project = projects[0]
+            project = self._get_project(session, project_id)
 
             if len(project.notes) == 0:
                 raise DataError(
@@ -265,6 +250,43 @@ class ProjectDataConnector(AbsDataProviderConnector):
         finally:
             session.close()
 
+    def remove_object(self, project_id, object_id):
+        session = self.session_maker()
+        try:
+            project = self._get_project(session=session, project_id=project_id)
+            for child_object in project.objects:
+                if child_object.id == object_id:
+                    project.objects.remove(child_object)
+                    session.commit()
+                    return session.query(scheme.Project) \
+                        .filter(scheme.Project.id == project_id) \
+                        .one().serialize()
+            else:
+                raise DataError(
+                    message="Project id {} contains no object with an"
+                            " id {}".format(project_id, object_id),
+                    status_code=404
+                )
+        finally:
+            session.close()
+
+    def _get_project(self, session, project_id):
+        projects = session.query(scheme.Project).filter(
+            scheme.Project.id == project_id).all()
+
+        if len(projects) == 0:
+            raise DataError(
+                message="Unable to locate project "
+                        "with ID: {}".format(project_id),
+                status_code=404
+            )
+
+        if len(projects) > 1:
+            raise DataError(
+                message="Found multiple projects with ID: {}".format(
+                    project_id))
+
+        return projects[0]
 
 class ObjectDataConnector(AbsDataProviderConnector):
 
