@@ -150,8 +150,7 @@ function remove(apiPath) {
     import {objects} from "{{url_for('static', filename="js/api.js")}}"
     const object_api_route = "{{ object_api_route }}";
     $(document).ready(function () {
-        {#FIXME#}
-        $("#newObject").bind("submit",
+        $("#newObject").unbind("submit").bind("submit",
             function(event) {
                 event.preventDefault();
                 const rawData = $(this).serializeArray();
