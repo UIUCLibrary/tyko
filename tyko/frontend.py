@@ -317,7 +317,7 @@ class ItemFrontend(FrontendEntity):
 class ObjectFrontend(FrontendEditable):
     def __init__(self, provider: data_provider.DataProvider) -> None:
         super().__init__(provider)
-
+        self._data_provider = provider
         self._data_connector = \
             data_provider.ObjectDataConnector(provider.db_session_maker)
 
@@ -404,13 +404,25 @@ class ObjectFrontend(FrontendEditable):
             project_id = project['project_id']
             selected_object['project_name'] = project_name
             selected_object['project_id'] = project_id
-
-        return self.render_page(template="object_details.html",
-                                edit=False,
-                                fields=fields,
-                                api_path=api_path,
-                                valid_note_types=valid_note_types,
-                                object=selected_object)
+        # TODO: add formats
+        formats = [
+            {
+                "format_id": 1,
+                "format_name": "sdsdsd"
+            },
+            {
+                "format_id": 2,
+                "format_name": "ssssssssssd"
+            },
+        ]
+        return self.render_page(
+            template="object_details.html",
+            edit=False,
+            fields=fields,
+            formats=self._data_provider.get_formats(serialize=True),
+            api_path=api_path,
+            valid_note_types=valid_note_types,
+            object=selected_object)
 
     def render_page(self, template="object_details.html", **context):
         context['itemType'] = "Object"

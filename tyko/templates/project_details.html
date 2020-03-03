@@ -49,8 +49,8 @@
             </table>
         </div>
     </div>
-    {{ new_object_modal("newObjectModal", collections, api_path + "/object") }}
     {{ confirm_remove_object_modal('confirmRemovalModal') }}
+    {{ new_object_modal("newObjectModal", collections, api_path + "/object") }}
 {%- endblock -%}
 {% block scripts %}
     {{ super() }}
