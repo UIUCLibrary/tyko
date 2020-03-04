@@ -404,17 +404,7 @@ class ObjectFrontend(FrontendEditable):
             project_id = project['project_id']
             selected_object['project_name'] = project_name
             selected_object['project_id'] = project_id
-        # TODO: add formats
-        formats = [
-            {
-                "format_id": 1,
-                "format_name": "sdsdsd"
-            },
-            {
-                "format_id": 2,
-                "format_name": "ssssssssssd"
-            },
-        ]
+        
         return self.render_page(
             template="object_details.html",
             edit=False,
