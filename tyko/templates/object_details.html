@@ -26,6 +26,7 @@
         </div>
         <div class="card-body">
             <table class="table">
+                {% if "project_id" in object %}
                 <tbody>
                     {% for item in object['items'] %}
                         <tr>
@@ -35,9 +36,12 @@
                     {%- endfor -%}
                     {{ item_new_button_row(url_for("project_object_add_item", object_id=object['object_id'], project_id=object['project_id']), "newItemtModal") }}
                 </tbody>
+                {% endif %}
             </table>
         </div>
-        {{ new_item_modal("newItemtModal", formats, url_for("project_object_add_item", object_id=object['object_id'], project_id=object['project_id'])) }}
+        {% if "project_id" in object %}
+            {{ new_item_modal("newItemtModal", formats, url_for("project_object_add_item", object_id=object['object_id'], project_id=object['project_id'])) }}
+        {% endif %}
     </div>
     <div class="card">
         <h5 class="card-header">Notes</h5>
