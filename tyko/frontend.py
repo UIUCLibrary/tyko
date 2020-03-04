@@ -404,7 +404,7 @@ class ObjectFrontend(FrontendEditable):
             project_id = project['project_id']
             selected_object['project_name'] = project_name
             selected_object['project_id'] = project_id
-        
+
         return self.render_page(
             template="object_details.html",
             edit=False,
