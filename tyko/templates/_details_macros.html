@@ -118,7 +118,7 @@
 </div>
 {% endmacro %}
 
-{% macro remove_modal_event_scripts(modal_id, removeal_callback) %}
+{% macro remove_modal_event_scripts(modal_id) %}
 
 <script type="module">
     import {requests} from "{{url_for('static', filename="js/request.js")}}"
@@ -154,7 +154,7 @@ function remove(apiPath) {
 
 {% macro child_entity_row(display_name, details_url, removal_modal_id, removal_apiroute) %}
 <tr>
-    <td><a href="{{ url }}">{{ display_name }}</a></td>
+    <td><a href="{{ details_url }}">{{ display_name }}</a></td>
     <td>
         <button
             class="float-right btn btn-danger btn-sm"
