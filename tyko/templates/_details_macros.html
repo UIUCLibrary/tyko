@@ -5,32 +5,32 @@
 {% endmacro %}
 
 {% macro field_edior(index, field_key, field_name, field_value, update_api_path) %}
-    <label for="Input{{ index }}"></label>
-    <input id="Input{{ index }}" type="text" class="form-control" value="{{field_value}}">
-    <div class="input-group-append">
-        <button id="{{field_name}}Confirm" class="btn btn-outline-secondary">Confirm</button>
-        <script type="module">
-            import {requests} from "{{url_for('static', filename="js/request.js")}}"
-            document.getElementById("{{field_name}}Confirm").onclick = function(){
-                const apiRoute = "{{ update_api_path }}";
-                const key = '{{field_key}}';
-                const value = document.getElementById('Input{{ index }}').value;
-                const data = {
-                    '{{field_key}}': value
-                };
-                requests.put(apiRoute,data).then(function (response) {
-                    location.reload();
-                }).catch(function (response) {
-                    alert("Failed to update " + key);
-                });
+<label for="Input{{ index }}"></label>
+<input id="Input{{ index }}" type="text" class="form-control" value="{{field_value}}">
+<div class="input-group-append">
+    <button id="{{field_name}}Confirm" class="btn btn-outline-secondary">Confirm</button>
+    <script type="module">
+        import {requests} from "{{url_for('static', filename="js/request.js")}}"
+        document.getElementById("{{field_name}}Confirm").onclick = function(){
+            const apiRoute = "{{ update_api_path }}";
+            const key = '{{field_key}}';
+            const value = document.getElementById('Input{{ index }}').value;
+            const data = {
+                '{{field_key}}': value
             };
-            document.getElementById("Input{{ index }}").addEventListener('keypress', (e) => {
-                if (e.key === "Enter") {
-                    document.getElementById("{{field_name}}Confirm").click();
-                }
+            requests.put(apiRoute,data).then(function (response) {
+                location.reload();
+            }).catch(function (response) {
+                alert("Failed to update " + key);
             });
-        </script>
-    </div>
+        };
+        document.getElementById("Input{{ index }}").addEventListener('keypress', (e) => {
+            if (e.key === "Enter") {
+                document.getElementById("{{field_name}}Confirm").click();
+            }
+        });
+    </script>
+</div>
 {% endmacro %}
 
 {% macro add_field_row(field_name, field_key, field_value, editable, update_api_path, index) %}

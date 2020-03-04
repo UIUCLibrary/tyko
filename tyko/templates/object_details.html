@@ -4,7 +4,7 @@
 {% from "_item_macros.html" import item_new_button_row, new_item_modal %}
 
 {%- block detail_table %}
-     <nav class="navbar navbar-expand-lg  navbar-light justify-content-start bg-light">
+    <nav class="navbar navbar-expand-lg  navbar-light justify-content-start bg-light">
         <div class="mx-1">
             <a href="{{ url_for('object_pbcore', id=object['object_id']) }}" download>PBCore</a>
         </div>
@@ -27,22 +27,22 @@
         <div class="card-body">
             <table class="table">
                 {% if "project_id" in object %}
-                <tbody>
-                    {% for item in object['items'] %}
-                        {{ child_entity_row(
-                            item['name'],
-                            url_for('page_project_object_item_details', project_id=object['project_id'], object_id=object['object_id'], item_id=item['item_id']),
-                            "removeItemModal",
-                            url_for("object_item", project_id=object['project_id'], object_id=object['object_id'], item_id=item['item_id'])
-                            ) }}
-                    {%- endfor -%}
-                    {{
-                            item_new_button_row(
-                                url_for("project_object_add_item", object_id=object['object_id'], project_id=object['project_id']),
-                                "newItemtModal"
-                            )
-                    }}
-                </tbody>
+                    <tbody>
+                        {% for item in object['items'] %}
+                            {{ child_entity_row(
+                                item['name'],
+                                url_for('page_project_object_item_details', project_id=object['project_id'], object_id=object['object_id'], item_id=item['item_id']),
+                                "removeItemModal",
+                                url_for("object_item", project_id=object['project_id'], object_id=object['object_id'], item_id=item['item_id'])
+                                ) }}
+                        {%- endfor -%}
+                        {{
+                                item_new_button_row(
+                                    url_for("project_object_add_item", object_id=object['object_id'], project_id=object['project_id']),
+                                    "newItemtModal"
+                                )
+                        }}
+                    </tbody>
                 {% endif %}
             </table>
         </div>
@@ -71,6 +71,6 @@
     {{ super() }}
     {{ remove_modal_event_scripts("removeItemModal") }}
     {% if "project_id" in object %}
-    {{ note_editor_events(url_for('project_object', project_id=object['project_id'], object_id=object['object_id']), valid_note_types) }}
+        {{ note_editor_events(url_for('project_object', project_id=object['project_id'], object_id=object['object_id']), valid_note_types) }}
     {% endif %}
 {% endblock %}
