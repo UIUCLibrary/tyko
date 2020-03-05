@@ -53,7 +53,7 @@ jobs:
         name: pytest-report
         path: reports/test-report.xml
     - name: debug
-      run: ls -la
+      run: ls -la reports
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       env:
