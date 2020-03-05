@@ -28,7 +28,7 @@ jobs:
       - name: Upload Jest coverage report
         uses: actions/upload-artifact@v1
         with:
-          name: jess-xunint
+          name: jest-coverage
           path: coverage
   pytest:
     name: Run Python tests
@@ -83,6 +83,16 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: pytest-report
+        path: reports
+    - name: Get Jest coverage report
+      uses: actions/download-artifact@v1
+      with:
+        name: jest-coverage
+        path: coverage
+    - name: Get Jest xunit report
+      uses: actions/download-artifact@v1
+      with:
+        name: jest-xunint
         path: reports
     - name: Get pytest coverage report
       uses: actions/download-artifact@v1
