@@ -3,7 +3,7 @@ name: SonarQube
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  pythonTests:
+  pytest:
     name: Run Python tests
     runs-on: ubuntu-latest
     steps:
@@ -51,6 +51,7 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: pytest-report
+        path: reports/test-report.xml
     - name: debug
       run: ls -la
     - name: SonarCloud Scan
