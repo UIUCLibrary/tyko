@@ -41,7 +41,7 @@ jobs:
         path: reports/test-report.xml
 
   sonarCloudTrigger:
-    needs: pythonTests
+    needs: pytest
     name: SonarCloud Trigger
     runs-on: ubuntu-latest
     steps:
