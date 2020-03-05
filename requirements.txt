@@ -2,3 +2,5 @@ flask
 sqlalchemy
 Flask-SQLAlchemy
 lxml
+pytest
+pytest_bdd
