@@ -3,7 +3,7 @@ name: SonarQube
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
+  pythonTests:
     name: Run Python tests
     runs-on: ubuntu-latest
     steps:
@@ -12,6 +12,7 @@ jobs:
 
   # This workflow contains a single job called "build"
   sonarCloudTrigger:
+    needs: pythonTests
     name: SonarCloud Trigger
     runs-on: ubuntu-latest
     steps:
