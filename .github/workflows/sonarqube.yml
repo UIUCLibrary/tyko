@@ -51,7 +51,7 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: pytest-report
-        path: reports/test-report.xml
+        path: reports
     - name: debug
       run: ls -laR reports
     - name: SonarCloud Scan
