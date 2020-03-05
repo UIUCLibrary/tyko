@@ -35,6 +35,7 @@ jobs:
         coverage xml -o coverage-reports/pythoncoverage-pytest.xml
         sed -i 's/\/home\/runner\/work\/tyko\/tyko\//\/github\/workspace\//g' coverage-reports/pythoncoverage-pytest.xml
         sed -i 's/\/home\/runner\/work\/tyko\/tyko\//\/github\/workspace\//g' reports/test-report.xml
+        cat coverage-reports/pythoncoverage-pytest.xml
 
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
