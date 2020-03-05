@@ -11,7 +11,7 @@ jobs:
     - run: git fetch --prune --unshallow
     - name: Setup python
       uses: actions/setup-python@v1
-        with:
+      with:
           python-version: 3.7
     - name: Cache python dependendies
       uses: actions/cache@v1
