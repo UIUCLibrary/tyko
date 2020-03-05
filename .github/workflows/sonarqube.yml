@@ -14,7 +14,16 @@ jobs:
       uses: actions/setup-python@v1
       with:
           python-version: 3.7
+    - name: Cache python dependendies
+      uses: actions/cache@v1
+      id: cache
+      with:
+        path: .cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-test
     - name: Install dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt pytest coverage pylint bandit
