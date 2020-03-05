@@ -48,11 +48,12 @@ jobs:
     - uses: actions/checkout@v2
     - run: |
       git fetch --prune --unshallow
-      ls -la
     - name: Get pytest report
       uses: actions/download-artifact@v1
       with:
         name: pytest-report
+    - name: debug
+      run: ls -la
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       env:
