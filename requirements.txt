@@ -2,8 +2,4 @@ flask
 sqlalchemy
 Flask-SQLAlchemy
 lxml
-pytest
-pytest_bdd
-coverage
 pylint
-bandit
