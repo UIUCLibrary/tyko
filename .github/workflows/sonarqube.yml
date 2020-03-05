@@ -165,6 +165,11 @@ jobs:
       with:
         name: pytest-coverage
         path: coverage-reports
+    - name: Get Bandit report
+      uses: actions/download-artifact@v1
+      with:
+        name: bandit-report
+        path: reports
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       env:
