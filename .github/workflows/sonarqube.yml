@@ -20,6 +20,7 @@ jobs:
           JEST_JUNIT_OUTPUT_NAME: js-junit.xml
           JEST_JUNIT_OUTPUT_DIR: reports
           JEST_JUNIT_ADD_FILE_ATTRIBUTE: true
+        continue-on-error: true
       - name: Upload Jest xunit
         uses: actions/upload-artifact@v1
         with:
