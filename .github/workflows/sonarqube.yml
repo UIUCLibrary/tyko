@@ -71,6 +71,36 @@ jobs:
       with:
         name: pytest-coverage
         path: coverage-reports/pythoncoverage-pytest.xml
+  pylint:
+    name: Run Pylint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+          python-version: 3.7
+    - name: Cache python dependendies
+      uses: actions/cache@v1
+      id: cache
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt pylint
+    - name: Run pylint
+      run: |
+       pylint tyko  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > reports/pylint_issues.txt
+    - name: Upload pylint report
+      uses: actions/upload-artifact@v1
+      with:
+        name: pylint-report
+        path: reports/pylint_issues.txt
 
   sonarCloudTrigger:
     needs: [pytest,jest]
@@ -93,6 +123,11 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: jest-xunint
+        path: reports
+    - name: Get Pylint report
+      uses: actions/download-artifact@v1
+      with:
+        name: pylint-report
         path: reports
     - name: Get pytest coverage report
       uses: actions/download-artifact@v1
