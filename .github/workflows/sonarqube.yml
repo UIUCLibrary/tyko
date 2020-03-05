@@ -95,6 +95,7 @@ jobs:
         pip install -r requirements.txt pylint
     - name: Run pylint
       run: |
+       mkdir -p reports
        pylint tyko  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > reports/pylint_issues.txt
     - name: Upload pylint report
       uses: actions/upload-artifact@v1
