@@ -104,7 +104,7 @@ jobs:
         path: reports/pylint_issues.txt
 
   sonarCloudTrigger:
-    needs: [pytest,jest]
+    needs: [pytest,jest,pylint]
     name: SonarCloud Trigger
     runs-on: ubuntu-latest
     steps:
