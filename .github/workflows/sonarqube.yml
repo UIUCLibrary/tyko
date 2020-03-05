@@ -8,26 +8,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - run: git fetch --prune --unshallow
     - name: Setup python
       uses: actions/setup-python@v1
         with:
           python-version: 3.7
-   - name: Cache python dependendies
-     uses: actions/cache@v1
-     id: cache
-     with:
-       path: ~/.cache/pip
-       key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-       restore-keys: |
-         ${{ runner.os }}-pip-
-         ${{ runner.os }}-
-   - name: Install dependencies
-     run: |
-       python -m pip install --upgrade pip
-       pip install -r requirements.txt
+    - name: Cache python dependendies
+      uses: actions/cache@v1
+      id: cache
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-   - name: Run Pytest
-     run: |
+    - name: Run Pytest
+      run: |
        coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml
        coverage combine
        coverage xml -o coverage-reports/pythoncoverage-pytest.xml
@@ -35,7 +36,6 @@ jobs:
        sed -i 's/\/home\/runner\/work\/tyko\/tyko/\/github\/workspace/g' reports/test-report.xml
        cat coverage-reports/pythoncoverage-pytest.xml
 
-  # This workflow contains a single job called "build"
   sonarCloudTrigger:
     needs: pythonTests
     name: SonarCloud Trigger
