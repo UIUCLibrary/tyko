@@ -2,4 +2,3 @@ flask
 sqlalchemy
 Flask-SQLAlchemy
 lxml
-pylint
