@@ -34,11 +34,16 @@ jobs:
        sed -i 's/\/home\/runner\/work\/tyko\/tyko/\/github\/workspace/g' coverage-reports/pythoncoverage-pytest.xml
        sed -i 's/\/home\/runner\/work\/tyko\/tyko/\/github\/workspace/g' reports/test-report.xml
        cat coverage-reports/pythoncoverage-pytest.xml
-    - name: Upload pytest report
+    - name: Upload pytest report xunit results
       uses: actions/upload-artifact@v1
       with:
         name: pytest-report
         path: reports/test-report.xml
+    - name: Upload pytest coverage report
+      uses: actions/upload-artifact@v1
+      with:
+        name: pytest-coverage
+        path: coverage-reports/pythoncoverage-pytest.xml
 
   sonarCloudTrigger:
     needs: pytest
@@ -52,8 +57,11 @@ jobs:
       with:
         name: pytest-report
         path: reports
-    - name: debug
-      run: ls -laR reports
+    - name: Get pytest coverage report
+      uses: actions/download-artifact@v1
+      with:
+        name: pytest-coverage
+        path: coverage-reports
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       env:
