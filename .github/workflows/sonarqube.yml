@@ -28,7 +28,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt pytest coverage pylint bandit
       
-      
+    - name: Run Pytest
+      run: coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml --junit-prefix=pytest
 
 #     # The type of runner that the job will run on
 #     runs-on: ubuntu-latest
