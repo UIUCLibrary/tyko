@@ -30,7 +30,7 @@ jobs:
       
     - name: Run Pytest
       run: |
-        coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml --junit-prefix=pytest
+        coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml
         coverage combine
         coverage xml -o coverage-reports/pythoncoverage-pytest.xml
     - name: SonarCloud Scan
