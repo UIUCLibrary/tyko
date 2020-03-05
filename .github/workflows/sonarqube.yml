@@ -60,7 +60,7 @@ jobs:
        coverage xml -o coverage-reports/pythoncoverage-pytest.xml
        sed -i 's/\/home\/runner\/work\/tyko\/tyko/\/github\/workspace/g' coverage-reports/pythoncoverage-pytest.xml
        sed -i 's/\/home\/runner\/work\/tyko\/tyko/\/github\/workspace/g' reports/test-report.xml
-       cat coverage-reports/pythoncoverage-pytest.xml
+      continue-on-error: true
     - name: Upload pytest report xunit results
       uses: actions/upload-artifact@v1
       with:
@@ -97,6 +97,7 @@ jobs:
       run: |
        mkdir -p reports
        pylint tyko  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" | tee reports/pylint_issues.txt
+      continue-on-error: true
     - name: Upload pylint report
       uses: actions/upload-artifact@v1
       with:
@@ -128,6 +129,7 @@ jobs:
       run: |
         mkdir -p reports
         bandit --format json --output reports/bandit-report.json --recursive tyko
+      continue-on-error: true
     - name: Upload Bandit report
       uses: actions/upload-artifact@v1
       with:
