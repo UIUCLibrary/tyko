@@ -19,9 +19,10 @@ jobs:
       id: cache
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
         restore-keys: |
-          ${{ runner.os }}-test
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
     - name: Install dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
