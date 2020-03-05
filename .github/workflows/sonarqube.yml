@@ -14,10 +14,12 @@ jobs:
           node-version: '12.x'
       - run: npm install
       - run: npm run build --if-present
-      - run: npm test
+      - run: npm test --  --reporters=default --reporters=jest-junit --collectCoverage
         env:
           CI: true
-
+          JEST_JUNIT_OUTPUT_NAME: js-junit.xml
+          JEST_JUNIT_OUTPUT_DIR: reports
+          JEST_JUNIT_ADD_FILE_ATTRIBUTE: true
 
 
   pytest:
