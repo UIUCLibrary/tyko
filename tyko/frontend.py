@@ -95,14 +95,6 @@ class AbsFrontend(metaclass=abc.ABCMeta):
         new_context.update(context)
         new_context["selected_menu_item"] = current_item
 
-        def filter_valid_entities_only(entity) -> bool:
-            if entity[0] not in entity_menu:
-                return False
-            return True
-
-        new_context["entities"] = filter(filter_valid_entities_only,
-                                         FrontendEntity.all_entities())
-
         form_list = set()
 
         for entity_name in entity_menu:
