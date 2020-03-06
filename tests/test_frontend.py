@@ -78,6 +78,14 @@ def test_view_web_project_details(app):
         )
         assert project_page_resp.status_code == 200
 
+
+def test_view_web_more(app):
+    with app.test_client() as server:
+
+        more_page_resp = server.get("/more")
+        assert more_page_resp.status_code == 200
+
+
 def test_view_web_item(app):
     with app.test_client() as server:
         project_id = server.post(
