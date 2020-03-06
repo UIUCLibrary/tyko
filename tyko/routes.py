@@ -345,12 +345,6 @@ class Routes:
                             self.mw.data_provider).display_details(
                                 object_id, show_bread_crumb=False)
                     ),
-                    # Route(
-                    #     "/object/<string:object_id>/edit",
-                    #     "page_object_edit",
-                    #     lambda object_id: frontend.ObjectFrontend(
-                    #         self.mw.data_provider).edit_details(object_id)
-                    # ),
                 ]),
             EntityPage(
                 "Items",
@@ -438,12 +432,6 @@ class Routes:
                             object_id=object_id,
                             show_bread_crumb=True)
                 ),
-                # Route(
-                #     "/project/<string:project_id>/edit",
-                #     "page_project_edit",
-                #     lambda project_id: frontend.ProjectFrontend(
-                #         self.mw.data_provider).edit_details(project_id)
-                # ),
                 Route(
                     "/project/create/",
                     "page_project_new",

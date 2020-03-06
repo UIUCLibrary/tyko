@@ -49,17 +49,25 @@ def test_view_web_object(app):
             content_type='application/json'
         ).get_json()['object']['object_id']
         # page_project_object_details
-        resulting_webpage = server.get(
+        resulting_webpage_from_project_object = server.get(
             url_for(
                 "page_project_object_details",
                 project_id=project_id,
                 object_id=object_id
             )
         )
-        assert resulting_webpage.status_code == 200
+        assert resulting_webpage_from_project_object.status_code == 200
         data = str(
-            resulting_webpage.data, encoding="utf-8")
+            resulting_webpage_from_project_object.data, encoding="utf-8")
         assert "my stupid object" in data
+
+        resulting_webpage_from_on_own = server.get(
+            url_for(
+                "page_object_details",
+                object_id=object_id
+            )
+        )
+        assert resulting_webpage_from_on_own.status_code == 200
 
 
 def test_view_web_project_details(app):
