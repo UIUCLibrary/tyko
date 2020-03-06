@@ -277,6 +277,16 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
         for note_type in self._data_connector.get_note_types():
             valid_note_types.append((note_type.name, note_type.id))
 
+        if "show_bread_crumb" in kwargs and kwargs['show_bread_crumb'] is True:
+            breadcrumbs = self.build_breadcrumbs(
+                active_level="Project",
+                project_url=url_for(
+                    "page_project_details",
+                    project_id=entity_id
+                )
+            )
+        else:
+            breadcrumbs = None
         return self.render_page(
             template="project_details.html",
             project=selected_project,
@@ -285,13 +295,8 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
             project_id=entity_id,
             valid_note_types=valid_note_types,
             fields=fields,
-            breadcrumbs=self.build_breadcrumbs(
-                active_level="Project",
-                project_url=url_for(
-                    "page_project_details",
-                    project_id=entity_id
-                )
-            ),
+            breadcrumbs=breadcrumbs,
+            show_bread_crumb=kwargs.get("show_bread_crumb"),
             collections=data_provider.CollectionDataConnector(
                 self._data_connector.session_maker).get(serialize=True)
             )
