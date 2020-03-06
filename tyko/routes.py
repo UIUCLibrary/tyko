@@ -342,7 +342,8 @@ class Routes:
                         "/object/<int:object_id>",
                         "page_object_details",
                         lambda object_id: frontend.ObjectFrontend(
-                            self.mw.data_provider).display_details(object_id)
+                            self.mw.data_provider).display_details(
+                                object_id, show_bread_crumb=False)
                     ),
                     Route(
                         "/object/<string:object_id>/edit",
@@ -365,7 +366,8 @@ class Routes:
                         "/item/<string:item_id>",
                         "page_item_details",
                         lambda item_id: frontend.ItemFrontend(
-                            self.mw.data_provider).display_details(item_id)
+                            self.mw.data_provider).display_details(
+                                item_id, show_bread_crumb=False)
                     ),
                 ]),
             EntityPage(
@@ -420,7 +422,8 @@ class Routes:
                     "/project/<int:project_id>/object/<int:object_id>",
                     "page_project_object_details",
                     lambda project_id, object_id: frontend.ObjectFrontend(
-                        self.mw.data_provider).display_details(object_id)
+                        self.mw.data_provider).display_details(
+                        object_id, show_bread_crumb=True)
                 ),
                 Route(
                     "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>",  # noqa: E501 pylint: disable=C0301
@@ -430,7 +433,8 @@ class Routes:
                         self.mw.data_provider).display_details(
                             item_id,
                             project_id=project_id,
-                            object_id=object_id)
+                            object_id=object_id,
+                            show_bread_crumb=True)
                 ),
                 Route(
                     "/project/<string:project_id>/edit",

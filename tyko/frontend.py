@@ -250,7 +250,6 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
     def list(self):
         return self.render_page(template="projects.html",
                                 api_path="api/project",
-                                row_table="projects"
                                 )
 
     @property
@@ -368,17 +367,19 @@ class ItemFrontend(ProjectComponentDetailFrontend):
         for f in fields:
             if f.source_key is not None:
                 selected_item[f.key] = f.source_key()
-
-        breadcrumbs = self.build_breadcrumbs(
-            active_level="Item",
-            project_url=url_for(
-                "page_project_details",
-                project_id=kwargs["project_id"]),
-            item_url="",
-            object_url=url_for(
-                "page_object_details",
-                object_id=kwargs['object_id'])
-        )
+        if "show_bread_crumb" in kwargs and kwargs['show_bread_crumb'] is True:
+            breadcrumbs = self.build_breadcrumbs(
+                active_level="Item",
+                project_url=url_for("page_project_details",
+                                    project_id=kwargs["project_id"]
+                                    ) if "project_id" in kwargs else None,
+                item_url="",
+                object_url=url_for("page_project_object_details",
+                                   project_id=kwargs["project_id"],
+                                   object_id=selected_item['parent_object_id'])
+            )
+        else:
+            breadcrumbs = None
 
         valid_note_types = []
         for note_type in self._data_connector.get_note_types():
@@ -388,9 +389,10 @@ class ItemFrontend(ProjectComponentDetailFrontend):
             template="item_details.html",
             project_id=kwargs.get("project_id"),
             valid_note_types=valid_note_types,
-            object_id=kwargs.get("object_id"),
+            object_id=selected_item['parent_object_id'],
             fields=fields,
             breadcrumbs=breadcrumbs,
+            show_bread_crumb=kwargs.get('show_bread_crumb'),
             api_path=api_path,
             item=selected_item)
 
@@ -498,14 +500,8 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
             selected_object['project_name'] = project_name
             selected_object['project_id'] = project_id
 
-        return self.render_page(
-            template="object_details.html",
-            edit=False,
-            fields=fields,
-            formats=self._data_provider.get_formats(serialize=True),
-            api_path=url_for('object_by_id', id=entity_id),
-            valid_note_types=valid_note_types,
-            breadcrumbs=self.build_breadcrumbs(
+        if "show_bread_crumb" in kwargs and kwargs["show_bread_crumb"] is True:
+            breadcrumbs = self.build_breadcrumbs(
                 "Object",
                 project_url=url_for(
                     "page_project_details",
@@ -516,7 +512,18 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
                     project_id=project['project_id'],
                     object_id=selected_object['object_id']
                 )
-            ),
+            )
+        else:
+            breadcrumbs = None
+        return self.render_page(
+            template="object_details.html",
+            edit=False,
+            fields=fields,
+            formats=self._data_provider.get_formats(serialize=True),
+            api_path=url_for('object_by_id', id=entity_id),
+            valid_note_types=valid_note_types,
+            breadcrumbs=breadcrumbs,
+            show_bread_crumb=kwargs.get("show_bread_crumb"),
             object=selected_object)
 
     def render_page(self, template="object_details.html", **context):
