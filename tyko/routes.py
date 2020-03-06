@@ -411,15 +411,15 @@ class Routes:
                     "page_project_details",
                     lambda project_id: frontend.ProjectFrontend(
                         self.mw.data_provider).display_details(
-                        project_id,
-                        show_bread_crumb=True)
+                            project_id,
+                            show_bread_crumb=True)
                 ),
                 Route(
                     "/project/<int:project_id>/object/<int:object_id>",
                     "page_project_object_details",
                     lambda project_id, object_id: frontend.ObjectFrontend(
                         self.mw.data_provider).display_details(
-                        object_id, show_bread_crumb=True)
+                            object_id, show_bread_crumb=True)
                 ),
                 Route(
                     "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>",  # noqa: E501 pylint: disable=C0301
