@@ -303,20 +303,6 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
                 self._data_connector.session_maker).get(serialize=True)
             )
 
-    def edit_details(self, entity_id):
-        selected_project = self._data_connector.get(
-            serialize=True, id=entity_id)[0]
-
-        api_path = f"{url_for('.page_index')}api/project/{entity_id}"
-        view_details_path = f"{url_for('page_projects')}/{entity_id}"
-
-        return self.render_page(template="project_details.html",
-                                project=selected_project,
-                                api_path=api_path,
-                                view_details_path=view_details_path,
-                                edit=True)
-
-    def create(self):
         return self.render_page(template="new_project.html",
                                 api_path="/api/project/",
                                 title="New Project",
@@ -427,19 +413,6 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
                                 title="New Object",
                                 on_success_redirect_base="/object/",
                                 )
-
-    def edit_details(self, entity_id):
-        selected_object = self._data_connector.get(
-            serialize=True, id=entity_id)[0]
-        edit_link = f"{url_for('page_object')}/{entity_id}/edit"
-        api_path = f"{url_for('.page_index')}api/object/{entity_id}"
-        view_details_path = f"{url_for('page_object')}/{entity_id}"
-        return self.render_page(template="object_details.html",
-                                object=selected_object,
-                                api_path=api_path,
-                                view_details_path=view_details_path,
-                                edit_link=edit_link,
-                                edit=True)
 
     @property
     def entity_title(self) -> str:
