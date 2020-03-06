@@ -62,6 +62,22 @@ def test_view_web_object(app):
         assert "my stupid object" in data
 
 
+def test_view_web_project_details(app):
+    with app.test_client() as server:
+        project_id = server.post(
+            "/api/project/",
+            data=json.dumps(
+                {
+                    "title": "my dumb project",
+                }
+            ),
+            content_type='application/json'
+        ).get_json()['id']
+        project_page_resp = server.get(
+            url_for("page_project_details", project_id=project_id)
+        )
+        assert project_page_resp.status_code == 200
+
 def test_view_web_item(app):
     with app.test_client() as server:
         project_id = server.post(
