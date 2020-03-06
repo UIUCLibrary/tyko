@@ -303,6 +303,7 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
                 self._data_connector.session_maker).get(serialize=True)
             )
 
+    def create(self):
         return self.render_page(template="new_project.html",
                                 api_path="/api/project/",
                                 title="New Project",
