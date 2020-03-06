@@ -157,6 +157,14 @@ def test_view_web_item(app):
         data = str(resulting_webpage.data, encoding="utf-8")
         assert "My dummy item" in data
 
+        resulting_webpage_from_on_own = server.get(
+            url_for(
+                "page_item_details",
+                item_id=new_item_data['item_id']
+            )
+        )
+        assert resulting_webpage_from_on_own.status_code == 200
+
 
 @pytest.fixture()
 def breadcrumb_builder_with_project():
