@@ -185,17 +185,19 @@ class FrontendEntity(AbsFrontend):
     @property
     @abc.abstractmethod
     def entity_title(self) -> str:
-        pass
+        """Title of the entity as it's meant to be displayed to the user"""
 
     @property
     @abc.abstractmethod
     def entity_rule(self) -> str:
-        pass
+        """The Rule use to look up webpage that displays the details of the
+        entity
+        """
 
     @property
     @abc.abstractmethod
     def entity_list_page_name(self) -> str:
-        pass
+        """The Rule to website that display a list of the given entity"""
 
     @classmethod
     def all_entities(cls):
