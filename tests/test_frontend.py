@@ -39,11 +39,23 @@ def test_view_web_object(app):
             ),
             content_type='application/json'
         ).get_json()['id']
+
+        collection_id = server.post(
+           url_for("add_collection"),
+            data=json.dumps(
+                {
+                    "collection_name": "my dumb collection",
+                }
+            ),
+            content_type='application/json'
+        ).get_json()['id']
+
         object_id = server.post(
             url_for("project_add_object", project_id=project_id),
             data=json.dumps(
                 {
                     "name": "my stupid object",
+                    "collection_id": collection_id
                 }
             ),
             content_type='application/json'
