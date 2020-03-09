@@ -160,7 +160,6 @@ class EditWidget extends Widgets{
     }
 
     cancel(parent){
-        console.log("Canceled");
         parent.swap();
     }
     _newConfirmationButton(confirmButtonId, inputElement) {
