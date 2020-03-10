@@ -1,4 +1,4 @@
-import {MetadataWidget} from "../tyko/static/js/widgets";
+import {getWidget} from "../tyko/static/js/widgets";
 
 describe('Testing widgets', ()=> {
     let metadataWidget;
@@ -8,11 +8,12 @@ describe('Testing widgets', ()=> {
             '<div id="sample">' +
 
             '</div>';
-        metadataWidget = new MetadataWidget(
+        metadataWidget = getWidget(
+            "textEditor",
             document.getElementById("sample"),
             "sampleField",
             "Sample text"
-        );
+            );
     });
 
 
@@ -46,5 +47,20 @@ describe('Testing widgets', ()=> {
     test("Metadata API setter", ()=>{
         metadataWidget.apiRoute = "/api/item/2";
         expect(metadataWidget.apiRoute).toBe("/api/item/2");
+    })
+});
+
+describe("Widget factory", ()=>{
+    beforeEach(()=>{
+        document.body.innerHTML =
+            '<div id="sample">' +
+
+            '</div>';
+    });
+    test("Get widgets", ()=>{
+        console.log("HERe");
+        const sampleElement = document.getElementById("sample");
+        let res = getWidget("textEditor", sampleElement, "sampleField", "Sample text");
+        expect(res.inputType).toBe("text");
     })
 });
