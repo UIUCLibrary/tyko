@@ -301,7 +301,7 @@ class TextEditorPartFactory{
         }
         if (type === "editState"){
             return ()=>{
-                rootElement._state = new TextEditWidget(baseWidget);
+                rootElement._state = new TextEditWidget(rootElement);
                 rootElement._state.draw(rootElement.element, rootElement._data);
             }
         }
