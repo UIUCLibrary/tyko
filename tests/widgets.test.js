@@ -32,6 +32,21 @@ describe('Testing text widget', ()=> {
         expect(metadataWidget.stateName()).toBe("edit");
     });
 
+    test("Swaps back to view mode after being in edit mode", ()=>{
+        expect(metadataWidget.stateName()).toBe("view");
+
+        metadataWidget.swap();
+        expect(metadataWidget.stateName()).toBe("edit");
+
+        metadataWidget.swap();
+        expect(metadataWidget.stateName()).toBe("view");
+    });
+
+    test("Selecting edit mode changed it to edit mode", ()=>{
+        expect(metadataWidget.stateName()).toBe("view");
+        metadataWidget.editMode();
+        expect(metadataWidget.stateName()).toBe("edit");
+    });
 
     test("Edit has an input element", ()=>{
         metadataWidget.swap();
@@ -47,7 +62,9 @@ describe('Testing text widget', ()=> {
     test("Metadata API setter", ()=>{
         metadataWidget.apiRoute = "/api/item/2";
         expect(metadataWidget.apiRoute).toBe("/api/item/2");
-    })
+    });
+
+
 });
 
 describe("test select widget", ()=>{
