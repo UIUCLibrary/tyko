@@ -266,51 +266,8 @@ class TextEditWidget extends WidgetEditState{
         element.appendChild(newRoot);
         this.setupEventListeners(element.id);
     }
-
-
-
-
-
-    // _newConfirmationButton(confirmButtonId, inputElement) {
-    //     let confirmationButtons = this.confirmChangesGroup();
-    //
-    //     const parent = this._parent;
-    //
-    //     let confirmButton = document.createElement("button");
-    //     confirmButton.innerText = "Confirm";
-    //     confirmButton.setAttribute("class", "btn btn-outline-secondary");
-    //     confirmButton.setAttribute("id", confirmButtonId);
-    //
-    //     const accept = this.accept;
-    //     confirmButton.onclick = function(){
-    //       accept(parent, inputElement.value)
-    //     };
-    //
-    //     confirmationButtons.appendChild(confirmButton);
-    //
-    //     let cancelButton = document.createElement("button");
-    //     cancelButton.innerText = "Cancel";
-    //     cancelButton.setAttribute("class", "btn btn-outline-secondary");
-    //
-    //     const cancel = this.cancel;
-    //     cancelButton.onclick = function(){
-    //         cancel(parent);
-    //
-    //     };
-    //
-    //     confirmationButtons.appendChild(cancelButton);
-    //
-    //     return confirmationButtons;
-    // }
-
-
 }
 
-class PartFactory {
-    constructor(type, rootElement) {
-        throw  `${this.constructor.name } doesn't know how construct type ${type}`;
-    }
-}
 class SelectEditorPartFactory{
     constructor(type, rootElement) {
 
