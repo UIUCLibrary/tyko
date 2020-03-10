@@ -28,6 +28,9 @@ class absMetadataWidget {
         }
         return this._onEdited;
     }
+    get state(){
+        return this._state._type;
+    }
 }
 
 class WidgetState{
@@ -61,6 +64,10 @@ class WidgetState{
     }
 }
 class WidgetEditState extends WidgetState{
+    constructor(parentClass) {
+        super(parentClass);
+        this._type = "edit";
+    }
     accept(parent, data){
         parent.onEdited(data);
         parent.viewOnlyMode();
@@ -157,8 +164,6 @@ class ViewWidget extends WidgetState{
         }
     }
 
-
-
     draw(element, data){
         element.innerHTML = "";
         let newRoot = this.newRoot();
@@ -208,7 +213,7 @@ class SelectEditWidget extends WidgetEditState {
         const inputId = `input${data['fieldName']}`;
         newRoot.appendChild(this.newInputLabel(inputId));
 
-        let inputElement = this._newSelect(this._parent.options, data['fieldText']);
+        let inputElement = this._newSelect(this._parent.options, data['fieldText'], data['fieldName']);
 
         newRoot.appendChild(inputElement);
         const confirmButtonID = `${data['fieldName']}ConfirmButton`;
@@ -217,8 +222,10 @@ class SelectEditWidget extends WidgetEditState {
         this.setupEventListeners(element.id);
     }
 
-    _newSelect(options, selected) {
+    _newSelect(options, selected, fieldName) {
+        const selectionId = `${fieldName}Select`;
         let inputElement = document.createElement("select");
+        inputElement.setAttribute("id", selectionId);
         inputElement.setAttribute("class", "form-control");
         options.forEach(option =>{
             let optionElement = document.createElement("option");
@@ -236,7 +243,6 @@ class TextEditWidget extends WidgetEditState{
 
     constructor(parentClass) {
         super(parentClass);
-        this._type = "edit";
     }
 
 
@@ -318,11 +324,9 @@ class SelectEditorPartFactory{
         }
         if (type === "editState") {
             return () => {
-                return () => {
-                    rootElement._state = new SelectEditWidget(rootElement);
-                    rootElement._state.draw(rootElement.element, rootElement._data);
-                }
-            };
+                rootElement._state = new SelectEditWidget(rootElement);
+                rootElement._state.draw(rootElement.element, rootElement._data);
+            }
         }
 
     }
