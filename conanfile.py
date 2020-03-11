@@ -37,10 +37,14 @@ class TykoConan(ConanFile):
             self.options["qt"].opengl = "dynamic"
 
     def imports(self):
-        self.copy("*.dll", "bin", "bin")
+        self.copy("*.dll", "", "bin")
         self.copy("*.dylib", "lib", "lib")
-        self.copy("*.dll", "plugins\platforms", "platforms")
-        self.copy("*.*", "QtQuick/Controls/", "qml/QtQuick/Controls")
+        self.copy("*.dll", "platforms/", "plugins/platforms")
+        self.copy("builtins.qmltypes", "qml/", "qml")
+        self.copy("*", "qml/QtQuick", "qml/QtQuick")
+        self.copy("*", "qml/QtQml", "qml/QtQml")
+        self.copy("*", "qml/QtQuick.2", "qml/QtQuick.2")
 
     def package(self):
         self.copy("avdatabaseEditor", "bin", "")
+        self.copy("avdatabaseEditor.exe", "", "")
