@@ -4,6 +4,11 @@ from conans import ConanFile, CMake
 
 
 class TykoConan(ConanFile):
+    name = "Tyko QML client"
+    version = "0.0.1a1"
+    url = "https://github.com/UIUCLibrary/tyko"
+    license = "University of Illinois/NCSA Open Source License"
+    author = 'University Library at The University of Illinois at Urbana Champaign: Preservation Services'
     settings = "os", "arch", "compiler", "build_type"
     generators = ["cmake_paths"]
     requires = [
