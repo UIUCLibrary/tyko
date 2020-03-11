@@ -178,7 +178,7 @@ foreach($file in $opengl32_libraries){
                     when {
                         anyOf{
                             equals expected: true, actual: params.BUILD_CLIENT
-                            changeset(pattern: "client/**,CI/build_VS2019/**")
+                            changeset(pattern: "client/**,CI/build_VS2019/**,conanfile.py")
                         }
                         beforeAgent true
                     }
