@@ -27,6 +27,10 @@ class TykoConan(ConanFile):
         cmake.configure()
         cmake.build()
 
+    def configure(self):
+        if self.settings.os == "Windows":
+            self.options["qt"].opengl = "dynamic"
+
     def imports(self):
         self.copy("*.dll", "bin", "bin")
         self.copy("*.dylib", "lib", "lib")
