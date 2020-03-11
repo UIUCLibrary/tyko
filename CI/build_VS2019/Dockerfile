@@ -31,6 +31,6 @@ RUN Set-ItemProperty -Path 'HKLM:\Software\Microsoft\Command Processor' -Name 'A
 RUN certutil -generateSSTFromWU roots.sst ; `
     certutil -addstore -f root roots.sst ; `
     del roots.sst
-COPY conanfile.txt C:/TEMP/
+COPY conanfile.py C:/TEMP/
 RUN conan install C:/TEMP/ --build  missing --no-import ;`
     conan remove * -b --src -f
