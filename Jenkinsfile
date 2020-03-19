@@ -424,7 +424,7 @@ pipeline {
                         stage("Audit npm") {
                             agent {
                               dockerfile {
-                                filename 'CI/npm_audit/Dockerfile'
+                                filename 'CI/jenkins/dockerfiles/npm_audit/Dockerfile'
                                 label "linux && docker"
                                 additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
                               }
