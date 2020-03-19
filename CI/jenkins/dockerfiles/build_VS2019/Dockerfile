@@ -6,7 +6,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 ARG CHOCOLATEY_REPO=https://chocolatey.org/api/v2
 
 ARG ChocolateyEnvironmentDebug=false
-ADD CI/shared/install_choco.ps1 choco/install_choco.ps1
+ADD CI/jenkins/dockerfiles/shared/install_choco.ps1 choco/install_choco.ps1
 RUN Set-ExecutionPolicy Bypass -Scope Process -Force; ./choco/install_choco.ps1 -packageRepo $env:CHOCOLATEY_REPO ; `
     choco source remove -n chocolatey ; choco source add -n=chocolatey_repo -s=\"$env:CHOCOLATEY_REPO\" ; `
     Remove-Item C:\ProgramData\chocolatey\bin\cpack.exe
