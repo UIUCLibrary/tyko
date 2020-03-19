@@ -95,7 +95,7 @@ pipeline {
                 stage("Building Server"){
                     agent {
                       dockerfile {
-                        filename 'CI/server_testing/Dockerfile'
+                        filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
                         label "linux && docker"
                       }
                     }
@@ -266,7 +266,7 @@ pipeline {
                         stage("PyTest"){
                             agent {
                               dockerfile {
-                                filename 'CI/server_testing/Dockerfile'
+                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
                                 label "linux && docker"
                               }
                             }
@@ -310,7 +310,7 @@ pipeline {
                             }
                             agent {
                               dockerfile {
-                                filename 'CI/server_testing/Dockerfile'
+                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
                                 label "linux && docker"
                               }
                             }
@@ -350,7 +350,7 @@ pipeline {
                         stage("Run MyPy Static Analysis") {
                             agent {
                               dockerfile {
-                                filename 'CI/server_testing/Dockerfile'
+                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
                                 label "linux && docker"
                               }
                             }
@@ -385,7 +385,7 @@ pipeline {
                         stage("Run Bandit Static Analysis") {
                             agent {
                               dockerfile {
-                                filename 'CI/server_testing/Dockerfile'
+                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
                                 label "linux && docker"
                               }
                             }
@@ -441,7 +441,7 @@ pipeline {
                         stage("Run Flake8 Static Analysis") {
                             agent {
                               dockerfile {
-                                filename 'CI/server_testing/Dockerfile'
+                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
                                 label "linux && docker"
                               }
                             }
@@ -474,7 +474,7 @@ pipeline {
                         stage("Run Pylint Static Analysis") {
                             agent {
                               dockerfile {
-                                filename 'CI/server_testing/Dockerfile'
+                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
                                 label "linux && docker"
                               }
                             }
@@ -654,7 +654,7 @@ pipeline {
                 stage("Creating Python Packages"){
                     agent {
                       dockerfile {
-                        filename 'CI/server_testing/Dockerfile'
+                        filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
                         label "linux && docker"
                       }
                     }
