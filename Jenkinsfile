@@ -115,7 +115,7 @@ pipeline {
                 stage("Build Client Software"){
                     agent {
                       dockerfile {
-                        filename 'CI/build_VS2019/Dockerfile'
+                        filename 'CI/jenkins/dockerfiles/build_VS2019/Dockerfile'
                         label "windows && docker"
                       }
                     }
