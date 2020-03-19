@@ -565,7 +565,7 @@ pipeline {
                 stage("Run SonarQube Analysis"){
                     agent{
                         dockerfile {
-                            filename 'CI/sonarqube/scanner/Dockerfile'
+                            filename 'CI/jenkins/dockerfiles/sonarqube/scanner/Dockerfile'
                             label "linux && docker"
                             additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
                             }
