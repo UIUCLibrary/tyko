@@ -13,10 +13,10 @@ class AbsFactory(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def middleware(self):
         """Middleware for the a given entity"""
-
-    @abc.abstractmethod
-    def web_frontend(self) -> frontend.FrontendEntity:
-        """Web front tne for displaying the information in a browser"""
+    #
+    # @abc.abstractmethod
+    # def web_frontend(self) -> frontend.FrontendEntity:
+    #     """Web front tne for displaying the information in a browser"""
 
 
 class EntityComponent(NamedTuple):
@@ -28,16 +28,16 @@ class ProjectFactory(AbsFactory):
     def middleware(self) -> middleware.AbsMiddlwareEntity:
         return middleware.ProjectMiddlwareEntity(self._data_provider)
 
-    def web_frontend(self) -> frontend.FrontendEntity:
-        return frontend.ProjectFrontend(self._data_provider)
+    # def web_frontend(self) -> frontend.FrontendEntity:
+    #     return frontend.ProjectFrontend(self._data_provider)
 
 
 class ItemFactory(AbsFactory):
     def middleware(self) -> middleware.AbsMiddlwareEntity:
         return middleware.ItemMiddlwareEntity(self._data_provider)
 
-    def web_frontend(self) -> frontend.FrontendEntity:
-        return frontend.ItemFrontend(self._data_provider)
+    # def web_frontend(self) -> frontend.FrontendEntity:
+    #     return frontend.ItemFrontend(self._data_provider)
 
 
 class CollectionFactory(AbsFactory):
@@ -45,17 +45,17 @@ class CollectionFactory(AbsFactory):
     def middleware(self):
         return middleware.CollectionMiddlwareEntity(self._data_provider)
 
-    def web_frontend(self) -> frontend.FrontendEntity:
-        return frontend.CollectiontFrontend(self._data_provider)
-
+    # def web_frontend(self) -> frontend.FrontendEntity:
+    #     return frontend.CollectiontFrontend(self._data_provider)
+    #
 
 class ObjectFactory(AbsFactory):
 
     def middleware(self):
         return middleware.ObjectMiddlwareEntity(self._data_provider)
 
-    def web_frontend(self) -> frontend.FrontendEntity:
-        return frontend.ObjectFrontend(self._data_provider)
+    # def web_frontend(self) -> frontend.FrontendEntity:
+    #     return frontend.ObjectFrontend(self._data_provider)
 
 
 def load_entity(name, provider: data_provider.DataProvider) \
@@ -70,8 +70,8 @@ class NotesFactory(AbsFactory):
     def middleware(self):
         return middleware.NotestMiddlwareEntity(self._data_provider)
 
-    def web_frontend(self) -> frontend.FrontendEntity:
-        pass
+    # def web_frontend(self) -> frontend.FrontendEntity:
+    #     pass
 
 
 all_entities = {
