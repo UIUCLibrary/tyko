@@ -7,7 +7,6 @@ from flask import jsonify, render_template, views
 from . import middleware
 from .data_provider import DataProvider
 from . import frontend
-from . import entities
 
 
 @dataclass
@@ -175,9 +174,10 @@ class Routes:
 
         if self.app:
             project = middleware.ProjectMiddlwareEntity(self.db_engine)
-            collection = entities.load_middleware("collection", self.db_engine)
+            collection = middleware.CollectionMiddlwareEntity(self.db_engine)
             item = middleware.ItemMiddlwareEntity(self.db_engine)
-            notes = entities.load_middleware("notes", self.db_engine)
+            notes = middleware.NotestMiddlwareEntity(self.db_engine)
+
             project_object = middleware.ObjectMiddlwareEntity(self.db_engine)
             api_entities = [
                 APIEntity("Projects", rules=[
