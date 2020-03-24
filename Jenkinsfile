@@ -778,6 +778,7 @@ pipeline {
                         equals expected: true, actual: params.DEPLOY_SERVER
                         beforeInput true
                     }
+//                     TODO: have a option the the user selects server a or server b
                     input {
                       message 'Deploy to server'
                       parameters {
@@ -838,6 +839,10 @@ pipeline {
                                     sshCommand remote: remote, command: "mv ./package/tyko-${props.Version}/* ./package/"
                                     sshPut remote: remote, from: 'deploy', into: './package/'
                                     sshPut remote: remote, from: 'database', into: './package/'
+
+//                                     TODO: Deploy the compose file based on the selection provided by the user
+// (for example deploy/docker-compose.yml and docker-compose.a.yml for server A )
+
                                     sshCommand remote: remote, command: """cd package &&
         docker-compose -f deploy/docker-compose.yml -p avdatabase build &&
         docker-compose -f deploy/docker-compose.yml -p avdatabase up -d"""
