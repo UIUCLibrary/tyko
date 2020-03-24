@@ -2,7 +2,6 @@ import abc
 import warnings
 from typing import NamedTuple, Type
 
-from . import frontend
 from . import middleware
 from . import data_provider
 
