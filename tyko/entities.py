@@ -1,4 +1,5 @@
 import abc
+import warnings
 from typing import NamedTuple, Type
 
 from . import frontend
@@ -44,10 +45,15 @@ class ObjectFactory(AbsFactory):
 
 def load_entity(name, provider: data_provider.DataProvider) \
         -> AbsFactory:
-
+    warnings.warn("use load_middleware instead", DeprecationWarning)
     new_entity = all_entities[name][0](provider)
 
     return new_entity
+
+
+def load_middleware(name: str, provider: data_provider.DataProvider)  \
+        -> middleware.AbsMiddlwareEntity:
+    return all_entities[name][0](provider).middleware()
 
 
 class NotesFactory(AbsFactory):
