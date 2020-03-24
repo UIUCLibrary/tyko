@@ -173,13 +173,12 @@ class Routes:
 
     def init_api_routes(self) -> None:
 
-        project = entities.load_middleware("project", self.db_engine)
-        collection = entities.load_middleware("collection", self.db_engine)
-        item = entities.load_middleware("item", self.db_engine)
-        project_object = entities.load_middleware("object", self.db_engine)
-        notes = entities.load_middleware("notes", self.db_engine)
-
         if self.app:
+            project = middleware.ProjectMiddlwareEntity(self.db_engine)
+            collection = entities.load_middleware("collection", self.db_engine)
+            item = middleware.ItemMiddlwareEntity(self.db_engine)
+            notes = entities.load_middleware("notes", self.db_engine)
+            project_object = middleware.ObjectMiddlwareEntity(self.db_engine)
             api_entities = [
                 APIEntity("Projects", rules=[
                     Route("/api/project", "projects",
