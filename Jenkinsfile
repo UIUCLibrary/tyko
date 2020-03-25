@@ -786,7 +786,7 @@ pipeline {
 //                         string(defaultValue: 'avdatabase_db_1', description: 'Name of the container with the database', name: 'CONTAINER_NAME_DATABASE', trim: false)
                         credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
                         credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'TYKO_DB_CREDS', description: '', name: 'DATABASE_CREDS', required: false
-                        choice choices: ['green', 'blue'], description: 'Which server do you want to deploy this to?', name: 'SERVER'
+                        choice choices: ['green', 'blue'], description: 'Which server do you want to deploy this to?', name: 'SERVER_COLOR'
                       }
                     }
                     stages{
@@ -802,7 +802,7 @@ pipeline {
                                         remote.password = password
                                         remote.allowAnyHosts = true
                                     }
-                                    def CONTAINER_NAME_DATABASE = "tyko-${SERVER}_db_1"
+                                    def CONTAINER_NAME_DATABASE = "tyko_${SERVER_COLOR}_db_1"
                                     def backup_file_name = "tyko-${BRANCH_NAME}-${BUILD_NUMBER}-backup.sql"
                                     catchError(buildResult: 'SUCCESS', message: 'Unable to make a backup of database', stageResult: 'UNSTABLE') {
                                         withCredentials([usernamePassword(credentialsId: DATABASE_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
@@ -841,16 +841,13 @@ pipeline {
                                     sshPut remote: remote, from: 'deploy', into: './package/'
                                     sshPut remote: remote, from: 'database', into: './package/'
 
-//                                     TODO: Deploy the compose file based on the selection provided by the user
-// (for example deploy/docker-compose.yml and docker-compose.a.yml for server A )
-
                                     sshCommand remote: remote, command: """cd package &&
-        docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.${SERVER}.yml -p tyko-${SERVER} build &&
-        docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.${SERVER}.yml -p tyko-${SERVER} up -d"""
+        docker-compose -f deploy/docker-compose.yml -p tyko build api-${SERVER_COLOR} db-${SERVER_COLOR} &&
+        docker-compose -f deploy/docker-compose.yml -p tyko up webserver api-${SERVER_COLOR} db-${SERVER_COLOR} -d"""
                                     sshRemove remote: remote, path: "package", failOnError: false
-                                    if(SERVER == "green"){
+                                    if(SERVER_COLOR == "green"){
                                         addBadge(icon: 'success.gif', id: '', link: "http://${SERVER_URL}:8000/", text: 'Server Application Deployed')
-                                    } else if (SERVER == "blue"){
+                                    } else if (SERVER_COLOR == "blue"){
                                         addBadge(icon: 'success.gif', id: '', link: "http://${SERVER_URL}:8001/", text: 'Server Application Deployed')
                                     }
                                 }
