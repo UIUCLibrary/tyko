@@ -786,6 +786,7 @@ pipeline {
                         string(defaultValue: 'avdatabase_db_1', description: 'Name of the container with the database', name: 'CONTAINER_NAME_DATABASE', trim: false)
                         credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'henryUserName', description: '', name: 'SERVER_CREDS', required: false
                         credentials credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl', defaultValue: 'TYKO_DB_CREDS', description: '', name: 'DATABASE_CREDS', required: false
+                        choice choices: ['green', 'blue'], description: 'Which server do you want to deploy this to?', name: 'SERVER'
                       }
                     }
                     stages{
@@ -844,11 +845,15 @@ pipeline {
 // (for example deploy/docker-compose.yml and docker-compose.a.yml for server A )
 
                                     sshCommand remote: remote, command: """cd package &&
-        docker-compose -f deploy/docker-compose.yml -p avdatabase build &&
-        docker-compose -f deploy/docker-compose.yml -p avdatabase up -d"""
+        docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.${SERVER}.yml -p avdatabase-${SERVER} build &&
+        docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.${SERVER}.yml -p avdatabase-${SERVER} up -d"""
                                     sshRemove remote: remote, path: "package", failOnError: false
+                                    if(SERVER == "green"){
+                                        addBadge(icon: 'success.gif', id: '', link: "http://${SERVER_URL}:8000/", text: 'Server Application Deployed')
+                                    } else if (SERVER == "blue"){
+                                        addBadge(icon: 'success.gif', id: '', link: "http://${SERVER_URL}:8001/", text: 'Server Application Deployed')
+                                    }
                                 }
-                                addBadge(icon: 'success.gif', id: '', link: "http://${SERVER_URL}:8000/", text: 'Server Application Deployed')
                             }
                         }
                     }
