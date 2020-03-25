@@ -842,8 +842,8 @@ pipeline {
                                     sshPut remote: remote, from: 'database', into: './package/'
 
                                     sshCommand remote: remote, command: """cd package &&
-        docker-compose -f deploy/docker-compose.yml -p tyko build api-${SERVER_COLOR} db-${SERVER_COLOR} &&
-        docker-compose -f deploy/docker-compose.yml -p tyko up webserver api-${SERVER_COLOR} db-${SERVER_COLOR} -d"""
+        docker-compose -f deploy/docker-compose.yml -p tyko build ${SERVER_COLOR}_api ${SERVER_COLOR}_db &&
+        docker-compose -f deploy/docker-compose.yml -p tyko up webserver ${SERVER_COLOR}_api ${SERVER_COLOR}_db -d"""
                                     sshRemove remote: remote, path: "package", failOnError: false
                                     if(SERVER_COLOR == "green"){
                                         addBadge(icon: 'success.gif', id: '', link: "http://${SERVER_URL}:8000/", text: 'Server Application Deployed')
