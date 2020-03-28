@@ -49,9 +49,8 @@ RUN if [ ! -z "$TYKO_SERVER_COLOR" ]; \
         echo "TYKO_SERVER_COLOR = '${TYKO_SERVER_COLOR}'" >> /app/config.cfg; \
     fi
 
-#COPY deploy/tyko/start.sh /app/start.sh
-#RUN chmod +x /app/start.sh
-EXPOSE 8000
+
+EXPOSE 9182
 ENV TYKO_SETTINGS=/app/config.cfg
-HEALTHCHECK --start-period=5s CMD curl --fail http://localhost:8000/ || exit 1
-CMD gunicorn --workers=5  --bind 0.0.0.0:8000  "tyko.run:create_app()"
+HEALTHCHECK --start-period=5s CMD curl --fail http://localhost:9182/ || exit 1
+CMD gunicorn --workers=5  --bind 0.0.0.0:9182  "tyko.run:create_app()"
