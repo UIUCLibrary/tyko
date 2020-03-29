@@ -52,5 +52,6 @@ RUN if [ ! -z "$TYKO_SERVER_COLOR" ]; \
 
 EXPOSE 9182
 ENV TYKO_SETTINGS=/app/config.cfg
+ADD deploy/tyko/gunicorn.conf.py gunicorn.conf.py
 HEALTHCHECK --start-period=5s CMD curl --fail http://localhost:9182/ || exit 1
-CMD gunicorn --workers=5  --bind 0.0.0.0:9182  "tyko.run:create_app()"
+CMD gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
