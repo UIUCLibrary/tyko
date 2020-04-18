@@ -196,7 +196,7 @@ pipeline {
                             }
                             steps{
                                 sh "mkdir -p reports"
-                                catchError(buildResult: 'UNSTABLE', message: 'Did not pass all pydocstyle tests', stageResult: 'UNSTABLE') {
+                                catchError(buildResult: 'SUCCESS', message: 'Did not pass all pydocstyle tests', stageResult: 'UNSTABLE') {
                                     sh(
                                         label: "Run PyTest",
                                         script: "pydocstyle tyko > reports/pydocstyle-report.txt"
