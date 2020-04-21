@@ -478,7 +478,7 @@ pipeline {
                             }
                             steps{
                                 sh "mkdir -p reports"
-                                sh "echo /home/user/.bashrc"
+                                sh "cat /home/user/.bashrc"
                                 sh "which eslint"
                                 sh(
                                     label:  "Running eslint",
