@@ -14,6 +14,7 @@ jobs:
           node-version: '12.x'
       - run: npm install -y
       - run: mkdir -p reports
+      - run: find . -name "eslint"
       - run: ./node_modules/.bin/eslint -f json -o reports/eslint_report.json tyko/static/js/
       - name: Upload ESlint report
         uses: actions/upload-artifact@v1
