@@ -490,7 +490,6 @@ pipeline {
                                 always{
                                     archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
                                     recordIssues(tools: [esLint(pattern: 'reports/eslint.xml')])
-
                                 }
                                 cleanup{
                                     cleanWs(
