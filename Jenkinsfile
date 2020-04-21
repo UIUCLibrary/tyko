@@ -479,10 +479,10 @@ pipeline {
                             steps{
                                 sh "mkdir -p reports"
                                 sh("npm install  -y")
-                                sh("find . -name 'eslint'")
+//                                 sh("find . -name 'eslint'")
                                 sh(
                                     label:  "Running eslint",
-                                    script: "eslint --format checkstyle tyko/static/js/ > reports/eslint.xml"
+                                    script: "./node_modules/.bin/eslint --format checkstyle tyko/static/js/ > reports/eslint.xml"
                                 )
                             }
                             post{
