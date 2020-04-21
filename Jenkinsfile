@@ -479,11 +479,12 @@ pipeline {
                             steps{
                                 sh "mkdir -p reports"
                                 sh("npm install  -y")
-//                                 sh("find . -name 'eslint'")
-                                sh(
-                                    label:  "Running eslint",
-                                    script: "./node_modules/.bin/eslint --format checkstyle tyko/static/js/ > reports/eslint.xml"
-                                )
+                                catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
+                                    sh(
+                                        label:  "Running ESlint",
+                                        script: "./node_modules/.bin/eslint --format checkstyle tyko/static/js/ -o reports/eslint.xml"
+                                    )
+                                }
                             }
                             post{
                                 always{
