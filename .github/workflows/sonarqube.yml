@@ -13,8 +13,9 @@ jobs:
         with:
           node-version: '12.x'
       - run: npm install -y
+      - run: mkdir -p reports
       - run: ./node_modules/.bin/eslint -f json -o reports/eslint_report.json tyko/static/js/
-      - name: Upload Jest coverage report
+      - name: Upload ESlint report
         uses: actions/upload-artifact@v1
         with:
          name: eslint-report
