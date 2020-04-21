@@ -479,6 +479,7 @@ pipeline {
                             steps{
                                 sh "mkdir -p reports"
                                 sh("npm install  -y")
+                                sh("find . -file 'eslint'")
                                 sh(
                                     label:  "Running eslint",
                                     script: "eslint --format checkstyle tyko/static/js/ > reports/eslint.xml"
