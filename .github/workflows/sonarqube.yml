@@ -156,7 +156,7 @@ jobs:
         path: reports/bandit-report.json
 
   sonarCloudTrigger:
-    needs: [pytest,jest,pylint,bandit]
+    needs: [pytest,jest,pylint,bandit,eslint]
     name: SonarCloud Trigger
     runs-on: ubuntu-latest
     steps:
@@ -172,6 +172,11 @@ jobs:
       with:
         name: jest-coverage
         path: coverage
+    - name: Get ESlint report
+      uses: actions/download-artifact@v1
+      with:
+        name: eslint-report
+        path: reports
     - name: Get Jest xunit report
       uses: actions/download-artifact@v1
       with:
