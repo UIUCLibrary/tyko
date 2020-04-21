@@ -16,6 +16,7 @@ jobs:
       - run: mkdir -p reports
       - run: ./node_modules/.bin/eslint -f json -o reports/eslint_report.json tyko/static/js/
         continue-on-error: true
+      - run : sed -i 's/\/home\/runner\/work\/tyko\/tyko/\/github\/workspace/g' reports/eslint_report.json
       - name: Upload ESlint report
         uses: actions/upload-artifact@v1
         with:
