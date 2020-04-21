@@ -478,12 +478,9 @@ pipeline {
                             }
                             steps{
                                 sh "mkdir -p reports"
-                                sh 'echo $PATH'
-                                sh 'source ~/.bashrc'
-                                sh "which eslint"
                                 sh(
                                     label:  "Running eslint",
-                                    script: "eslint --format checkstyle tyko/static/js/ > reports/eslint.xml"
+                                    script: "/home/user/node_modules/.bin//eslint --format checkstyle tyko/static/js/ > reports/eslint.xml"
                                 )
                             }
                             post{
