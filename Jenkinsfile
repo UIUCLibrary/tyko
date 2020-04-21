@@ -480,6 +480,7 @@ pipeline {
                                 sh "mkdir -p reports"
                                 sh "cat /home/user/.bashrc"
                                 sh 'echo $PATH'
+                                sh 'source ~/.bashrc'
                                 sh "which eslint"
                                 sh(
                                     label:  "Running eslint",
