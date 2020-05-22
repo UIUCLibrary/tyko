@@ -155,6 +155,28 @@ jobs:
       with:
         name: bandit-report
         path: reports/bandit-report.json
+  flake8:
+    name: Check code style
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+          python-version: 3.7
+    - name: Cache python dependendies
+      uses: actions/cache@v1
+      id: cache
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt flake8
 
   sonarCloudTrigger:
     needs: [pytest,jest,pylint,bandit,eslint]
