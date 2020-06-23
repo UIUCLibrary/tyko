@@ -13,7 +13,7 @@ RUN Set-ExecutionPolicy Bypass -Scope Process -Force; `
     { `
         Write-Host "Adding $env:CHOCOLATEY_SOURCE to chocolatey sources" ; `
         choco source add -n=CHOCOLATEY_SOURCE --priority=1 -s=\"$env:CHOCOLATEY_SOURCE\"; `
-        choco source remove -n=chocolatey ;`
+        choco source remove -n=chocolatey ; `
     }; `
     Remove-Item C:\ProgramData\chocolatey\bin\cpack.exe ; `
     Remove-Item -Force -Recurse ${Env:TEMP}\*
