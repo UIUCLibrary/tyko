@@ -19,7 +19,7 @@ pipeline {
     }
     options {
         disableConcurrentBuilds()  //each branch has 1 job running at a time
-        timeout(180)  // Timeout after 180 minutes. This shouldn't take this long
+        timeout(time: 1, unit: 'DAYS')
         buildDiscarder logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '30', daysToKeepStr: '100', numToKeepStr: '100')
     }
     environment{
