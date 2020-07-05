@@ -139,10 +139,6 @@ pipeline {
             }
         }
         stage('Testing') {
-
-            options{
-                timeout(10)
-            }
             stages{
                 stage("Running Tests"){
                     parallel {
@@ -154,17 +150,19 @@ pipeline {
                               }
                             }
                             steps{
-                                sh "mkdir -p reports"
-                                catchError(buildResult: 'UNSTABLE', message: 'Did not pass all pytest tests', stageResult: 'UNSTABLE') {
-                                    sh(
-                                        label: "Run PyTest",
-                                        script: "coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml"
-                                    )
+                                timeout(10){
+                                    catchError(buildResult: 'UNSTABLE', message: 'Did not pass all pytest tests', stageResult: 'UNSTABLE') {
+                                        sh(
+                                            label: "Run PyTest",
+                                            script: '''mkdir -p reports
+                                                       coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml
+                                                    '''
+                                        )
+                                    }
                                 }
                             }
                             post {
                                 always{
-
                                     junit "reports/test-report.xml"
                                     sh "coverage combine"
                                     sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
@@ -195,13 +193,17 @@ pipeline {
                               }
                             }
                             steps{
-                                sh "mkdir -p reports"
-                                catchError(buildResult: 'SUCCESS', message: 'Did not pass all pydocstyle tests', stageResult: 'UNSTABLE') {
-                                    sh(
-                                        label: "Run PyTest",
-                                        script: "pydocstyle tyko > reports/pydocstyle-report.txt"
-                                    )
+                                timeout(10){
+                                    catchError(buildResult: 'SUCCESS', message: 'Did not pass all pydocstyle tests', stageResult: 'UNSTABLE') {
+                                        sh(
+                                            label: "Run PyTest",
+                                            script: '''mkdir -p reports
+                                                       pydocstyle tyko > reports/pydocstyle-report.txt
+                                                    '''
+                                        )
+                                    }
                                 }
+
                             }
                             post {
                                 always{
@@ -228,19 +230,21 @@ pipeline {
                               }
                             }
                             steps {
-                                sh "mkdir -p logs"
-                                script{
-                                    try{
-                                        sh (
-                                            label: "Run Tox",
-                                            script: "tox --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
-                                        )
+                                timeout(10){
+                                    sh "mkdir -p logs"
+                                    script{
+                                        try{
+                                            sh (
+                                                label: "Run Tox",
+                                                script: "tox --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
+                                            )
 
-                                    } catch (exc) {
-                                        sh(
-                                            label: "Run Tox with new environments",
-                                            script: "tox --recreate --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
-                                        )
+                                        } catch (exc) {
+                                            sh(
+                                                label: "Run Tox with new environments",
+                                                script: "tox --recreate --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -268,14 +272,16 @@ pipeline {
                               }
                             }
                             steps{
-                                sh "mkdir -p reports/mypy/html"
-                                sh "mkdir -p logs"
-                                tee('logs/mypy.log') {
-                                    catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            script: "mypy tyko --html-report reports/mypy/html",
-                                            label: "Running MyPy"
-                                            )
+                                timeout(10){
+                                    sh "mkdir -p reports/mypy/html"
+                                    sh "mkdir -p logs"
+                                    tee('logs/mypy.log') {
+                                        catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
+                                            sh(
+                                                script: "mypy tyko --html-report reports/mypy/html",
+                                                label: "Running MyPy"
+                                                )
+                                        }
                                     }
                                 }
                             }
@@ -303,12 +309,14 @@ pipeline {
                               }
                             }
                             steps{
-                                sh "mkdir -p reports"
-                                catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
-                                    sh(
-                                        label: "Running bandit",
-                                        script: "bandit --format json --output reports/bandit-report.json --recursive tyko ||  bandit -f html --recursive tyko --output reports/bandit-report.html"
-                                    )
+                                timeout(10){
+                                    sh "mkdir -p reports"
+                                    catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
+                                        sh(
+                                            label: "Running bandit",
+                                            script: "bandit --format json --output reports/bandit-report.json --recursive tyko ||  bandit -f html --recursive tyko --output reports/bandit-report.html"
+                                        )
+                                    }
                                 }
                             }
                             post {
@@ -343,11 +351,13 @@ pipeline {
                               }
                             }
                             steps{
-                                catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
-                                    sh(
-                                        label: "Running npm audit",
-                                        script: "npm audit"
-                                    )
+                                timeout(10){
+                                    catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
+                                        sh(
+                                            label: "Running npm audit",
+                                            script: "npm audit"
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -359,13 +369,15 @@ pipeline {
                               }
                             }
                             steps{
-                                sh "mkdir -p logs"
-                                catchError(buildResult: 'SUCCESS', message: 'Flake8 found issues', stageResult: 'UNSTABLE') {
+                                timeout(10){
+                                    sh "mkdir -p logs"
+                                    catchError(buildResult: 'SUCCESS', message: 'Flake8 found issues', stageResult: 'UNSTABLE') {
 
-                                    sh(
-                                        script: "flake8 tyko --tee --output-file=logs/flake8.log",
-                                        label: "Running Flake8"
-                                    )
+                                        sh(
+                                            script: "flake8 tyko --tee --output-file=logs/flake8.log",
+                                            label: "Running Flake8"
+                                        )
+                                    }
                                 }
                             }
                             post {
@@ -395,13 +407,14 @@ pipeline {
                                 PYLINTHOME="."
                             }
                             steps{
-                                sh "mkdir -p reports"
-
-                                catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
-                                    sh(
-                                        script: 'pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint_issues.txt',
-                                        label: "Running pylint"
-                                    )
+                                timeout(10){
+                                    sh "mkdir -p reports"
+                                    catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
+                                        sh(
+                                            script: 'pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint_issues.txt',
+                                            label: "Running pylint"
+                                        )
+                                    }
                                 }
                             }
                             post{
@@ -434,13 +447,15 @@ pipeline {
                                 JEST_JUNIT_ADD_FILE_ATTRIBUTE="true"
                             }
                             steps{
-                                sh "mkdir -p reports"
-                                sh("npm install  -y")
-                                withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
-                                    sh(
-                                        label:  "Running Jest",
-                                        script: "npm test --  --ci --reporters=default --reporters=jest-junit --collectCoverage"
-                                    )
+                                timeout(10){
+                                    sh "mkdir -p reports"
+                                    sh("npm install  -y")
+                                    withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
+                                        sh(
+                                            label:  "Running Jest",
+                                            script: "npm test --  --ci --reporters=default --reporters=jest-junit --collectCoverage"
+                                        )
+                                    }
                                 }
                             }
                             post{
@@ -477,13 +492,15 @@ pipeline {
                                 }
                             }
                             steps{
-                                sh "mkdir -p reports"
-                                sh("npm install  -y")
-                                catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
-                                    sh(
-                                        label:  "Running ESlint",
-                                        script: "./node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml"
-                                    )
+                                timeout(10){
+                                    sh "mkdir -p reports"
+                                    sh("npm install  -y")
+                                    catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
+                                        sh(
+                                            label:  "Running ESlint",
+                                            script: "./node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml"
+                                        )
+                                    }
                                 }
                             }
                             post{
@@ -506,10 +523,6 @@ pipeline {
             }
         }
         stage("Packaging") {
-
-            options{
-                timeout(10)
-            }
             failFast true
             parallel{
                 stage("Creating Python Packages"){
@@ -520,7 +533,9 @@ pipeline {
                       }
                     }
                     steps{
-                        sh script: "python setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist"
+                        timeout(10){
+                            sh script: "python setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist"
+                        }
                     }
                     post {
                         success {
@@ -537,50 +552,7 @@ pipeline {
                         }
                     }
                 }
-
-//                stage("Creating Package Installers for Client"){
-//                    agent{
-//                        label "Docker && Windows && 1903"
-//
-//                    }
-//                    when {
-//                        equals expected: true, actual: params.BUILD_CLIENT
-//                        beforeAgent true
-//                    }
-//                    environment{
-//                        DOCKER_PATH = tool name: 'Docker', type: 'org.jenkinsci.plugins.docker.commons.tools.DockerTool'
-//                        PATH = "${DOCKER_PATH};$PATH"
-//                    }
-//                    steps{
-//                            unstash "CLIENT_BUILD_DOCKER"
-//                            bat "if not exist dist mkdir dist"
-//                            bat(
-//                                label: "Running build command from CMake on node ${NODE_NAME}",
-//                                script: "docker run --rm -v \"${WORKSPACE}\\build:c:\\build:rw\" -v \"${WORKSPACE}\\dist:c:\\dist\" -v \"${WORKSPACE}\\scm:c:\\source:rw\" -v \"${WORKSPACE}\\scm\\CI\\shared_docker_scripts:c:\\ci_scripts:ro\" --workdir=\"c:\\build\" %DOCKER_IMAGE_TAG% cpack -G NSIS;WIX;ZIP -C Release --verbose"
-//                            )
-//
-//                    }
-//                    post{
-//                        cleanup{
-//                            cleanWs(
-//                                deleteDirs: true,
-//                                patterns: [
-//                                    [pattern: 'build', type: 'INCLUDE'],
-//                                    [pattern: 'dist', type: 'INCLUDE'],
-//                                    ]
-//                            )
-//                        }
-//                        failure{
-//                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/**/*.log'
-//                        }
-//                        success{
-//                            archiveArtifacts allowEmptyArchive: true, artifacts: 'build/*.exe,build/*.msi,build/*.zip'
-//                            stash includes: 'build/*.exe,build/*.msi,build/*.zip,', name: "CLIENT_INSTALLERS"
-//                        }
-//                    }
-//                }
             }
-
         }
         stage("Testing Package Installers"){
             agent {
@@ -603,7 +575,6 @@ pipeline {
                         )
                     }
                 }
-
             }
             post{
                 always{
