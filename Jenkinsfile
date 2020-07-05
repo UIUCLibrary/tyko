@@ -273,13 +273,14 @@ pipeline {
                             }
                             steps{
                                 timeout(10){
-                                    sh "mkdir -p reports/mypy/html"
-                                    sh "mkdir -p logs"
                                     tee('logs/mypy.log') {
                                         catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
                                             sh(
-                                                script: "mypy tyko --html-report reports/mypy/html",
-                                                label: "Running MyPy"
+                                                label: "Running MyPy",
+                                                script: '''mkdir -p reports/mypy/html
+                                                           mkdir -p logs
+                                                           mypy tyko --html-report reports/mypy/html
+                                                           '''
                                                 )
                                         }
                                     }
@@ -310,11 +311,11 @@ pipeline {
                             }
                             steps{
                                 timeout(10){
-                                    sh "mkdir -p reports"
                                     catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            label: "Running bandit",
-                                            script: "bandit --format json --output reports/bandit-report.json --recursive tyko ||  bandit -f html --recursive tyko --output reports/bandit-report.html"
+                                        sh(label: "Running bandit",
+                                            script: '''mkdir -p reports
+                                                       bandit --format json --output reports/bandit-report.json --recursive tyko ||  bandit -f html --recursive tyko --output reports/bandit-report.html
+                                                    '''
                                         )
                                     }
                                 }
@@ -370,12 +371,12 @@ pipeline {
                             }
                             steps{
                                 timeout(10){
-                                    sh "mkdir -p logs"
                                     catchError(buildResult: 'SUCCESS', message: 'Flake8 found issues', stageResult: 'UNSTABLE') {
-
                                         sh(
-                                            script: "flake8 tyko --tee --output-file=logs/flake8.log",
-                                            label: "Running Flake8"
+                                            label: "Running Flake8",
+                                            script: '''mkdir -p logs
+                                                       flake8 tyko --tee --output-file=logs/flake8.log
+                                                       '''
                                         )
                                     }
                                 }
@@ -408,11 +409,12 @@ pipeline {
                             }
                             steps{
                                 timeout(10){
-                                    sh "mkdir -p reports"
                                     catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
                                         sh(
-                                            script: 'pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint_issues.txt',
-                                            label: "Running pylint"
+                                            label: "Running pylint",
+                                            script: '''mkdir -p reports
+                                                       pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint_issues.txt
+                                                    '''
                                         )
                                     }
                                 }
@@ -448,12 +450,13 @@ pipeline {
                             }
                             steps{
                                 timeout(10){
-                                    sh "mkdir -p reports"
-                                    sh("npm install  -y")
                                     withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
                                         sh(
                                             label:  "Running Jest",
-                                            script: "npm test --  --ci --reporters=default --reporters=jest-junit --collectCoverage"
+                                            script: '''mkdir -p reports
+                                                       npm install  -y
+                                                       npm test --  --ci --reporters=default --reporters=jest-junit --collectCoverage
+                                                       '''
                                         )
                                     }
                                 }
@@ -493,12 +496,13 @@ pipeline {
                             }
                             steps{
                                 timeout(10){
-                                    sh "mkdir -p reports"
-                                    sh("npm install  -y")
                                     catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
                                         sh(
                                             label:  "Running ESlint",
-                                            script: "./node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml"
+                                            script: '''mkdir -p reports
+                                                       npm install  -y
+                                                       ./node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml
+                                                       '''
                                         )
                                     }
                                 }
@@ -534,7 +538,7 @@ pipeline {
                     }
                     steps{
                         timeout(10){
-                            sh script: "python setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist"
+                            sh(script: "python setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist")
                         }
                     }
                     post {
