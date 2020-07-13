@@ -14,9 +14,6 @@ def parseBanditReport(htmlReport){
 
 pipeline {
     agent none
-    triggers {
-        parameterizedCron '@daily % TEST_RUN_TOX=true'
-    }
     options {
         disableConcurrentBuilds()  //each branch has 1 job running at a time
         timeout(time: 1, unit: 'DAYS')
