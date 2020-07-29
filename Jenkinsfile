@@ -15,13 +15,9 @@ def parseBanditReport(htmlReport){
 pipeline {
     agent none
     options {
-        disableConcurrentBuilds()  //each branch has 1 job running at a time
         timeout(time: 1, unit: 'DAYS')
-        buildDiscarder logRotator(artifactDaysToKeepStr: '30', artifactNumToKeepStr: '30', daysToKeepStr: '100', numToKeepStr: '100')
     }
     environment{
-//         PKG_NAME = pythonPackageName(toolName: "CPython-3.7")
-//         PKG_VERSION = pythonPackageVersion(toolName: "CPython-3.7")
         DOC_ZIP_FILENAME = "${env.PKG_NAME}-${env.PKG_VERSION}.doc.zip"
         DEVPI = credentials("DS_devpi")
         DOCKER_IMAGE_TAG="tyko/${env.BRANCH_NAME.toLowerCase()}"
@@ -598,6 +594,9 @@ pipeline {
             }
         }
         stage("Deploy"){
+            options{
+                lock("tyko-deploy")
+            }
             parallel{
                 stage("Deploy Server"){
                     agent {
@@ -691,21 +690,4 @@ pipeline {
             }
         }
      }
-//     post {
-//        cleanup {
-//          cleanWs(
-//                deleteDirs: true,
-//                patterns: [
-//                    [pattern: 'dist', type: 'INCLUDE'],
-//                    [pattern: 'reports', type: 'INCLUDE'],
-//                    [pattern: 'logs', type: 'INCLUDE'],
-//                    [pattern: 'certs', type: 'INCLUDE'],
-//                    [pattern: 'mypy_stubs', type: 'INCLUDE'],
-//                    [pattern: '*tmp', type: 'INCLUDE'],
-//                    [pattern: "scm", type: 'INCLUDE'],
-//                    ]
-//                )
-//        }
-//      }
-
 }
