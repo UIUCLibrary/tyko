@@ -25,14 +25,9 @@ RUN C:\ProgramData\chocolatey\bin\choco.exe sources ; `
     C:\ProgramData\chocolatey\bin\choco.exe install -y --stoponfirstfailure --no-progress choco/packages.config ;`
     Remove-Item C:\Users\ContainerAdministrator\AppData\Local\Temp\chocolatey -Recurse ; `
     Remove-Item -Force -Recurse ${Env:TEMP}\* ; `
-    if (!(Test-Path 'C:\Program Files\CMake\bin\cmake.exe')) `
-    { `
-        throw 'cmake.exe not found' ; `
-    }; `
-    if (!(Test-Path 'C:\Program Files\Git\cmd\git.exe')) `
-    { `
-        throw 'git.exe not found' ; `
-    }; `
+    $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User') ; `
+    cmake --version ; `
+    git --version ; `
     if (! (Test-Path 'C:\BuildTools\Common7\Tools\VsDevCmd.bat')) `
     { `
         throw 'VsDevCmd.bat not found' ; `
