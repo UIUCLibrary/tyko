@@ -31,15 +31,33 @@ ARG CHOCOLATEY_REPO=https://chocolatey.org/api/v2
 
 ARG ChocolateyEnvironmentDebug=false
 ADD CI/jenkins/dockerfiles/shared/install_choco.ps1 choco/install_choco.ps1
-RUN Set-ExecutionPolicy Bypass -Scope Process -Force; ./choco/install_choco.ps1 -packageRepo $env:CHOCOLATEY_REPO ; `
-    choco source remove -n chocolatey ; choco source add -n=chocolatey_repo -s=\"$env:CHOCOLATEY_REPO\" ; `
-    Remove-Item C:\ProgramData\chocolatey\bin\cpack.exe
+RUN Set-ExecutionPolicy Bypass -Scope Process -Force; `
+    ./choco/install_choco.ps1 -packageRepo $env:CHOCOLATEY_SOURCE ; `
+    if( -not ([string]::IsNullOrEmpty($Env:CHOCOLATEY_SOURCE ))) `
+    { `
+        Write-Host "Adding $env:CHOCOLATEY_SOURCE to chocolatey sources" ; `
+        choco source add -n=CHOCOLATEY_SOURCE --priority=1 -s=\"$env:CHOCOLATEY_SOURCE\"; `
+        choco source remove -n=chocolatey ; `
+    }; `
+    Remove-Item C:\ProgramData\chocolatey\bin\cpack.exe ; `
+    Remove-Item -Force -Recurse ${Env:TEMP}\*
+
 
 # Install packages that can be installed by chocolatey
 ADD CI/jenkins/dockerfiles/build_VS2019/chocolatey/packages.config choco/packages.config
-RUN choco install -y choco/packages.config --no-progress --stoponfirstfailure;`
+RUN C:\ProgramData\chocolatey\bin\choco.exe sources ; `
+    C:\ProgramData\chocolatey\bin\choco.exe install -y --stoponfirstfailure --no-progress choco/packages.config ;`
     Remove-Item C:\Users\ContainerAdministrator\AppData\Local\Temp\chocolatey -Recurse ; `
+    Remove-Item -Force -Recurse ${Env:TEMP}\* ; `
+    $env:Path = [System.Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path','User') ; `
+    cmake --version ; `
+    git --version ; `
+    if (! (Test-Path 'C:\BuildTools\Common7\Tools\VsDevCmd.bat')) `
+    { `
+        throw 'VsDevCmd.bat not found' ; `
+    }; `
     Write-Host "Finished install packages with Chocolatey"
+
 
 # Install WiX toolset for making .msi installers and put the tools on the path
 ADD CI/jenkins/dockerfiles/build_VS2019/nuget/packages.config nuget/packages.config

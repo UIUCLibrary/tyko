@@ -4,7 +4,7 @@ ADD requirements.txt ./
 RUN pip install --no-cache-dir \
     "tox<3.10" \
     pytest \
-    pytest-bdd \
+    "pytest-bdd<4.0" \
     bandit \
     mypy \
     flake8 \
