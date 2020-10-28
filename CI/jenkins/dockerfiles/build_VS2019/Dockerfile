@@ -72,7 +72,7 @@ RUN conan install c:/temp/ --build missing --no-import  ; `
     conan remove "*" -b --src -f ; `
     conan remove --locks
 
-#FROM CONAN_BASE
+FROM CONAN_BASE
 COPY --from=CONAN_CACHE_BUILDER C:/Users/ContainerAdministrator/.conan/ C:/Users/ContainerAdministrator/.conan/
 COPY --from=CONAN_CACHE_BUILDER C:/.conan/ C:/.conan/
 COPY conanfile.py c:/temp/conanfile.py
