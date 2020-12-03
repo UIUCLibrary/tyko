@@ -10,3 +10,4 @@ Development Status:
 [![Build Status](https://jenkins.library.illinois.edu/buildStatus/icon?job=OpenSourceProjects/tyko/master)](https://jenkins.library.illinois.edu/user/hborcher/my-views/view/all/job/OpenSourceProjects/job/tyko/job/master/)
 [![Jenkins Coverage](https://img.shields.io/jenkins/coverage/api/https/jenkins.library.illinois.edu/job/OpenSourceProjects/job/tyko/job/master)](https://jenkins.library.illinois.edu/job/OpenSourceProjects/job/tyko/job/master/coverage)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=UIUCLibrary_tyko&metric=alert_status)](https://sonarcloud.io/dashboard?id=UIUCLibrary_tyko)
+
