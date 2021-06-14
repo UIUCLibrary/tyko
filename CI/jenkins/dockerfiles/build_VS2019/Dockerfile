@@ -73,6 +73,7 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     $Env:PYTHONUNBUFFERED = 0 ; `
     python -m pip install pip wheel --no-cache-dir --upgrade ; `
     pip install --no-cache-dir conan ;`
+    conan --version ; `
     Write-Output "Finished installing Conan"
 ENV CONAN_USER_HOME=C:/Users/ContainerAdministrator
 FROM CONAN_BASE as CONAN_CACHE_BUILDER
