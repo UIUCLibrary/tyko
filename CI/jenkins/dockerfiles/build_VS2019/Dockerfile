@@ -89,7 +89,7 @@ RUN conan config init ; `
     conan config home
 ADD ["CI/jenkins/dockerfiles/build_VS2019/vcvarsall.bat", "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Auxiliary/Build/vcvarsall.bat"]
 
-RUN conan install c:/temp/ --build missing --no-import  ; `
+RUN conan install c:/temp/ --build outdated --no-import  ; `
     conan remove "*" -b --src -f ; `
     conan remove --locks
 

@@ -77,7 +77,7 @@ pipeline {
 
                                 bat(
                                     label: "installing dependencies",
-                                    script: "cd build && conan install .."
+                                    script: "conan install . -if build"
                                     )
                                 bat(
                                     label: "Configuring CMake Project",
