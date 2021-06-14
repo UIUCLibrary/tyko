@@ -107,6 +107,7 @@ install(CODE [[
                     qtquick2plugin.dll
                 HINTS
                     ${CMAKE_INSTALL_PREFIX}/bin/qml/QtQuick.2
+                REQUIRED
             )
             list(APPEND PLUGIN_LIBRARIES ${QTQUICK2PLUGIN})
 
@@ -116,6 +117,7 @@ install(CODE [[
                     qtquickcontrols2plugin.dll
                 HINTS
                     ${CMAKE_INSTALL_PREFIX}/bin/qml/QtQuick/Controls.2
+                REQUIRED
             )
             list(APPEND PLUGIN_LIBRARIES  ${QTQUICKCONTROLS2PLUGIN})
 
@@ -125,6 +127,7 @@ install(CODE [[
                     qtquickcontrolsplugin.dll
                 HINTS
                     ${CMAKE_INSTALL_PREFIX}/bin/qml/QtQuick/Controls
+                REQUIRED
             )
             list(APPEND PLUGIN_LIBRARIES  ${QTQUICKCONTROLSPLUGIN})
 
