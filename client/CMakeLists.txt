@@ -107,6 +107,7 @@ install(CODE [[
                     qtquick2plugin.dll
                 HINTS
                     ${CMAKE_INSTALL_PREFIX}/bin/qml/QtQuick.2
+                REQUIRED
             )
             list(APPEND PLUGIN_LIBRARIES ${QTQUICK2PLUGIN})
 
@@ -116,6 +117,7 @@ install(CODE [[
                     qtquickcontrols2plugin.dll
                 HINTS
                     ${CMAKE_INSTALL_PREFIX}/bin/qml/QtQuick/Controls.2
+                REQUIRED
             )
             list(APPEND PLUGIN_LIBRARIES  ${QTQUICKCONTROLS2PLUGIN})
 
@@ -125,15 +127,17 @@ install(CODE [[
                     qtquickcontrolsplugin.dll
                 HINTS
                     ${CMAKE_INSTALL_PREFIX}/bin/qml/QtQuick/Controls
+                REQUIRED
             )
             list(APPEND PLUGIN_LIBRARIES  ${QTQUICKCONTROLSPLUGIN})
 
             include(BundleUtilities)
+            include("CPackConfig.cmake")
+            list(APPEND lib_paths  "${CPACK_BUILD_SOURCE_DIRS}")
             set(EXE_TO_FIXUP "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>")
-
+            list(APPEND lib_paths  "${CPACK_OUTPUT_FILE_PREFIX}")
             fixup_bundle("${EXE_TO_FIXUP}"
                     "${PLUGIN_LIBRARIES}"
-                    ""
                      "${lib_paths}"
                      IGNORE_ITEM "OPENGL32.dll;opengl32.dll")
 ]])

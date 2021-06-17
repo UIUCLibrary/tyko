@@ -58,19 +58,22 @@ RUN C:\ProgramData\chocolatey\bin\choco.exe sources ; `
     }; `
     Write-Host "Finished install packages with Chocolatey"
 
+RUN Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force ;`
+    Register-PackageSource -Name MyNuGet -Location https://www.nuget.org/api/v2 -ProviderName NuGet ;`
+    Install-Package -Name WiX -Source MyNuGet -Force ; `
+    $WIX_NUGET_PATH = $(Split-Path((Get-Package -Name Wix)[0].Source));`
+    $WIX_PATH ="$((Get-Childitem -Path $WIX_NUGET_PATH -Include wix.dll -File -Recurse)[0].DirectoryName)" ; `
+    $env:Path += $WIX_PATH ; `
+    [Environment]::SetEnvironmentVariable('Path', $env:Path, [EnvironmentVariableTarget]::Machine ) ;`
+    Write-Host "Updated path to = $env:Path"
 
-# Install WiX toolset for making .msi installers and put the tools on the path
-ADD CI/jenkins/dockerfiles/build_VS2019/nuget/packages.config nuget/packages.config
-RUN Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force ; `
-    nuget update -self ;`
-    nuget install nuget/packages.config -OutputDirectory c:\BuildTools\ ; `
-    [Environment]::SetEnvironmentVariable('PATH', \"$($env:Path);$((Get-Childitem -Path C:\BuildTools -Include wix.dll -File -Recurse)[0].DirectoryName)\", [EnvironmentVariableTarget]::Machine)
 
 FROM BASE_BUILDER as CONAN_BASE
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
     $Env:PYTHONUNBUFFERED = 0 ; `
     python -m pip install pip wheel --no-cache-dir --upgrade ; `
     pip install --no-cache-dir conan ;`
+    conan --version ; `
     Write-Output "Finished installing Conan"
 ENV CONAN_USER_HOME=C:/Users/ContainerAdministrator
 FROM CONAN_BASE as CONAN_CACHE_BUILDER
@@ -86,7 +89,7 @@ RUN conan config init ; `
     conan config home
 ADD ["CI/jenkins/dockerfiles/build_VS2019/vcvarsall.bat", "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Auxiliary/Build/vcvarsall.bat"]
 
-RUN conan install c:/temp/ --build missing --no-import  ; `
+RUN conan install c:/temp/ --build outdated --no-import  ; `
     conan remove "*" -b --src -f ; `
     conan remove --locks
 
