@@ -130,13 +130,13 @@ install(CODE [[
                 REQUIRED
             )
             list(APPEND PLUGIN_LIBRARIES  ${QTQUICKCONTROLSPLUGIN})
+            list(APPEND lib_paths  "${CPACK_BUILD_SOURCE_DIRS}")
 
             include(BundleUtilities)
             set(EXE_TO_FIXUP "${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:avdatabaseEditor>")
 
             fixup_bundle("${EXE_TO_FIXUP}"
                     "${PLUGIN_LIBRARIES}"
-                    ""
                      "${lib_paths}"
                      IGNORE_ITEM "OPENGL32.dll;opengl32.dll")
 ]])
