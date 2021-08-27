@@ -196,17 +196,17 @@ class ItemAPI(views.MethodView):
                 object_provider.get(id=item['parent_object_id'],
                                     serialize=True)['parent_project_id']
 
-            for f in item['files']:
-                f['routes'] = {
+            for file in item['files']:
+                file['routes'] = {
                     "frontend": url_for("page_file_details",
                                         item_id=item['item_id'],
                                         object_id=item['parent_object_id'],
                                         project_id=parent_project,
-                                        file_id=f["id"]),
+                                        file_id=file["id"]),
                     "api": url_for("item_files",
                                    item_id=item['item_id'],
                                    object_id=item['parent_object_id'],
-                                   project_id=parent_project, id=f["id"])
+                                   project_id=parent_project, id=file["id"])
 
                 }
 
@@ -214,8 +214,7 @@ class ItemAPI(views.MethodView):
             "item": item
         }
 
-        response = make_response(jsonify(data), 200)
-        return response
+        return make_response(jsonify(data), 200)
 
     def delete(self, item_id):
         res = self._data_connector.delete(item_id)
