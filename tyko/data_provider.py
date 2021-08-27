@@ -372,15 +372,16 @@ class ObjectDataConnector(AbsNotesConnector):
                 all_collection_object = \
                     session.query(CollectionObject).filter(
                         CollectionObject.project is not None).all()
-        except sqlalchemy.exc.DatabaseError as e:
-            raise DataError(message="Unable to find object: {}".format(e))
+        except sqlalchemy.exc.DatabaseError as error:
+            raise DataError(
+                message=f"Unable to find object: {error}"
+            ) from error
 
         if serialize:
-            serialized_all_collection_object = []
-            for collection_object in all_collection_object:
-                serialized_all_collection_object.append(
-                    collection_object.serialize(False)
-                )
+            serialized_all_collection_object = [
+                collection_object.serialize(False)
+                for collection_object in all_collection_object
+            ]
 
             all_collection_object = serialized_all_collection_object
         session.close()
