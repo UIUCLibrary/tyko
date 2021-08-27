@@ -107,9 +107,8 @@ function loadNewEntityFormClass(
                     '        <span aria-hidden="true">&times;</span>\n' +
                     '</div>';
                 alertBox.html(responsesMessage);
-                if(reason.responseText){
+                if (reason.responseText) {
                   console.error(reason.responseText);
-
                 }
               });
           return false;
