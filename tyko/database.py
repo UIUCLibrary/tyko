@@ -5,10 +5,10 @@ import sqlalchemy as db
 from sqlalchemy.orm.session import sessionmaker
 
 import tyko.schema.avtables
+from tyko import schema
 from .schema import formats
 from .schema import notes
 from .schema import projects
-from tyko import schema
 
 
 def init_database(engine) -> None:
