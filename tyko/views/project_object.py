@@ -9,10 +9,10 @@ class ProjectObjectAPI(views.MethodView):
 
     def get(self, project_id, object_id):
 
-        p = self._project.get_project_by_id(id=project_id)
-        for o in p['objects']:
-            if object_id == o['object_id']:
-                for item in o['items']:
+        project = self._project.get_project_by_id(id=project_id)
+        for project_object in project['objects']:
+            if object_id == project_object['object_id']:
+                for item in project_object['items']:
                     routes = {
                         "frontend": url_for(
                             "page_project_object_item_details",
@@ -30,7 +30,7 @@ class ProjectObjectAPI(views.MethodView):
                     item['routes'] = routes
                 return jsonify(
                     {
-                        **o,
+                        **project_object,
                         "parent_project_id": project_id
                     }
                 )

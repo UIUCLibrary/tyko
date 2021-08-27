@@ -23,7 +23,7 @@ def is_correct_db_version(app, database) -> bool:
             "Problem getting version information. "
             "Reason given: {}".format(exc))
         if "no such table" in str(exc):
-            raise NoTable()
+            raise NoTable() from exc
         return False
     return version == ALEMBIC_VERSION
 

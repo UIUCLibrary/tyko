@@ -8,6 +8,7 @@ import sqlalchemy
 from sqlalchemy.sql.expression import true
 from sqlalchemy import orm
 
+from tyko import utils
 from .schema.collection import Collection
 from .schema import formats
 from .schema.instantiation import FileNotes, InstantiationFile, \
@@ -20,7 +21,6 @@ from .schema.formats import CassetteType, CassetteTapeType, \
     CassetteTapeThickness, AudioCassette, AVFormat
 from .exceptions import DataError
 from . import database
-from tyko import utils
 
 DATE_FORMAT = '%Y-%m-%d'
 
@@ -304,11 +304,11 @@ class ProjectDataConnector(AbsNotesConnector):
 
             project = self._get_project(session, project_id)
             object_connector = ObjectDataConnector(self.session_maker)
-            new_data = dict()
-            for k, v in data.items():
-                if isinstance(v, str) and v.strip() == "":
-                    continue
-                new_data[k] = v
+            new_data = {
+                k: v
+                for k, v in data.items()
+                if not isinstance(v, str) or v.strip() != ""
+            }
 
             new_object_id = object_connector.create(**new_data)
             project.objects.append(object_connector.get(id=new_object_id))
@@ -372,15 +372,16 @@ class ObjectDataConnector(AbsNotesConnector):
                 all_collection_object = \
                     session.query(CollectionObject).filter(
                         CollectionObject.project is not None).all()
-        except sqlalchemy.exc.DatabaseError as e:
-            raise DataError(message="Unable to find object: {}".format(e))
+        except sqlalchemy.exc.DatabaseError as error:
+            raise DataError(
+                message=f"Unable to find object: {error}"
+            ) from error
 
         if serialize:
-            serialized_all_collection_object = []
-            for collection_object in all_collection_object:
-                serialized_all_collection_object.append(
-                    collection_object.serialize(False)
-                )
+            serialized_all_collection_object = [
+                collection_object.serialize(False)
+                for collection_object in all_collection_object
+            ]
 
             all_collection_object = serialized_all_collection_object
         session.close()
@@ -1131,7 +1132,8 @@ class AudioCassetteDataConnector(ItemDataConnector):
         finally:
             session.close()
 
-    def _add_optional_args(self, new_cassette, **params):
+    @staticmethod
+    def _add_optional_args(new_cassette, **params):
         tape_thickness_id = params.get('tape_type_id')
         if tape_thickness_id is not None and str(tape_thickness_id) != "":
             new_cassette.tape_thickness_id = int(tape_thickness_id)
@@ -1360,8 +1362,10 @@ class DataProvider:
                 all_formats = session.query(formats.FormatTypes).all()
             session.close()
 
-        except sqlalchemy.exc.DatabaseError as e:
-            raise DataError("Enable to get all format. Reason: {}".format(e))
+        except sqlalchemy.exc.DatabaseError as error:
+            raise DataError(
+                f"Enable to get all format. Reason: {error}"
+            ) from error
 
         if serialize:
             return [format_.serialize() for format_ in all_formats]
@@ -1544,8 +1548,7 @@ class EnumConnector(AbsDataProviderConnector, metaclass=ABCMeta):
         ).one()
         if serialize:
             return enum_results.serialize()
-        else:
-            return enum_results
+        return enum_results
 
     def update(self, id, changed_data):
         session = self.session_maker()

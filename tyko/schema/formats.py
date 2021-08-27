@@ -71,7 +71,7 @@ class AVFormat(AVTables):
         yield from self.notes
 
     def format_details(self) -> Mapping[str, SerializedData]:
-        return dict()
+        return {}
 
     def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
 
@@ -384,7 +384,7 @@ class CollectionItem(AVFormat):
                           back_populates="collection_items")
 
     def format_details(self) -> Mapping[str, SerializedData]:
-        return dict()
+        return {}
 
 # ############################ End of AV Formats ##############################
 

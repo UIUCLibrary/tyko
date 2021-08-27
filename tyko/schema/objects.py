@@ -64,14 +64,13 @@ class CollectionObject(AVTables):
     groove_disks = relationship("GroovedDisc", back_populates="object")
 
     def all_items(self):
-        r = self.collection_items \
+        return self.collection_items \
             + self.audio_cassettes \
             + self.films \
             + self.audio_videos \
             + self.groove_disks \
             + self.open_reels \
             + self.collection_items
-        return r
 
     def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
 
