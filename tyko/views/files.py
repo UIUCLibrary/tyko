@@ -172,8 +172,7 @@ class FileNotesAPI(views.MethodView):
                 f"File {file_id} has no note with id {note_id}")
 
         json_request = request.get_json()
-        changed_data = dict()
-        changed_data['message'] = json_request['message']
+        changed_data = {'message': json_request['message']}
         return self._data_connector.update(note_id, changed_data)
 
     def _file_has_matching_note(self, file_id: int, note_id: int) -> bool:

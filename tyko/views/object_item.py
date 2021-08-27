@@ -154,7 +154,7 @@ class ItemAPI(views.MethodView):
     @classmethod
     def create_changed_data(cls, json_request) -> Dict[str, Any]:
 
-        new_item = dict()
+        new_item = {}
         for field in cls.WRITABLE_FIELDS:
             if field == "obj_sequence":
                 continue

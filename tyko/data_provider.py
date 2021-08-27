@@ -304,11 +304,11 @@ class ProjectDataConnector(AbsNotesConnector):
 
             project = self._get_project(session, project_id)
             object_connector = ObjectDataConnector(self.session_maker)
-            new_data = dict()
-            for k, v in data.items():
-                if isinstance(v, str) and v.strip() == "":
-                    continue
-                new_data[k] = v
+            new_data = {
+                k: v
+                for k, v in data.items()
+                if not isinstance(v, str) or v.strip() != ""
+            }
 
             new_object_id = object_connector.create(**new_data)
             project.objects.append(object_connector.get(id=new_object_id))

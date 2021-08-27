@@ -56,7 +56,7 @@ class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
                 f"only {', '.join(cls.WRITABLE_FIELDS)} can be modified."
             )
 
-        return dict()
+        return {}
 
 
 class Middleware:
@@ -826,7 +826,7 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         return make_response("", 404)
 
     def update(self, id):
-        new_object = dict()
+        new_object = {}
         json_request = request.get_json()
         for k, _ in json_request.items():
             if not self.field_can_edit(k):

@@ -48,7 +48,7 @@ class BreadcrumbBuilder(collections.abc.MutableMapping):
     ]
 
     def __init__(self) -> None:
-        self._data: Dict[str, str] = dict()
+        self._data: Dict[str, str] = {}
 
     def __delitem__(self, v: str) -> None:
         del self._data[v]
@@ -73,7 +73,7 @@ class BreadcrumbBuilder(collections.abc.MutableMapping):
         if active_level not in BreadcrumbBuilder.VALID_CRUMBS:
             raise ValueError("Not a valid breadcrumb type")
 
-        breadcrumbs: List[Breadcrumb] = list()
+        breadcrumbs: List[Breadcrumb] = []
         for k in BreadcrumbBuilder.VALID_CRUMBS:
             self._add_crumb(breadcrumbs, k, current=active_level == k)
 
@@ -94,7 +94,7 @@ class AbsFrontend(metaclass=abc.ABCMeta):
             "Items",
             "Objects",
         ]
-        new_context = dict()
+        new_context = {}
         new_context.update(context)
         new_context["selected_menu_item"] = current_item
 
