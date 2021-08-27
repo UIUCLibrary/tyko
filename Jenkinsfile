@@ -20,17 +20,13 @@ if(!config.contains('python-groovy')){
         '(.*):(\\d+):+ (.*): (.*)',
         '''
         import edu.hm.hafner.analysis.Severity
-        String message = matcher.group(4)
-        String fileName = matcher.group(1)
-        String category = matcher.group(3)
-
 
         Integer line = Integer.parseInt(matcher.group(2))
 
-        return builder.setFileName(fileName)
+        return builder.setFileName( matcher.group(1))
             .setLineStart(line)
-            .setCategory(category)
-            .setMessage(message)
+            .setCategory(matcher.group(3))
+            .setMessage(matcher.group(4))
             .buildOptional()''',
         "/usr/local/lib/python3.7/site-packages/flask_sqlalchemy/__init__.py:873: FSADeprecationWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds significant overhead and will be disabled by default in the future.  Set it to True or False to suppress this warning."
     )
