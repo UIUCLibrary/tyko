@@ -314,6 +314,16 @@ def test_db_version_test_valid():
     assert is_correct_db_version(app, db) is True
 
 
+def test_is_correct_db_version_no_table():
+    app = Flask(__name__, template_folder="../tyko/templates")
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    db = SQLAlchemy(app)
+    with pytest.raises(tyko.exceptions.NoTable):
+        is_correct_db_version(app, db)
+
+
 def test_db_version_test_different():
     app = Flask(__name__, template_folder="../tyko/templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
