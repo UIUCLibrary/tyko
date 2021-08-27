@@ -508,7 +508,7 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
                 object_id=entity_id
             )
         else:
-            api_route = url_for('object', object_id=entity_id),
+            api_route = url_for('object', object_id=entity_id)
         return self.render_page(
             template="object_details.html",
             edit=False,
