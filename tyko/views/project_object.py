@@ -9,8 +9,8 @@ class ProjectObjectAPI(views.MethodView):
 
     def get(self, project_id, object_id):
 
-        p = self._project.get_project_by_id(id=project_id)
-        for project_object in p['objects']:
+        project = self._project.get_project_by_id(id=project_id)
+        for project_object in project['objects']:
             if object_id == project_object['object_id']:
                 for item in project_object['items']:
                     routes = {
