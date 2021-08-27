@@ -14,10 +14,12 @@ from tyko import frontend
 @pytest.fixture()
 def app():
     app = Flask(__name__, template_folder="../tyko/templates")
+    app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
     tyko.database.init_database(db.engine)
-    app.config["TESTING"] = True
     return app
 
 

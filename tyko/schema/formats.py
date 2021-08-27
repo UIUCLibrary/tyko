@@ -330,7 +330,8 @@ class AudioCassette(AVFormat, ABC):
 
     @classmethod
     def encode_date(cls, date_string: str) -> Tuple[datetime.datetime, int]:
-        warnings.warn("use utils.serialize_precision_datetime instead",
+        warnings.warn("encode_date is deprecated. "
+                      "use utils.serialize_precision_datetime instead",
                       DeprecationWarning)
 
         if cls.REGEX_DAY_MONTH_YEAR.match(date_string):

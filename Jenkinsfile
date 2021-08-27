@@ -11,6 +11,22 @@ def parseBanditReport(htmlReport){
     }
 }
 
+def startup(){
+    parallel(
+        [
+            failFast: true,
+            'Loading Reference Build Information': {
+                node(){
+                    checkout scm
+                    discoverGitReferenceBuild(latestBuildIfNotFound: true)
+                }
+            }
+        ]
+    )
+}
+
+
+startup()
 
 pipeline {
     agent none
