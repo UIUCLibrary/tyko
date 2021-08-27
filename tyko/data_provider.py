@@ -8,6 +8,7 @@ import sqlalchemy
 from sqlalchemy.sql.expression import true
 from sqlalchemy import orm
 
+from tyko import utils
 from .schema.collection import Collection
 from .schema import formats
 from .schema.instantiation import FileNotes, InstantiationFile, \
@@ -20,7 +21,6 @@ from .schema.formats import CassetteType, CassetteTapeType, \
     CassetteTapeThickness, AudioCassette, AVFormat
 from .exceptions import DataError
 from . import database
-from tyko import utils
 
 DATE_FORMAT = '%Y-%m-%d'
 
