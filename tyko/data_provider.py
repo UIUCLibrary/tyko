@@ -1546,8 +1546,7 @@ class EnumConnector(AbsDataProviderConnector, metaclass=ABCMeta):
         ).one()
         if serialize:
             return enum_results.serialize()
-        else:
-            return enum_results
+        return enum_results
 
     def update(self, id, changed_data):
         session = self.session_maker()
