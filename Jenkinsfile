@@ -145,17 +145,20 @@ pipeline {
                             steps{
                                 timeout(10){
                                     catchError(buildResult: 'UNSTABLE', message: 'Did not pass all pytest tests', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            label: "Run PyTest",
-                                            script: '''mkdir -p reports
-                                                       coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml
-                                                    '''
-                                        )
+                                        tee('logs/pytest.log'){
+                                            sh(
+                                                label: "Run PyTest",
+                                                script: '''mkdir -p reports
+                                                           coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml
+                                                        '''
+                                            )
+                                        }
                                     }
                                 }
                             }
                             post {
                                 always{
+                                    recordIssues(tools: [groovyScript(parserId: 'pythonWarnings', pattern: 'logs/pytest.log')])
                                     junit "reports/test-report.xml"
                                     sh "coverage combine"
                                     sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
