@@ -1362,8 +1362,10 @@ class DataProvider:
                 all_formats = session.query(formats.FormatTypes).all()
             session.close()
 
-        except sqlalchemy.exc.DatabaseError as e:
-            raise DataError("Enable to get all format. Reason: {}".format(e))
+        except sqlalchemy.exc.DatabaseError as error:
+            raise DataError(
+                f"Enable to get all format. Reason: {error}"
+            ) from error
 
         if serialize:
             return [format_.serialize() for format_ in all_formats]
