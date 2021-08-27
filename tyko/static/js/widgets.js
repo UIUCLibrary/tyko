@@ -485,7 +485,7 @@ class builder {
 }
 
 
-class textEditorBuilder extends builder {
+class TextEditorBuilder extends builder {
   getEditMode(baseWidget) {
     return new TextEditorPartFactory('editState', baseWidget);
   }
@@ -504,7 +504,7 @@ class textEditorBuilder extends builder {
 }
 
 
-class selectionEditorBuilder extends builder {
+class SelectionEditorBuilder extends builder {
   getViewOnlyMode(baseWidget) {
     return new SelectEditorPartFactory('viewState', baseWidget);
   }
@@ -561,10 +561,10 @@ class Factory {
     this.widgetTypes = {
 
       'textEditor': (rootElement, fieldName, displayText) => {
-        return new textEditorBuilder(rootElement, fieldName, displayText);
+        return new TextEditorBuilder(rootElement, fieldName, displayText);
       },
       'selectEditor': (rootElement, fieldName, displayText) => {
-        return new selectionEditorBuilder(rootElement, fieldName, displayText);
+        return new SelectionEditorBuilder(rootElement, fieldName, displayText);
       },
       'datePicker': (rootElement, fieldName, displayText) => {
         return new DatePickerBuilder(rootElement, fieldName, displayText);
