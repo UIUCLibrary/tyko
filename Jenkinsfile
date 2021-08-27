@@ -11,6 +11,32 @@ def parseBanditReport(htmlReport){
     }
 }
 
+def config = io.jenkins.plugins.analysis.warnings.groovy.ParserConfiguration.getInstance()
+
+if(!config.contains('python-groovy')){
+    def newParser = new io.jenkins.plugins.analysis.warnings.groovy.GroovyParser(
+        'python-groovy',
+        'Python Groovy Parser',
+        '(.*):(\\d+):+ (.*): (.*)',
+        '''
+        import edu.hm.hafner.analysis.Severity
+        String message = matcher.group(4)
+        String fileName = matcher.group(1)
+        String category = matcher.group(3)
+
+
+        Integer line = Integer.parseInt(matcher.group(2))
+
+        return builder.setFileName(fileName)
+            .setLineStart(line)
+            .setCategory(category)
+            .setMessage(message)
+            .buildOptional()''',
+        "/usr/local/lib/python3.7/site-packages/flask_sqlalchemy/__init__.py:873: FSADeprecationWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds significant overhead and will be disabled by default in the future.  Set it to True or False to suppress this warning."
+    )
+    config.setParsers(config.getParsers().plus(newParser))
+}
+
 
 pipeline {
     agent none
@@ -158,7 +184,7 @@ pipeline {
                             }
                             post {
                                 always{
-                                    recordIssues(tools: [groovyScript(parserId: 'pythonWarnings', pattern: 'logs/pytest.log')])
+                                    recordIssues(tools: [groovyScript(parserId: 'python-groovy', pattern: 'logs/pytest.log')])
                                     junit "reports/test-report.xml"
                                     sh "coverage combine"
                                     sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
