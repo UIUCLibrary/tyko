@@ -9,10 +9,12 @@ from tyko.data_provider import DataProvider
 
 def test_get_api():
     testing_app = Flask(__name__, template_folder="../tyko/templates")
+    testing_app.config["TESTING"] = True
+    testing_app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    testing_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(testing_app)
     tyko.create_app(testing_app, verify_db=False)
     tyko.database.init_database(db.engine)
-    testing_app.config["TESTING"] = True
     data_provider = DataProvider(db.engine)
 
     routes = tyko.routes.Routes(data_provider, testing_app)

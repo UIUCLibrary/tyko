@@ -43,10 +43,12 @@ def test_pbcore_valid_id(tmpdir):
     app = flask.Flask(__name__, template_folder="../tyko/"
                                                 "templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["TESTING"] = True
+
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
     tyko.database.init_database(db.engine)
-    app.config["TESTING"] = True
     with app.test_client() as server:
         sample_collection = server.post(
             "/api/collection/",

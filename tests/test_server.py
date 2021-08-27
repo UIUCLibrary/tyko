@@ -41,8 +41,14 @@ api_routes = [
 
 @pytest.mark.parametrize("route", static_page_routes)
 def test_static_pages(route):
-    app = tyko.create_app(verify_db=False)
+    app = Flask(__name__, template_folder="../tyko/templates")
     app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    app = tyko.create_app(app=app, verify_db=False)
+    app.config["TESTING"] = True
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     with app.test_client() as server:
         resp = server.get(route)
         assert resp.status == "200 OK"
@@ -51,10 +57,12 @@ def test_static_pages(route):
 @pytest.mark.parametrize("route", dynamic_page_routes)
 def test_dynamic_pages(route):
     app = Flask(__name__, template_folder="../tyko/templates")
+    app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
     tyko.database.init_database(db.engine)
-    app.config["TESTING"] = True
     with app.test_client() as server:
         resp = server.get(route)
         assert resp.status == "200 OK"
@@ -63,10 +71,12 @@ def test_dynamic_pages(route):
 @pytest.fixture(scope="module")
 def test_app():
     app = Flask(__name__, template_folder="../tyko/templates")
+    app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
     tyko.database.init_database(db.engine)
-    app.config["TESTING"] = True
     return app.test_client()
 
 
@@ -87,10 +97,12 @@ def test_api_formats(test_app):
 @pytest.mark.parametrize("route", api_routes)
 def test_api_routes(route):
     app = Flask(__name__, template_folder="../tyko/templates")
+    app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
     tyko.database.init_database(db.engine)
-    app.config["TESTING"] = True
     with app.test_client() as server:
         resp = server.get(route)
         assert resp.status == "200 OK"
@@ -154,10 +166,12 @@ test_data_read = [
 def test_create_and_read2(data_type, data_value):
 
     app = Flask(__name__, template_folder="../tyko/templates")
+    app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
     tyko.database.init_database(db.engine)
-    app.config["TESTING"] = True
     with app.test_client() as server:
         route ="/api/{}/".format(data_type)
         create_resp = server.post(
@@ -196,10 +210,12 @@ def test_empty_database_error():
 def test_get_object_pbcore():
     app = Flask(__name__, template_folder="../tyko/templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["TESTING"] = True
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
     tyko.database.init_database(db.engine)
-    app.config["TESTING"] = True
     with app.test_client() as server:
         create_resp = server.post(
             "/api/object/",
@@ -282,6 +298,8 @@ def test_project_default_status():
 def test_db_version_test_valid():
     app = Flask(__name__, template_folder="../tyko/templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
     db = SQLAlchemy(app)
     version_table = sqlalchemy.Table(
         "alembic_version", db.metadata,
@@ -299,6 +317,7 @@ def test_db_version_test_valid():
 def test_db_version_test_different():
     app = Flask(__name__, template_folder="../tyko/templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     version_table = sqlalchemy.Table(
         "alembic_version", db.metadata,
@@ -316,6 +335,7 @@ def test_db_version_test_different():
 def test_db_version_test_no_data():
     app = Flask(__name__, template_folder="../tyko/templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     version_table = sqlalchemy.Table(
         "alembic_version", db.metadata,

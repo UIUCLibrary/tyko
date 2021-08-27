@@ -9,20 +9,25 @@ import tyko.database
 @pytest.fixture()
 def app():
     testing_app = Flask(__name__, template_folder="../tyko/templates")
+    testing_app.config["TESTING"] = True
+    testing_app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    testing_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(testing_app)
     tyko.create_app(testing_app, verify_db=False)
     tyko.database.init_database(db.engine)
-    testing_app.config["TESTING"] = True
+
     return testing_app
 
 
 @pytest.fixture()
 def server_with_project():
     testing_app = Flask(__name__, template_folder="../tyko/templates")
+    testing_app.config["TESTING"] = True
+    testing_app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    testing_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(testing_app)
     tyko.create_app(testing_app, verify_db=False)
     tyko.database.init_database(db.engine)
-    testing_app.config["TESTING"] = True
     with testing_app.test_client() as server:
         assert server.post(
             "/api/project/",
@@ -39,10 +44,12 @@ def server_with_project():
 @pytest.fixture()
 def server_with_object():
     testing_app = Flask(__name__, template_folder="../tyko/templates")
+    testing_app.config["TESTING"] = True
+    testing_app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    testing_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(testing_app)
     tyko.create_app(testing_app, verify_db=False)
     tyko.database.init_database(db.engine)
-    testing_app.config["TESTING"] = True
     with testing_app.test_client() as server:
         new_collection_response = server.post(
             "/api/collection/",
@@ -104,10 +111,12 @@ def server_with_object():
 @pytest.fixture()
 def server_with_object_and_item():
     testing_app = Flask(__name__, template_folder="../tyko/templates")
+    testing_app.config["TESTING"] = True
+    testing_app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    testing_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(testing_app)
     tyko.create_app(testing_app, verify_db=False)
     tyko.database.init_database(db.engine)
-    testing_app.config["TESTING"] = True
     with testing_app.test_client() as server:
         new_collection_response = server.post(
             "/api/collection/",
