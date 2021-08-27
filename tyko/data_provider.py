@@ -1131,7 +1131,8 @@ class AudioCassetteDataConnector(ItemDataConnector):
         finally:
             session.close()
 
-    def _add_optional_args(self, new_cassette, **params):
+    @staticmethod
+    def _add_optional_args(new_cassette, **params):
         tape_thickness_id = params.get('tape_type_id')
         if tape_thickness_id is not None and str(tape_thickness_id) != "":
             new_cassette.tape_thickness_id = int(tape_thickness_id)
