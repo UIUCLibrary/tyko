@@ -158,8 +158,14 @@ pipeline {
                             }
                             post {
                                 always{
-                                    // See CI/jenkins/scripts/python_warnings.groovy for more information about the groovyScript
-                                    recordIssues(tools: [groovyScript(parserId: 'python', pattern: 'logs/pytest.log')])
+                                    script{
+                                        try{
+                                            // See CI/jenkins/scripts/python_warnings.groovy for more information about the groovyScript
+                                            recordIssues(tools: [groovyScript(parserId: 'pythonWarnings', pattern: 'logs/pytest.log')])
+                                        } catch(Exception e){
+                                            echo "Unable to parse Python warnings. Reason: ${e}"
+                                        }
+                                    }
                                     junit "reports/test-report.xml"
                                     sh "coverage combine"
                                     sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
