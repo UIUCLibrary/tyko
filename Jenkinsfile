@@ -184,17 +184,6 @@ pipeline {
                                                 }
                                             }
                                             junit "reports/test-report.xml"
-                                            sh "coverage combine"
-                                            sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
-                                            stash includes: ".coverage.*,reports/pytest/junit-*.xml,coverage-reports/pythoncoverage-pytest.xml", name: 'PYTEST_COVERAGE_DATA'
-
-                                            publishCoverage(
-                                                adapters: [
-                                                        coberturaAdapter('coverage-reports/pythoncoverage-pytest.xml')
-                                                        ],
-                                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
-                                                )
-                                        archiveArtifacts allowEmptyArchive: true, artifacts: "coverage-reports/*.xml"
                                         }
                                     }
                                 }
@@ -351,17 +340,9 @@ pipeline {
                                     }
                                     post{
                                         always{
-                                            stash includes: "reports/*.xml,coverage-reports/**", name: 'JEST_REPORT'
+                                            stash includes: "reports/*.xml,coverage-reports/cobertura-coverage.xml", name: 'JEST_REPORT'
                                             junit "reports/*.xml"
                                             archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
-                                            archiveArtifacts allowEmptyArchive: true, artifacts: "coverage-reports/*.xml"
-
-                                            publishCoverage(
-                                                adapters: [
-                                                        coberturaAdapter('coverage-reports/cobertura-coverage.xml')
-                                                        ],
-                                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
-                                            )
                                         }
                                     }
                                 }
@@ -390,6 +371,24 @@ pipeline {
                         }
                     }
                     post{
+                        always{
+                            sh "coverage combine"
+                            sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
+                            stash includes: ".coverage.*,reports/pytest/junit-*.xml,coverage-reports/pythoncoverage-pytest.xml", name: 'PYTEST_COVERAGE_DATA'
+                            publishCoverage(
+                                adapters: [
+                                        coberturaAdapter('coverage-reports/cobertura-coverage.xml')
+                                        ],
+                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
+                            )
+                            publishCoverage(
+                                adapters: [
+                                        coberturaAdapter('coverage-reports/pythoncoverage-pytest.xml')
+                                        ],
+                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
+                                )
+                            archiveArtifacts allowEmptyArchive: true, artifacts: "coverage-reports/*.xml"
+                        }
                         cleanup{
                             cleanWs(
                                 deleteDirs: true,
