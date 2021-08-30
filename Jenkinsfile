@@ -329,7 +329,7 @@ pipeline {
                                                     label:  "Running Jest",
                                                     script: '''mkdir -p reports
                                                                npm install  -y
-                                                               npm test --  --ci --reporters=default --reporters=jest-junit --coverageReporters=cobertura --collectCoverage   --coverageDirectory=$WORKSPACE/coverage-reports
+                                                               npm test -- --reporters=default --reporters=jest-junit --coverageReporters=cobertura --collectCoverage   --coverageDirectory=$WORKSPACE/coverage-reports
                                                                '''
                                                 )
                                             }
@@ -380,12 +380,6 @@ pipeline {
                                         ],
                                 sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
                             )
-//                             publishCoverage(
-//                                 adapters: [
-//                                         coberturaAdapter('coverage-reports/pythoncoverage-pytest.xml')
-//                                         ],
-//                                 sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
-//                                 )
                             archiveArtifacts allowEmptyArchive: true, artifacts: "coverage-reports/*.xml"
                         }
                         cleanup{
