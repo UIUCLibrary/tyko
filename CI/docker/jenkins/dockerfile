@@ -1,4 +1,6 @@
 FROM python:3.9 as base_image
+RUN apt -y update && \
+    apt install -y npm
 
 FROM base_image as wheel_builder
 COPY requirements.txt ./

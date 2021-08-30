@@ -156,7 +156,7 @@ pipeline {
                       }
                     }
                     stages{
-                        stage("Running Tests"){
+                        stage("Python Tests"){
                             parallel {
                                 stage("PyTest"){
                                     steps{
@@ -316,6 +316,76 @@ pipeline {
                                 }
                             }
                         }
+                        stage('js testing'){
+                            parallel{
+                                stage("Audit npm") {
+                                    steps{
+                                        timeout(10){
+                                            catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
+                                                sh(
+                                                    label: "Running npm audit",
+                                                    script: "npm audit"
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                stage("Testing Javascript with Jest"){
+                                    environment{
+                                        JEST_JUNIT_OUTPUT_NAME="js-junit.xml"
+                                        JEST_JUNIT_ADD_FILE_ATTRIBUTE="true"
+                                    }
+                                    steps{
+                                        timeout(10){
+                                            withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
+                                                sh(
+                                                    label:  "Running Jest",
+                                                    script: '''mkdir -p reports
+                                                               npm install  -y
+                                                               npm test --  --ci --reporters=default --reporters=jest-junit --collectCoverage
+                                                               '''
+                                                )
+                                            }
+                                        }
+                                    }
+                                    post{
+                                        always{
+                                            stash includes: "reports/*.xml,coverage/**", name: 'JEST_REPORT'
+                                            junit "reports/*.xml"
+                                            archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
+
+                                            publishCoverage(
+                                                adapters: [
+                                                        coberturaAdapter('coverage/cobertura-coverage.xml')
+                                                        ],
+                                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
+                                            )
+                                        }
+                                    }
+                                }
+                                stage("Linting Javascript with ESlint"){
+                                    steps{
+                                        timeout(10){
+                                            catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
+                                                sh(
+                                                    label:  "Running ESlint",
+                                                    script: '''mkdir -p reports
+                                                               npm install  -y
+                                                               ./node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml
+                                                               '''
+                                                )
+                                            }
+                                        }
+                                    }
+                                    post{
+                                        always{
+                                            archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
+                                            recordIssues(tools: [esLint(pattern: 'reports/eslint.xml')])
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     post{
                         cleanup{
@@ -326,117 +396,10 @@ pipeline {
                                     [pattern: 'logs/', type: 'INCLUDE'],
                                     [pattern: '.mypy_cache/', type: 'INCLUDE'],
                                     [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                                    [pattern: 'test-report.xml', type: 'INCLUDE'],
+                                    [pattern: 'node_modules/', type: 'INCLUDE'],
                                 ]
                             )
-                        }
-                    }
-                }
-                stage("More testing"){
-                    parallel{
-                        stage("Audit npm") {
-                            agent {
-                              dockerfile {
-                                filename 'CI/jenkins/dockerfiles/npm_audit/Dockerfile'
-                                label "linux && docker"
-                                additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
-                              }
-                            }
-                            steps{
-                                timeout(10){
-                                    catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            label: "Running npm audit",
-                                            script: "npm audit"
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        stage("Testing Javascript with Jest"){
-                            agent {
-                                dockerfile {
-                                    filename 'CI/jenkins/dockerfiles/testing_javascript/Dockerfile'
-                                    label "linux && docker"
-                                    additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
-                                }
-                            }
-                            environment{
-                                JEST_JUNIT_OUTPUT_NAME="js-junit.xml"
-                                JEST_JUNIT_ADD_FILE_ATTRIBUTE="true"
-                            }
-                            steps{
-                                timeout(10){
-                                    withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
-                                        sh(
-                                            label:  "Running Jest",
-                                            script: '''mkdir -p reports
-                                                       npm install  -y
-                                                       npm test --  --ci --reporters=default --reporters=jest-junit --collectCoverage
-                                                       '''
-                                        )
-                                    }
-                                }
-                            }
-                            post{
-                                always{
-                                    stash includes: "reports/*.xml,coverage/**", name: 'JEST_REPORT'
-                                    junit "reports/*.xml"
-                                    archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
-
-                                    publishCoverage(
-                                        adapters: [
-                                                coberturaAdapter('coverage/cobertura-coverage.xml')
-                                                ],
-                                        sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
-                                    )
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'test-report.xml', type: 'INCLUDE'],
-                                            [pattern: 'node_modules/', type: 'INCLUDE'],
-                                            [pattern: 'reports/', type: 'INCLUDE'],
-                                            ]
-                                    )
-                                }
-                            }
-                        }
-                        stage("Linting Javascript with ESlint"){
-                            agent {
-                                dockerfile {
-                                    filename 'CI/jenkins/dockerfiles/testing_javascript/Dockerfile'
-                                    label "linux && docker"
-                                    additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
-                                }
-                            }
-                            steps{
-                                timeout(10){
-                                    catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            label:  "Running ESlint",
-                                            script: '''mkdir -p reports
-                                                       npm install  -y
-                                                       ./node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml
-                                                       '''
-                                        )
-                                    }
-                                }
-                            }
-                            post{
-                                always{
-                                    archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
-                                    recordIssues(tools: [esLint(pattern: 'reports/eslint.xml')])
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'reports/', type: 'INCLUDE'],
-                                        ]
-                                    )
-                                }
-                            }
                         }
                     }
                 }
