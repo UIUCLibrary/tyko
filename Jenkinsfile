@@ -33,15 +33,9 @@ pipeline {
     options {
         timeout(time: 1, unit: 'DAYS')
     }
-//     environment{
-//         DOC_ZIP_FILENAME = "${env.PKG_NAME}-${env.PKG_VERSION}.doc.zip"
-//         DEVPI = credentials("DS_devpi")
-//         DOCKER_IMAGE_TAG="tyko/${env.BRANCH_NAME.toLowerCase()}"
-//     }
     parameters {
         booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
-//         todo make default true
-        booleanParam(name: "BUILD_CLIENT", defaultValue: false, description: "Build Client program")
+        booleanParam(name: "BUILD_CLIENT", defaultValue: true, description: "Build Client program")
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
