@@ -214,7 +214,7 @@ pipeline {
                                         }
                                     }
                                 }
-                                stage("Run MyPy Static Analysis") {
+                                stage('MyPy') {
                                     steps{
                                         timeout(10){
                                             tee('logs/mypy.log') {
@@ -238,7 +238,7 @@ pipeline {
                                         }
                                     }
                                 }
-                                stage("Run Bandit Static Analysis") {
+                                stage('Bandit') {
                                     steps{
                                         timeout(10){
                                             catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
@@ -265,7 +265,7 @@ pipeline {
                                         }
                                     }
                                 }
-                                stage("Run Flake8 Static Analysis") {
+                                stage('Flake8') {
                                     steps{
                                         timeout(10){
                                             catchError(buildResult: 'SUCCESS', message: 'Flake8 found issues', stageResult: 'UNSTABLE') {
@@ -286,7 +286,7 @@ pipeline {
                                         }
                                     }
                                 }
-                                stage("Run Pylint Static Analysis") {
+                                stage('Pylint') {
                                     environment{
                                         PYLINTHOME="."
                                     }
@@ -323,7 +323,7 @@ pipeline {
                                         }
                                     }
                                 }
-                                stage("Testing Javascript with Jest"){
+                                stage('Jest'){
                                     environment{
                                         JEST_JUNIT_OUTPUT_NAME="js-junit.xml"
                                         JEST_JUNIT_ADD_FILE_ATTRIBUTE="true"
@@ -348,7 +348,7 @@ pipeline {
                                         }
                                     }
                                 }
-                                stage("Linting Javascript with ESlint"){
+                                stage('ESlint'){
                                     steps{
                                         timeout(10){
                                             catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
