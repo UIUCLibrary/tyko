@@ -332,6 +332,7 @@ pipeline {
                                                                '''
                                                 )
                                             }
+                                            sh "sed -i '/DOCTYPE/d' coverage-reports/cobertura-coverage.xml"
                                         }
                                     }
                                     post{
