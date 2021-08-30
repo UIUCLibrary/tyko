@@ -1,4 +1,4 @@
-@Library(["devpi", "PythonHelpers"]) _
+// @Library(["devpi", "PythonHelpers"]) _
 def parseBanditReport(htmlReport){
     script {
         try{
@@ -26,18 +26,18 @@ def startup(){
 }
 
 
-startup()
+// startup()
 
 pipeline {
     agent none
     options {
         timeout(time: 1, unit: 'DAYS')
     }
-    environment{
-        DOC_ZIP_FILENAME = "${env.PKG_NAME}-${env.PKG_VERSION}.doc.zip"
-        DEVPI = credentials("DS_devpi")
-        DOCKER_IMAGE_TAG="tyko/${env.BRANCH_NAME.toLowerCase()}"
-    }
+//     environment{
+//         DOC_ZIP_FILENAME = "${env.PKG_NAME}-${env.PKG_VERSION}.doc.zip"
+//         DEVPI = credentials("DS_devpi")
+//         DOCKER_IMAGE_TAG="tyko/${env.BRANCH_NAME.toLowerCase()}"
+//     }
     parameters {
         booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
         booleanParam(name: "BUILD_CLIENT", defaultValue: true, description: "Build Client program")
@@ -45,107 +45,107 @@ pipeline {
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
-        stage("Building"){
-            failFast true
-            parallel{
-                stage("Building Server"){
-                    agent {
-                      dockerfile {
-                        filename 'CI/docker/jenkins/dockerfile'
-                        label "linux && docker"
-                      }
-                    }
-                    steps{
-                        sh "python setup.py build -b build/server dist_info"
-                    }
-                    post{
-                        success{
-                            stash includes: "deploy/**,database/**,alembic/**", name: 'SERVER_DEPLOY_FILES'
-                            stash includes: "tyko.dist-info/**", name: 'DIST-INFO'
-                        }
-                        cleanup{
-                            cleanWs()
-                        }
-                    }
-                }
-                stage("Build Client Software"){
-                    agent {
-                      dockerfile {
-                        filename 'CI/jenkins/dockerfiles/build_VS2019/Dockerfile'
-                        label "windows && docker"
-                      }
-                    }
-                    when {
-                        anyOf{
-                            equals expected: true, actual: params.BUILD_CLIENT
-                            changeset(pattern: "client/**,CI/build_VS2019/**,conanfile.py")
-                        }
-                        beforeAgent true
-                    }
-                    options{
-                        timestamps()
-                    }
-                    stages{
-                        stage("Build Client"){
-                            steps{
-                                bat "if not exist build mkdir build"
-
-                                bat(
-                                    label: "installing dependencies",
-                                    script: "conan install . -if build"
-                                    )
-                                bat(
-                                    label: "Configuring CMake Project",
-                                    script:"cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE:FILE=${WORKSPACE}\\build\\conan_paths.cmake"
-                                    )
-                                bat(
-                                    label: "Building project",
-                                    script: "cmake --build build --config Release"
-                                    )
-                            }
-                            post{
-                                success{
-                                    bat "dumpbin /DEPENDENTS build\\Release\\avdatabaseEditor.exe"
-                                }
-                            }
-                        }
-                        stage("Package Client"){
-                            steps{
-                                dir("build"){
-                                    bat(script: "cpack -G WIX;ZIP;NSIS --verbose")
-                                }
-                            }
-                        }
-                    }
-                    post{
-                        success{
-                            script{
-                                def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi,build/tyko-*-win64.exe")
-                                bat "if not exist dist mkdir dist"
-                                install_files.each{
-                                    powershell "Move-Item -Path ${it.path} -Destination .\\dist\\${it.name}"
-                                }
-
-                            }
-                            stash includes: "dist/*", name: 'CLIENT_BUILD_PACKAGES'
-                        }
-                        failure{
-                            bat "tree /A /F build"
-                        }
-                        cleanup{
-                            cleanWs(
-                                deleteDirs: true,
-                                patterns: [
-                                    [pattern: 'dist', type: 'INCLUDE'],
-                                    [pattern: 'dist/', type: 'INCLUDE'],
-                                    [pattern: 'build/', type: 'INCLUDE']
-                                ]
-                            )
-                        }
-                    }
-                }
-            }
-        }
+//         stage("Building"){
+//             failFast true
+//             parallel{
+//                 stage("Building Server"){
+//                     agent {
+//                       dockerfile {
+//                         filename 'CI/docker/jenkins/dockerfile'
+//                         label "linux && docker"
+//                       }
+//                     }
+//                     steps{
+//                         sh "python setup.py build -b build/server dist_info"
+//                     }
+//                     post{
+//                         success{
+//                             stash includes: "deploy/**,database/**,alembic/**", name: 'SERVER_DEPLOY_FILES'
+//                             stash includes: "tyko.dist-info/**", name: 'DIST-INFO'
+//                         }
+//                         cleanup{
+//                             cleanWs()
+//                         }
+//                     }
+//                 }
+//                 stage("Build Client Software"){
+//                     agent {
+//                       dockerfile {
+//                         filename 'CI/jenkins/dockerfiles/build_VS2019/Dockerfile'
+//                         label "windows && docker"
+//                       }
+//                     }
+//                     when {
+//                         anyOf{
+//                             equals expected: true, actual: params.BUILD_CLIENT
+//                             changeset(pattern: "client/**,CI/build_VS2019/**,conanfile.py")
+//                         }
+//                         beforeAgent true
+//                     }
+//                     options{
+//                         timestamps()
+//                     }
+//                     stages{
+//                         stage("Build Client"){
+//                             steps{
+//                                 bat "if not exist build mkdir build"
+//
+//                                 bat(
+//                                     label: "installing dependencies",
+//                                     script: "conan install . -if build"
+//                                     )
+//                                 bat(
+//                                     label: "Configuring CMake Project",
+//                                     script:"cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE:FILE=${WORKSPACE}\\build\\conan_paths.cmake"
+//                                     )
+//                                 bat(
+//                                     label: "Building project",
+//                                     script: "cmake --build build --config Release"
+//                                     )
+//                             }
+//                             post{
+//                                 success{
+//                                     bat "dumpbin /DEPENDENTS build\\Release\\avdatabaseEditor.exe"
+//                                 }
+//                             }
+//                         }
+//                         stage("Package Client"){
+//                             steps{
+//                                 dir("build"){
+//                                     bat(script: "cpack -G WIX;ZIP;NSIS --verbose")
+//                                 }
+//                             }
+//                         }
+//                     }
+//                     post{
+//                         success{
+//                             script{
+//                                 def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi,build/tyko-*-win64.exe")
+//                                 bat "if not exist dist mkdir dist"
+//                                 install_files.each{
+//                                     powershell "Move-Item -Path ${it.path} -Destination .\\dist\\${it.name}"
+//                                 }
+//
+//                             }
+//                             stash includes: "dist/*", name: 'CLIENT_BUILD_PACKAGES'
+//                         }
+//                         failure{
+//                             bat "tree /A /F build"
+//                         }
+//                         cleanup{
+//                             cleanWs(
+//                                 deleteDirs: true,
+//                                 patterns: [
+//                                     [pattern: 'dist', type: 'INCLUDE'],
+//                                     [pattern: 'dist/', type: 'INCLUDE'],
+//                                     [pattern: 'build/', type: 'INCLUDE']
+//                                 ]
+//                             )
+//                         }
+//                     }
+//                 }
+//             }
+//         }
         stage('Testing') {
             stages{
                 stage("Python Testing"){
@@ -343,7 +343,7 @@ pipeline {
                                                     label:  "Running Jest",
                                                     script: '''mkdir -p reports
                                                                npm install  -y
-                                                               npm test --  --ci --reporters=default --reporters=jest-junit --coverageReporters=cobertura --collectCoverage
+                                                               npm test --  --ci --reporters=default --reporters=jest-junit --coverageReporters=cobertura --collectCoverage   --coverageDirectory=$WORKSPACE/coverage-reports
                                                                '''
                                                 )
                                             }
@@ -351,14 +351,14 @@ pipeline {
                                     }
                                     post{
                                         always{
-                                            stash includes: "reports/*.xml,coverage/**", name: 'JEST_REPORT'
+                                            stash includes: "reports/*.xml,coverage-reports/**", name: 'JEST_REPORT'
                                             junit "reports/*.xml"
                                             archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
-                                            archiveArtifacts allowEmptyArchive: true, artifacts: "coverage/*.xml"
+                                            archiveArtifacts allowEmptyArchive: true, artifacts: "coverage-reports/*.xml"
 
                                             publishCoverage(
                                                 adapters: [
-                                                        istanbulCoberturaAdapter('coverage/cobertura-coverage.xml')
+                                                        coberturaAdapter('coverage-reports/cobertura-coverage.xml')
                                                         ],
                                                 sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
                                             )
