@@ -16,6 +16,7 @@ RUN pip wheel -w /wheels/ \
     "pytest-bdd<4.0" \
     bandit \
     mypy \
+    types-setuptools \
     flake8 \
     coverage \
     pylint \
@@ -32,6 +33,7 @@ RUN pip install --no-cache-dir --no-index --find-links=/wheels/ \
     "pytest-bdd<4.0" \
     bandit \
     mypy \
+    types-setuptools \
     flake8 \
     coverage \
     pylint \
