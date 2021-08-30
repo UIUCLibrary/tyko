@@ -401,10 +401,10 @@ pipeline {
                         equals expected: true, actual: params.TEST_RUN_TOX
                     }
                     agent {
-                      dockerfile {
-                        filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                        label "linux && docker"
-                      }
+                        dockerfile {
+                            filename 'CI/docker/jenkins/dockerfile'
+                            label "linux && docker"
+                        }
                     }
                     steps {
                         timeout(10){
