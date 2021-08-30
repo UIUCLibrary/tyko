@@ -1,4 +1,4 @@
-@Library(["devpi", "PythonHelpers"]) _
+// @Library(["devpi", "PythonHelpers"]) _
 def parseBanditReport(htmlReport){
     script {
         try{
@@ -33,11 +33,6 @@ pipeline {
     options {
         timeout(time: 1, unit: 'DAYS')
     }
-    environment{
-        DOC_ZIP_FILENAME = "${env.PKG_NAME}-${env.PKG_VERSION}.doc.zip"
-        DEVPI = credentials("DS_devpi")
-        DOCKER_IMAGE_TAG="tyko/${env.BRANCH_NAME.toLowerCase()}"
-    }
     parameters {
         booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
         booleanParam(name: "BUILD_CLIENT", defaultValue: true, description: "Build Client program")
@@ -51,7 +46,7 @@ pipeline {
                 stage("Building Server"){
                     agent {
                       dockerfile {
-                        filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
+                        filename 'CI/docker/jenkins/dockerfile'
                         label "linux && docker"
                       }
                     }
@@ -85,7 +80,6 @@ pipeline {
                     options{
                         timestamps()
                     }
-
                     stages{
                         stage("Build Client"){
                             steps{
@@ -149,397 +143,297 @@ pipeline {
         }
         stage('Testing') {
             stages{
-                stage("Running Tests"){
-                    parallel {
-                        stage("PyTest"){
-                            agent {
-                              dockerfile {
-                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                                label "linux && docker"
-                              }
-                            }
+                stage("Code Quality"){
+                    agent {
+                      dockerfile {
+                        filename 'CI/docker/jenkins/dockerfile'
+                        label "linux && docker"
+                      }
+                    }
+                    stages{
+                        stage("Setup Tests"){
                             steps{
-                                timeout(10){
-                                    catchError(buildResult: 'UNSTABLE', message: 'Did not pass all pytest tests', stageResult: 'UNSTABLE') {
-                                        tee('logs/pytest.log'){
-                                            sh(
-                                                label: "Run PyTest",
-                                                script: '''mkdir -p reports
-                                                           coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml
-                                                        '''
-                                            )
+                                sh 'npm install -y'
+                                sh 'mkdir -p reports'
+                            }
+                        }
+                        stage("Running Tests"){
+                            parallel {
+                                stage("PyTest"){
+                                    steps{
+                                        timeout(10){
+                                            catchError(buildResult: 'UNSTABLE', message: 'Did not pass all pytest tests', stageResult: 'UNSTABLE') {
+                                                tee('logs/pytest.log'){
+                                                    sh(
+                                                        label: "Run PyTest",
+                                                        script: '''mkdir -p reports
+                                                                   coverage run --parallel-mode --branch --source=tyko,tests -m pytest --junitxml=reports/test-report.xml
+                                                                '''
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                    post {
+                                        always{
+                                            script{
+                                                try{
+                                                    // See CI/jenkins/scripts/python_warnings.groovy for more information about the groovyScript
+                                                    recordIssues(qualityGates: [[threshold: 1, type: 'NEW', unstable: true]], tools: [groovyScript(parserId: 'pythonWarnings', pattern: 'logs/pytest.log')])
+                                                } catch(Exception e){
+                                                    echo "Unable to parse Python warnings. Reason: ${e}"
+                                                }
+                                            }
+                                            junit "reports/test-report.xml"
                                         }
                                     }
                                 }
-                            }
-                            post {
-                                always{
-                                    script{
-                                        try{
-                                            // See CI/jenkins/scripts/python_warnings.groovy for more information about the groovyScript
-                                            recordIssues(qualityGates: [[threshold: 1, type: 'NEW', unstable: true]], tools: [groovyScript(parserId: 'pythonWarnings', pattern: 'logs/pytest.log')])
-                                        } catch(Exception e){
-                                            echo "Unable to parse Python warnings. Reason: ${e}"
-                                        }
-                                    }
-                                    junit "reports/test-report.xml"
-                                    sh "coverage combine"
-                                    sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
-                                    stash includes: ".coverage.*,reports/pytest/junit-*.xml,coverage-reports/pythoncoverage-pytest.xml", name: 'PYTEST_COVERAGE_DATA'
-
-                                    publishCoverage(
-                                        adapters: [
-                                                coberturaAdapter('coverage-reports/pythoncoverage-pytest.xml')
-                                                ],
-                                        sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
-                                        )
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'reports/', type: 'INCLUDE'],
-                                        ]
-                                    )
-                                }
-                            }
-                        }
-                        stage("pydocstyle"){
-                            agent {
-                              dockerfile {
-                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                                label "linux && docker"
-                              }
-                            }
-                            steps{
-                                timeout(10){
-                                    catchError(buildResult: 'SUCCESS', message: 'Did not pass all pydocstyle tests', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            label: "Run PyTest",
-                                            script: '''mkdir -p reports
-                                                       pydocstyle tyko > reports/pydocstyle-report.txt
-                                                    '''
-                                        )
-                                    }
-                                }
-
-                            }
-                            post {
-                                always{
-                                    recordIssues(tools: [pyDocStyle(pattern: 'reports/pydocstyle-report.txt')])
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'reports/', type: 'INCLUDE'],
-                                        ]
-                                    )
-                                }
-                            }
-                        }
-                        stage("Tox") {
-                            when {
-                                equals expected: true, actual: params.TEST_RUN_TOX
-                            }
-                            agent {
-                              dockerfile {
-                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                                label "linux && docker"
-                              }
-                            }
-                            steps {
-                                timeout(10){
-                                    sh "mkdir -p logs"
-                                    script{
-                                        try{
-                                            sh (
-                                                label: "Run Tox",
-                                                script: "tox --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
-                                            )
-
-                                        } catch (exc) {
-                                            sh(
-                                                label: "Run Tox with new environments",
-                                                script: "tox --recreate --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                            post {
-                                always {
-                                    archiveArtifacts allowEmptyArchive: true, artifacts: '.tox/py*/log/*.log,.tox/log/*.log,logs/tox_report.json'
-                                    recordIssues(tools: [pep8(id: 'tox', name: 'Tox', pattern: '.tox/py*/log/*.log,.tox/log/*.log')])
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'logs/', type: 'INCLUDE'],
-                                            [pattern: '.tox/', type: 'INCLUDE'],
-                                            ]
-                                    )
-                                }
-                            }
-                        }
-                        stage("Run MyPy Static Analysis") {
-                            agent {
-                              dockerfile {
-                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                                label "linux && docker"
-                              }
-                            }
-                            steps{
-                                timeout(10){
-                                    tee('logs/mypy.log') {
-                                        catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
-                                            sh(
-                                                label: "Running MyPy",
-                                                script: '''mkdir -p reports/mypy/html
-                                                           mkdir -p logs
-                                                           mypy tyko --html-report reports/mypy/html
-                                                           '''
+                                stage("pydocstyle"){
+                                    steps{
+                                        timeout(10){
+                                            catchError(buildResult: 'SUCCESS', message: 'Did not pass all pydocstyle tests', stageResult: 'UNSTABLE') {
+                                                sh(
+                                                    label: 'Run pydocstyle',
+                                                    script: '''mkdir -p reports
+                                                               pydocstyle tyko > reports/pydocstyle-report.txt
+                                                            '''
                                                 )
+                                            }
                                         }
-                                    }
-                                }
-                            }
-                            post {
-                                always {
-                                    stash includes: "logs/mypy.log", name: 'MYPY_LOGS'
-                                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/mypy/html/", reportFiles: 'index.html', reportName: 'MyPy HTML Report', reportTitles: ''])
-                                    recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'logs/', type: 'INCLUDE'],
-                                            ]
-                                    )
-                                }
-                            }
-                        }
-                        stage("Run Bandit Static Analysis") {
-                            agent {
-                              dockerfile {
-                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                                label "linux && docker"
-                              }
-                            }
-                            steps{
-                                timeout(10){
-                                    catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
-                                        sh(label: "Running bandit",
-                                            script: '''mkdir -p reports
-                                                       bandit --format json --output reports/bandit-report.json --recursive tyko ||  bandit -f html --recursive tyko --output reports/bandit-report.html
-                                                    '''
-                                        )
-                                    }
-                                }
-                            }
-                            post {
-                                always {
-                                    archiveArtifacts "reports/bandit-report.json,reports/bandit-report.html"
-                                    stash includes: "reports/bandit-report.json", name: 'BANDIT_REPORT'
-                                }
-                                unstable{
-                                    script{
-                                        if(fileExists('reports/bandit-report.html')){
-                                            parseBanditReport("reports/bandit-report.html")
-                                            addWarningBadge text: "Bandit security issues detected", link: "${currentBuild.absoluteUrl}"
-                                        }
-                                    }
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'reports/', type: 'INCLUDE'],
-                                            ]
-                                    )
-                                }
-                            }
-                        }
-                        stage("Audit npm") {
-                            agent {
-                              dockerfile {
-                                filename 'CI/jenkins/dockerfiles/npm_audit/Dockerfile'
-                                label "linux && docker"
-                                additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
-                              }
-                            }
-                            steps{
-                                timeout(10){
-                                    catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            label: "Running npm audit",
-                                            script: "npm audit"
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        stage("Run Flake8 Static Analysis") {
-                            agent {
-                              dockerfile {
-                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                                label "linux && docker"
-                              }
-                            }
-                            steps{
-                                timeout(10){
-                                    catchError(buildResult: 'SUCCESS', message: 'Flake8 found issues', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            label: "Running Flake8",
-                                            script: '''mkdir -p logs
-                                                       flake8 tyko --tee --output-file=logs/flake8.log
-                                                       '''
-                                        )
-                                    }
-                                }
-                            }
-                            post {
-                                always {
-                                    stash includes: "logs/flake8.log", name: 'FLAKE8_LOGS'
-                                    archiveArtifacts 'logs/flake8.log'
-                                    recordIssues(tools: [flake8(pattern: 'logs/flake8.log')])
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'logs/', type: 'INCLUDE'],
-                                            ]
-                                    )
-                                }
-                            }
-                        }
-                        stage("Run Pylint Static Analysis") {
-                            agent {
-                              dockerfile {
-                                filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                                label "linux && docker"
-                              }
-                            }
-                            environment{
-                                PYLINTHOME="."
-                            }
-                            steps{
-                                timeout(10){
-                                    catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            label: "Running pylint",
-                                            script: '''mkdir -p reports
-                                                       pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint_issues.txt
-                                                    '''
-                                        )
-                                    }
-                                }
-                            }
-                            post{
-                                always{
-                                    stash includes: "reports/pylint_issues.txt,reports/pylint.txt", name: 'PYLINT_REPORT'
-                                    archiveArtifacts allowEmptyArchive: true, artifacts: "reports/pylint.txt"
-                                    unstash "PYLINT_REPORT"
-                                    recordIssues(tools: [pyLint(pattern: 'reports/pylint_issues.txt')])
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'reports/', type: 'INCLUDE'],
-                                            ]
-                                    )
-                                }
-                            }
-                        }
-                        stage("Testing Javascript with Jest"){
-                            agent {
-                                dockerfile {
-                                    filename 'CI/jenkins/dockerfiles/testing_javascript/Dockerfile'
-                                    label "linux && docker"
-                                    additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
-                                }
-                            }
-                            environment{
-                                JEST_JUNIT_OUTPUT_NAME="js-junit.xml"
-                                JEST_JUNIT_ADD_FILE_ATTRIBUTE="true"
-                            }
-                            steps{
-                                timeout(10){
-                                    withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
-                                        sh(
-                                            label:  "Running Jest",
-                                            script: '''mkdir -p reports
-                                                       npm install  -y
-                                                       npm test --  --ci --reporters=default --reporters=jest-junit --collectCoverage
-                                                       '''
-                                        )
-                                    }
-                                }
-                            }
-                            post{
-                                always{
-                                    stash includes: "reports/*.xml,coverage/**", name: 'JEST_REPORT'
-                                    junit "reports/*.xml"
-                                    archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
 
-                                    publishCoverage(
-                                        adapters: [
-                                                coberturaAdapter('coverage/cobertura-coverage.xml')
-                                                ],
-                                        sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
-                                    )
+                                    }
+                                    post {
+                                        always{
+                                            recordIssues(tools: [pyDocStyle(pattern: 'reports/pydocstyle-report.txt')])
+                                        }
+                                    }
                                 }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'test-report.xml', type: 'INCLUDE'],
-                                            [pattern: 'node_modules/', type: 'INCLUDE'],
-                                            [pattern: 'reports/', type: 'INCLUDE'],
-                                            ]
+                                stage('MyPy') {
+                                    steps{
+                                        timeout(10){
+                                            tee('logs/mypy.log') {
+                                                catchError(buildResult: 'SUCCESS', message: 'MyPy found issues', stageResult: 'UNSTABLE') {
+                                                    sh(
+                                                        label: "Running MyPy",
+                                                        script: '''mkdir -p reports/mypy/html
+                                                                   mkdir -p logs
+                                                                   mypy tyko --html-report reports/mypy/html
+                                                                   '''
+                                                        )
+                                                }
+                                            }
+                                        }
+                                    }
+                                    post {
+                                        always {
+                                            stash includes: "logs/mypy.log", name: 'MYPY_LOGS'
+                                            publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/mypy/html/", reportFiles: 'index.html', reportName: 'MyPy HTML Report', reportTitles: ''])
+                                            recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
+                                        }
+                                    }
+                                }
+                                stage('Bandit') {
+                                    steps{
+                                        timeout(10){
+                                            catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
+                                                sh(label: "Running bandit",
+                                                    script: '''mkdir -p reports
+                                                               bandit --format json --output reports/bandit-report.json --recursive tyko ||  bandit -f html --recursive tyko --output reports/bandit-report.html
+                                                            '''
+                                                )
+                                            }
+                                        }
+                                    }
+                                    post {
+                                        always {
+                                            archiveArtifacts "reports/bandit-report.json,reports/bandit-report.html"
+                                            stash includes: "reports/bandit-report.json", name: 'BANDIT_REPORT'
+                                        }
+                                        unstable{
+                                            script{
+                                                if(fileExists('reports/bandit-report.html')){
+                                                    parseBanditReport("reports/bandit-report.html")
+                                                    addWarningBadge text: "Bandit security issues detected", link: "${currentBuild.absoluteUrl}"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                stage('Flake8') {
+                                    steps{
+                                        timeout(10){
+                                            catchError(buildResult: 'SUCCESS', message: 'Flake8 found issues', stageResult: 'UNSTABLE') {
+                                                sh(
+                                                    label: "Running Flake8",
+                                                    script: '''mkdir -p logs
+                                                               flake8 tyko --tee --output-file=logs/flake8.log
+                                                               '''
+                                                )
+                                            }
+                                        }
+                                    }
+                                    post {
+                                        always {
+                                            stash includes: "logs/flake8.log", name: 'FLAKE8_LOGS'
+                                            archiveArtifacts 'logs/flake8.log'
+                                            recordIssues(tools: [flake8(pattern: 'logs/flake8.log')])
+                                        }
+                                    }
+                                }
+                                stage('Pylint') {
+                                    environment{
+                                        PYLINTHOME="."
+                                    }
+                                    steps{
+                                        timeout(10){
+                                            catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
+                                                sh(
+                                                    label: "Running pylint",
+                                                    script: '''mkdir -p reports
+                                                               pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint_issues.txt
+                                                            '''
+                                                )
+                                            }
+                                        }
+                                    }
+                                    post{
+                                        always{
+                                            stash includes: "reports/pylint_issues.txt,reports/pylint.txt", name: 'PYLINT_REPORT'
+                                            archiveArtifacts allowEmptyArchive: true, artifacts: "reports/pylint.txt"
+                                            unstash "PYLINT_REPORT"
+                                            recordIssues(tools: [pyLint(pattern: 'reports/pylint_issues.txt')])
+                                        }
+                                    }
+                                }
+                                stage("Audit npm") {
+                                    steps{
+                                        timeout(10){
+                                            catchError(buildResult: 'SUCCESS', message: 'Bandit found issues', stageResult: 'UNSTABLE') {
+                                                sh(
+                                                    label: "Running npm audit",
+                                                    script: "npm audit"
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                stage('Jest'){
+                                    environment{
+                                        JEST_JUNIT_OUTPUT_NAME="js-junit.xml"
+                                        JEST_JUNIT_ADD_FILE_ATTRIBUTE="true"
+                                    }
+                                    steps{
+                                        timeout(10){
+                                            withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
+                                                sh(
+                                                    label:  "Running Jest",
+                                                    script: '''
+                                                               npm test -- --reporters=default --reporters=jest-junit --coverageReporters=cobertura --collectCoverage   --coverageDirectory=$WORKSPACE/coverage-reports
+                                                               '''
+                                                )
+                                            }
+                                        }
+                                    }
+                                    post{
+                                        always{
+                                            stash includes: "reports/*.xml,coverage-reports/cobertura-coverage.xml", name: 'JEST_REPORT'
+                                            junit "reports/*.xml"
+                                            archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
+                                        }
+                                    }
+                                }
+                                stage('ESlint'){
+                                    steps{
+                                        timeout(10){
+                                            catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
+                                                sh(
+                                                    label:  "Running ESlint",
+                                                    script: './node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml'
+                                                )
+                                            }
+                                        }
+                                    }
+                                    post{
+                                        always{
+                                            archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
+                                            recordIssues(tools: [esLint(pattern: 'reports/eslint.xml')])
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    post{
+                        always{
+                            sh "coverage combine"
+                            sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
+                            stash includes: ".coverage.*,reports/pytest/junit-*.xml,coverage-reports/pythoncoverage-pytest.xml", name: 'PYTEST_COVERAGE_DATA'
+                            publishCoverage(
+                                adapters: [
+                                        coberturaAdapter('coverage-reports/cobertura-coverage.xml'),
+                                        coberturaAdapter('coverage-reports/pythoncoverage-pytest.xml')
+                                        ],
+                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
+                            )
+                            archiveArtifacts allowEmptyArchive: true, artifacts: "coverage-reports/*.xml"
+                        }
+                        cleanup{
+                            cleanWs(
+                                deleteDirs: true,
+                                patterns: [
+                                    [pattern: 'reports/', type: 'INCLUDE'],
+                                    [pattern: 'logs/', type: 'INCLUDE'],
+                                    [pattern: '.mypy_cache/', type: 'INCLUDE'],
+                                    [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                                    [pattern: 'test-report.xml', type: 'INCLUDE'],
+                                    [pattern: 'node_modules/', type: 'INCLUDE'],
+                                ]
+                            )
+                        }
+                    }
+                }
+                stage("Tox") {
+                    when {
+                        equals expected: true, actual: params.TEST_RUN_TOX
+                    }
+                    agent {
+                        dockerfile {
+                            filename 'CI/docker/jenkins/dockerfile'
+                            label "linux && docker"
+                        }
+                    }
+                    steps {
+                        timeout(10){
+                            sh "mkdir -p logs"
+                            script{
+                                try{
+                                    sh (
+                                        label: "Run Tox",
+                                        script: "tox --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
+                                    )
+
+                                } catch (exc) {
+                                    sh(
+                                        label: "Run Tox with new environments",
+                                        script: "tox --recreate --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
                                     )
                                 }
                             }
                         }
-                        stage("Linting Javascript with ESlint"){
-                            agent {
-                                dockerfile {
-                                    filename 'CI/jenkins/dockerfiles/testing_javascript/Dockerfile'
-                                    label "linux && docker"
-                                    additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
-                                }
-                            }
-                            steps{
-                                timeout(10){
-                                    catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
-                                        sh(
-                                            label:  "Running ESlint",
-                                            script: '''mkdir -p reports
-                                                       npm install  -y
-                                                       ./node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml
-                                                       '''
-                                        )
-                                    }
-                                }
-                            }
-                            post{
-                                always{
-                                    archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
-                                    recordIssues(tools: [esLint(pattern: 'reports/eslint.xml')])
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'reports/', type: 'INCLUDE'],
-                                        ]
-                                    )
-                                }
-                            }
+                    }
+                    post {
+                        always {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: '.tox/py*/log/*.log,.tox/log/*.log,logs/tox_report.json'
+                            recordIssues(tools: [pep8(id: 'tox', name: 'Tox', pattern: '.tox/py*/log/*.log,.tox/log/*.log')])
+                        }
+                        cleanup{
+                            cleanWs(
+                                deleteDirs: true,
+                                patterns: [
+                                    [pattern: 'logs/', type: 'INCLUDE'],
+                                    [pattern: '.tox/', type: 'INCLUDE'],
+                                    ]
+                            )
                         }
                     }
                 }
@@ -550,10 +444,10 @@ pipeline {
             parallel{
                 stage("Creating Python Packages"){
                     agent {
-                      dockerfile {
-                        filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                        label "linux && docker"
-                      }
+                        dockerfile {
+                            filename 'CI/docker/jenkins/dockerfile'
+                            label "linux && docker"
+                        }
                     }
                     steps{
                         timeout(10){
