@@ -353,6 +353,7 @@ pipeline {
                                             stash includes: "reports/*.xml,coverage/**", name: 'JEST_REPORT'
                                             junit "reports/*.xml"
                                             archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
+                                            archiveArtifacts allowEmptyArchive: true, artifacts: "coverage/*.xml"
 
                                             publishCoverage(
                                                 adapters: [
