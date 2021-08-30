@@ -149,7 +149,7 @@ pipeline {
         }
         stage('Testing') {
             stages{
-                stage("Python Testing"){
+                stage("Code Quality"){
                     agent {
                       dockerfile {
                         filename 'CI/docker/jenkins/dockerfile'
@@ -157,7 +157,7 @@ pipeline {
                       }
                     }
                     stages{
-                        stage("Python Tests"){
+                        stage("Running Tests"){
                             parallel {
                                 stage("PyTest"){
                                     steps{
@@ -333,7 +333,6 @@ pipeline {
                                                                '''
                                                 )
                                             }
-//                                             sh "sed -i '/DOCTYPE/d' coverage-reports/cobertura-coverage.xml"
                                         }
                                     }
                                     post{
@@ -449,10 +448,10 @@ pipeline {
             parallel{
                 stage("Creating Python Packages"){
                     agent {
-                      dockerfile {
-                        filename 'CI/jenkins/dockerfiles/server_testing/Dockerfile'
-                        label "linux && docker"
-                      }
+                        dockerfile {
+                            filename 'CI/docker/jenkins/dockerfile'
+                            label "linux && docker"
+                        }
                     }
                     steps{
                         timeout(10){
