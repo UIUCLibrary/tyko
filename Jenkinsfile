@@ -157,6 +157,12 @@ pipeline {
                       }
                     }
                     stages{
+                        stage("Setup Tests"){
+                            steps{
+                                sh 'npm install -y'
+                                sh 'mkdir -p reports'
+                            }
+                        }
                         stage("Running Tests"){
                             parallel {
                                 stage("PyTest"){
@@ -327,8 +333,7 @@ pipeline {
                                             withEnv(["JEST_JUNIT_OUTPUT_DIR=${WORKSPACE}/reports"]) {
                                                 sh(
                                                     label:  "Running Jest",
-                                                    script: '''mkdir -p reports
-                                                               npm install  -y
+                                                    script: '''
                                                                npm test -- --reporters=default --reporters=jest-junit --coverageReporters=cobertura --collectCoverage   --coverageDirectory=$WORKSPACE/coverage-reports
                                                                '''
                                                 )
@@ -349,10 +354,7 @@ pipeline {
                                             catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
                                                 sh(
                                                     label:  "Running ESlint",
-                                                    script: '''mkdir -p reports
-                                                               npm install  -y
-                                                               ./node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml
-                                                               '''
+                                                    script: './node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml'
                                                 )
                                             }
                                         }
