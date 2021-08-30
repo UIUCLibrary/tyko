@@ -304,10 +304,6 @@ pipeline {
                                         }
                                     }
                                 }
-                            }
-                        }
-                        stage('js testing'){
-                            parallel{
                                 stage("Audit npm") {
                                     steps{
                                         timeout(10){
