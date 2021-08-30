@@ -6,37 +6,17 @@ RUN npm install -g npm && \
     chmod 777 /.npm
 
 FROM base_image as wheel_builder
-COPY requirements.txt ./
+COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
 RUN python -m pip install pip --upgrade
 RUN python -m pip install wheel
 
 RUN pip wheel -w /wheels/ \
-    "tox<3.10" \
-    pytest \
-    "pytest-bdd<4.0" \
-    bandit \
-    mypy \
-    types-setuptools \
-    flake8 \
-    coverage \
-    pylint \
-    pydocstyle \
-    sqlalchemy-stubs \
-     -r requirements.txt
+    -r requirements-ci.txt \
+    -r requirements.txt
 
 FROM base_image
 COPY --from=wheel_builder /wheels /wheels/
-COPY requirements.txt ./
+COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ \
-    "tox<3.10" \
-    pytest \
-    "pytest-bdd<4.0" \
-    bandit \
-    mypy \
-    types-setuptools \
-    flake8 \
-    coverage \
-    pylint \
-    pydocstyle \
-    sqlalchemy-stubs \
-     -r requirements.txt
+    -r requirements-ci.txt \
+    -r requirements.txt

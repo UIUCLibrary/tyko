@@ -1,0 +1,11 @@
+tox<3.10
+pytest
+pytest-bdd<4.0
+bandit
+mypy
+types-setuptools
+flake8
+coverage
+pylint
+pydocstyle
+sqlalchemy-stubs
