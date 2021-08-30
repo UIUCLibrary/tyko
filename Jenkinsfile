@@ -194,6 +194,7 @@ pipeline {
                                                         ],
                                                 sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
                                                 )
+                                        archiveArtifacts allowEmptyArchive: true, artifacts: "coverage-reports/*.xml"
                                         }
                                     }
                                 }
@@ -342,7 +343,7 @@ pipeline {
                                                     label:  "Running Jest",
                                                     script: '''mkdir -p reports
                                                                npm install  -y
-                                                               npm test --  --ci --reporters=default --reporters=jest-junit --collectCoverage
+                                                               npm test --  --ci --reporters=default --reporters=jest-junit --coverageReporters=cobertura --collectCoverage
                                                                '''
                                                 )
                                             }
@@ -357,7 +358,7 @@ pipeline {
 
                                             publishCoverage(
                                                 adapters: [
-                                                        coberturaAdapter('coverage/cobertura-coverage.xml')
+                                                        istanbulCoberturaAdapter('coverage/cobertura-coverage.xml')
                                                         ],
                                                 sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
                                             )
