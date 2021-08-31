@@ -20,14 +20,60 @@ def startup(){
                     checkout scm
                     discoverGitReferenceBuild(latestBuildIfNotFound: true)
                 }
+            },
+            'Getting Distribution Info': {
+                node('linux && docker') {
+                    ws{
+                        checkout scm
+                        try{
+                            docker.image('python').inside {
+                                timeout(2){
+                                    sh(
+                                       label: 'Running setup.py with dist_info',
+                                       script: '''python --version
+                                                  PIP_NO_CACHE_DIR=off python setup.py dist_info
+                                               '''
+                                    )
+                                    stash includes: '*.dist-info/**', name: 'DIST-INFO'
+                                    archiveArtifacts artifacts: '*.dist-info/**'
+                                }
+                            }
+                        } finally{
+                            cleanWs()
+                        }
+                    }
+                }
             }
         ]
     )
 }
+def get_props(){
+    stage('Reading Package Metadata'){
+        node() {
+            try{
+                unstash 'DIST-INFO'
 
+                def metadataFiles = findFiles(glob: '*.dist-info/METADATA')
+                if( metadataFiles.size() == 0){
+                    error 'unable to located .dist-info/METADATA file'
+                }
+                def props = readProperties( interpolate: true, file: metadataFiles[0].path)
+                return props
+            } finally {
+                cleanWs()
+            }
+        }
+    }
+}
+def getDefaultParams(){
+    def defaults = [:]
+    defaults.USE_SONARQUBE = true
+    return defaults
+}
 
 startup()
-
+props = get_props()
+defaultParamValues = getDefaultParams()
 pipeline {
     agent none
     options {
@@ -35,7 +81,12 @@ pipeline {
     }
     parameters {
         booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
-        booleanParam(name: "BUILD_CLIENT", defaultValue: true, description: "Build Client program")
+        booleanParam(
+                name: 'USE_SONARQUBE',
+                defaultValue: defaultParamValues.USE_SONARQUBE,
+                description: 'Send data test data to SonarQube'
+            )
+        booleanParam(name: "BUILD_CLIENT", defaultValue: false, description: "Build Client program")
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
@@ -148,11 +199,13 @@ pipeline {
                       dockerfile {
                         filename 'CI/docker/jenkins/dockerfile'
                         label "linux && docker"
+                        args '--mount source=sonar-cache-tyko,target=/opt/sonar/.sonar/cache'
                       }
                     }
                     stages{
                         stage("Setup Tests"){
                             steps{
+                                sh 'which sonar-scanner'
                                 sh 'npm install -y'
                                 sh 'mkdir -p reports'
                             }
@@ -290,10 +343,15 @@ pipeline {
                                                 sh(
                                                     label: "Running pylint",
                                                     script: '''mkdir -p reports
-                                                               pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint_issues.txt
+                                                               pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint.txt
                                                             '''
                                                 )
                                             }
+                                            sh(
+                                                script: 'PYLINTHOME=. pylint  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > reports/pylint_issues.txt',
+                                                label: 'Running pylint for sonarqube',
+                                                returnStatus: true
+                                            )
                                         }
                                     }
                                     post{
@@ -301,7 +359,7 @@ pipeline {
                                             stash includes: "reports/pylint_issues.txt,reports/pylint.txt", name: 'PYLINT_REPORT'
                                             archiveArtifacts allowEmptyArchive: true, artifacts: "reports/pylint.txt"
                                             unstash "PYLINT_REPORT"
-                                            recordIssues(tools: [pyLint(pattern: 'reports/pylint_issues.txt')])
+                                            recordIssues(tools: [pyLint(pattern: 'reports/pylint.txt')])
                                         }
                                     }
                                 }
@@ -328,7 +386,7 @@ pipeline {
                                                 sh(
                                                     label:  "Running Jest",
                                                     script: '''
-                                                               npm test -- --reporters=default --reporters=jest-junit --coverageReporters=cobertura --collectCoverage   --coverageDirectory=$WORKSPACE/coverage-reports
+                                                               npm test -- --reporters=default --reporters=jest-junit --coverageReporters=cobertura --coverageReporters=lcov --collectCoverage   --coverageDirectory=$WORKSPACE/coverage-reports
                                                                '''
                                                 )
                                             }
@@ -348,7 +406,7 @@ pipeline {
                                             catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
                                                 sh(
                                                     label:  "Running ESlint",
-                                                    script: './node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint.xml'
+                                                    script: './node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint_report.xml -f json -o reports/eslint_report.json'
                                                 )
                                             }
                                         }
@@ -356,41 +414,97 @@ pipeline {
                                     post{
                                         always{
                                             archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
-                                            recordIssues(tools: [esLint(pattern: 'reports/eslint.xml')])
+                                            recordIssues(tools: [esLint(pattern: 'reports/eslint_report.xml')])
                                         }
                                     }
                                 }
                             }
+                            post{
+                                always{
+                                    sh "coverage combine"
+                                    sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
+                                    stash includes: ".coverage.*,reports/pytest/junit-*.xml,coverage-reports/pythoncoverage-pytest.xml", name: 'PYTEST_COVERAGE_DATA'
+
+                                    // remove this when publishCoverage works with cobertura coverage data produced by jest
+                                    cobertura(
+                                        autoUpdateHealth: false,
+                                        autoUpdateStability: false,
+                                        coberturaReportFile: 'coverage-reports/cobertura-coverage.xml',
+                                        conditionalCoverageTargets: '70, 0, 0',
+                                        enableNewApi: true,
+                                        failUnhealthy: false,
+                                        failUnstable: false,
+                                        lineCoverageTargets: '80, 0, 0',
+                                        maxNumberOfBuilds: 0,
+                                        methodCoverageTargets: '80, 0, 0',
+                                        onlyStable: false,
+                                        sourceEncoding: 'ASCII',
+                                        zoomCoverageChart: false
+                                    )
+
+                                    publishCoverage(
+                                        adapters: [
+                                                coberturaAdapter('coverage-reports/cobertura-coverage.xml'),
+                                                coberturaAdapter('coverage-reports/pythoncoverage-pytest.xml')
+                                                ],
+                                        sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
+                                    )
+                                    archiveArtifacts allowEmptyArchive: true, artifacts: "coverage-reports/*.xml"
+                                }
+                            }
+                        }
+                        stage('Submit Test Results to Sonarcloud for Analysis'){
+                            options{
+                                lock('tyko-sonarcloud')
+                            }
+                            when{
+                                equals expected: true, actual: params.USE_SONARQUBE
+                                beforeAgent true
+                                beforeOptions true
+                            }
+                            steps{
+//                                 sh(
+//                                     label: 'Preparing c++ coverage data available for SonarQube',
+//                                     script: """mkdir -p build/coverage
+//                                     find ./build -name '*.gcno' -exec gcov {} -p --source-prefix=${WORKSPACE}/ \\;
+//                                     mv *.gcov build/coverage/
+//                                     """
+//                                     )
+
+                                script{
+                                    load('CI/jenkins/scripts/sonarqube.groovy').sonarcloudSubmit2(
+                                        credentialsId: 'sonarcloud-token',
+                                        projectVersion: props.Version
+                                    )
+//                                     load('ci/jenkins/scripts/sonarqube.groovy').sonarcloudSubmit('reports/sonar-report.json', 'sonarcloud-token')
+                                }
+                            }
+                            post {
+                                cleanup{
+                                        cleanWs(
+                                            deleteDirs: true,
+                                            patterns: [
+                                                [pattern: 'reports/', type: 'INCLUDE'],
+                                                [pattern: 'logs/', type: 'INCLUDE'],
+                                                [pattern: '.mypy_cache/', type: 'INCLUDE'],
+                                                [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                                                [pattern: 'test-report.xml', type: 'INCLUDE'],
+                                                [pattern: 'node_modules/', type: 'INCLUDE'],
+                                            ]
+                                        )
+                                    }
+                                }
+//                                 always{
+//                                     script{
+//                                         if(fileExists('reports/sonar-report.json')){
+//                                             recordIssues(tools: [sonarQube(pattern: 'reports/sonar-report.json')])
+//                                         }
+//                                     }
+//                                 }
+//                             }
                         }
                     }
-                    post{
-                        always{
-                            sh "coverage combine"
-                            sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
-                            stash includes: ".coverage.*,reports/pytest/junit-*.xml,coverage-reports/pythoncoverage-pytest.xml", name: 'PYTEST_COVERAGE_DATA'
-                            publishCoverage(
-                                adapters: [
-                                        coberturaAdapter('coverage-reports/cobertura-coverage.xml'),
-                                        coberturaAdapter('coverage-reports/pythoncoverage-pytest.xml')
-                                        ],
-                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
-                            )
-                            archiveArtifacts allowEmptyArchive: true, artifacts: "coverage-reports/*.xml"
-                        }
-                        cleanup{
-                            cleanWs(
-                                deleteDirs: true,
-                                patterns: [
-                                    [pattern: 'reports/', type: 'INCLUDE'],
-                                    [pattern: 'logs/', type: 'INCLUDE'],
-                                    [pattern: '.mypy_cache/', type: 'INCLUDE'],
-                                    [pattern: '**/__pycache__/', type: 'INCLUDE'],
-                                    [pattern: 'test-report.xml', type: 'INCLUDE'],
-                                    [pattern: 'node_modules/', type: 'INCLUDE'],
-                                ]
-                            )
-                        }
-                    }
+
                 }
                 stage("Tox") {
                     when {
@@ -572,9 +686,9 @@ pipeline {
                             steps{
                                 unstash "PYTHON_PACKAGES"
                                 unstash "SERVER_DEPLOY_FILES"
-                                unstash "DIST-INFO"
+//                                 unstash "DIST-INFO"
                                 script{
-                                    def props = readProperties interpolate: true, file: 'tyko.dist-info/METADATA'
+//                                     def props = readProperties interpolate: true, file: 'tyko.dist-info/METADATA'
                                     def remote = [:]
 
                                     withCredentials([usernamePassword(credentialsId: SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {

@@ -1,7 +1,12 @@
+/**
+ * @jest-environment jsdom
+ */
+
 'use strict';
 
 import * as formatOptions from '../tyko/static/js/load_format_options';
 import {items} from "../tyko/static/js/api"
+import {datepicker} from 'gijgo'
 import {requests} from '../tyko/static/js/request';
 jest.mock('../tyko/static/js/request.js');
 jest.mock('../tyko/static/js/api.js');

@@ -1,11 +1,41 @@
 FROM python:3.9 as base_image
 RUN apt -y update && \
     apt install -y npm
-RUN npm install -g npm && \
+RUN npm cache clean -f && \
+    npm install -g n
+RUN n stable -y && \
+    npm install -g npm && \
     mkdir /.npm && \
     chmod 777 /.npm
 
+#==============================================================================
+
+FROM base_image as SONAR_BUILDER
+RUN apt-get update && \
+    apt-get install -y unzip
+
+ENV SONAR_SCANNER_VERSION=4.6.2.2472
+ARG SONAR_SCANNER_HOME=/opt/sonar/${SONAR_SCANNER_VERSION}-linux
+ENV SONAR_USER_HOME=/opt/sonar/.sonar
+
+RUN curl --create-dirs -sSLo /tmp/sonar-scanner.zip \
+        https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip && \
+    unzip -o /tmp/sonar-scanner.zip -d /opt/sonar/ && \
+    rm /tmp/sonar-scanner.zip && \
+    mkdir -p $SONAR_USER_HOME/cache && \
+    chmod -R 777 "${SONAR_USER_HOME}" &&\
+    ln -s /opt/sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux/bin/sonar-scanner /usr/local/bin/sonar-scanner && \
+    which sonar-scanner
+
+
+RUN curl --create-dirs -sSLo /tmp/build-wrapper-linux-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip && \
+    unzip -o /tmp/build-wrapper-linux-x86.zip -d /opt/ && \
+    ln -s /opt/build-wrapper-linux-x86/build-wrapper-linux-x86-64 /usr/local/bin/build-wrapper-linux-x86-64 && \
+    which build-wrapper-linux-x86-64
+#==============================================================================
+
 FROM base_image as wheel_builder
+
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
 RUN python -m pip install pip --upgrade
 RUN python -m pip install wheel
@@ -15,6 +45,25 @@ RUN pip wheel -w /wheels/ \
     -r requirements.txt
 
 FROM base_image
+COPY --from=SONAR_BUILDER /opt/sonar /opt/sonar/
+COPY --from=SONAR_BUILDER /opt/build-wrapper-linux-x86 /opt/build-wrapper-linux-x86/
+ENV SONAR_SCANNER_VERSION=4.6.2.2472
+ARG SONAR_SCANNER_HOME=/opt/sonar/${SONAR_SCANNER_VERSION}-linux
+ENV SONAR_USER_HOME=/opt/sonar/.sonar
+
+RUN ln -s /opt/sonar/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin/sonar-scanner /usr/local/bin/sonar-scanner && \
+    which sonar-scanner
+
+RUN ln -s /opt/build-wrapper-linux-x86/build-wrapper-linux-x86-64 /usr/local/bin/build-wrapper-linux-x86-64 && \
+    which build-wrapper-linux-x86-64
+
+RUN mkdir -p /.sonar/cache && \
+    chmod -R 777 /.sonar/cache
+
+RUN chmod -R 777 $SONAR_USER_HOME
+
+ENV SONAR_SCANNER_OPTS="-server"
+
 COPY --from=wheel_builder /wheels /wheels/
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ \

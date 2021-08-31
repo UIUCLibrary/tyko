@@ -1,5 +1,9 @@
-import {getWidget} from "../tyko/static/js/widgets";
+/**
+ * @jest-environment jsdom
+ */
 
+import {datepicker} from 'gijgo'
+import {getWidget} from "../tyko/static/js/widgets";
 describe('Testing text widget', ()=> {
     let metadataWidget;
 
