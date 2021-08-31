@@ -1,5 +1,9 @@
-import {MetadataWidgetBuilder, applyStyles} from "../tyko/static/js/metadataWidgets.mjs"
+/**
+ * @jest-environment jsdom
+ */
 
+import {MetadataWidgetBuilder, applyStyles} from "../tyko/static/js/metadataWidgets.mjs"
+import {datepicker} from 'gijgo'
 describe('Testing text widget', ()=> {
   beforeEach(()=> {
     document.body.innerHTML =

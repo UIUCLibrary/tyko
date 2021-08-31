@@ -1,5 +1,9 @@
+/**
+ * @jest-environment jsdom
+ */
 import {editNote} from "../tyko/static/js/noteModal";
-import {notes} from "../tyko/static/js/api.js"
+import {notes} from "../tyko/static/js/api.js";
+import {modal} from "bootstrap"
 
 describe('Testing text widget', ()=> {
     beforeEach(()=>{
