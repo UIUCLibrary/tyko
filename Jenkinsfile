@@ -373,7 +373,7 @@ pipeline {
                                         coberturaAdapter('coverage-reports/cobertura-coverage.xml'),
 //                                         coberturaAdapter('coverage-reports/pythoncoverage-pytest.xml')
                                         ],
-                                sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
+//                                 sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
                             )
                             publishCoverage(
                                 adapters: [
