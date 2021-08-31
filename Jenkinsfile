@@ -368,6 +368,7 @@ pipeline {
                             sh "coverage combine"
                             sh "coverage xml -o coverage-reports/pythoncoverage-pytest.xml"
                             stash includes: ".coverage.*,reports/pytest/junit-*.xml,coverage-reports/pythoncoverage-pytest.xml", name: 'PYTEST_COVERAGE_DATA'
+                            cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage-reports/cobertura-coverage.xml', conditionalCoverageTargets: '70, 0, 0', enableNewApi: true, failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
                             publishCoverage(
                                 adapters: [
                                         coberturaAdapter('coverage-reports/cobertura-coverage.xml'),
@@ -375,6 +376,7 @@ pipeline {
                                         ],
 //                                 sourceFileResolver: sourceFiles('STORE_ALL_BUILD'),
                             )
+
                             publishCoverage(
                                 adapters: [
 //                                         coberturaAdapter('coverage-reports/cobertura-coverage.xml'),
