@@ -10,10 +10,11 @@ class TykoConan(ConanFile):
     license = "University of Illinois/NCSA Open Source License"
     author = 'University Library at The University of Illinois at Urbana Champaign: Preservation Services'
     settings = "os", "arch", "compiler", "build_type"
-    generators = ["cmake_paths"]
+    generators = ["cmake_paths", "cmake_find_package"]
     requires = [
-        "qt/5.14.1@bincrafters/stable",
-        "bzip2/1.0.8@conan/stable"
+        "qt/5.15.2"
+        # "qt/5.14.1@bincrafters/stable",
+        # "bzip2/1.0.8@conan/stable"
     ]
 
     default_options = {
@@ -22,6 +23,8 @@ class TykoConan(ConanFile):
         "qt:with_mysql": False,
         "qt:with_sqlite3": False,
         "qt:qttools": True,
+        "qt:qtnetworkauth": True,
+        "qt:shared": True
     }
 
     def build(self):
