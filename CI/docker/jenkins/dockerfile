@@ -1,8 +1,11 @@
-FROM python:3.9 as base_image
+FROM ubuntu:20.04 as base_image
+# FROM python:3.9 as base_image
+ENV TZ=America/Chicago
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 COPY CI/docker/jenkins/apt/apt-packages.txt /packages/apt-packages.txt
 
 RUN apt -y update && \
-    apt -y upgrade && \
     xargs -a /packages/apt-packages.txt apt install -y && \
     rm -rf /var/lib/apt/lists/*
 
@@ -14,9 +17,9 @@ RUN n stable -y && \
     mkdir /.npm && \
     chmod 777 /.npm
 
-RUN python -m pip install pip --upgrade && \
-    pip install wheel --no-cache && \
-    pip install conan --no-cache
+RUN python3 -m pip install pip --upgrade && \
+    python3 -m pip install wheel --no-cache && \
+    python3 -m pip install conan --no-cache
 
 COPY CI/docker/jenkins/conan/profile.ini  /conan/.conan/profiles/default
 COPY CI/docker/jenkins/conan/remotes.json CI/docker/jenkins/conan/conan.conf /conan/.conan/
@@ -31,8 +34,7 @@ ENV CONAN_USER_HOME=/conan
 ENV CONAN_SYSREQUIRES_SUDO=False
 COPY conanfile.py /tmp/conanfile.py
 RUN conan config init
-RUN conan install /tmp --build outdated --no-import
-RUN conan install /tmp --build outdated --no-import  -s build_type=Debug && \
+RUN conan install /tmp --build outdated --no-import && \
     conan remove "*" -b --src -f && \
     conan remove --locks
 
@@ -65,10 +67,10 @@ RUN curl --create-dirs -sSLo /tmp/build-wrapper-linux-x86.zip https://sonarcloud
 FROM base_image as wheel_builder
 
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
-RUN python -m pip install pip --upgrade
-RUN python -m pip install wheel
+RUN python3 -m pip install pip --upgrade
+RUN python3 -m pip install wheel
 
-RUN pip wheel -w /wheels/ \
+RUN python3 -m pip wheel -w /wheels/ \
     -r requirements-ci.txt \
     -r requirements.txt
 
@@ -103,6 +105,6 @@ RUN conan install /tmp --build  missing --no-import && \
 
 COPY --from=wheel_builder /wheels /wheels/
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
-RUN pip install --no-cache-dir --no-index --find-links=/wheels/ \
+RUN python3 -m pip install --no-cache-dir --no-index --find-links=/wheels/ \
     -r requirements-ci.txt \
     -r requirements.txt
