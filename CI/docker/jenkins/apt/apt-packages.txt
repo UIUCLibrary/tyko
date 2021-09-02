@@ -15,3 +15,4 @@ libxcb-xfixes0-dev
 libxcb-xinerama0-dev
 libxcb-xkb-dev
 ninja-build
+xkb-data
