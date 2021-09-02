@@ -92,9 +92,9 @@ pipeline {
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
-        stage('Testing') {
+        stage('Code Quality') {
             stages{
-                stage("Code Quality"){
+                stage('Testing'){
                     agent {
                       dockerfile {
                         filename 'CI/docker/jenkins/dockerfile'
