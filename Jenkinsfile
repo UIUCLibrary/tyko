@@ -114,82 +114,6 @@ pipeline {
                         }
                     }
                 }
-                stage("Build Client Software"){
-                    agent {
-                      dockerfile {
-                        filename 'CI/jenkins/dockerfiles/build_VS2019/Dockerfile'
-                        label "windows && docker"
-                      }
-                    }
-                    when {
-                        anyOf{
-                            equals expected: true, actual: params.BUILD_CLIENT
-                            changeset(pattern: "client/**,CI/build_VS2019/**,conanfile.py")
-                        }
-                        beforeAgent true
-                    }
-                    options{
-                        timestamps()
-                    }
-                    stages{
-                        stage("Build Client"){
-                            steps{
-                                bat "if not exist build mkdir build"
-
-                                bat(
-                                    label: "installing dependencies",
-                                    script: "conan install . -if build"
-                                    )
-                                bat(
-                                    label: "Configuring CMake Project",
-                                    script:"cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE:FILE=${WORKSPACE}\\build\\conan_paths.cmake"
-                                    )
-                                bat(
-                                    label: "Building project",
-                                    script: "cmake --build build --config Release"
-                                    )
-                            }
-                            post{
-                                success{
-                                    bat "dumpbin /DEPENDENTS build\\Release\\avdatabaseEditor.exe"
-                                }
-                            }
-                        }
-                        stage("Package Client"){
-                            steps{
-                                dir("build"){
-                                    bat(script: "cpack -G WIX;ZIP;NSIS --verbose")
-                                }
-                            }
-                        }
-                    }
-                    post{
-                        success{
-                            script{
-                                def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi,build/tyko-*-win64.exe")
-                                bat "if not exist dist mkdir dist"
-                                install_files.each{
-                                    powershell "Move-Item -Path ${it.path} -Destination .\\dist\\${it.name}"
-                                }
-
-                            }
-                            stash includes: "dist/*", name: 'CLIENT_BUILD_PACKAGES'
-                        }
-                        failure{
-                            bat "tree /A /F build"
-                        }
-                        cleanup{
-                            cleanWs(
-                                deleteDirs: true,
-                                patterns: [
-                                    [pattern: 'dist', type: 'INCLUDE'],
-                                    [pattern: 'dist/', type: 'INCLUDE'],
-                                    [pattern: 'build/', type: 'INCLUDE']
-                                ]
-                            )
-                        }
-                    }
-                }
             }
         }
         stage('Testing') {
@@ -556,6 +480,82 @@ pipeline {
         stage("Packaging") {
             failFast true
             parallel{
+                stage('Packaging Client Software for Windows'){
+                    agent {
+                      dockerfile {
+                        filename 'CI/jenkins/dockerfiles/build_VS2019/Dockerfile'
+                        label "windows && docker"
+                      }
+                    }
+                    when {
+                        anyOf{
+                            equals expected: true, actual: params.BUILD_CLIENT
+                            changeset(pattern: "client/**,CI/build_VS2019/**,conanfile.py")
+                        }
+                        beforeAgent true
+                    }
+                    options{
+                        timestamps()
+                    }
+                    stages{
+                        stage("Build Client"){
+                            steps{
+                                bat "if not exist build mkdir build"
+
+                                bat(
+                                    label: "installing dependencies",
+                                    script: "conan install . -if build"
+                                    )
+                                bat(
+                                    label: "Configuring CMake Project",
+                                    script:"cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE:FILE=${WORKSPACE}\\build\\conan_paths.cmake"
+                                    )
+                                bat(
+                                    label: "Building project",
+                                    script: "cmake --build build --config Release"
+                                    )
+                            }
+                            post{
+                                success{
+                                    bat "dumpbin /DEPENDENTS build\\Release\\avdatabaseEditor.exe"
+                                }
+                            }
+                        }
+                        stage("Package Client"){
+                            steps{
+                                dir("build"){
+                                    bat(script: "cpack -G WIX;ZIP;NSIS --verbose")
+                                }
+                            }
+                        }
+                    }
+                    post{
+                        success{
+                            script{
+                                def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi,build/tyko-*-win64.exe")
+                                bat "if not exist dist mkdir dist"
+                                install_files.each{
+                                    powershell "Move-Item -Path ${it.path} -Destination .\\dist\\${it.name}"
+                                }
+
+                            }
+                            stash includes: "dist/*", name: 'CLIENT_BUILD_PACKAGES'
+                        }
+                        failure{
+                            bat "tree /A /F build"
+                        }
+                        cleanup{
+                            cleanWs(
+                                deleteDirs: true,
+                                patterns: [
+                                    [pattern: 'dist', type: 'INCLUDE'],
+                                    [pattern: 'dist/', type: 'INCLUDE'],
+                                    [pattern: 'build/', type: 'INCLUDE']
+                                ]
+                            )
+                        }
+                    }
+                }
                 stage("Creating Python Packages"){
                     agent {
                         dockerfile {
