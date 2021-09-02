@@ -103,7 +103,7 @@ pipeline {
                       }
                     }
                     stages{
-                        stage("Setup Tests"){
+                        stage('Setup Tests'){
                             parallel{
                                 stage('Set Up Javascript Environment'){
                                     steps{
@@ -113,7 +113,10 @@ pipeline {
                                 }
                                 stage('Set Up C++ Test Environment'){
                                     steps{
-                                        echo 'Running conan'
+                                        sh(
+                                            label: 'Running conan',
+                                            script: 'conan install . -if build/client'
+                                        )
                                     }
                                 }
                             }
