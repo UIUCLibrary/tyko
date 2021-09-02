@@ -31,8 +31,8 @@ ENV CONAN_USER_HOME=/conan
 ENV CONAN_SYSREQUIRES_SUDO=False
 COPY conanfile.py /tmp/conanfile.py
 RUN conan config init
-RUN conan install /tmp --build outdated --no-import  && \
-    conan install /tmp --build outdated --no-import  -s build_type=Debug && \
+RUN conan install /tmp --build outdated --no-import
+RUN conan install /tmp --build outdated --no-import  -s build_type=Debug && \
     conan remove "*" -b --src -f && \
     conan remove --locks
 
