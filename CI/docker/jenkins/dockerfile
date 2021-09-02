@@ -28,6 +28,7 @@ ARG PIP_EXTRA_INDEX_URL
 ARG PIP_INDEX_URL
 
 ENV CONAN_USER_HOME=/conan
+ENV CONAN_SYSREQUIRES_SUDO=False
 COPY conanfile.py /tmp/conanfile.py
 RUN conan config init
 RUN conan install /tmp --build outdated --no-import  && \
