@@ -95,6 +95,7 @@ RUN chmod -R 777 $SONAR_USER_HOME
 
 ENV SONAR_SCANNER_OPTS="-server"
 
+COPY conanfile.py /tmp/conanfile.py
 COPY --from=conan_builder /conan/.conan/ /conan/.conan/
 ENV CONAN_USER_HOME=/conan
 RUN conan config init
