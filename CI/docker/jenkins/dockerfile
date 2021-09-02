@@ -1,12 +1,38 @@
 FROM python:3.9 as base_image
+COPY CI/docker/jenkins/apt/apt-packages.txt /packages/apt-packages.txt
+
 RUN apt -y update && \
-    apt install -y npm
+    xargs -a /packages/apt-packages.txt apt install -y && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN npm cache clean -f && \
     npm install -g n
+
 RUN n stable -y && \
     npm install -g npm && \
     mkdir /.npm && \
     chmod 777 /.npm
+
+RUN python -m pip install pip --upgrade && \
+    pip install wheel --no-cache && \
+    pip install conan --no-cache
+
+COPY CI/docker/jenkins/conan/profile.ini  /conan/.conan/profiles/default
+COPY CI/docker/jenkins/conan/remotes.json CI/docker/jenkins/conan/conan.conf /conan/.conan/
+ENV CONAN_USER_HOME=/conan
+ENV CONAN_COLOR_DISPLAY=0
+#==============================================================================
+FROM base_image as conan_builder
+ARG PIP_EXTRA_INDEX_URL
+ARG PIP_INDEX_URL
+
+ENV CONAN_USER_HOME=/conan
+COPY conanfile.py /tmp/conanfile.py
+RUN conan config init
+RUN conan install /tmp --build outdated --no-import  && \
+    conan install /tmp --build outdated --no-import  -s build_type=Debug && \
+    conan remove "*" -b --src -f && \
+    conan remove --locks
 
 #==============================================================================
 
@@ -44,6 +70,7 @@ RUN pip wheel -w /wheels/ \
     -r requirements-ci.txt \
     -r requirements.txt
 
+#==============================================================================
 FROM base_image
 COPY --from=SONAR_BUILDER /opt/sonar /opt/sonar/
 COPY --from=SONAR_BUILDER /opt/build-wrapper-linux-x86 /opt/build-wrapper-linux-x86/
@@ -63,6 +90,14 @@ RUN mkdir -p /.sonar/cache && \
 RUN chmod -R 777 $SONAR_USER_HOME
 
 ENV SONAR_SCANNER_OPTS="-server"
+
+COPY --from=conan_builder /conan/.conan/ /conan/.conan/
+ENV CONAN_USER_HOME=/conan
+RUN conan config init
+RUN conan install /tmp --build  missing --no-import && \
+    conan remove "*" -b --src -f && \
+    conan remove --locks && \
+    chmod -R 777 /conan
 
 COPY --from=wheel_builder /wheels /wheels/
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
