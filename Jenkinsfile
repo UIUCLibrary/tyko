@@ -104,9 +104,18 @@ pipeline {
                     }
                     stages{
                         stage("Setup Tests"){
-                            steps{
-                                sh 'npm install -y'
-                                sh 'mkdir -p reports'
+                            parallel{
+                                stage('Set Up Javascript Environment'){
+                                    steps{
+                                        sh 'npm install -y'
+                                        sh 'mkdir -p reports'
+                                    }
+                                }
+                                stage('Set Up C++ Test Environment'){
+                                    steps{
+                                        echo 'Running conan'
+                                    }
+                                }
                             }
                         }
                         stage("Running Tests"){
