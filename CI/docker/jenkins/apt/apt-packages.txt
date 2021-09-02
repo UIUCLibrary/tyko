@@ -1,6 +1,7 @@
 npm
 libgl-dev
 xorg-dev
+freetds-dev
 libx11-xcb-dev
 libxcb-dri3-dev
 libxcb-icccm4-dev
@@ -16,3 +17,5 @@ libxcb-xinerama0-dev
 libxcb-xkb-dev
 ninja-build
 xkb-data
+clang-tidy
+cppcheck
