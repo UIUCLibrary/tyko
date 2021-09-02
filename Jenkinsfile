@@ -105,7 +105,6 @@ pipeline {
                     stages{
                         stage("Setup Tests"){
                             steps{
-                                sh 'which sonar-scanner'
                                 sh 'npm install -y'
                                 sh 'mkdir -p reports'
                             }
