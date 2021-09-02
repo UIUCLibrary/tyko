@@ -35,6 +35,7 @@ def startup(){
                                                '''
                                     )
                                     stash includes: '*.dist-info/**', name: 'DIST-INFO'
+                                    stash includes: "deploy/**,database/**,alembic/**", name: 'SERVER_DEPLOY_FILES'
                                     archiveArtifacts artifacts: '*.dist-info/**'
                                 }
                             }
@@ -91,31 +92,6 @@ pipeline {
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
-        stage("Building"){
-            failFast true
-            parallel{
-                stage("Building Server"){
-                    agent {
-                      dockerfile {
-                        filename 'CI/docker/jenkins/dockerfile'
-                        label "linux && docker"
-                      }
-                    }
-                    steps{
-                        sh "python setup.py build -b build/server dist_info"
-                    }
-                    post{
-                        success{
-                            stash includes: "deploy/**,database/**,alembic/**", name: 'SERVER_DEPLOY_FILES'
-                            stash includes: "tyko.dist-info/**", name: 'DIST-INFO'
-                        }
-                        cleanup{
-                            cleanWs()
-                        }
-                    }
-                }
-            }
-        }
         stage('Testing') {
             stages{
                 stage("Code Quality"){
@@ -686,9 +662,7 @@ pipeline {
                             steps{
                                 unstash "PYTHON_PACKAGES"
                                 unstash "SERVER_DEPLOY_FILES"
-//                                 unstash "DIST-INFO"
                                 script{
-//                                     def props = readProperties interpolate: true, file: 'tyko.dist-info/METADATA'
                                     def remote = [:]
 
                                     withCredentials([usernamePassword(credentialsId: SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {
