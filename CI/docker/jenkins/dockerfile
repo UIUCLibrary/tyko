@@ -21,10 +21,11 @@ RUN python3 -m pip install pip --upgrade && \
     python3 -m pip install wheel --no-cache && \
     python3 -m pip install conan --no-cache
 
-COPY CI/docker/jenkins/conan/profile.ini  /conan/.conan/profiles/default
+# COPY CI/docker/jenkins/conan/profile.ini  /conan/.conan/profiles/default
 COPY CI/docker/jenkins/conan/remotes.json CI/docker/jenkins/conan/conan.conf /conan/.conan/
 ENV CONAN_USER_HOME=/conan
 ENV CONAN_COLOR_DISPLAY=0
+RUN conan profile new default --detect
 #==============================================================================
 FROM base_image as conan_builder
 ARG PIP_EXTRA_INDEX_URL
@@ -99,6 +100,7 @@ COPY conanfile.py /tmp/conanfile.py
 COPY --from=conan_builder /conan/.conan/ /conan/.conan/
 ENV CONAN_USER_HOME=/conan
 RUN conan config init
+
 RUN conan install /tmp --build  missing --no-import && \
     conan remove "*" -b --src -f && \
     conan remove --locks && \
