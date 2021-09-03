@@ -108,7 +108,6 @@ pipeline {
                                 stage('Set Up Javascript Environment'){
                                     steps{
                                         sh 'npm install -y'
-                                        sh 'mkdir -p reports'
                                     }
                                 }
                                 stage('Set Up C++ Test Environment'){
@@ -117,7 +116,44 @@ pipeline {
                                             label: 'Running conan',
                                             script: 'conan install . -if build/client'
                                         )
+                                        tee("logs/cmakebuild.log"){
+                                            sh(
+                                                label: 'Building client',
+                                                script: '''
+                                                    cmake -S . -B build/client -Wdev -DCMAKE_TOOLCHAIN_FILE:FILE=build/client/conan_paths.cmake -DCMAKE_CXX_FLAGS="-fpic -Wall -Wextra -fprofile-arcs -ftest-coverage" -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON
+                                                    build-wrapper-linux-x86-64 --out-dir build/build_wrapper_output_directory cmake --build build/client
+                                                '''
+                                            )
+                                        }
                                     }
+                                    post{
+                                        always{
+                                            recordIssues(
+                                                tools: [
+                                                        gcc(pattern: 'logs/cmakebuild.log'),
+                                                        [$class: 'Cmake', pattern: 'logs/cmakebuild.log'],
+                                                    ],
+                                                filters: [
+                                                        excludeFile('/usr/include/*')
+                                                    ]
+                                            )
+                                        }
+                                        failure{
+                                            script{
+                                                findFiles(glob: "build/**/conaninfo.txt").each{
+                                                    archiveArtifacts it.path
+                                                }
+                                                findFiles(glob: "build/**/CMakeCache.txt").each{
+                                                    archiveArtifacts it.path
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            post{
+                                success{
+                                    sh 'mkdir -p reports'
                                 }
                             }
                         }

@@ -10,3 +10,4 @@ pylint
 pydocstyle
 sqlalchemy-stubs
 types-Flask
+cmake
