@@ -35,6 +35,7 @@ def startup(){
                                                '''
                                     )
                                     stash includes: '*.dist-info/**', name: 'DIST-INFO'
+                                    stash includes: "deploy/**,database/**,alembic/**", name: 'SERVER_DEPLOY_FILES'
                                     archiveArtifacts artifacts: '*.dist-info/**'
                                 }
                             }
@@ -80,7 +81,6 @@ pipeline {
         timeout(time: 1, unit: 'DAYS')
     }
     parameters {
-        booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
         booleanParam(
                 name: 'USE_SONARQUBE',
                 defaultValue: defaultParamValues.USE_SONARQUBE,
@@ -91,123 +91,34 @@ pipeline {
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
-        stage("Building"){
-            failFast true
-            parallel{
-                stage("Building Server"){
-                    agent {
-                      dockerfile {
-                        filename 'CI/docker/jenkins/dockerfile'
-                        label "linux && docker"
-                      }
-                    }
-                    steps{
-                        sh "python setup.py build -b build/server dist_info"
-                    }
-                    post{
-                        success{
-                            stash includes: "deploy/**,database/**,alembic/**", name: 'SERVER_DEPLOY_FILES'
-                            stash includes: "tyko.dist-info/**", name: 'DIST-INFO'
-                        }
-                        cleanup{
-                            cleanWs()
-                        }
-                    }
-                }
-                stage("Build Client Software"){
-                    agent {
-                      dockerfile {
-                        filename 'CI/jenkins/dockerfiles/build_VS2019/Dockerfile'
-                        label "windows && docker"
-                      }
-                    }
-                    when {
-                        anyOf{
-                            equals expected: true, actual: params.BUILD_CLIENT
-                            changeset(pattern: "client/**,CI/build_VS2019/**,conanfile.py")
-                        }
-                        beforeAgent true
-                    }
-                    options{
-                        timestamps()
-                    }
-                    stages{
-                        stage("Build Client"){
-                            steps{
-                                bat "if not exist build mkdir build"
-
-                                bat(
-                                    label: "installing dependencies",
-                                    script: "conan install . -if build"
-                                    )
-                                bat(
-                                    label: "Configuring CMake Project",
-                                    script:"cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE:FILE=${WORKSPACE}\\build\\conan_paths.cmake"
-                                    )
-                                bat(
-                                    label: "Building project",
-                                    script: "cmake --build build --config Release"
-                                    )
-                            }
-                            post{
-                                success{
-                                    bat "dumpbin /DEPENDENTS build\\Release\\avdatabaseEditor.exe"
-                                }
-                            }
-                        }
-                        stage("Package Client"){
-                            steps{
-                                dir("build"){
-                                    bat(script: "cpack -G WIX;ZIP;NSIS --verbose")
-                                }
-                            }
-                        }
-                    }
-                    post{
-                        success{
-                            script{
-                                def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi,build/tyko-*-win64.exe")
-                                bat "if not exist dist mkdir dist"
-                                install_files.each{
-                                    powershell "Move-Item -Path ${it.path} -Destination .\\dist\\${it.name}"
-                                }
-
-                            }
-                            stash includes: "dist/*", name: 'CLIENT_BUILD_PACKAGES'
-                        }
-                        failure{
-                            bat "tree /A /F build"
-                        }
-                        cleanup{
-                            cleanWs(
-                                deleteDirs: true,
-                                patterns: [
-                                    [pattern: 'dist', type: 'INCLUDE'],
-                                    [pattern: 'dist/', type: 'INCLUDE'],
-                                    [pattern: 'build/', type: 'INCLUDE']
-                                ]
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        stage('Testing') {
+        stage('Code Quality') {
             stages{
-                stage("Code Quality"){
+                stage('Testing'){
                     agent {
                       dockerfile {
                         filename 'CI/docker/jenkins/dockerfile'
                         label "linux && docker"
+                        additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
                         args '--mount source=sonar-cache-tyko,target=/opt/sonar/.sonar/cache'
                       }
                     }
                     stages{
-                        stage("Setup Tests"){
-                            steps{
-                                sh 'which sonar-scanner'
-                                sh 'npm install -y'
-                                sh 'mkdir -p reports'
+                        stage('Setup Tests'){
+                            parallel{
+                                stage('Set Up Javascript Environment'){
+                                    steps{
+                                        sh 'npm install -y'
+                                        sh 'mkdir -p reports'
+                                    }
+                                }
+                                stage('Set Up C++ Test Environment'){
+                                    steps{
+                                        sh(
+                                            label: 'Running conan',
+                                            script: 'conan install . -if build/client'
+                                        )
+                                    }
+                                }
                             }
                         }
                         stage("Running Tests"){
@@ -281,7 +192,10 @@ pipeline {
                                         always {
                                             stash includes: "logs/mypy.log", name: 'MYPY_LOGS'
                                             publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/mypy/html/", reportFiles: 'index.html', reportName: 'MyPy HTML Report', reportTitles: ''])
-                                            recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
+                                            recordIssues(
+                                                filters: [excludeFile('/stubs/*')],
+                                                tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')]
+                                                )
                                         }
                                     }
                                 }
@@ -556,6 +470,82 @@ pipeline {
         stage("Packaging") {
             failFast true
             parallel{
+                stage('Packaging Client Software for Windows'){
+                    agent {
+                      dockerfile {
+                        filename 'CI/jenkins/dockerfiles/build_VS2019/Dockerfile'
+                        label "windows && docker"
+                      }
+                    }
+                    when {
+                        anyOf{
+                            equals expected: true, actual: params.BUILD_CLIENT
+                            changeset(pattern: "client/**,CI/build_VS2019/**,conanfile.py")
+                        }
+                        beforeAgent true
+                    }
+                    options{
+                        timestamps()
+                    }
+                    stages{
+                        stage("Build Client"){
+                            steps{
+                                bat "if not exist build mkdir build"
+
+                                bat(
+                                    label: "installing dependencies",
+                                    script: "conan install . -if build"
+                                    )
+                                bat(
+                                    label: "Configuring CMake Project",
+                                    script:"cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE:FILE=${WORKSPACE}\\build\\conan_paths.cmake"
+                                    )
+                                bat(
+                                    label: "Building project",
+                                    script: "cmake --build build --config Release"
+                                    )
+                            }
+                            post{
+                                success{
+                                    bat "dumpbin /DEPENDENTS build\\Release\\avdatabaseEditor.exe"
+                                }
+                            }
+                        }
+                        stage("Package Client"){
+                            steps{
+                                dir("build"){
+                                    bat(script: "cpack -G WIX;ZIP;NSIS --verbose")
+                                }
+                            }
+                        }
+                    }
+                    post{
+                        always{
+                            script{
+                                def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi,build/tyko-*-win64.exe")
+                                bat "if not exist dist mkdir dist"
+                                install_files.each{
+                                    powershell "Move-Item -Path ${it.path} -Destination .\\dist\\${it.name}"
+                                }
+
+                            }
+                            stash includes: "dist/*", name: 'CLIENT_BUILD_PACKAGES'
+                        }
+                        failure{
+                            bat "tree /A /F build"
+                        }
+                        cleanup{
+                            cleanWs(
+                                deleteDirs: true,
+                                patterns: [
+                                    [pattern: 'dist', type: 'INCLUDE'],
+                                    [pattern: 'dist/', type: 'INCLUDE'],
+                                    [pattern: 'build/', type: 'INCLUDE']
+                                ]
+                            )
+                        }
+                    }
+                }
                 stage("Creating Python Packages"){
                     agent {
                         dockerfile {
@@ -565,7 +555,7 @@ pipeline {
                     }
                     steps{
                         timeout(10){
-                            sh(script: "python setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist")
+                            sh(script: "python3 setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist")
                         }
                     }
                     post {
@@ -686,9 +676,7 @@ pipeline {
                             steps{
                                 unstash "PYTHON_PACKAGES"
                                 unstash "SERVER_DEPLOY_FILES"
-//                                 unstash "DIST-INFO"
                                 script{
-//                                     def props = readProperties interpolate: true, file: 'tyko.dist-info/METADATA'
                                     def remote = [:]
 
                                     withCredentials([usernamePassword(credentialsId: SERVER_CREDS, passwordVariable: 'password', usernameVariable: 'username')]) {

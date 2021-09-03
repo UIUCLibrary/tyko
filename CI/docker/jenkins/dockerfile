@@ -1,12 +1,43 @@
-FROM python:3.9 as base_image
+FROM ubuntu:20.04 as base_image
+# FROM python:3.9 as base_image
+ENV TZ=America/Chicago
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+COPY CI/docker/jenkins/apt/apt-packages.txt /packages/apt-packages.txt
+
 RUN apt -y update && \
-    apt install -y npm
+    xargs -a /packages/apt-packages.txt apt install -y && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN npm cache clean -f && \
     npm install -g n
+
 RUN n stable -y && \
     npm install -g npm && \
     mkdir /.npm && \
     chmod 777 /.npm
+
+RUN python3 -m pip install pip --upgrade && \
+    python3 -m pip install wheel --no-cache && \
+    python3 -m pip install conan --no-cache
+
+# COPY CI/docker/jenkins/conan/profile.ini  /conan/.conan/profiles/default
+COPY CI/docker/jenkins/conan/remotes.json CI/docker/jenkins/conan/conan.conf /conan/.conan/
+ENV CONAN_USER_HOME=/conan
+ENV CONAN_COLOR_DISPLAY=0
+RUN conan profile new default --detect
+#==============================================================================
+FROM base_image as conan_builder
+ARG PIP_EXTRA_INDEX_URL
+ARG PIP_INDEX_URL
+
+ENV CONAN_USER_HOME=/conan
+ENV CONAN_SYSREQUIRES_SUDO=False
+COPY conanfile.py /tmp/conanfile.py
+RUN conan config init
+RUN conan install /tmp --build outdated --no-import && \
+    conan remove "*" -b --src -f && \
+    conan remove --locks
 
 #==============================================================================
 
@@ -37,13 +68,14 @@ RUN curl --create-dirs -sSLo /tmp/build-wrapper-linux-x86.zip https://sonarcloud
 FROM base_image as wheel_builder
 
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
-RUN python -m pip install pip --upgrade
-RUN python -m pip install wheel
+RUN python3 -m pip install pip --upgrade
+RUN python3 -m pip install wheel
 
-RUN pip wheel -w /wheels/ \
+RUN python3 -m pip wheel -w /wheels/ \
     -r requirements-ci.txt \
     -r requirements.txt
 
+#==============================================================================
 FROM base_image
 COPY --from=SONAR_BUILDER /opt/sonar /opt/sonar/
 COPY --from=SONAR_BUILDER /opt/build-wrapper-linux-x86 /opt/build-wrapper-linux-x86/
@@ -64,8 +96,39 @@ RUN chmod -R 777 $SONAR_USER_HOME
 
 ENV SONAR_SCANNER_OPTS="-server"
 
+COPY conanfile.py /tmp/conanfile.py
+COPY --from=conan_builder /conan/.conan/ /conan/.conan/
+ENV CONAN_USER_HOME=/conan
+RUN conan config init
+
+RUN conan install /tmp --build  missing --no-import && \
+    conan remove "*" -b --src -f && \
+    conan remove --locks && \
+    chmod -R 777 /conan
+
 COPY --from=wheel_builder /wheels /wheels/
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
-RUN pip install --no-cache-dir --no-index --find-links=/wheels/ \
+
+RUN python3 -m pip install --no-cache-dir --no-index --find-links=/wheels/ \
     -r requirements-ci.txt \
     -r requirements.txt
+
+ENV MYPYPATH=/stubs/
+RUN stubgen -o $MYPYPATH --include-private -p flask -p jinja2 -p itsdangerous && \
+    chmod -R 777 $MYPYPATH
+
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+
+RUN if id $USER_ID ; then \
+        echo 'Existing user id found: Creating an alias' ;\
+        groupadd --non-unique --gid $GROUP_ID user ; \
+        useradd  --non-unique --uid $USER_ID -s /bin/sh -m -d /home/user -g user user  ; \
+    else \
+        echo "Creating user id for $USER_ID" ;\
+        groupadd -g $GROUP_ID user ; \
+        echo "Create GROUP_ID $GROUP_ID" ;\
+        useradd  -u $USER_ID -s /bin/sh -m -d /home/user -g user user ;\
+    fi
+
+RUN chown -R $USER_ID /conan

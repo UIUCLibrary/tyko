@@ -85,6 +85,7 @@ if(WIN32)
         PATHS
             ${CMAKE_BINARY_DIR}/platforms
             ${Qt_root_path}/plugins/platforms
+            ${CONAN_QT_ROOT}/bin/archdatadir/plugins/platforms
             )
 #
     install(FILES ${platform_plugin} DESTINATION bin/platforms)
@@ -93,6 +94,7 @@ if(WIN32)
                 builtins.qmltypes
             PATHS
                 ${CMAKE_BINARY_DIR}/qml
+                ${CONAN_QT_ROOT}/bin/archdatadir/qml
             )
     install(DIRECTORY ${QML_DIR} DESTINATION bin)
 endif()
