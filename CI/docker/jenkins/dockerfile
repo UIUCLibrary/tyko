@@ -119,6 +119,7 @@ RUN if id $USER_ID ; then \
         groupadd --non-unique --gid $GROUP_ID user ; \
         useradd  --non-unique --uid $USER_ID -s /bin/sh -m -d /home/user -g user user  ; \
     else \
+        echo "Creating user id for $USER_ID" ;\
         groupadd -g $GROUP_ID user ; \
         useradd  -u $USER_ID -s /bin/sh -m -d /home/user -g user user ;\
     fi
