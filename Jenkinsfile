@@ -120,7 +120,7 @@ pipeline {
                                         sh(
                                             label: 'Configuring cmake build',
                                             script: '''
-                                                cmake -S . -B build/client -DCMAKE_TOOLCHAIN_FILE:FILE=build/client/conan_paths.cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+                                                cmake -S . -B build/client -Wdev -DCMAKE_TOOLCHAIN_FILE:FILE=build/client/conan_paths.cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
                                             '''
                                         )
                                         sh(
