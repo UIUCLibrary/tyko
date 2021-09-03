@@ -81,7 +81,6 @@ pipeline {
         timeout(time: 1, unit: 'DAYS')
     }
     parameters {
-        booleanParam(name: "FRESH_WORKSPACE", defaultValue: false, description: "Purge workspace before staring and checking out source")
         booleanParam(
                 name: 'USE_SONARQUBE',
                 defaultValue: defaultParamValues.USE_SONARQUBE,
