@@ -131,6 +131,9 @@ pipeline {
                                                 findFiles(glob: "build/**/conaninfo.txt").each{
                                                     archiveArtifacts it.path
                                                 }
+                                                findFiles(glob: "build/**/CMakeCache.txt").each{
+                                                    archiveArtifacts it.path
+                                                }
 
 
                                             }
