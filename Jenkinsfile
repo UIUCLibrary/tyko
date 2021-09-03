@@ -108,7 +108,6 @@ pipeline {
                                 stage('Set Up Javascript Environment'){
                                     steps{
                                         sh 'npm install -y'
-                                        sh 'mkdir -p reports'
                                     }
                                 }
                                 stage('Set Up C++ Test Environment'){
@@ -139,6 +138,11 @@ pipeline {
                                             }
                                         }
                                     }
+                                }
+                            }
+                            post{
+                                success{
+                                    sh 'mkdir -p reports'
                                 }
                             }
                         }
