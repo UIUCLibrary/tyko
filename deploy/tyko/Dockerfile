@@ -1,6 +1,7 @@
 FROM python:3.7-alpine as builder
 RUN apk add --no-cache \
     gcc \
+    build-base \
     musl-dev \
     linux-headers \
     mariadb-client \
@@ -8,6 +9,7 @@ RUN apk add --no-cache \
     libressl-dev \
     libxml2-dev \
     libxslt-dev
+
 
 RUN python -m pip install pip --upgrade
 RUN pip install gunicorn mysqlclient lxml flask sqlalchemy
