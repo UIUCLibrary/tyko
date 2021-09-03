@@ -125,6 +125,17 @@ pipeline {
                                             '''
                                         )
                                     }
+                                    post{
+                                        failure{
+                                            script{
+                                                findFiles(glob: "build/**/conaninfo.txt").each{
+                                                    archiveArtifacts it.path
+                                                }
+
+
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
