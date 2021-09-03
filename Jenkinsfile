@@ -117,7 +117,12 @@ pipeline {
                                             label: 'Running conan',
                                             script: 'conan install . -if build/client'
                                         )
-                                        echo 'Building client'
+                                        sh(
+                                        label: 'Building client',
+                                        script: '''
+                                            cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE:FILE=build/client/conan_paths.cmake
+                                        '''
+                                        )
                                     }
                                 }
                             }
