@@ -118,9 +118,14 @@ pipeline {
                                             script: 'conan install . -if build/client'
                                         )
                                         sh(
-                                            label: 'Building client',
+                                            label: 'Configuring cmake build',
                                             script: '''
                                                 cmake -S . -B build/client -DCMAKE_TOOLCHAIN_FILE:FILE=build/client/conan_paths.cmake -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+                                            '''
+                                        )
+                                        sh(
+                                            label: 'Building client',
+                                            script: '''
                                                 cmake --build build/client
                                             '''
                                         )
