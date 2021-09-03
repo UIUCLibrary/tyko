@@ -520,7 +520,7 @@ pipeline {
                         }
                     }
                     post{
-                        success{
+                        always{
                             script{
                                 def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi,build/tyko-*-win64.exe")
                                 bat "if not exist dist mkdir dist"
