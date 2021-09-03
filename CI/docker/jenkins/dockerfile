@@ -125,4 +125,4 @@ RUN if id $USER_ID ; then \
         useradd  -u $USER_ID -s /bin/sh -m -d /home/user -g user user ;\
     fi
 
-RUN chown -R $GROUP_ID /conan
+RUN chown -R $USER_ID /conan
