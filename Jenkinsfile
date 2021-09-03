@@ -126,7 +126,7 @@ pipeline {
                                         sh(
                                             label: 'Building client',
                                             script: '''
-                                                cmake --build build/client
+                                                cmake --build build/client --target avdatabaseEditor
                                             '''
                                         )
                                     }
