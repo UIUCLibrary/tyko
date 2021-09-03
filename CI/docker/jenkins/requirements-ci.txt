@@ -9,3 +9,4 @@ coverage
 pylint
 pydocstyle
 sqlalchemy-stubs
+types-Flask
