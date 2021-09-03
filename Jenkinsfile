@@ -262,6 +262,23 @@ pipeline {
                                         }
                                     }
                                 }
+                                stage("Clang-Tidy"){
+                                    steps{
+                                        catchError(buildResult: 'SUCCESS', message: 'Clang-Tidy found issues', stageResult: 'UNSTABLE') {
+                                            tee('logs/clang-tidy.log') {
+                                                sh(
+                                                    label: 'Run Clang-Tidy',
+                                                    script: "run-clang-tidy -clang-tidy-binary clang-tidy -p ./build/client/ client/"
+                                                   )
+                                            }
+                                        }
+                                    }
+                                    post{
+                                        always {
+                                            recordIssues(tools: [clangTidy(pattern: 'logs/clang-tidy.log')])
+                                        }
+                                    }
+                                }
                                 stage("CPP Check"){
                                     steps{
                                         catchError(buildResult: 'SUCCESS', message: 'cppcheck found issues', stageResult: 'UNSTABLE') {
