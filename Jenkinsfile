@@ -131,8 +131,7 @@ pipeline {
                                             recordIssues(
                                                 tools: [
                                                         gcc(pattern: 'logs/cmakebuild.log'),
-                                                        [$class: 'Cmake', pattern: 'logs/cmakebuild.log']
-                                                        ,
+                                                        [$class: 'Cmake', pattern: 'logs/cmakebuild.log'],
                                                     ],
                                                 filters: [
                                                         excludeFile('/usr/include/*')
