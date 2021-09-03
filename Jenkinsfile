@@ -262,6 +262,45 @@ pipeline {
                                         }
                                     }
                                 }
+                                stage("Clang-Tidy"){
+                                    steps{
+                                        catchError(buildResult: 'SUCCESS', message: 'Clang-Tidy found issues', stageResult: 'UNSTABLE') {
+                                            tee('logs/clang-tidy.log') {
+                                                sh(
+                                                    label: 'Run Clang-Tidy',
+                                                    script: "run-clang-tidy -clang-tidy-binary clang-tidy -p ./build/client/ client/"
+                                                   )
+                                            }
+                                        }
+                                    }
+                                    post{
+                                        always {
+                                            recordIssues(tools: [clangTidy(pattern: 'logs/clang-tidy.log')])
+                                        }
+                                    }
+                                }
+                                stage("CPP Check"){
+                                    steps{
+                                        catchError(buildResult: 'SUCCESS', message: 'cppcheck found issues', stageResult: 'UNSTABLE') {
+                                            sh(label: "Running cppcheck",
+                                               script:'cppcheck --error-exitcode=1 --project=build/client/compile_commands.json --enable=all  -ibuild/debug/_deps --xml --output-file=logs/cppcheck.xml'
+                                               )
+                                        }
+                                    }
+                                    post{
+                                        always {
+                                            recordIssues(
+//                                                 filters: [
+//                                                         excludeFile('build/debug/_deps/*'),
+//                                                         excludeFile('home/user/.conan/*'),
+//                                                     ],
+                                                tools: [
+                                                        cppCheck(pattern: 'logs/cppcheck.xml')
+                                                    ]
+                                            )
+                                        }
+                                    }
+                                }
                                 stage('Flake8') {
                                     steps{
                                         timeout(10){
