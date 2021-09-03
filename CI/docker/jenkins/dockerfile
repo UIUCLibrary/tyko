@@ -108,9 +108,15 @@ RUN conan install /tmp --build  missing --no-import && \
 
 COPY --from=wheel_builder /wheels /wheels/
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
+
 RUN python3 -m pip install --no-cache-dir --no-index --find-links=/wheels/ \
     -r requirements-ci.txt \
     -r requirements.txt
+
+ENV MYPYPATH=/stubs/
+RUN stubgen -o $MYPYPATH --include-private -p flask -p jinja2 -p itsdangerous && \
+    chmod -R 777 $MYPYPATH
+
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 
