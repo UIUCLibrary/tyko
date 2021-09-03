@@ -121,5 +121,6 @@ RUN if id $USER_ID ; then \
     else \
         echo "Creating user id for $USER_ID" ;\
         groupadd -g $GROUP_ID user ; \
+        echo "Create GROUP_ID $GROUP_ID" ;\
         useradd  -u $USER_ID -s /bin/sh -m -d /home/user -g user user ;\
     fi
