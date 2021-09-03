@@ -123,5 +123,6 @@ RUN if id $USER_ID ; then \
         groupadd -g $GROUP_ID user ; \
         echo "Create GROUP_ID $GROUP_ID" ;\
         useradd  -u $USER_ID -s /bin/sh -m -d /home/user -g user user ;\
-    fi \
-    chown -R $GROUP_ID /conan
+    fi
+
+RUN chown -R $GROUP_ID /conan
