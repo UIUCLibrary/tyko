@@ -118,14 +118,9 @@ pipeline {
                                             script: 'conan install . -if build/client'
                                         )
                                         sh(
-                                            label: 'Configuring cmake build',
-                                            script: '''
-                                                cmake -S . -B build/client -Wdev -DCMAKE_TOOLCHAIN_FILE:FILE=build/client/conan_paths.cmake -DCMAKE_CXX_FLAGS="-fpic -Wall -Wextra -fprofile-arcs -ftest-coverage" -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON
-                                            '''
-                                        )
-                                        sh(
                                             label: 'Building client',
                                             script: '''
+                                                cmake -S . -B build/client -Wdev -DCMAKE_TOOLCHAIN_FILE:FILE=build/client/conan_paths.cmake -DCMAKE_CXX_FLAGS="-fpic -Wall -Wextra -fprofile-arcs -ftest-coverage" -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON
                                                 cmake --build build/client
                                             '''
                                         )
