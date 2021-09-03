@@ -117,6 +117,7 @@ pipeline {
                                             label: 'Running conan',
                                             script: 'conan install . -if build/client'
                                         )
+                                        echo 'Building client'
                                     }
                                 }
                             }
