@@ -11,6 +11,7 @@ find_package(Qt5
         QuickTest
         )
 if (Qt5_FOUND)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     option(${PROJECT_NAME}_QT_CLIENT "Qt based desktop client" ON)
 endif()
 
