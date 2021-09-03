@@ -41,6 +41,7 @@ add_executable(avdatabaseEditor
         )
 set_target_properties(avdatabaseEditor PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+        POSITION_INDEPENDENT_CODE TRUE
     )
 
 #target_link_libraries(avdatabaseEditor PRIVATE Qt5::Core Qt5::Widgets Qt5::Quick)
