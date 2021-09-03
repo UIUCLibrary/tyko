@@ -99,6 +99,7 @@ pipeline {
                       dockerfile {
                         filename 'CI/docker/jenkins/dockerfile'
                         label "linux && docker"
+                        additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
                         args '--mount source=sonar-cache-tyko,target=/opt/sonar/.sonar/cache'
                       }
                     }
