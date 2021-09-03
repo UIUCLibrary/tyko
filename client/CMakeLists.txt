@@ -57,7 +57,6 @@ target_link_libraries(avdatabaseEditor
 
         )
 #get_target_property(editor_apple_bundle avdatabaseEditor MACOSX_BUNDLE)
-set_property(TARGET avdatabaseEditor PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 install(TARGETS avdatabaseEditor RUNTIME DESTINATION bin)
 #
 #
