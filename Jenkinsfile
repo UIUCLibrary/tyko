@@ -262,6 +262,28 @@ pipeline {
                                         }
                                     }
                                 }
+                                stage("CPP Check"){
+                                    steps{
+                                        catchError(buildResult: 'SUCCESS', message: 'cppcheck found issues', stageResult: 'UNSTABLE') {
+                                            sh(label: "Running cppcheck",
+                                               script:'cppcheck --error-exitcode=1 --project=build/client/compile_commands.json --enable=all  -ibuild/debug/_deps --xml --output-file=logs/cppcheck.xml'
+                                               )
+                                        }
+                                    }
+                                    post{
+                                        always {
+                                            recordIssues(
+//                                                 filters: [
+//                                                         excludeFile('build/debug/_deps/*'),
+//                                                         excludeFile('home/user/.conan/*'),
+//                                                     ],
+                                                tools: [
+                                                        cppCheck(pattern: 'logs/cppcheck.xml')
+                                                    ]
+                                            )
+                                        }
+                                    }
+                                }
                                 stage('Flake8') {
                                     steps{
                                         timeout(10){
