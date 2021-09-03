@@ -192,7 +192,10 @@ pipeline {
                                         always {
                                             stash includes: "logs/mypy.log", name: 'MYPY_LOGS'
                                             publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "reports/mypy/html/", reportFiles: 'index.html', reportName: 'MyPy HTML Report', reportTitles: ''])
-                                            recordIssues(tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')])
+                                            recordIssues(
+                                                filters: [excludeFile('/stubs/*')],
+                                                tools: [myPy(name: 'MyPy', pattern: 'logs/mypy.log')]
+                                                )
                                         }
                                     }
                                 }
