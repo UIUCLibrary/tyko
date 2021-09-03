@@ -553,7 +553,7 @@ pipeline {
                     }
                     steps{
                         timeout(10){
-                            sh(script: "python setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist")
+                            sh(script: "python3 setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist")
                         }
                     }
                     post {
