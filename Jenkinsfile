@@ -275,7 +275,10 @@ pipeline {
                                     }
                                     post{
                                         always {
-                                            recordIssues(tools: [clangTidy(pattern: 'logs/clang-tidy.log')])
+                                            recordIssues(
+                                                tools: [clangTidy(pattern: 'logs/clang-tidy.log')],
+                                                filters: [excludeFile('build/client/*')],
+                                            )
                                         }
                                     }
                                 }
