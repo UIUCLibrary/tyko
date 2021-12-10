@@ -11,3 +11,7 @@ Development Status:
 [![Jenkins Coverage](https://img.shields.io/jenkins/coverage/api/https/jenkins.library.illinois.edu/job/OpenSourceProjects/job/tyko/job/master)](https://jenkins.library.illinois.edu/job/OpenSourceProjects/job/tyko/job/master/coverage)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=UIUCLibrary_tyko&metric=alert_status)](https://sonarcloud.io/dashboard?id=UIUCLibrary_tyko)
 
+
+Note:
+
+To create a basic config file needed to run Tyko. run create_config.py script
