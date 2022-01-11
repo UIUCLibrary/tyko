@@ -96,7 +96,7 @@ pipeline {
                 stage('Testing'){
                     agent {
                       dockerfile {
-                        filename 'CI/docker/jenkins/dockerfile'
+                        filename 'CI/docker/jenkins/Dockerfile'
                         label "linux && docker"
                         additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
                         args '--mount source=sonar-cache-tyko,target=/opt/sonar/.sonar/cache'
@@ -504,7 +504,7 @@ pipeline {
                     }
                     agent {
                         dockerfile {
-                            filename 'CI/docker/jenkins/dockerfile'
+                            filename 'CI/docker/jenkins/Dockerfile'
                             label "linux && docker"
                         }
                     }
@@ -627,7 +627,7 @@ pipeline {
                 stage("Creating Python Packages"){
                     agent {
                         dockerfile {
-                            filename 'CI/docker/jenkins/dockerfile'
+                            filename 'CI/docker/jenkins/Dockerfile'
                             label "linux && docker"
                         }
                     }
