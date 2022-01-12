@@ -287,7 +287,7 @@ class SelectDateWidget extends WidgetEditState {
   }
 
   validateInput(confirmButtonID, value) {
-    const re = new RegExp('^([0-9]{4})-([0-9]{2})-([0-9]{2})$');
+    const re = /^(\d{4})-(\d{2})-(\d{2})$/;
     const confirmButton = document.getElementById(confirmButtonID);
     if (!confirmButton) {
       return;

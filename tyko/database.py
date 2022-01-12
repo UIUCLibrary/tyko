@@ -65,7 +65,7 @@ def _populate_starting_project_status(
         session,
         project_status_table: Type[projects.ProjectStatus]) -> None:
 
-    print("Populating {} Table".format(project_status_table.__tablename__))
+    print(f"Populating {project_status_table.__tablename__} Table")
     statuses = ['In progress', "Complete", "No work done"]
     for status in statuses:
         new_status = project_status_table(name=status)

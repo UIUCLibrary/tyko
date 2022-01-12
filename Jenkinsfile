@@ -315,13 +315,15 @@ pipeline {
                                             catchError(buildResult: 'SUCCESS', message: 'ESlint found issues', stageResult: 'UNSTABLE') {
                                                 sh(
                                                     label:  "Running ESlint",
-                                                    script: './node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint_report.xml -f json -o reports/eslint_report.json'
+                                                    script: 'npm run eslint-output'
+//                                                     script: './node_modules/.bin/eslint --format checkstyle tyko/static/js/ --ext=.js,.mjs  -o reports/eslint_report.xml -f json -o reports/eslint_report.json'
                                                 )
                                             }
                                         }
                                     }
                                     post{
                                         always{
+                                            sh 'ls reports'
                                             archiveArtifacts allowEmptyArchive: true, artifacts: "reports/*.xml"
                                             recordIssues(tools: [esLint(pattern: 'reports/eslint_report.xml')])
                                         }

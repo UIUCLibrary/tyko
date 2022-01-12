@@ -124,7 +124,9 @@ class ProjectDataConnector(AbsNotesConnector):
 
             if len(names) > 1:
                 raise DataError(
-                    "Database contained multiple matches for {}".format(name))
+                    f"Database contained multiple matches for {name}"
+                )
+
             if len(names) == 0:
                 if create_if_not_exists is True:
                     new_project_status = ProjectStatus(name=name)
@@ -366,8 +368,7 @@ class ObjectDataConnector(AbsNotesConnector):
                     session.query(CollectionObject).filter(
                         CollectionObject.id == id).all()
                 if len(all_collection_object) == 0:
-                    raise DataError(
-                        message="Unable to find object: {}".format(id))
+                    raise DataError(message=f"Unable to find object: {id}")
             else:
                 all_collection_object = \
                     session.query(CollectionObject).filter(
