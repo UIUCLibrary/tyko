@@ -6,10 +6,14 @@
   "directories": {
     "test": "tests"
   },
+  "files": [
+    "src/*"
+  ],
   "scripts": {
     "test": "jest",
     "lint": "eslint ./tyko",
-    "eslint-output": "eslint-output"
+    "eslint-output": "eslint-output",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -31,10 +35,13 @@
     "eslint": "^7.32.0",
     "eslint-config-google": "^0.14.0",
     "eslint-output": "^3.0.1",
+    "expose-loader": "^3.1.0",
     "jest": "^27.1.0",
     "jest-junit": "^13.0.0",
     "jest-sonar-reporter": "^2.0.0",
-    "mkdirp": ">=1.0.3"
+    "mkdirp": ">=1.0.3",
+    "webpack": "^5.66.0",
+    "webpack-cli": "^4.9.1"
   },
   "jest-junit": {
     "addFileAttribute": "true",
@@ -66,11 +73,16 @@
     "reportPath": "reports"
   },
   "dependencies": {
-    "bootstrap": "^4.6.0",
+    "bootstrap": "4.4.1",
+    "bootstrap-table": "^1.19.1",
+    "css-loader": "^6.2.0",
     "gijgo": "^1.9.13",
     "jquery": "^3.6.0",
+    "material-components-web": "^13.0.0",
+    "material-icons": "^1.10.5",
     "npm": "^7.21.1",
     "popper.js": "^1.16.1",
+    "style-loader": "^3.2.1",
     "test": "^0.6.0"
   }
 }
