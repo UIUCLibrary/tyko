@@ -1,2 +1,2 @@
-include tox.ini LICENSE requirements.txt
+include tox.ini LICENSE requirements.txt package.json package-lock.json webpack.config.js
 recursive-include tests *.py *.feature
