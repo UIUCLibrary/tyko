@@ -1,0 +1,24 @@
+{
+  "files": ["tyko"],
+  "formats": [
+    {
+      "name": "stylish",
+      "output": "console"
+    },
+    {
+      "name": "checkstyle",
+      "output": "file",
+      "path": "reports/eslint_report.xml",
+      "id": "eslintReportXML"
+    },
+    {
+      "name": "json",
+      "output": "file",
+      "path": "reports/eslint_report.json",
+      "id": "eslintReportJSON"
+    }
+  ],
+  "eslintConfig": {
+    "extensions": [".js",".mjs"]
+  }
+}
