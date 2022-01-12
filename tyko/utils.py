@@ -17,8 +17,7 @@ def identify_precision(data) -> int:
     for precision, matcher in DATE_PRECISIONS_REGEX.items():
         if matcher.match(data):
             return precision
-    raise AttributeError(
-        "Unable to identify format for string {}".format(data))
+    raise AttributeError(f"Unable to identify format for string {data}")
 
 
 def create_precision_datetime(date: str, precision: int = 3):
