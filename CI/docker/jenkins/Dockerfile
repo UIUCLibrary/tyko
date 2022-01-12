@@ -16,29 +16,6 @@ RUN n stable -y && \
     npm install -g npm && \
     mkdir /.npm && \
     chmod 777 /.npm
-
-RUN python3 -m pip install pip --upgrade && \
-    python3 -m pip install wheel --no-cache && \
-    python3 -m pip install conan --no-cache
-
-# COPY CI/docker/jenkins/conan/profile.ini  /conan/.conan/profiles/default
-COPY CI/docker/jenkins/conan/remotes.json CI/docker/jenkins/conan/conan.conf /conan/.conan/
-ENV CONAN_USER_HOME=/conan
-ENV CONAN_COLOR_DISPLAY=0
-RUN conan profile new default --detect
-#==============================================================================
-FROM base_image as conan_builder
-ARG PIP_EXTRA_INDEX_URL
-ARG PIP_INDEX_URL
-
-ENV CONAN_USER_HOME=/conan
-ENV CONAN_SYSREQUIRES_SUDO=False
-COPY conanfile.py /tmp/conanfile.py
-RUN conan config init
-RUN conan install /tmp --build outdated --no-import && \
-    conan remove "*" -b --src -f && \
-    conan remove --locks
-
 #==============================================================================
 
 FROM base_image as SONAR_BUILDER
@@ -96,16 +73,6 @@ RUN chmod -R 777 $SONAR_USER_HOME
 
 ENV SONAR_SCANNER_OPTS="-server"
 
-COPY conanfile.py /tmp/conanfile.py
-COPY --from=conan_builder /conan/.conan/ /conan/.conan/
-ENV CONAN_USER_HOME=/conan
-RUN conan config init
-
-RUN conan install /tmp --build  missing --no-import && \
-    conan remove "*" -b --src -f && \
-    conan remove --locks && \
-    chmod -R 777 /conan
-
 COPY --from=wheel_builder /wheels /wheels/
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
 
@@ -126,5 +93,3 @@ RUN if id $USER_ID ; then \
         echo "Create GROUP_ID $GROUP_ID" ;\
         useradd  -u $USER_ID -s /bin/sh -m -d /home/user -g user user ;\
     fi
-
-RUN chown -R $USER_ID /conan

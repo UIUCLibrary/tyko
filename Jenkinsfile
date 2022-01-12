@@ -86,7 +86,6 @@ pipeline {
                 defaultValue: defaultParamValues.USE_SONARQUBE,
                 description: 'Send data test data to SonarQube'
             )
-        booleanParam(name: "BUILD_CLIENT", defaultValue: false, description: "Build Client program")
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
@@ -96,7 +95,7 @@ pipeline {
                 stage('Testing'){
                     agent {
                       dockerfile {
-                        filename 'CI/docker/jenkins/dockerfile'
+                        filename 'CI/docker/jenkins/Dockerfile'
                         label "linux && docker"
                         additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
                         args '--mount source=sonar-cache-tyko,target=/opt/sonar/.sonar/cache'
@@ -108,46 +107,6 @@ pipeline {
                                 stage('Set Up Javascript Environment'){
                                     steps{
                                         sh 'npm install -y'
-                                    }
-                                }
-                                stage('Set Up C++ Test Environment'){
-                                    steps{
-                                        sh(
-                                            label: 'Running conan',
-                                            script: 'conan install . -if build/client'
-                                        )
-                                        tee("logs/cmakebuild.log"){
-                                            sh(
-                                                label: 'Building client',
-                                                script: '''
-                                                    cmake -S . -B build/client -Wdev -DCMAKE_TOOLCHAIN_FILE:FILE=build/client/conan_paths.cmake -DCMAKE_CXX_FLAGS="-fpic -Wall -Wextra -fprofile-arcs -ftest-coverage" -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON
-                                                    build-wrapper-linux-x86-64 --out-dir build/build_wrapper_output_directory cmake --build build/client
-                                                '''
-                                            )
-                                        }
-                                    }
-                                    post{
-                                        always{
-                                            recordIssues(
-                                                tools: [
-                                                        gcc(pattern: 'logs/cmakebuild.log'),
-                                                        [$class: 'Cmake', pattern: 'logs/cmakebuild.log'],
-                                                    ],
-                                                filters: [
-                                                        excludeFile('/usr/include/*')
-                                                    ]
-                                            )
-                                        }
-                                        failure{
-                                            script{
-                                                findFiles(glob: "build/**/conaninfo.txt").each{
-                                                    archiveArtifacts it.path
-                                                }
-                                                findFiles(glob: "build/**/CMakeCache.txt").each{
-                                                    archiveArtifacts it.path
-                                                }
-                                            }
-                                        }
                                     }
                                 }
                             }
@@ -259,48 +218,6 @@ pipeline {
                                                     addWarningBadge text: "Bandit security issues detected", link: "${currentBuild.absoluteUrl}"
                                                 }
                                             }
-                                        }
-                                    }
-                                }
-                                stage("Clang-Tidy"){
-                                    steps{
-                                        catchError(buildResult: 'SUCCESS', message: 'Clang-Tidy found issues', stageResult: 'UNSTABLE') {
-                                            tee('logs/clang-tidy.log') {
-                                                sh(
-                                                    label: 'Run Clang-Tidy',
-                                                    script: "run-clang-tidy -clang-tidy-binary clang-tidy -p ./build/client/ client/"
-                                                   )
-                                            }
-                                        }
-                                    }
-                                    post{
-                                        always {
-                                            recordIssues(
-                                                tools: [clangTidy(pattern: 'logs/clang-tidy.log')],
-                                                filters: [excludeFile('build/client/*')],
-                                            )
-                                        }
-                                    }
-                                }
-                                stage("CPP Check"){
-                                    steps{
-                                        catchError(buildResult: 'SUCCESS', message: 'cppcheck found issues', stageResult: 'UNSTABLE') {
-                                            sh(label: "Running cppcheck",
-                                               script:'cppcheck --error-exitcode=1 --project=build/client/compile_commands.json --enable=all  -ibuild/debug/_deps --xml --output-file=logs/cppcheck.xml'
-                                               )
-                                        }
-                                    }
-                                    post{
-                                        always {
-                                            recordIssues(
-//                                                 filters: [
-//                                                         excludeFile('build/debug/_deps/*'),
-//                                                         excludeFile('home/user/.conan/*'),
-//                                                     ],
-                                                tools: [
-                                                        cppCheck(pattern: 'logs/cppcheck.xml')
-                                                    ]
-                                            )
                                         }
                                     }
                                 }
@@ -504,7 +421,7 @@ pipeline {
                     }
                     agent {
                         dockerfile {
-                            filename 'CI/docker/jenkins/dockerfile'
+                            filename 'CI/docker/jenkins/Dockerfile'
                             label "linux && docker"
                         }
                     }
@@ -545,153 +462,30 @@ pipeline {
                 }
             }
         }
-        stage("Packaging") {
-            failFast true
-            parallel{
-                stage('Packaging Client Software for Windows'){
-                    agent {
-                      dockerfile {
-                        filename 'CI/jenkins/dockerfiles/build_VS2019/Dockerfile'
-                        label "windows && docker"
-                      }
-                    }
-                    when {
-                        anyOf{
-                            equals expected: true, actual: params.BUILD_CLIENT
-                            changeset(pattern: "client/**,CI/build_VS2019/**,conanfile.py")
-                        }
-                        beforeAgent true
-                    }
-                    options{
-                        timestamps()
-                    }
-                    stages{
-                        stage("Build Client"){
-                            steps{
-                                bat "if not exist build mkdir build"
-
-                                bat(
-                                    label: "installing dependencies",
-                                    script: "conan install . -if build"
-                                    )
-                                bat(
-                                    label: "Configuring CMake Project",
-                                    script:"cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE:FILE=${WORKSPACE}\\build\\conan_paths.cmake"
-                                    )
-                                bat(
-                                    label: "Building project",
-                                    script: "cmake --build build --config Release"
-                                    )
-                            }
-                            post{
-                                success{
-                                    bat "dumpbin /DEPENDENTS build\\Release\\avdatabaseEditor.exe"
-                                }
-                            }
-                        }
-                        stage("Package Client"){
-                            steps{
-                                dir("build"){
-                                    bat(script: "cpack -G WIX;ZIP;NSIS --verbose")
-                                }
-                            }
-                        }
-                    }
-                    post{
-                        always{
-                            script{
-                                def install_files = findFiles(glob: "build/tyko-*-win64.zip,build/tyko-*-win64.msi,build/tyko-*-win64.exe")
-                                bat "if not exist dist mkdir dist"
-                                install_files.each{
-                                    powershell "Move-Item -Path ${it.path} -Destination .\\dist\\${it.name}"
-                                }
-
-                            }
-                            stash includes: "dist/*", name: 'CLIENT_BUILD_PACKAGES'
-                        }
-                        failure{
-                            bat "tree /A /F build"
-                        }
-                        cleanup{
-                            cleanWs(
-                                deleteDirs: true,
-                                patterns: [
-                                    [pattern: 'dist', type: 'INCLUDE'],
-                                    [pattern: 'dist/', type: 'INCLUDE'],
-                                    [pattern: 'build/', type: 'INCLUDE']
-                                ]
-                            )
-                        }
-                    }
-                }
-                stage("Creating Python Packages"){
-                    agent {
-                        dockerfile {
-                            filename 'CI/docker/jenkins/dockerfile'
-                            label "linux && docker"
-                        }
-                    }
-                    steps{
-                        timeout(10){
-                            sh(script: "python3 setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist")
-                        }
-                    }
-                    post {
-                        success {
-                            archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
-                            stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz", name: 'PYTHON_PACKAGES'
-                        }
-                        unstable {
-                            archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
-                            stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz,", name: 'PYTHON_PACKAGES'
-                        }
-
-                        cleanup{
-                            cleanWs()
-                        }
-                    }
-                }
-            }
-        }
-        stage("Testing Package Installers"){
+        stage("Creating Python Packages"){
             agent {
-                docker {
-                    image 'mcr.microsoft.com/windows/servercore:ltsc2019'
-                    label 'windows && docker'
+                dockerfile {
+                    filename 'CI/docker/jenkins/Dockerfile'
+                    label "linux && docker"
                 }
-            }
-            when {
-                equals expected: true, actual: params.BUILD_CLIENT
-                beforeAgent true
             }
             steps{
-                unstash "CLIENT_BUILD_PACKAGES"
-                script{
-                    findFiles(glob: "dist/*.msi").each{
-                        powershell (
-                            label: "Installing ${it.name}",
-                            script:"New-Item -ItemType Directory -Force -Path ${WORKSPACE}\\logs; msiexec /i ${it.path} /qn /norestart /L*v! ${WORKSPACE}\\logs\\msiexec.log"
-                        )
-                    }
+                timeout(10){
+                    sh(script: "python3 setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist")
                 }
             }
-            post{
-                always{
-                    archiveArtifacts allowEmptyArchive: true, artifacts: "logs\\msiexec.log"
-                    bat 'dir "C:\\Program Files\\"'
+            post {
+                success {
+                    archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
+                    stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz", name: 'PYTHON_PACKAGES'
                 }
-                success{
-                    archiveArtifacts artifacts: "dist/*.msi,dist/*.exe,dist/*.zip"
+                unstable {
+                    archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
+                    stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz,", name: 'PYTHON_PACKAGES'
                 }
+
                 cleanup{
-                    cleanWs(
-                        deleteDirs: true,
-                        patterns: [
-                            [pattern: 'build/', type: 'INCLUDE'],
-                            [pattern: 'dist/', type: 'INCLUDE'],
-                            [pattern: 'logs/', type: 'INCLUDE'],
-                        ]
-                    )
+                    cleanWs()
                 }
             }
         }
