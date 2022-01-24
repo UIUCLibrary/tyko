@@ -579,7 +579,6 @@ pipeline {
                                         [pattern: 'dist/', type: 'INCLUDE'],
                                         ]
                                 )
-                            sh 'ls'
                         }
                     }
                 }
