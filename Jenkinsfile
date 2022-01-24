@@ -185,6 +185,17 @@ pipeline {
                                         }
                                     }
                                 }
+                                stage('Doctest'){
+                                    steps{
+                                        unstash 'DOCS_ARCHIVE'
+                                        sh 'coverage run --parallel-mode --source=tyko -m sphinx -b doctest docs build/docs -d build/docs/doctrees -v'
+                                    }
+                                    post{
+                                        failure{
+                                            sh 'ls -R build/docs/'
+                                        }
+                                    }
+                                }
                                 stage("pydocstyle"){
                                     steps{
                                         timeout(10){
