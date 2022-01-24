@@ -24,7 +24,7 @@ Setting up a Development Environment
 
     Windows::
 
-        venv\\Scripts\\activate
+        venv\Scripts\activate
 
 
 3) Install dependencies::
