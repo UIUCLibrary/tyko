@@ -87,9 +87,47 @@ pipeline {
                 description: 'Send data test data to SonarQube'
             )
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
+        booleanParam(name: 'DEPLOY_DOCS', defaultValue: false, description: 'Update online documentation')
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
+        stage('Build Docs'){
+            agent {
+              dockerfile {
+                filename 'CI/docker/jenkins/Dockerfile'
+                label "linux && docker"
+              }
+            }
+            steps{
+                sh(
+                    label: 'Building docs',
+                    script: '''mkdir -p logs
+                               python3 -m sphinx docs/ build/docs/html -d build/docs/.doctrees -v -w logs/build_sphinx.log
+                               '''
+                )
+            }
+            post{
+                always {
+                    recordIssues(tools: [sphinxBuild(name: 'Sphinx Documentation Build', pattern: 'logs/build_sphinx.log')])
+                    archiveArtifacts artifacts: 'logs/build_sphinx.log'
+                }
+                success{
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'build/docs/html', reportFiles: 'index.html', reportName: 'Documentation', reportTitles: ''])
+                    zip archive: true, dir: 'build/docs/html', glob: '', zipFile: "dist/${props.Name}-${props.Version}.doc.zip"
+                    stash includes: 'dist/*.doc.zip,build/docs/html/**', name: 'DOCS_ARCHIVE'
+                }
+                cleanup{
+                    cleanWs(
+                        deleteDirs: true,
+                        patterns: [
+                            [pattern: 'build/', type: 'INCLUDE'],
+                            [pattern: 'logs/', type: 'INCLUDE'],
+                            [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                        ]
+                    )
+                }
+            }
+        }
         stage('Code Quality') {
             stages{
                 stage('Testing'){
@@ -144,6 +182,17 @@ pipeline {
                                                 }
                                             }
                                             junit "reports/test-report.xml"
+                                        }
+                                    }
+                                }
+                                stage('Doctest'){
+                                    steps{
+                                        unstash 'DOCS_ARCHIVE'
+                                        sh 'coverage run --parallel-mode --source=tyko -m sphinx -b doctest docs build/docs -d build/docs/doctrees -v'
+                                    }
+                                    post{
+                                        failure{
+                                            sh 'ls -R build/docs/'
                                         }
                                     }
                                 }
@@ -496,6 +545,42 @@ pipeline {
                 lock("tyko-deploy")
             }
             parallel{
+                stage('Deploy Online Documentation') {
+                    when{
+                        equals expected: true, actual: params.DEPLOY_DOCS
+                        beforeAgent true
+                        beforeInput true
+                    }
+                    agent {
+                      dockerfile {
+                        filename 'CI/docker/jenkins/Dockerfile'
+                        label "linux && docker"
+                      }
+                    }
+                    options{
+                        timeout(time: 1, unit: 'DAYS')
+                    }
+                    input {
+                        message 'Update project documentation?'
+                    }
+                    steps{
+                        unstash 'DOCS_ARCHIVE'
+                        withCredentials([usernamePassword(credentialsId: 'dccdocs-server', passwordVariable: 'docsPassword', usernameVariable: 'docsUsername')]) {
+                            sh 'python3 utils/upload_docs.py --username=$docsUsername --password=$docsPassword --subroute=tyko build/docs/html apache-ns.library.illinois.edu'
+                        }
+                    }
+                    post{
+                        cleanup{
+                            cleanWs(
+                                    deleteDirs: true,
+                                    patterns: [
+                                        [pattern: 'build/', type: 'INCLUDE'],
+                                        [pattern: 'dist/', type: 'INCLUDE'],
+                                        ]
+                                )
+                        }
+                    }
+                }
                 stage("Deploy Server"){
                     agent {
                         label "!aws"

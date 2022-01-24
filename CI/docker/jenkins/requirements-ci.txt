@@ -11,3 +11,5 @@ pydocstyle
 sqlalchemy-stubs
 types-Flask
 cmake
+sphinx
+paramiko
