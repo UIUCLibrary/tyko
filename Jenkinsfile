@@ -99,7 +99,17 @@ pipeline {
               }
             }
             steps{
-                sh 'ls'
+                sh(
+                    label: 'Building docs',
+                    script: '''mkdir -p logs
+                               python3 -m sphinx docs/ build/docs/html -d build/docs/.doctrees -v -w logs/build_sphinx.log
+                               '''
+                )
+            }
+            post{
+                cleanup{
+                    sh 'ls'
+                }
             }
         }
         stage('Code Quality') {
