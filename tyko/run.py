@@ -29,6 +29,8 @@ def is_correct_db_version(app, database) -> bool:
 
 
 def create_app(app=None, verify_db=True) -> Flask:
+    """Create a new flask app."""
+
     if app is None:
         app = Flask(__name__)
     app.logger.setLevel(logging.INFO)
