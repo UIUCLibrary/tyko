@@ -1,4 +1,9 @@
+"""Exception used by Tyko"""
+
+
 class DataError(Exception):
+    """Data related error."""
+
     status_code = 500
 
     def __init__(self, *args, message="Problem accessing data",

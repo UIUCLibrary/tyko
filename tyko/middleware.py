@@ -60,6 +60,8 @@ class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
 
 
 class Middleware:
+    """Middleware to connect to database."""
+
     def __init__(self, data_provider: dp.DataProvider) -> None:
         self.data_provider = data_provider
 

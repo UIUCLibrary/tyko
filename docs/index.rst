@@ -11,6 +11,7 @@ Welcome to Tyko's documentation!
    :caption: Contents:
 
    development
+   api
 
 
 
