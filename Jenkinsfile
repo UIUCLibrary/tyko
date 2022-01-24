@@ -107,6 +107,10 @@ pipeline {
                 )
             }
             post{
+                always {
+                    recordIssues(tools: [sphinxBuild(name: 'Sphinx Documentation Build', pattern: 'logs/build_sphinx.log')])
+                    archiveArtifacts artifacts: 'logs/build_sphinx.log'
+                }
                 cleanup{
                     cleanWs(
                             deleteDirs: true,
@@ -116,7 +120,6 @@ pipeline {
                                 [pattern: '**/__pycache__/', type: 'INCLUDE'],
                             ]
                         )
-                    sh 'ls'
                 }
             }
         }
