@@ -86,8 +86,8 @@ pipeline {
                 defaultValue: defaultParamValues.USE_SONARQUBE,
                 description: 'Send data test data to SonarQube'
             )
-        booleanParam(name: 'DEPLOY_DOCS', defaultValue: false, description: 'Update online documentation')
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
+        booleanParam(name: 'DEPLOY_DOCS', defaultValue: false, description: 'Update online documentation')
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
@@ -119,12 +119,12 @@ pipeline {
                 }
                 cleanup{
                     cleanWs(
-                            deleteDirs: true,
-                            patterns: [
-                                [pattern: 'build/', type: 'INCLUDE'],
-                                [pattern: 'logs/', type: 'INCLUDE'],
-                                [pattern: '**/__pycache__/', type: 'INCLUDE'],
-                            ]
+                        deleteDirs: true,
+                        patterns: [
+                            [pattern: 'build/', type: 'INCLUDE'],
+                            [pattern: 'logs/', type: 'INCLUDE'],
+                            [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                        ]
                     )
                 }
             }
@@ -564,6 +564,17 @@ pipeline {
                     }
                     steps{
                         unstash 'DOCS_ARCHIVE'
+                    }
+                    post{
+                        cleanup{
+                            cleanWs(
+                                    deleteDirs: true,
+                                    patterns: [
+                                        [pattern: 'build/', type: 'INCLUDE'],
+                                        ]
+                                )
+                            sh 'ls'
+                        }
                     }
                 }
                 stage("Deploy Server"){
