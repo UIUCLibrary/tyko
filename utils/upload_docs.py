@@ -28,7 +28,6 @@ def get_arg_parser():
     parser.add_argument("--port", default=22)
     parser.add_argument("--username", required=True)
     parser.add_argument("--password", required=True)
-    parser.add_argument("--host",  default="apache-ns.library.illinois.edu")
     parser.add_argument("--server_output", default='/var/www/html/dccdocs')
     parser.add_argument("--subroute", help="Subdirectory to deploy files to")
 
