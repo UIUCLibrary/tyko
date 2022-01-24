@@ -73,10 +73,10 @@ RUN chmod -R 777 $SONAR_USER_HOME
 
 ENV SONAR_SCANNER_OPTS="-server"
 
-COPY --from=wheel_builder /wheels /wheels/
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
+COPY --from=wheel_builder /wheels /wheels/
 
-RUN python3 -m pip install --no-cache-dir --no-index --find-links=/wheels/ \
+RUN python3 -m pip install --no-cache-dir  --find-links=/wheels/ \
     -r requirements-ci.txt \
     -r requirements.txt
 
