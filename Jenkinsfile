@@ -96,7 +96,7 @@ pipeline {
               dockerfile {
                 filename 'CI/docker/jenkins/Dockerfile'
                 label "linux && docker"
-                additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
+//                 additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
               }
             }
             steps{
@@ -113,7 +113,7 @@ pipeline {
                     archiveArtifacts artifacts: 'logs/build_sphinx.log'
                 }
                 success{
-                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'build/docs/html', reportFiles: 'index.html', reportName: 'Documentation', reportTitles: ''])
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'build/docs/html', reportFiles: 'index.html', reportName: 'DocumentatDocumentation', reportTitles: ''])
                     zip archive: true, dir: 'build/docs/html', glob: '', zipFile: "dist/${props.Name}-${props.Version}.doc.zip"
                     stash includes: 'dist/*.doc.zip,build/docs/html/**', name: 'DOCS_ARCHIVE'
                 }
