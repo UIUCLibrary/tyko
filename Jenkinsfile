@@ -96,7 +96,6 @@ pipeline {
               dockerfile {
                 filename 'CI/docker/jenkins/Dockerfile'
                 label "linux && docker"
-//                 additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
               }
             }
             steps{
