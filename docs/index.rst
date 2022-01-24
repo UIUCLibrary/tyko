@@ -10,6 +10,8 @@ Welcome to Tyko's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   development
+
 
 
 Indices and tables
