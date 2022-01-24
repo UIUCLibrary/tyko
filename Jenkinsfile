@@ -86,6 +86,7 @@ pipeline {
                 defaultValue: defaultParamValues.USE_SONARQUBE,
                 description: 'Send data test data to SonarQube'
             )
+        booleanParam(name: 'DEPLOY_DOCS', defaultValue: false, description: 'Update online documentation')
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
@@ -545,6 +546,26 @@ pipeline {
                 lock("tyko-deploy")
             }
             parallel{
+                stage('Deploy Online Documentation') {
+                    when{
+                        equals expected: true, actual: params.DEPLOY_DOCS
+                        beforeAgent true
+                        beforeInput true
+                    }
+                    agent {
+                      dockerfile {
+                        filename 'CI/docker/jenkins/Dockerfile'
+                        label "linux && docker"
+                        additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
+                      }
+                    }
+                    input {
+                        message 'Update project documentation?'
+                    }
+                    steps{
+                        unstash 'DOCS_ARCHIVE'
+                    }
+                }
                 stage("Deploy Server"){
                     agent {
                         label "!aws"
