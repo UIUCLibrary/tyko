@@ -90,6 +90,18 @@ pipeline {
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
+        stage('Build Docs'){
+            agent {
+              dockerfile {
+                filename 'CI/docker/jenkins/Dockerfile'
+                label "linux && docker"
+                additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
+              }
+            }
+            steps{
+                sh 'ls'
+            }
+        }
         stage('Code Quality') {
             stages{
                 stage('Testing'){
