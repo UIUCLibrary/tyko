@@ -556,14 +556,19 @@ pipeline {
                       dockerfile {
                         filename 'CI/docker/jenkins/Dockerfile'
                         label "linux && docker"
-                        additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
                       }
+                    }
+                    options{
+                        timeout(time: 1, unit: 'DAYS')
                     }
                     input {
                         message 'Update project documentation?'
                     }
                     steps{
                         unstash 'DOCS_ARCHIVE'
+                        withCredentials([usernamePassword(credentialsId: 'dccdocs-server', passwordVariable: 'docsPassword', usernameVariable: 'docsUsername')]) {
+                            sh 'python3 utils/upload_docs.py --username=$docsUsername --password=$docsPassword --subroute=tyko build/docs/html apache-ns.library.illinois.edu'
+                        }
                     }
                     post{
                         cleanup{
@@ -571,6 +576,7 @@ pipeline {
                                     deleteDirs: true,
                                     patterns: [
                                         [pattern: 'build/', type: 'INCLUDE'],
+                                        [pattern: 'dist/', type: 'INCLUDE'],
                                         ]
                                 )
                             sh 'ls'
