@@ -108,6 +108,14 @@ pipeline {
             }
             post{
                 cleanup{
+                    cleanWs(
+                            deleteDirs: true,
+                            patterns: [
+                                [pattern: 'build/', type: 'INCLUDE'],
+                                [pattern: 'logs/', type: 'INCLUDE'],
+                                [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                            ]
+                        )
                     sh 'ls'
                 }
             }
