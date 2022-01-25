@@ -65,9 +65,12 @@ function loadNewEntityFormClass(
     location.reload();
   };
 
-  function loadData(rawData) {
+  /**
+   * Parse data into an Associative arrays
+   */
+  function parseData(rawData) {
     const data = {};
-    for(let item of rawData){
+    for (let item of rawData){
       const key = item.name.split('.');
 
       if (key.length === 1) {
@@ -94,7 +97,7 @@ function loadNewEntityFormClass(
     form.unbind('submit').bind('submit',
         function(event) {
           event.preventDefault();
-          items.addItem(addUrl, loadData($(element).serializeArray())).
+          items.addItem(addUrl, parseData($(element).serializeArray())).
               then((resp) => onSuccess(resp)).
               catch(function(reason) {
                 const alertBox = $('#submitResultAlert');
