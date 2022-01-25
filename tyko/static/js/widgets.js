@@ -450,7 +450,7 @@ class TextEditorPartFactory {
 }
 
 
-class builder {
+class Builder {
   constructor(rootElement, fieldName, displayText) {
     const baseWidget = new AbsMetadataWidget(rootElement,
         fieldName, displayText);
@@ -485,7 +485,7 @@ class builder {
 }
 
 
-class TextEditorBuilder extends builder {
+class TextEditorBuilder extends Builder {
   getEditMode(baseWidget) {
     return new TextEditorPartFactory('editState', baseWidget);
   }
@@ -504,7 +504,7 @@ class TextEditorBuilder extends builder {
 }
 
 
-class SelectionEditorBuilder extends builder {
+class SelectionEditorBuilder extends Builder {
   getViewOnlyMode(baseWidget) {
     return new SelectEditorPartFactory('viewState', baseWidget);
   }
@@ -522,7 +522,7 @@ class SelectionEditorBuilder extends builder {
   }
 }
 
-class DatePickerBuilder extends builder {
+class DatePickerBuilder extends Builder {
   getViewOnlyMode(baseWidget) {
     return new DatePickerPartFactory('viewState', baseWidget);
   }
@@ -536,7 +536,7 @@ class DatePickerBuilder extends builder {
   }
 }
 
-class NumberPickerBuilder extends builder {
+class NumberPickerBuilder extends Builder {
   getViewOnlyMode(baseWidget) {
     return () => {
       const viewWidget = new ViewWidget(baseWidget);
