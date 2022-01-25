@@ -67,6 +67,8 @@ function loadNewEntityFormClass(
 
   /**
    * Parse data into an Associative arrays
+   * @param {Object} rawData source
+   * @return {Object} reformatted data
    */
   function parseData(rawData) {
     const data = {};
