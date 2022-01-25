@@ -70,7 +70,7 @@ function loadNewEntityFormClass(
    */
   function parseData(rawData) {
     const data = {};
-    for (let item of rawData){
+    for (const item of rawData){
       const key = item.name.split('.');
 
       if (key.length === 1) {
