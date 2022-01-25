@@ -8,16 +8,17 @@ RUN apk add --no-cache \
     mariadb-dev \
     libressl-dev \
     libxml2-dev \
-    libxslt-dev
+    libxslt-dev \
+    npm
 
 
 RUN python -m pip install pip --upgrade
 RUN pip install gunicorn mysqlclient lxml flask sqlalchemy
-COPY ["requirements.txt", "setup.py", "setup.cfg", "/build/"]
-COPY tyko/ /build/tyko/
 WORKDIR /build
 RUN pip wheel --wheel-dir /build/wheels gunicorn mysqlclient
+COPY ["requirements.txt", "setup.py", "setup.cfg", "webpack.config.js", "MANIFEST.in", "package.json", "package-lock.json", "/build/"]
 RUN pip wheel --wheel-dir /build/wheels -r /build/requirements.txt
+COPY tyko/ /build/tyko/
 RUN python setup.py bdist_wheel
 
 FROM python:3.7-alpine as app
@@ -59,4 +60,7 @@ EXPOSE 9182
 ENV TYKO_SETTINGS=/app/config.cfg
 ADD deploy/tyko/gunicorn.conf.py gunicorn.conf.py
 HEALTHCHECK --start-period=5s CMD curl --fail http://localhost:9182/ || exit 1
-CMD gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
+#CMD alembic upgrade head
+#TODO: create a way to run alembic upgrade head from startup
+CMD alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
+#CMD python -m tyko init-db && alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
