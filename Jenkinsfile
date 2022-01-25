@@ -522,7 +522,7 @@ pipeline {
             }
             steps{
                 timeout(10){
-                    sh(script: "python3 setup.py sdist -d dist --format=zip,gztar bdist_wheel -d dist")
+                    sh(script: "python3 -m build")
                 }
             }
             post {
@@ -536,7 +536,13 @@ pipeline {
                 }
 
                 cleanup{
-                    cleanWs()
+                    cleanWs(
+                        deleteDirs: true,
+                        patterns: [
+                            [pattern: 'dist/', type: 'INCLUDE'],
+                            [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                        ]
+                    )
                 }
             }
         }
