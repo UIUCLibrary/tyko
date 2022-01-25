@@ -67,20 +67,20 @@ function loadNewEntityFormClass(
 
   function loadData(rawData) {
     const data = {};
-    for (let i = 0; i < rawData.length; i++) {
-      const key = rawData[i].name.split('.');
+    for(let item of rawData){
+      const key = item.name.split('.');
 
       if (key.length === 1) {
-        data[key[0]] = rawData[i].value;
+        data[key[0]] = item.value;
         continue;
       }
 
       if (key.length === 2) {
         if (data.hasOwnProperty(key[0])) {
-          data[key[0]][key[1]] = rawData[i].value;
+          data[key[0]][key[1]] = item.value;
         } else {
           const o = {};
-          o[key[1]] = rawData[i].value;
+          o[key[1]] = item.value;
           data[key[0]] = o;
         }
       }
