@@ -64,33 +64,37 @@ function loadNewEntityFormClass(
   onSuccess = onSuccess != null ? onSuccess : function(response) {
     location.reload();
   };
+
+  function loadData(rawData) {
+    const data = {};
+    for (let i = 0; i < rawData.length; i++) {
+      const key = rawData[i].name.split('.');
+
+      if (key.length === 1) {
+        data[key[0]] = rawData[i].value;
+        continue;
+      }
+
+      if (key.length === 2) {
+        if (data.hasOwnProperty(key[0])) {
+          data[key[0]][key[1]] = rawData[i].value;
+        } else {
+          const o = {};
+          o[key[1]] = rawData[i].value;
+          data[key[0]] = o;
+        }
+      }
+    }
+    return data;
+  }
+
   $.each($(`.${className}`), function(index, element) {
     const form = $(element);
     const addUrl = $(element).data(apiElementDataName);
     form.unbind('submit').bind('submit',
         function(event) {
           event.preventDefault();
-          const rawData = $(element).serializeArray();
-          const data = {};
-          for (let i = 0; i < rawData.length; i++) {
-            const key = rawData[i].name.split('.');
-
-            if (key.length === 1) {
-              data[key[0]] = rawData[i].value;
-              continue;
-            }
-
-            if (key.length === 2) {
-              if (data.hasOwnProperty(key[0])) {
-                data[key[0]][key[1]] = rawData[i].value;
-              } else {
-                const o = {};
-                o[key[1]] = rawData[i].value;
-                data[key[0]] = o;
-              }
-            }
-          }
-          items.addItem(addUrl, data).
+          items.addItem(addUrl, loadData($(element).serializeArray())).
               then((resp) => onSuccess(resp)).
               catch(function(reason) {
                 const alertBox = $('#submitResultAlert');
