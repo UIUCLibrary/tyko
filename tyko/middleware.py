@@ -5,6 +5,7 @@ import hashlib
 import json
 import sys
 import traceback
+import typing
 from typing import List, Dict, Any, Iterator
 
 from flask import jsonify, make_response, abort, request, url_for
@@ -432,11 +433,18 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
 
         return abort(404)
 
-    def serialize_notes(self, notes: Iterator[Dict[str, Any]]):
+    def serialize_notes(
+            self,
+            notes: Iterator[Dict[str, Any]],
+            notes_middleware: typing.Optional[AbsMiddlwareEntity] = None
+    ):
         serialize_notes = []
+
+        note_mw = \
+            notes_middleware or NotestMiddlwareEntity(self._data_provider)
+
         for note in notes:
             note_id = note['note_id']
-            note_mw = NotestMiddlwareEntity(self._data_provider)
             serialize_notes.append(
                 note_mw.get(id=note_id, resolve_parents=False)
             )
