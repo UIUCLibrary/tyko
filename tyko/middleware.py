@@ -437,7 +437,10 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         for note in notes:
             note_id = note['note_id']
             note_mw = NotestMiddlwareEntity(self._data_provider)
-            serialize_notes.append(note_mw.get(id=note_id, resolve_parents=False))
+            serialize_notes.append(
+                note_mw.get(id=note_id, resolve_parents=False)
+            )
+
         return serialize_notes
 
     def delete(self, id):
