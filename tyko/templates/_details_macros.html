@@ -427,7 +427,7 @@ function remove(apiPath) {
 
 {% macro card(title, card_class) %}
     <div class="card {{ card_class }}">
-        <div class="card-header">{{ title }}</div>
+        <div id="{{ title }}Header" class="card-header">{{ title }}</div>
         <div class="card-body">
             {{ caller() }}
         </div>
