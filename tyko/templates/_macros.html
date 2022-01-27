@@ -103,7 +103,7 @@
 {% macro notes_table(notes, api_path) %}
 <div class="flex-column">
     <div>
-        <table class="table table-sm">
+        <table class="table table-sm" aria-describedby="NotesHeader">
             {% if notes|length > 0 %}
             <thead>
                 <tr>
