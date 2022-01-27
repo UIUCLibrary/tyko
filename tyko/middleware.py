@@ -5,7 +5,7 @@ import hashlib
 import json
 import sys
 import traceback
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Iterator
 
 from flask import jsonify, make_response, abort, request, url_for
 
@@ -432,7 +432,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
 
         return abort(404)
 
-    def serialize_notes(self, notes: Dict[str, Any]):
+    def serialize_notes(self, notes: Iterator[Dict[str, Any]]):
         serialize_notes = []
         for note in notes:
             note_id = note['note_id']
