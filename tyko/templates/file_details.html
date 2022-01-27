@@ -46,19 +46,22 @@
                     <tr>
                         <td>{{ annotation['type']['name'] }}</td>
                         <td>{{ annotation['content'] }}</td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-sm btn-secondary dropdown-toggle"
-                                    data-toggle="dropdown"
-                                    aria-haspopup="true"
-                                    aria-expanded="false"></button>
-                            <div class="dropdown-menu">
-                                <button class="dropdown-item btn-sm"
-                                        onclick='document.getElementById("fileAnnotationTable").dispatchEvent(new CustomEvent("editAnnotation", {"detail": {"annotation": {{ annotation|tojson }} }}))'>
-                                    Edit</button>
-                                <button class="dropdown-item btn-sm btn-danger"
-                                        onclick='document.getElementById("fileAnnotationTable").dispatchEvent(new CustomEvent("removeAnnotation", {"detail": {"annotation": {{ annotation|tojson }} }}))'>
-                                    Remove</button>
+                        <td >
+                            <div class="d-flex justify-content-end">
+
+                                <button type="button"
+                                        class="btn btn-sm btn-secondary dropdown-toggle"
+                                        data-bs-toggle="dropdown"
+                                        aria-haspopup="true"
+                                        aria-expanded="false"></button>
+                                <div class="dropdown-menu justify-content-end">
+                                    <button class="dropdown-item btn-sm"
+                                            onclick='document.getElementById("fileAnnotationTable").dispatchEvent(new CustomEvent("editAnnotation", {"detail": {"annotation": {{ annotation|tojson }} }}))'>
+                                        Edit</button>
+                                    <button class="dropdown-item btn-sm btn-danger"
+                                            onclick='document.getElementById("fileAnnotationTable").dispatchEvent(new CustomEvent("removeAnnotation", {"detail": {"annotation": {{ annotation|tojson }} }}))'>
+                                        Remove</button>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -66,7 +69,7 @@
             </tbody>
         </table>
         <div class="card-footer bg-transparent">
-            <button id="addAnnotationsBtn" class="btn btn-primary float-right btn-sm">Add</button>
+            <button id="addAnnotationsBtn" class="btn btn-primary float-end btn-sm">Add</button>
         </div>
     {% endcall %}
 <script type="module">
@@ -188,7 +191,7 @@
                         <div class="btn-group" role="group" aria-label="Edit">
                             <button type="button"
                                     class="btn btn-sm btn-secondary dropdown-toggle"
-                                    data-toggle="dropdown"
+                                    data-bs-toggle="dropdown"
                                     aria-haspopup="true"
                                     aria-expanded="false"></button>
                             <div class="dropdown-menu">
@@ -315,7 +318,7 @@
 
 
         <div class="card-footer bg-transparent">
-             <button id="newNoteBtn" class="btn btn-primary btn-sm float-right">Add</button>
+             <button id="newNoteBtn" class="btn btn-primary btn-sm float-end">Add</button>
             <script type="module">
                 document.getElementById('newNoteBtn').addEventListener('click', function (event) {
                     const modal = $('#editNoteModal');

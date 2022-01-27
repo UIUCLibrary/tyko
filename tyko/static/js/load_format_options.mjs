@@ -111,8 +111,8 @@ function loadNewEntityFormClass(
                 responsesMessage += reason.statusText;
                 responsesMessage += '</strong>';
                 responsesMessage +=
-                    '    <button type="button" class="close" ' +
-                    'data-dismiss="alert" aria-label="Close">\n' +
+                    '    <button type="button" class="btn-close" ' +
+                    'data-bs-dismiss="alert" aria-label="Close">\n' +
                     '        <span aria-hidden="true">&times;</span>\n' +
                     '</div>';
                 alertBox.html(responsesMessage);

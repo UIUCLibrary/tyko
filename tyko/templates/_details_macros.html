@@ -1,7 +1,7 @@
 {% macro field_edit_button(index, field_name, field_value) %}
 <button id="editButton{{index}}"
         onclick="flipMode('{{field_name}}Label', '{{field_name}}InputGroup', 'Input{{ index }}', '{{- field_value -}}', 'editButton{{index}}' )"
-        class="btn btn-secondary float-right btn-sm">Edit</button>
+        class="btn btn-secondary float-end btn-sm">Edit</button>
 {% endmacro %}
 
 {% macro field_edior(index, field_key, field_name, field_value, update_api_path) %}
@@ -63,8 +63,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">{{modal_title}}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id={{ formId }} class="tyko-form-new-entity" data-addapiurl="{{ add_api_route }}">
@@ -81,7 +80,7 @@
 
 {#<div class="alert alert-danger alert-dismissible d-none" role="alert" id="submitResultAlert">#}
 {#    <strong id="errorMessage"></strong>#}
-{#    <button type="button" class="close" data-dismiss="d-none" aria-label="Close">#}
+{#    <button type="button" class="btn-close" data-bs-dismiss="d-none" aria-label="Close">#}
 {#        <span aria-hidden="true">&times;</span>#}
 {#    </button>#}
 {#</div>#}
@@ -95,7 +94,7 @@
                 <h5 class="modal-title" id="{{ modalName }}RemovalTitle">
                     Are you Sure?
                 </h5>
-                <button type="button" class="close" data-dismiss="modal"
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -107,10 +106,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"
-                        data-dismiss="modal">Cancel
+                        data-bs-dismiss="modal">Cancel
                 </button>
                 <button type="button" class="btn btn-primary"
-                        id="{{ modalName }}RemoveButton" data-dismiss="modal">
+                        id="{{ modalName }}RemoveButton" data-bs-dismiss="modal">
                     Remove
                 </button>
             </div>
@@ -129,7 +128,7 @@
                 <h5 class="modal-title" id="{{ modalName }}RemovalTitle">
                     Are you Sure?
                 </h5>
-                <button type="button" class="close" data-dismiss="modal"
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -141,11 +140,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"
-                        data-dismiss="modal">Cancel
+                        data-bs-dismiss="modal">Cancel
                 </button>
 
                 <button type="button" class="btn btn-primary"
-                        id="{{ confirmButtonID }}" data-dismiss="modal">
+                        id="{{ confirmButtonID }}" data-bs-dismiss="modal">
 {#                    onclick="(()=> {#}
 {#                          console.log('CLECIASDCDSA');#}
 {#                        })()">#}
@@ -224,11 +223,11 @@ function remove(apiPath) {
     <td><a href="{{ details_url }}">{{ display_name }}</a></td>
     <td>
         <button
-            class="float-right btn btn-danger btn-sm"
-            data-toggle="modal"
+            class="float-end btn btn-danger btn-sm"
+            data-bs-toggle="modal"
             data-displayname="{{ display_name }}"
             data-apiroute="{{- removal_apiroute }}"
-            data-target="#{{- removal_modal_id }}">
+            data-bs-target="#{{- removal_modal_id }}">
             Remove
         </button>
     </td>
@@ -428,7 +427,7 @@ function remove(apiPath) {
 
 {% macro card(title, card_class) %}
     <div class="card {{ card_class }}">
-        <div class="card-header">{{ title }}</div>
+        <div id="{{ title }}Header" class="card-header">{{ title }}</div>
         <div class="card-body">
             {{ caller() }}
         </div>

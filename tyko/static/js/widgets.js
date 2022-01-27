@@ -216,7 +216,7 @@ class ViewWidget extends WidgetState {
   newEditButton() {
     const newButton = document.createElement('button');
     newButton.setAttribute('class',
-        'btn btn-sm btn-secondary btn-sm float-right');
+        'btn btn-sm btn-secondary btn-sm float-end');
     newButton.setAttribute('id', this._parent.editButtonId);
     // newButton.setAttribute('style', "word-break: break-word;");
 

@@ -4,12 +4,12 @@
     <td>{{ note['text'] }}</td>
     <td>
         <div class="btn-group-sm d-flex justify-content-end" role="group" aria-label="Edit">
-            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
             <div class="dropdown-menu dropdown-menu-right">
                 <button
                     class="btn btn-secondary btn-sm dropdown-item"
-                    data-toggle="modal"
-                    data-target="#noteEditor"
+                    data-bs-toggle="modal"
+                    data-bs-target="#noteEditor"
                     data-title="Edit Note"
                     data-dialogtype="edit"
                     data-text="{{ note['text'] }}"
@@ -17,8 +17,8 @@
                     data-apiroute="{{ note_api_route }}">Edit</button>
                 <button
                     class="btn btn-secondary btn-danger btn-sm dropdown-item"
-                    data-toggle="modal"
-                    data-target="#noteRemoveConfirm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#noteRemoveConfirm"
                     data-title="Remove Note"
                     data-text="{{ note['text'] }}"
                     data-apiroute="{{ note_api_route }}">
@@ -35,11 +35,11 @@
     <td></td>
     <td></td>
     <td>
-        <div class="btn-group float-right" role="group">
+        <div class="btn-group float-end" role="group">
             <button
                 class="btn btn-primary btn-sm"
-                data-toggle="modal"
-                data-target="#noteEditor"
+                data-bs-toggle="modal"
+                data-bs-target="#noteEditor"
                 data-title="Create New Note"
                 data-dialogtype="new"
                 data-source="{{ note_api_route }}">
@@ -87,7 +87,7 @@
 
 {% macro metadata_table() %}
 <table class="table table-sm">
-    <caption hidden>Metadata</caption>
+{#    <caption hidden>Metadata</caption>#}
     <thead hidden>
         <tr>
             <th scope="col">Type</th>
@@ -103,8 +103,7 @@
 {% macro notes_table(notes, api_path) %}
 <div class="flex-column">
     <div>
-        <table class="table table-sm">
-            <caption hidden>Notes</caption>
+        <table class="table table-sm" aria-describedby="NotesHeader">
             {% if notes|length > 0 %}
             <thead>
                 <tr>
@@ -122,11 +121,11 @@
         </table>
     </div>
     <div>
-        <div class="btn-group float-right" role="group">
+        <div class="btn-group float-end" role="group">
                 <button
                     class="btn btn-primary btn-sm"
-                    data-toggle="modal"
-                    data-target="#noteEditor"
+                    data-bs-toggle="modal"
+                    data-bs-target="#noteEditor"
                     data-title="Create New Note"
                     data-dialogtype="new"
                     data-source="{{ note_api_route }}">
@@ -138,7 +137,7 @@
 {% endmacro %}
 
 {% macro list_header(title) %}
-    <h1 class="mt-5">{{ title }}</h1>
+    <h1 id="list-header" class="mt-5">{{ title }}</h1>
 {% endmacro %}
 
 {% macro list_table(api_path, row_table, table_columns) %}
@@ -152,20 +151,21 @@
            data-url="{{ api_path }}"
            data-cache="false"
            class="table-striped"
+           aria-describedby="list-header"
            data-data-field="{{ row_table }}">
-    <caption hidden>{{row_table}}</caption>
-    <thead class="thead-light">
-        <tr>
-            {% for table_column in table_columns %}
-                <th scope="col"
-                    data-field="{{table_column.field}}"
-                    {{ 'data-formatter=\"'|safe ~ table_column.formatter ~ '"'|safe if "formatter" in table_column }}
-                    data-sortable="{{table_column.sortable}}"
+        <thead class="thead-light">
+            <tr>
+                {% for table_column in table_columns %}
+                    <th scope="col"
+                        data-field="{{table_column.field}}"
+                        {{ 'data-formatter=\"'|safe ~ table_column.formatter ~ '"'|safe if "formatter" in table_column }}
+                        data-sortable="{{table_column.sortable}}"
 
-                >{{table_column.display_text}}</th>
-            {% endfor %}
-        </tr>
-    </thead>
+                    >{{table_column.display_text}}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+    <caption hidden>{{row_table}}</caption>
     </table>
 {% endmacro %}
 

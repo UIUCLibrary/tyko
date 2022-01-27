@@ -20,6 +20,7 @@
         function submitNew(api_path) {
             const formData = new FormData(document.forms["new-project-form"]);
             const formJson = JSON.stringify(Object.fromEntries(formData));
+            console.debug(formJson)
             let xhr = new XMLHttpRequest();
             xhr.withCredentials = true;
             xhr.open("POST", api_path);

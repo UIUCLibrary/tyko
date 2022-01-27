@@ -5,7 +5,8 @@ import hashlib
 import json
 import sys
 import traceback
-from typing import List, Dict, Any
+import typing
+from typing import List, Dict, Any, Iterator
 
 from flask import jsonify, make_response, abort, request, url_for
 
@@ -427,9 +428,28 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
                                     project_id=id,
                                     object_id=obj['object_id'])
                 }
+                obj['notes'] = self.serialize_notes(obj['notes'])
             return current_project
 
         return abort(404)
+
+    def serialize_notes(
+            self,
+            notes: Iterator[Dict[str, Any]],
+            notes_middleware: typing.Optional[AbsMiddlwareEntity] = None
+    ):
+        serialize_notes = []
+
+        note_mw = \
+            notes_middleware or NotestMiddlwareEntity(self._data_provider)
+
+        for note in notes:
+            note_id = note['note_id']
+            serialize_notes.append(
+                note_mw.get(id=note_id, resolve_parents=False)
+            )
+
+        return serialize_notes
 
     def delete(self, id):
         if self._data_connector.delete(id):
@@ -784,9 +804,14 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         newone['parents'] = parent_routes
         return newone
 
-    def get(self, serialize=False, **kwargs):
+    def get(self, serialize=False, resolve_parents=True, **kwargs):
         if "id" in kwargs:
             note = self._data_connector.get(kwargs['id'], serialize=True)
+            if not resolve_parents:
+                del note['parent_project_ids']
+                del note['parent_object_ids']
+                del note['parent_item_ids']
+                return note
             note_data = self.resolve_parents(note)
             del note_data['parent_project_ids']
             del note_data['parent_object_ids']
