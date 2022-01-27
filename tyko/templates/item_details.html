@@ -6,7 +6,7 @@
 
 {% block main_details %}
     {%  call widgets.card("Details", "my-1")  %}
-        {%  call metadata_table() %}
+        {% call metadata_table() %}
             <tr>
                 {{widgets.metadata_text_edit_widget("Name", item['name'], 'name', api_path)}}
             </tr>
@@ -157,10 +157,12 @@
     {{ super() }}
     <script type="application/javascript">
         let $table = $('#filesTable');
-        $table.bootstrapTable({
-            onLoadSuccess: function (data, status, jqXHR) {
-                $table.bootstrapTable('load', data.item.files);
-            }
+        $table.ready(()=>{
+            $table.bootstrapTable({
+                onLoadSuccess: function (data, status, jqXHR) {
+                    $table.bootstrapTable('load', data.item.files);
+                }
+            })
         })
 
 

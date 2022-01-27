@@ -401,7 +401,7 @@ class MetadataEditSelectEnumWidget extends MetadataEditWidget {
     const elements = [];
     elements.push('<div class="input-group">');
 
-    elements.push(`<select class="custom-select" id="${id}">`);
+    elements.push(`<select class="form-select" id="${id}">`);
     this.options.forEach((option) => {
       if (this.selected === option['value']) {
         elements.push(

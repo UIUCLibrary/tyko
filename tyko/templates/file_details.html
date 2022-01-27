@@ -49,7 +49,7 @@
                         <td>
                             <button type="button"
                                     class="btn btn-sm btn-secondary dropdown-toggle"
-                                    data-toggle="dropdown"
+                                    data-bs-toggle="dropdown"
                                     aria-haspopup="true"
                                     aria-expanded="false"></button>
                             <div class="dropdown-menu">
@@ -66,7 +66,7 @@
             </tbody>
         </table>
         <div class="card-footer bg-transparent">
-            <button id="addAnnotationsBtn" class="btn btn-primary float-right btn-sm">Add</button>
+            <button id="addAnnotationsBtn" class="btn btn-primary float-end btn-sm">Add</button>
         </div>
     {% endcall %}
 <script type="module">
@@ -188,7 +188,7 @@
                         <div class="btn-group" role="group" aria-label="Edit">
                             <button type="button"
                                     class="btn btn-sm btn-secondary dropdown-toggle"
-                                    data-toggle="dropdown"
+                                    data-bs-toggle="dropdown"
                                     aria-haspopup="true"
                                     aria-expanded="false"></button>
                             <div class="dropdown-menu">
@@ -315,7 +315,7 @@
 
 
         <div class="card-footer bg-transparent">
-             <button id="newNoteBtn" class="btn btn-primary btn-sm float-right">Add</button>
+             <button id="newNoteBtn" class="btn btn-primary btn-sm float-end">Add</button>
             <script type="module">
                 document.getElementById('newNoteBtn').addEventListener('click', function (event) {
                     const modal = $('#editNoteModal');

@@ -3,12 +3,10 @@
 <div class="flex-column">
         <div>
             <table id="filesTable"
-                   data-toggle="table"
                    data-cache="false"
                    data-sort-name="generation"
                    data-classes="table table-sm"
                    data-url="{{ api_path }}">
-                <caption hidden>Files</caption>
                 <thead>
                     <tr>
                         <th scope="col"
@@ -45,9 +43,9 @@
                         const fileName = $table.bootstrapTable('getData')[index]['name'];
                         const fileApiUrl = row['routes']['api'];
                         const fileFrontendURL = row['routes']['frontend'];
-                        const dropdownButton = '<button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>';
+                        const dropdownButton = '<button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>';
                         const editButton = `<button class="dropdown-item" onclick="window.location='${fileFrontendURL}'">Edit</button>`
-                        const removeButton = `<button class="dropdown-item btn-danger" data-toggle="modal" data-target="#removeFileModal" data-entity-name=${fileName} data-removeurl=${fileApiUrl}>Remove</button>`
+                        const removeButton = `<button class="dropdown-item btn-danger" data-bs-toggle="modal" data-bs-target="#removeFileModal" data-entity-name=${fileName} data-removeurl=${fileApiUrl}>Remove</button>`
                         const dropdownMenu =
                             `<div class="dropdown-menu">${editButton}${removeButton}</div>`
                         return `<div class="btn-group-sm justify-content-end" role="group" aria-label="Options">${dropdownButton}${dropdownMenu}</div>`;
@@ -56,11 +54,11 @@
                 </script>
             </table>
         </div>
-        <div class="btn-group float-right mt-4" role="group">
+        <div class="btn-group float-end mt-4" role="group">
             <button
                 class="btn btn-sm btn-primary"
-                data-toggle="modal"
-                data-target="#fileModal"
+                data-bs-toggle="modal"
+                data-bs-target="#fileModal"
                 data-title="Create New File Record">
                 Add
             </button>
@@ -93,7 +91,7 @@
 <div class="form-group row">
     <label for="generationSelection" class="col-sm-2 col-form-label">Generation</label>
     <div class="col-sm-10">
-        <select class="custom-select" name="generation" id="generationSelection" required>
+        <select class="form-select" name="generation" id="generationSelection" required>
             <option>Access</option>
             <option>Preservation</option>
             <option>Mezzanine</option>
@@ -128,7 +126,7 @@
                             responsesMessage += reason.statusText;
                             responsesMessage += "</strong>";
                             responsesMessage +=
-                                '    <button type="button" class="close" data-dismiss="alert" aria-label="Close">\n' +
+                                '    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">\n' +
                                 '        <span aria-hidden="true">&times;</span>\n' +
                                 '    </button>\n' +
                                 '</div>';

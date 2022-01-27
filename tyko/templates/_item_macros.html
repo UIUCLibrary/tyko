@@ -10,7 +10,7 @@
     <div class="form-group row">
         <label for="itemFormatSelection" class="col-sm-2 col-form-label">Format</label>
         <div class="col-sm-10">
-            <select class="custom-select" class="form-control" name="format_id" id="itemFormatSelection" required>
+            <select class="form-select" class="form-control" name="format_id" id="itemFormatSelection" required>
                 <option value="" disabled selected>Select a Format</option>
                 {%- for format in formats%}
                     <option value="{{format.format_types_id}}">{{ format.name }}</option>
@@ -67,8 +67,8 @@
 <tr>
     <td></td>
     <td>
-        <div class="btn-group float-right" role="group">
-            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#{{modal_id}}">Add</button>
+        <div class="btn-group float-end" role="group">
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#{{modal_id}}">Add</button>
         </div>
     </td>
 </tr>
@@ -86,8 +86,8 @@
 {#            dsdsd#}
             <button
                 class="btn btn-secondary btn-danger btn-sm"
-{#                data-toggle="modal"#}
-{#                data-target="#fileRemoveConfirm"#}
+{#                data-bs-toggle="modal"#}
+{#                data-bs-target="#fileRemoveConfirm"#}
 {#                data-title="Remove File"#}
 {#                onclick="alert('This doesnt do anything yet')"#}
 {#                data-text="{{ note['text'] }}"#}

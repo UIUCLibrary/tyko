@@ -2,6 +2,7 @@
 
 import abc
 import collections.abc
+import typing
 from abc import ABC
 from typing import Tuple, Set, Optional, Callable, List, Iterator, \
     NamedTuple, Dict
@@ -501,6 +502,9 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
             )
         else:
             breadcrumbs = None
+
+        selected_object["notes"] = self._serialize_notes(selected_object)
+
         if selected_object['parent_project_id'] is not None:
             api_route = url_for(
                 "project_object",
@@ -509,6 +513,7 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
             )
         else:
             api_route = url_for('object', object_id=entity_id)
+
         return self.render_page(
             template="object_details.html",
             edit=False,
@@ -520,6 +525,25 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
             breadcrumbs=breadcrumbs,
             show_bread_crumb=kwargs.get("show_bread_crumb"),
             object=selected_object)
+
+    def _serialize_notes(self, selected_object: typing.Dict[str, typing.Any]):
+        notes = []
+        notes_data_connector = \
+            data_provider.NotesDataConnector(
+                self._data_provider.db_session_maker
+            )
+        for note in selected_object.get("notes", []):
+            serialize_note = \
+                notes_data_connector.get(
+                    note['note_id'],
+                    serialize=True
+                )
+
+            del serialize_note['parent_project_ids']
+            del serialize_note['parent_object_ids']
+            del serialize_note['parent_item_ids']
+            notes.append(serialize_note)
+        return notes
 
     def render_page(self, template="object_details.html", **context):
         context['itemType'] = "Object"

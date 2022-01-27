@@ -9,7 +9,7 @@
     <div class="form-group row">
         <label for="objectCollectionSelection" class="col-sm-2 col-form-label">Collection</label>
         <div class="col-sm-10">
-            <select class="custom-select" class="form-control" name="collectionId" id="objectCollectionSelection" required>
+            <select class="form-select" class="form-control" name="collectionId" id="objectCollectionSelection" required>
                 <option value="" disabled selected>Select a collection</option>
                 {%- for collection in collections%}
                     <option value="{{collection.collection_id}}">{{ collection.collection_name }}</option>
@@ -41,11 +41,11 @@
 <tr>
     <td></td>
     <td>
-        <div class="btn-group float-right" role="group">
+        <div class="btn-group float-end" role="group">
             <button
                 class="btn btn-primary btn-sm"
-                data-toggle="modal"
-                data-target="#{{- modal_id }}">
+                data-bs-toggle="modal"
+                data-bs-target="#{{- modal_id }}">
                 Add
             </button>
         </div>

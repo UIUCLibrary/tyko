@@ -427,6 +427,12 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
                                     project_id=id,
                                     object_id=obj['object_id'])
                 }
+                notes = []
+                for note in obj['notes']:
+                    note_id = note['note_id']
+                    note_mw = NotestMiddlwareEntity(self._data_provider)
+                    notes.append(note_mw.get(id=note_id, resolve_parents=False))
+                obj['notes'] = notes
             return current_project
 
         return abort(404)
@@ -784,9 +790,14 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         newone['parents'] = parent_routes
         return newone
 
-    def get(self, serialize=False, **kwargs):
+    def get(self, serialize=False, resolve_parents=True, **kwargs):
         if "id" in kwargs:
             note = self._data_connector.get(kwargs['id'], serialize=True)
+            if not resolve_parents:
+                del note['parent_project_ids']
+                del note['parent_object_ids']
+                del note['parent_item_ids']
+                return note
             note_data = self.resolve_parents(note)
             del note_data['parent_project_ids']
             del note_data['parent_object_ids']
