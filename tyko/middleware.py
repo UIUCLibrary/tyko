@@ -427,15 +427,18 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
                                     project_id=id,
                                     object_id=obj['object_id'])
                 }
-                notes = []
-                for note in obj['notes']:
-                    note_id = note['note_id']
-                    note_mw = NotestMiddlwareEntity(self._data_provider)
-                    notes.append(note_mw.get(id=note_id, resolve_parents=False))
-                obj['notes'] = notes
+                obj['notes'] = self.serialize_notes(obj['notes'])
             return current_project
 
         return abort(404)
+
+    def serialize_notes(self, notes: Dict[str, Any]):
+        serialize_notes = []
+        for note in notes:
+            note_id = note['note_id']
+            note_mw = NotestMiddlwareEntity(self._data_provider)
+            serialize_notes.append(note_mw.get(id=note_id, resolve_parents=False))
+        return serialize_notes
 
     def delete(self, id):
         if self._data_connector.delete(id):
