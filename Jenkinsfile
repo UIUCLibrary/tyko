@@ -105,6 +105,19 @@ pipeline {
                             steps{
                                 sh 'npm run jsdocs'
                             }
+                            post{
+                                success{
+                                    publishHTML([
+                                        allowMissing: false,
+                                        alwaysLinkToLastBuild: false,
+                                        keepAll: false,
+                                        reportDir: 'build/jsdocs',
+                                        reportFiles: 'index.html',
+                                        reportName: 'JSDoc Documentation',
+                                        reportTitles: ''
+                                        ])
+                                }
+                            }
                         }
                         stage('Python Docs'){
                             steps{
