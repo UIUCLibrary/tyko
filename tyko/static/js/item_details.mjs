@@ -62,7 +62,7 @@ export async function load() {
 
 /**
  * Tester for loading modules to make sure required data is included
- * @return {[]}
+ * @return {String[]}
  */
 function getMissingVariables() {
   const missing = [];
@@ -108,3 +108,110 @@ $(metadataWidgets).ready(() => {
     });
   });
 });
+
+
+/**
+ *
+ * @param {Object[]} notes - List of Notes
+ * @param {HTMLTableElement} notesTable - table used for notes
+ */
+export function loadNotes(notes, notesTable) {
+  notes.forEach((note) => {
+    const apiRoute = note['route']['api'];
+    const onclickFunction =
+        'notesTable.dispatchEvent(' +
+        `new CustomEvent('openForEditing', {detail: '${apiRoute}'})` +
+        ')';
+
+    $(notesTable).append(`
+      <tr>
+        <td>${note['note_type']}</td>
+        <td>${note['text']}</td>
+        <td>
+          <div class="btn-group float-end" role="group">
+            <button 
+              class="btn btn-primary btn-sm"
+              data-title="Create New Note"
+              data-noteId="${note['note_id']}"
+              onclick="${onclickFunction}"
+              >
+              Edit
+            </button>
+          </div>
+        </td>
+      </tr>`,
+    );
+  });
+}
+/**
+ * Controls a Note editor
+ */
+export class NoteEditor extends bootstrap.Modal {
+  /**
+   * Create a Note Editor
+   * @param {HTMLTableElement} base
+   * @param item
+   */
+  #item;
+  #options = []
+
+
+  /**
+   *
+   * @param item
+   */
+  constructor(item) {
+    super(item);
+    this.#item = item;
+    this.url = null;
+    const self = this;
+    item.addEventListener('hidden.bs.modal', function (event) {
+      self.clearNoteTypes();
+    });
+  }
+
+  addNoteType(noteId, noteText) {
+    this.#options.push({'id': noteId, 'text': noteText});
+  }
+
+  setApiUrl(url) {
+    this.url = url;
+  }
+  open() {
+    fetch(this.url)
+        .then((r) => r.json(), (r) => console.log(r))
+        .then((jsonData)=> {
+          this.#setData(jsonData, this.#item);
+          this.#item.dataset.apiUrl = this.url
+          this.show();
+        }, (r) => console.log(r));
+  }
+
+  clearNoteTypes(){
+    this.#options = [];
+    const noteTypeSelection = this.#item.querySelector('#noteTypeSelect');
+    while (noteTypeSelection.firstChild) {
+      noteTypeSelection.removeChild(noteTypeSelection.lastChild);
+    }
+  }
+
+  /**
+   *
+   * @param {Object} data
+   * @param {HTMLDivElement} item
+   */
+  #setData(data, item) {
+    console.log(data.constructor)
+    const noteTypeSelection = item.querySelector('#noteTypeSelect');
+    for (const optionData of this.#options) {
+      const option = document.createElement('option');
+      option.text = optionData.text;
+      option.value = optionData.id;
+      if (data['note_type_id'] === optionData.id) {
+        option.selected = true;
+      }
+      noteTypeSelection.add(option);
+    }
+    item.querySelector('#message-text').value = data['text'];
+  }
+}
