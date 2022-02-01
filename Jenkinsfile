@@ -103,7 +103,7 @@ pipeline {
                     parallel{
                         stage('Javascript Docs'){
                             steps{
-                                sh 'echo "here"'
+                                sh 'npm run jsdocs'
                             }
                         }
                         stage('Python Docs'){
