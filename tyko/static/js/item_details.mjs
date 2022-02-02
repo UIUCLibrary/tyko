@@ -170,13 +170,27 @@ export class NoteEditor extends bootstrap.Modal {
     });
   }
 
+  /**
+   * Add note Type to dropdown selection
+   * @param {String} noteId
+   * @param {String} noteText
+   */
   addNoteType(noteId, noteText) {
     this.#options.push({'id': noteId, 'text': noteText});
   }
 
+  /**
+   * Set the api URL to note
+   * @param {String} url
+   */
   setApiUrl(url) {
     this.url = url;
   }
+
+  /**
+   * Open the modal dialog box
+   * @return {Promise<boolean>} - The Promise returns true is the window open.
+   */
   open() {
     return fetch(this.url)
         .then((r) => r.json(), (r) => console.log(r))
@@ -184,9 +198,16 @@ export class NoteEditor extends bootstrap.Modal {
           this.#setData(jsonData, this.#item);
           this.#item.dataset.apiUrl = this.url;
           this.show();
-        }, (r) => console.error(r));
+          return true;
+        }, (r) => {
+          console.error(r);
+          return false;
+        });
   }
 
+  /**
+   * Clear the note type selections from dropdown box
+   */
   clearNoteTypes() {
     this.#options = [];
     const noteTypeSelection = this.#item.querySelector('#noteTypeSelect');
