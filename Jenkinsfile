@@ -324,12 +324,14 @@ pipeline {
                                     steps{
                                         timeout(10){
                                             catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
-                                                sh(
-                                                    label: "Running pylint",
-                                                    script: '''mkdir -p reports
-                                                               pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint.txt
-                                                            '''
-                                                )
+                                                tee('reports/pylint.txt'){
+                                                    sh(
+                                                        label: "Running pylint",
+                                                        script: '''mkdir -p reports
+                                                                   pylint --rcfile=./CI/jenkins/pylintrc tyko
+                                                                '''
+                                                    )
+                                                }
                                             }
                                             sh(
                                                 script: 'PYLINTHOME=. pylint  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > reports/pylint_issues.txt',
