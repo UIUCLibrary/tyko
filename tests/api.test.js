@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import {notes} from "../tyko/static/js/api.js";
 
 jest.mock("../tyko/static/js/request");
