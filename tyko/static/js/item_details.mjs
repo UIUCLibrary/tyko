@@ -153,7 +153,7 @@ export class NoteEditor extends bootstrap.Modal {
    * @param item
    */
   #item;
-  #options = []
+  #options = [];
 
 
   /**
