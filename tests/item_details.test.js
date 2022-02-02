@@ -3,7 +3,7 @@
  */
 
 'use strict';
-
+require('jest-fetch-mock').enableMocks();
 jest.mock('../tyko/static/js/request.js');
 import * as module from '../tyko/static/js/item_details.mjs';
 
@@ -69,5 +69,46 @@ describe('load Notes', ()=>{
     const table = document.getElementById('dummy');
     module.loadNotes(notes, table);
     expect(table.childElementCount).toBeGreaterThan(0);
+  });
+});
+
+describe('NoteEditor', ()=>{
+  beforeEach(() => {
+    fetch.resetMocks();
+    document.body.innerHTML =`
+<div class="modal fade tyko-editor" 
+     id="noteEditor" 
+     tabindex="-1" 
+     role="dialog">
+ <div class="modal-body">
+    <div class="form-group">
+      <label for="noteTypeSelect" class="col-form-label" >Type:</label>
+      <select class="form-select" name="typeId"
+              id="noteTypeSelect"></select>
+      <label for="message-text" class="col-form-label">Note:</label>
+      <textarea class="form-control" name="text"
+                id="message-text" required></textarea>
+    </div>
+  </div>
+</div>
+`;
+  });
+  test('message text gets note text', async ()=> {
+    fetch.mockResponseOnce(
+        JSON.stringify(
+            {
+              note_type_id: 1,
+              text: 'Foo bar baz',
+            },
+        ),
+    );
+    const noteEditorDiv = document.getElementById('noteEditor');
+    const noteEditor = new module.NoteEditor(noteEditorDiv);
+    noteEditor.setApiUrl('foo');
+    noteEditor.addNoteType(1, 'Production');
+    await noteEditor.open();
+
+    expect(document.getElementById('message-text').value)
+        .toEqual('Foo bar baz');
   });
 });

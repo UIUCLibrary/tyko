@@ -178,13 +178,13 @@ export class NoteEditor extends bootstrap.Modal {
     this.url = url;
   }
   open() {
-    fetch(this.url)
+    return fetch(this.url)
         .then((r) => r.json(), (r) => console.log(r))
         .then((jsonData)=> {
           this.#setData(jsonData, this.#item);
           this.#item.dataset.apiUrl = this.url
           this.show();
-        }, (r) => console.log(r));
+        }, (r) => console.error(r));
   }
 
   clearNoteTypes(){
@@ -197,21 +197,28 @@ export class NoteEditor extends bootstrap.Modal {
 
   /**
    *
-   * @param {Object} data
+   * @param {Object} newData
    * @param {HTMLDivElement} item
    */
-  #setData(data, item) {
-    console.log(data.constructor)
+  #setData(newData, item) {
     const noteTypeSelection = item.querySelector('#noteTypeSelect');
-    for (const optionData of this.#options) {
-      const option = document.createElement('option');
-      option.text = optionData.text;
-      option.value = optionData.id;
-      if (data['note_type_id'] === optionData.id) {
-        option.selected = true;
+    if(noteTypeSelection){
+      for (const optionData of this.#options) {
+        const option = document.createElement('option');
+        option.text = optionData.text;
+        option.value = optionData.id;
+        if (newData['note_type_id'] === optionData.id) {
+          option.selected = true;
+        }
+        noteTypeSelection.add(option);
       }
-      noteTypeSelection.add(option);
     }
-    item.querySelector('#message-text').value = data['text'];
+    const textArea = item.querySelector('#message-text')
+    if(textArea){
+      textArea.value = newData['text'];
+    } else {
+      console.warn('message-text not found.')
+    }
+
   }
 }
