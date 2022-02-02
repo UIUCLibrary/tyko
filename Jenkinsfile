@@ -202,7 +202,13 @@ pipeline {
                                             script{
                                                 try{
                                                     // See CI/jenkins/scripts/python_warnings.groovy for more information about the groovyScript
-                                                    recordIssues(qualityGates: [[threshold: 1, type: 'NEW', unstable: true]], tools: [groovyScript(parserId: 'pythonWarnings', pattern: 'logs/pytest.log')])
+                                                    recordIssues(
+                                                        qualityGates: [[threshold: 1, type: 'NEW', unstable: true]],
+                                                        filters:[
+                                                            excludeFile('/usr/local/lib/python3.8/dist-packages/jinja2/*')
+                                                        ],
+                                                        tools: [groovyScript(parserId: 'pythonWarnings', pattern: 'logs/pytest.log')]
+                                                        )
                                                 } catch(Exception e){
                                                     echo "Unable to parse Python warnings. Reason: ${e}"
                                                 }
