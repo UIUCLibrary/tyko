@@ -17,9 +17,15 @@ describe('module', () => {
   });
 
   test('returns the data', async () => {
-    module.urls['tapeTypesUrl'] = '/api/formats/cassette_tape/cassette_tape_tape_types';
-    module.urls['cassetteTypesUrl'] = '/api/formats/cassette_tape/cassette_tape_format_types';
-    module.urls['cassetteTapeTapeThicknessURL'] = '/api/formats/cassette_tape/cassette_tape_tape_thickness';
+    module.urls['tapeTypesUrl'] =
+        '/api/formats/cassette_tape/cassette_tape_tape_types';
+
+    module.urls['cassetteTypesUrl'] =
+        '/api/formats/cassette_tape/cassette_tape_format_types';
+
+    module.urls['cassetteTapeTapeThicknessURL'] =
+        '/api/formats/cassette_tape/cassette_tape_tape_thickness';
+
     return await expect(module.load()).resolves.toEqual(
         {
           'formatTypes': [
