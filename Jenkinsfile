@@ -205,7 +205,7 @@ pipeline {
                                                     recordIssues(
                                                         qualityGates: [[threshold: 1, type: 'NEW', unstable: true]],
                                                         filters:[
-                                                            excludeFile('/usr/local/lib/python3.8/dist-packages/jinja2/*')
+                                                            excludeFile('/usr/local/lib/*')
                                                         ],
                                                         tools: [groovyScript(parserId: 'pythonWarnings', pattern: 'logs/pytest.log')]
                                                         )
