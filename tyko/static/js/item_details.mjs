@@ -165,7 +165,7 @@ export class NoteEditor extends bootstrap.Modal {
     this.#item = item;
     this.url = null;
     const self = this;
-    item.addEventListener('hidden.bs.modal', function (event) {
+    item.addEventListener('hidden.bs.modal', function(event) {
       self.clearNoteTypes();
     });
   }
@@ -182,12 +182,12 @@ export class NoteEditor extends bootstrap.Modal {
         .then((r) => r.json(), (r) => console.log(r))
         .then((jsonData)=> {
           this.#setData(jsonData, this.#item);
-          this.#item.dataset.apiUrl = this.url
+          this.#item.dataset.apiUrl = this.url;
           this.show();
         }, (r) => console.error(r));
   }
 
-  clearNoteTypes(){
+  clearNoteTypes() {
     this.#options = [];
     const noteTypeSelection = this.#item.querySelector('#noteTypeSelect');
     while (noteTypeSelection.firstChild) {
@@ -202,7 +202,7 @@ export class NoteEditor extends bootstrap.Modal {
    */
   #setData(newData, item) {
     const noteTypeSelection = item.querySelector('#noteTypeSelect');
-    if(noteTypeSelection){
+    if (noteTypeSelection) {
       for (const optionData of this.#options) {
         const option = document.createElement('option');
         option.text = optionData.text;
@@ -213,12 +213,11 @@ export class NoteEditor extends bootstrap.Modal {
         noteTypeSelection.add(option);
       }
     }
-    const textArea = item.querySelector('#message-text')
-    if(textArea){
+    const textArea = item.querySelector('#message-text');
+    if (textArea) {
       textArea.value = newData['text'];
     } else {
-      console.warn('message-text not found.')
+      console.warn('message-text not found.');
     }
-
   }
 }
