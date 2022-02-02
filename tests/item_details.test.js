@@ -93,6 +93,43 @@ describe('NoteEditor', ()=>{
 </div>
 `;
   });
+  test('add note types', async ()=>{
+    fetch.mockResponseOnce(
+        JSON.stringify(
+            {
+              note_type_id: 1,
+              text: 'Foo bar baz',
+            },
+        ),
+    );
+    const noteEditorDiv = document.getElementById('noteEditor');
+    const noteEditor = new module.NoteEditor(noteEditorDiv);
+    noteEditor.addNoteType(1, 'Production');
+    noteEditor.setApiUrl('foo');
+    await noteEditor.open();
+    const noteTypeSelection = document.getElementById('noteTypeSelect');
+    expect(noteTypeSelection.childElementCount).toEqual(1);
+  });
+
+  test('clear note types', async ()=>{
+    const noteEditorDiv = document.getElementById('noteEditor');
+    const noteTypeSelection = document.getElementById('noteTypeSelect');
+    const noteEditor = new module.NoteEditor(noteEditorDiv);
+    noteEditor.addNoteType(1, 'Production');
+    noteEditor.clearNoteTypes();
+    fetch.mockResponseOnce(
+        JSON.stringify(
+            {
+              note_type_id: 1,
+              text: 'Foo bar baz',
+            },
+        ),
+    );
+    noteEditor.setApiUrl('foo');
+    await noteEditor.open();
+    expect(noteTypeSelection.childElementCount).toEqual(0);
+  });
+
   test('message text gets note text', async ()=> {
     fetch.mockResponseOnce(
         JSON.stringify(
