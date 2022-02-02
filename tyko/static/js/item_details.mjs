@@ -158,7 +158,7 @@ export class NoteEditor extends bootstrap.Modal {
 
   /**
    *
-   * @param item
+   * @param {HTMLDivElement} item
    */
   constructor(item) {
     super(item);
