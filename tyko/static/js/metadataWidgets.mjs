@@ -360,7 +360,7 @@ class MetadataEditWidget {
 
   /**
    * Get the row used by this widget
-   * @return {[]}
+   * @return {Object[]}
    */
   row() {
     return [
