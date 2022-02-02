@@ -4,8 +4,9 @@
 
 'use strict';
 
+import {loadNotes} from '../tyko/static/js/item_details.mjs';
+
 jest.mock('../tyko/static/js/request.js');
-import * as module from '../tyko/static/js/item_details.mjs';
 
 describe('module', () => {
   beforeEach(() => {
@@ -49,4 +50,25 @@ describe('module', () => {
     );
   },
   );
+});
+
+describe('load Notes', ()=>{
+  beforeEach(() => {
+    document.body.innerHTML = `<table id="dummy""></table>`;
+  });
+  const notes = [
+    {
+      route: {
+        api: '/api/foo',
+      },
+      note_type: 'production',
+      note_id: 1,
+      text: 'Just a test',
+    },
+  ];
+  test('Adds a row', ()=>{
+    const table = document.getElementById('dummy');
+    loadNotes(notes, table);
+    expect(table.childElementCount).toBeGreaterThan(0);
+  });
 });
