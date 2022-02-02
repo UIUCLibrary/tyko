@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "test": "jest",
-    "lint": "eslint ./tyko",
+    "lint": "eslint  ./tyko/static/js/*.mjs ./tyko/static/js/*.js ",
     "eslint-output": "eslint-output",
     "build": "webpack",
     "jsdocs": "jsdoc -c docs/jsdocs_config.json -d build/jsdocs"
@@ -38,6 +38,7 @@
     "eslint-output": "^3.0.1",
     "expose-loader": "^3.1.0",
     "jest": "^27.1.0",
+    "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^13.0.0",
     "jest-sonar-reporter": "^2.0.0",
     "jsdoc": "^3.6.10",
@@ -50,6 +51,8 @@
     "includeConsoleOutput": true
   },
   "jest": {
+    "automock": false,
+    "resetMocks": false,
     "testResultsProcessor": "jest-sonar-reporter",
     "coverageReporters": [
       "text",

@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import {parseUpdateRequestData} from '../tyko/static/js/utils.mjs';
 
 describe('Testing parseUpdateRequestData on flat data', () => {
@@ -36,7 +40,7 @@ describe('Testing parseUpdateRequestData on data with a dot', () => {
       'format_id': '7',
       'format_details': {
         'inspection_date': '05-05-2020',
-        'recorded_date': '02-01-1995'
+        'recorded_date': '02-01-1995',
       },
     });
   });
