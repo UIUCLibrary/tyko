@@ -16,6 +16,7 @@ RUN n stable -y && \
     npm install -g npm && \
     mkdir /.npm && \
     chmod 777 /.npm
+
 #==============================================================================
 
 FROM base_image as SONAR_BUILDER
@@ -59,7 +60,7 @@ COPY --from=SONAR_BUILDER /opt/build-wrapper-linux-x86 /opt/build-wrapper-linux-
 ENV SONAR_SCANNER_VERSION=4.6.2.2472
 ARG SONAR_SCANNER_HOME=/opt/sonar/${SONAR_SCANNER_VERSION}-linux
 ENV SONAR_USER_HOME=/opt/sonar/.sonar
-
+RUN npm install -g jsdoc
 RUN ln -s /opt/sonar/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin/sonar-scanner /usr/local/bin/sonar-scanner && \
     which sonar-scanner
 

@@ -91,20 +91,46 @@ pipeline {
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
-        stage('Build Docs'){
+        stage('Documentation'){
             agent {
               dockerfile {
                 filename 'CI/docker/jenkins/Dockerfile'
                 label "linux && docker"
               }
             }
-            steps{
-                sh(
-                    label: 'Building docs',
-                    script: '''mkdir -p logs
-                               python3 -m sphinx docs/ build/docs/html -d build/docs/.doctrees -v -w logs/build_sphinx.log
-                               '''
-                )
+            stages{
+                stage('Backing Docs'){
+                    parallel{
+                        stage('Javascript Docs'){
+                            steps{
+                                sh 'npm run jsdocs'
+                            }
+                            post{
+                                success{
+                                    publishHTML([
+                                        allowMissing: false,
+                                        alwaysLinkToLastBuild: false,
+                                        keepAll: false,
+                                        reportDir: 'build/jsdocs',
+                                        reportFiles: 'index.html',
+                                        reportName: 'JSDoc Documentation',
+                                        reportTitles: ''
+                                        ])
+                                }
+                            }
+                        }
+                        stage('Python Docs'){
+                            steps{
+                                sh(
+                                    label: 'Running Sphinx',
+                                    script: '''mkdir -p logs
+                                               python3 -m sphinx docs/ build/docs/html -d build/docs/.doctrees -v -w logs/build_sphinx.log
+                                               '''
+                                )
+                            }
+                        }
+                    }
+                }
             }
             post{
                 always {
@@ -298,12 +324,14 @@ pipeline {
                                     steps{
                                         timeout(10){
                                             catchError(buildResult: 'SUCCESS', message: 'Pylint found issues', stageResult: 'UNSTABLE') {
-                                                sh(
-                                                    label: "Running pylint",
-                                                    script: '''mkdir -p reports
-                                                               pylint --rcfile=./CI/jenkins/pylintrc tyko > reports/pylint.txt
-                                                            '''
-                                                )
+                                                tee('reports/pylint.txt'){
+                                                    sh(
+                                                        label: "Running pylint",
+                                                        script: '''mkdir -p reports
+                                                                   pylint --rcfile=./CI/jenkins/pylintrc tyko
+                                                                '''
+                                                    )
+                                                }
                                             }
                                             sh(
                                                 script: 'PYLINTHOME=. pylint  -r n --msg-template="{path}:{module}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > reports/pylint_issues.txt',

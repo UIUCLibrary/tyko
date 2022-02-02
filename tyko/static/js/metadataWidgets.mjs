@@ -360,7 +360,7 @@ class MetadataEditWidget {
 
   /**
    * Get the row used by this widget
-   * @return {(*|jQuery.fn.init|jQuery|HTMLElement)[]}
+   * @return {Object[]}
    */
   row() {
     return [

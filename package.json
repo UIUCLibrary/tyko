@@ -11,9 +11,10 @@
   ],
   "scripts": {
     "test": "jest",
-    "lint": "eslint ./tyko",
+    "lint": "eslint  ./tyko/static/js/*.mjs ./tyko/static/js/*.js ",
     "eslint-output": "eslint-output",
-    "build": "webpack"
+    "build": "webpack",
+    "jsdocs": "jsdoc -c docs/jsdocs_config.json -d build/jsdocs"
   },
   "repository": {
     "type": "git",
@@ -32,13 +33,15 @@
     "@babel/plugin-transform-modules-commonjs": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "babel-jest": "^27.1.0",
-    "eslint": "^7.32.0",
+    "eslint": "^8.8.0",
     "eslint-config-google": "^0.14.0",
     "eslint-output": "^3.0.1",
     "expose-loader": "^3.1.0",
     "jest": "^27.1.0",
+    "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^13.0.0",
     "jest-sonar-reporter": "^2.0.0",
+    "jsdoc": "^3.6.10",
     "mkdirp": ">=1.0.3",
     "webpack": "^5.66.0",
     "webpack-cli": "^4.9.1"
@@ -48,6 +51,8 @@
     "includeConsoleOutput": true
   },
   "jest": {
+    "automock": false,
+    "resetMocks": false,
     "testResultsProcessor": "jest-sonar-reporter",
     "coverageReporters": [
       "text",
@@ -80,8 +85,6 @@
     "jquery": "^3.6.0",
     "material-components-web": "^13.0.0",
     "material-icons": "^1.10.5",
-    "npm": "^7.21.1",
-    "popper.js": "^1.16.1",
     "style-loader": "^3.2.1",
     "test": "^0.6.0"
   }

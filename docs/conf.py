@@ -51,8 +51,10 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
+    'sphinx_js'
 ]
-
+js_source_path = '../tyko/static/js'
+jsdoc_config_path = 'jsdocs_config.json'
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
