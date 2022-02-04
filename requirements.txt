@@ -1,5 +1,5 @@
 flask
 Flask-SQLAlchemy
-jinja2
+jinja2<3.0,>2.0
 lxml
 SQLAlchemy>1.4
