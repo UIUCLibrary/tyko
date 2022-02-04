@@ -2,4 +2,4 @@ flask<2.0
 Flask-SQLAlchemy
 jinja2
 lxml
-SQLAlchemy
+SQLAlchemy>1.4

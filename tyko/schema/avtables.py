@@ -2,12 +2,7 @@ import abc
 import datetime
 from typing import Union, List, Optional, Mapping
 
-try:
-    from sqlalchemy.orm import DeclarativeMeta, declarative_base
-except ImportError:
-    from sqlalchemy.ext.declarative.api import \
-        DeclarativeMeta,\
-        declarative_base
+from sqlalchemy.orm import DeclarativeMeta, declarative_base
 
 
 SerializedData = \
