@@ -2,6 +2,7 @@ import sys
 from typing import Dict, Tuple, Any, Type
 
 import sqlalchemy as db
+import sqlalchemy.orm
 from sqlalchemy.orm.session import sessionmaker
 
 import tyko.schema.avtables
@@ -9,16 +10,26 @@ from tyko import schema
 from .schema import formats
 from .schema import notes
 from .schema import projects
+import packaging.version
 
 
-def init_database(engine) -> None:
+def alembic_table_exists(engine) -> bool:
+
+    if packaging.version.parse(sqlalchemy.__version__) < packaging.version.parse("1.4"):
+        return engine.dialect.has_table(engine, "alembic_version")
+    else:
+        return sqlalchemy.inspect(engine).has_table("alembic_version")
+
+
+def init_database(engine: sqlalchemy.engine.Engine) -> None:
     # if engine.dialect.has_table(engine, "audio_video"):
     #     return
     print("Creating all tables")
     tyko.schema.avtables.AVTables.metadata.create_all(bind=engine)
+
     initial_session = sessionmaker(bind=engine)
-    session = initial_session()
-    if not engine.dialect.has_table(engine, "alembic_version"):
+    session: sqlalchemy.orm.Session = initial_session()
+    if not alembic_table_exists(engine):
         version_table = db.Table(
             "alembic_version", tyko.schema.avtables.AVTables.metadata,
             db.Column("version_num", db.String(length=32), primary_key=True)

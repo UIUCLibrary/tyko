@@ -102,7 +102,7 @@ setup(
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-bdd"],
     install_requires=[
-        "SQLAlchemy<1.4",
+        "SQLAlchemy",
         # "mysqlclient",
         "flask",
         "Flask-SQLAlchemy",

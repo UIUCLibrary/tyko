@@ -1,4 +1,4 @@
 flask<2.0
-SQLAlchemy<1.4
+SQLAlchemy
 Flask-SQLAlchemy
 lxml
