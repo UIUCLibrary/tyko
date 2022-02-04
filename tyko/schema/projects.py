@@ -1,7 +1,7 @@
 from typing import Dict, TYPE_CHECKING, Mapping
 
 import sqlalchemy as db
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 from tyko.schema.avtables import AVTables, SerializedData
 
@@ -43,7 +43,7 @@ class Project(AVTables):
 
     objects = relationship(
         "CollectionObject",
-        backref="object_source"
+        back_populates="project",
     )
 
     def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
