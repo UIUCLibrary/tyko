@@ -1,3 +1,5 @@
+import pytest
+
 import tyko.database
 import tyko.schema.formats
 from tyko import schema
@@ -48,25 +50,23 @@ def test_database_feature():
     pass
 
 
-@given("a blank database")
+@given("a blank database", target_fixture='dummy_database')
 def dummy_database():
     engine = create_engine("sqlite:///:memory:")
     tyko.database.init_database(engine)
 
     dummy_session = sessionmaker(bind=engine)
-    session = dummy_session()
-    yield session
-    session.close()
+    with dummy_session() as session:
+        return session
 
 
-@given("a contact for a collection")
+@given("a contact for a collection", target_fixture='collection_contact')
 def collection_contact():
-    new_contact = schema.Contact(
+    return schema.Contact(
         first_name=CONTACT_COLLECTION_FIRST_NAME,
         last_name=CONTACT_COLLECTION_LAST_NAME,
         email_address=CONTACT_COLLECTION_EMAIL
     )
-    return new_contact
 
 
 @when("the contact is added to the database")
@@ -90,7 +90,7 @@ def test_collection_feature():
 
 
 @when("a new collection is created with a contact")
-def new_collection(dummy_database, new_collection):
+def w_new_collection(dummy_database, new_collection):
     dummy_database.add(new_collection)
     dummy_database.commit()
     return database_with_collection
@@ -122,24 +122,24 @@ def test_database_object():
     pass
 
 
-@given("a new collection")
+@given("a new collection", target_fixture="new_collection")
 def new_collection(dummy_database, collection_contact):
     dummy_database.add(collection_contact)
     dummy_database.commit()
-
+#
     contact = dummy_database.query(schema.Contact).first()
-    new_collection = schema.Collection(
+    return schema.Collection(
         record_series=SAMPLE_RECORD_SERIES,
         collection_name=SAMPLE_COLLECTION_NAME,
         department=SAMPLE_DEPARTMENT,
         contact=contact
 
     )
-    return new_collection
 
 
-@given("a database with a collection")
+@given("a database with a collection", target_fixture='database_with_collection')
 def database_with_collection(dummy_database, new_collection):
+
     dummy_database.add(new_collection)
     dummy_database.commit()
     return dummy_database
@@ -152,7 +152,7 @@ def add_new_object(dummy_database, create_new_object):
     return dummy_database
 
 
-@given(parsers.parse("a new object for the collection with a barcode"))
+@given(parsers.parse("a new object for the collection with a barcode"), target_fixture="create_new_object")
 def create_new_object(dummy_database, new_collection, new_project):
 
     new_object = schema.CollectionObject(
@@ -167,7 +167,7 @@ def create_new_object(dummy_database, new_collection, new_project):
     return new_object
 
 
-@given("a new Project")
+@given("a new Project", target_fixture='new_project')
 def new_project(dummy_database):
 
     return schema.Project(
@@ -199,7 +199,7 @@ def collection_has_project(dummy_database):
 
 
 @given(parsers.parse(
-    "a staff contact named {staff_first_name} {staff_last_name}"))
+    "a staff contact named {staff_first_name} {staff_last_name}"), target_fixture='staff_contact')
 def staff_contact(dummy_database, staff_first_name, staff_last_name):
     new_contact = schema.Contact(
         first_name=staff_first_name,
@@ -222,7 +222,7 @@ def test_newitem():
     pass
 
 
-@given(parsers.parse("a new {media_format_name} item is created by the staff"))
+@given(parsers.parse("a new {media_format_name} item is created by the staff"), target_fixture='new_item')
 def new_item(dummy_database, new_collection, new_project, staff_contact,
              create_new_object, media_format_name):
 
@@ -265,7 +265,7 @@ def test_database_note():
     pass
 
 
-@given(parsers.parse("a new {note_type} note is created"))
+@given(parsers.parse("a new {note_type} note is created"), target_fixture='new_note')
 def new_note(dummy_database, note_type):
     inspection_note = \
         dummy_database.query(schema.NoteTypes).filter(
@@ -323,7 +323,7 @@ def treatment_add_to_item(dummy_database, new_item, treatment_record):
 
 
 @given(parsers.parse('a new treatment record is created that '
-                     'needs "{needs}" and got "{given}"'))
+                     'needs "{needs}" and got "{given}"'), target_fixture='treatment_record')
 def treatment_record(needs, given):
     return schema.Treatment(
         needed=needs,
@@ -353,7 +353,7 @@ def test_new_media_project():
     pass
 
 
-@given("a new <media_type> item with <file_name> added to the object")
+@given("a new <media_type> item with <file_name> added to the object", target_fixture='add_new_item_to_object')
 def add_new_item_to_object(dummy_database, create_new_object, media_type,
                            file_name):
 
@@ -485,7 +485,7 @@ def test_vendor():
     pass
 
 
-@given("an empty database")
+@given("an empty database", target_fixture='empty_database')
 def empty_database(dummy_database):
     return dummy_database
 
@@ -695,7 +695,7 @@ def new_open_reel(dummy_database):
 
 
 @scenario("database.feature", "Create a new OpenReel object")
-def test_database_open_reel(dummy_database):
+def test_database_open_reel():
     pass
 
 
@@ -773,7 +773,7 @@ def file_with_note(dummy_database, file_name, annotation_type,
     assert False
 
 
-@given("annotations for <annotation_type> configured in the database")
+@given("annotations for <annotation_type> configured in the database", target_fixture='add_file_annotation_type')
 def add_file_annotation_type(dummy_database, annotation_type):
     dummy_database.add(
         schema.FileAnnotationType(name=annotation_type))
@@ -785,7 +785,7 @@ def test_audio_cassette_feature():
     pass
 
 
-@given("a database with a project and a collection")
+@given("a database with a project and a collection", target_fixture='project_and_collection')
 def project_and_collection(dummy_database):
     new_collection = schema.Collection(collection_name="simple collection")
     dummy_database.add(new_collection)
@@ -796,7 +796,7 @@ def project_and_collection(dummy_database):
     return new_collection, new_project
 
 #
-@given("a new <object_title> audio recording is added")
+@given("a new <object_title> audio recording is added", target_fixture='new_audio_object')
 def new_audio_object(dummy_database, project_and_collection, object_title):
     collection, project = project_and_collection
     new_object = schema.CollectionObject(name=object_title,
