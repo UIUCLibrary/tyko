@@ -1,7 +1,7 @@
 from typing import Dict, TYPE_CHECKING, Mapping
 
 import sqlalchemy as db
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
 from tyko.schema.avtables import AVTables, SerializedData
 

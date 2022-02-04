@@ -15,7 +15,8 @@ import packaging.version
 
 def alembic_table_exists(engine) -> bool:
 
-    if packaging.version.parse(sqlalchemy.__version__) < packaging.version.parse("1.4"):
+    if packaging.version.parse(sqlalchemy.__version__) < \
+            packaging.version.parse("1.4"):
         return engine.dialect.has_table(engine, "alembic_version")
     else:
         return sqlalchemy.inspect(engine).has_table("alembic_version")
