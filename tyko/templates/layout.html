@@ -5,8 +5,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 {% block head -%}
-    <script src="{{ url_for('static', filename='pack/index.bundle.js') }}"></script></head>
+
+
     <link rel="stylesheet" href="{{url_for('static', filename='css/sticky-footer-navbar.css')}}"/>
+
     <title>Tyko</title>
 {%- endblock %}
 </head>
@@ -31,5 +33,16 @@
 </footer>
 {% block scripts %}
 {% endblock %}
+<script src="{{ url_for('static', filename='pack/index.bundle.js') }}"></script>
+<script type="module" src="{{url_for('static', filename="js/tyko.mjs")}}"></script>
+{#<script>#}
+    {#console.log('hello');#}
+    {#const elem = document.querySelector('input[name="originals_rec_date"]');#}
+    {#console.log(elem)#}
+    {#const datepicker = new Datepicker(elem, {buttonClass: 'btn'});#}
+{##}
+{#    console.log('done');#}
+
+{#</script>#}
 </body>
 </html>

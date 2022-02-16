@@ -21,7 +21,7 @@ def is_correct_db_version(app, database) -> bool:
     except OperationalError as exc:
         app.logger.error(
             "Problem getting version information. "
-            "Reason given: {}".format(exc))
+            f"Reason given: {exc}")
         if "no such table" in str(exc):
             raise NoTable() from exc
         return False

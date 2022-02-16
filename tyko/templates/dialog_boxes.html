@@ -101,6 +101,172 @@
     </div>
 {% endmacro %}
 
+{% macro removeNoteModal(modalId="removeNoteModal", confirmButtonId="confirmRemoveNoteButton") %}
+    <div class="modal fade" id="{{ modalId }}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered"
+                 role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Remove Note</h5>
+                </div>
+                <div class="modal-body">
+                    <p>This action is permanent! Are you sure you want to remove this?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="{{ confirmButtonId }}" data-bs-dismiss="modal">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro newNoteModal(submit_url, modalId="newNote", formId="newNotesForm", noteTypeSelectorId="noteTypeSelect") %}
+    <div class="modal fade" id="newNote" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Note</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <iframe name="hiddenFrame" class="hide" hidden></iframe>
+                <form id="{{ formId }}" action="{{ submit_url }}" method="post" target="hiddenFrame">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="mb-3 row">
+                                <label for="{{ noteTypeSelectorId }}" class="col-sm-2 col-form-label" >Type:</label>
+                                <div class="col-sm-10">
+                                    <select class="form-select" name="note_type_id"
+                                            id="{{ noteTypeSelectorId }}"></select>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="message-text" class="col-sm-2 col-form-label">Note:</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" name="text"
+                                              id="message-text" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit"
+                                class="btn btn-primary tyko-accept"
+                                id="saveNoteButton"
+                                data-bs-dismiss="modal">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro newEntityModal(modalId, submitUrl, title="", formId="newEdityForm", titleId="newItemTitle") %}
+<div class="modal fade" id="{{ modalId }}" tabindex="-1" role="dialog" aria-labelledby="{{ titleId }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{ titleId }}">{{ title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+            <form id="{{ formId }}" action="{{ submitUrl }}" method="post" target="hiddenFrame">
+                <iframe name="hiddenFrame" class="hide" hidden></iframe>
+                <div class="modal-body">
+                    {{ caller() }}
+                </div>
+                <div class="modal-footer">
+                    <div id="status"></div>
+                    <button class="btn btn-primary" type="submit">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const modalElement = document.currentScript.parentElement;
+        const formElement = modalElement.querySelector('#{{formId}}');
+        {#const statusBar = modalElement.querySelector('#responseStatus');#}
+        {#const z = modalElement.querySelector(".modal-footer");#}
+        const statusBar = modalElement.querySelector("#status");
+        formElement.addEventListener('submit', (e)=> {
+            e.preventDefault();
+            fetch(e.target.action, {
+                method: 'POST',
+                body: new URLSearchParams(new FormData(e.target))
+            }).then((resp) => {
+                if(resp.ok){
+                    location.reload();
+                }
+                else {
+                    statusBar.innerHTML = `
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                          <strong>Failed to create a new entity!</strong> ${resp.statusText}
+                          <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        `
+
+                }
+            });
+        })
+        modalElement.addEventListener('hidden.bs.modal', ()=> {
+                document.getElementById('{{ formId }}').reset();
+            });
+    </script>
+</div>
+
+{% endmacro %}
+
+{% macro editNoteModal(submit_url, modalId="noteEditor") %}
+<div class="modal fade tyko-editor" id="{{ modalId }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+            <iframe name="hiddenFrame" class="hide" hidden></iframe>
+            <form id="notesForm" action="{{ submit_url }}" method="post" target="hiddenFrame">
+                <div class="modal-body">
+                    <div class="form-group">
+                         <input type="hidden" id="noteId" name="noteId" value="">
+                    </div>
+                    <div class="form-group">
+                        <div class="mb-3 row">
+                            <label for="noteTypeSelect" class="col-sm-2 col-form-label" >Type:</label>
+                            <div class="col-sm-10">
+                                <select class="form-select tyko-notes" name="note_type_id"
+                                        id="noteTypeSelect"></select>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="message-text" class="col-sm-2 col-form-label">Note:</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" name="text"
+                                      id="message-text" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary tyko-accept"
+                            id="saveNoteButton" data-bs-dismiss="modal">Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
 {% macro editFileNote(modal_id) %}
     <div class="modal fade" id="{{ modal_id }}" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">

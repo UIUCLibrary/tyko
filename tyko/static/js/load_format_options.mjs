@@ -37,12 +37,16 @@ function updateOptions(url, optionId, displayCallback = null) {
  * @param {string} className - defaults to tyko-input-fulldate
  */
 function loadInputDatePickerClass(className = 'tyko-input-fulldate') {
-  $.each($(`.${className}`), function(i, element) {
-    $(element).datepicker({
-      format: 'mm-dd-yyyy',
-      uiLibrary: 'bootstrap4',
-    });
-  });
+  // [...document.getElementsByClassName(className)].forEach(
+  //     (element, index, array)=>{
+  //       const e = $(element);
+  //       e.ready(()=> {
+  //         e.datepicker({
+  //           format: 'mm-dd-yyyy',
+  //           uiLibrary: 'bootstrap4',
+  //         });
+  //       });
+  //   });
 }
 
 /**

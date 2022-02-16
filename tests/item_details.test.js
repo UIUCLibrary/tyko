@@ -53,7 +53,7 @@ describe('module', () => {
 
 describe('load Notes', ()=>{
   beforeEach(() => {
-    document.body.innerHTML = `<table id="dummy""></table>`;
+    document.body.innerHTML = `<table id="dummy""><tbody></tbody></table>`;
   });
   const notes = [
     {
@@ -80,16 +80,21 @@ describe('NoteEditor', ()=>{
      id="noteEditor" 
      tabindex="-1" 
      role="dialog">
- <div class="modal-body">
-    <div class="form-group">
-      <label for="noteTypeSelect" class="col-form-label" >Type:</label>
-      <select class="form-select" name="typeId"
-              id="noteTypeSelect"></select>
-      <label for="message-text" class="col-form-label">Note:</label>
-      <textarea class="form-control" name="text"
-                id="message-text" required></textarea>
+ <form id="notesForm">
+   <div class="modal-body">
+      <div class="form-group">
+        <input type="hidden" id="noteId" name="noteId" value="36">
+      </div>
+      <div class="form-group">
+        <label for="noteTypeSelect" class="col-form-label" >Type:</label>
+        <select class="form-select" name="typeId"
+                id="noteTypeSelect"></select>
+        <label for="message-text" class="col-form-label">Note:</label>
+        <textarea class="form-control" name="text"
+                  id="message-text" required></textarea>
+      </div>
     </div>
-  </div>
+</form>
 </div>
 `;
   });
@@ -97,6 +102,7 @@ describe('NoteEditor', ()=>{
     fetch.mockResponseOnce(
         JSON.stringify(
             {
+              note_id: 1,
               note_type_id: 1,
               text: 'Foo bar baz',
             },

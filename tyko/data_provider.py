@@ -357,6 +357,29 @@ class ProjectDataConnector(AbsNotesConnector):
 
         return projects[0]
 
+    def get_note(self, project_id, note_id, serialize):
+        session = self.session_maker()
+        try:
+            project = self.get(id=project_id, serialize=True)
+            notes = project.get('notes', [])
+            for note in notes:
+                if note_id == note["note_id"]:
+                    return note
+            raise ValueError("No Note found")
+        finally:
+            session.close()
+
+    def add_note(self, project_id, text, note_type_id):
+        session = self.session_maker()
+        try:
+            project = self._get_project(session, project_id)
+            new_note = self.new_note(session, text, note_type_id)
+            project.notes.append(new_note)
+            session.commit()
+            return new_note.serialize()
+        finally:
+            session.close()
+
 
 class ObjectDataConnector(AbsNotesConnector):
 
@@ -689,6 +712,18 @@ class ObjectDataConnector(AbsNotesConnector):
             if matching_item in subtype:
                 return subtype
         return None
+
+    def get_note(self, object_id, note_id, serialize=False):
+        session = self.session_maker()
+        try:
+            collection_object = self._get_object(object_id, session=session)
+            return self._find_note(
+                collection_object,
+                note_id
+            ).serialize(serialize)
+
+        finally:
+            session.close()
 
 
 class FileNotesDataConnector(AbsDataProviderConnector):
@@ -1067,7 +1102,7 @@ class ItemDataConnector(AbsNotesConnector):
             session.close()
 
     def update_note(self, item_id, note_id, changed_data):
-        session = self.session_maker()
+        session: sqlalchemy.orm.session.Session = self.session_maker()
         try:
             item = self._get_item(item_id, session=session)
 
@@ -1098,7 +1133,30 @@ class ItemDataConnector(AbsNotesConnector):
         for note in item.notes:
             if note.id == note_id:
                 return note
-        raise ValueError("No matching note for item")
+        raise ValueError(f"No matching note for item {note_id}")
+
+    def get_note(self, item_id, note_id):
+        session = self.session_maker()
+        item = self._get_item(item_id, session=session)
+        return self._find_note(item, note_id).serialize()
+
+    def add_file(self, project_id, object_id, item_id, file_name, generation):
+        session = self.session_maker()
+        try:
+            collection_item = self._get_item(item_id, session=session)
+            collection_item.files.append(
+                self.new_file(session, file_name, generation)
+            )
+            session.commit()
+            return self._get_item(item_id, session=session).serialize()
+
+        finally:
+            session.close()
+
+    def new_file(self, session, file_name, generation):
+        new_file = InstantiationFile(file_name=file_name, generation=generation)
+        session.add(new_file)
+        return new_file
 
 
 class AudioCassetteDataConnector(ItemDataConnector):
@@ -1286,6 +1344,13 @@ class NotesDataConnector(AbsDataProviderConnector):
             return all_notes[0]
 
         return all_notes
+
+    def list_types(self):
+        session = self.session_maker()
+        try:
+            return [i.serialize() for i in session.query(NoteTypes).all()]
+        finally:
+            session.close()
 
     def create(self, *args, **kwargs):
         note_types_id = kwargs.get("note_types_id")

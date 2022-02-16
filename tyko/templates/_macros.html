@@ -100,6 +100,25 @@
 </table>
 {% endmacro %}
 
+{% macro notes_table2(api_path, table_id="notesTable") %}
+    <div class="flex-column" id="noteCard">
+            <table class="table table-sm"
+                   id="{{ table_id }}"
+                   aria-describedby="NotesHeader"
+                   data-tyko-api-url="{{ api_path }}"
+            >
+                <thead>
+                    <tr>
+                        <th scope="col">Type</th>
+                        <th class="col-sm-3" id="noteMessageColumnHeader">Message</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+{% endmacro %}
+
 {% macro notes_table(notes, api_path) %}
 <div class="flex-column">
     <div>

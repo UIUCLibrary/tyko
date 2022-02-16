@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 
 class TestProjectMiddlewareEntity:
-    def test_serialize_notes(self):
-        data_provider = Mock()
+    def test_serialize_notes(self, monkeypatch):
+        data_provider = Mock(name="data provider")
         mw = middleware.ProjectMiddlwareEntity(data_provider)
         notes = [{"note_id": 1}]
         note_detail = {
@@ -15,7 +15,17 @@ class TestProjectMiddlewareEntity:
             }
         notes_middleware = Mock(spec=middleware.NotestMiddlwareEntity)
         notes_middleware.get = Mock(return_value=note_detail)
-        assert [note_detail] == mw.serialize_notes(notes, notes_middleware)
+
+        monkeypatch.setattr(
+            middleware,
+            "url_for", lambda *args, **kwargs: "/api/some/url"
+        )
+        assert [note_detail] == mw.serialize_object_notes(
+            notes,
+            project_id=1,
+            object_id=1,
+            notes_middleware=notes_middleware
+        )
 
 
 class TestNotestMiddlewareEntity:

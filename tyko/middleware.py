@@ -78,7 +78,6 @@ class Middleware:
         formats = self.data_provider.get_formats(id=id, serialize=True)
         return jsonify(formats)
 
-
 class ObjectMiddlwareEntity(AbsMiddlwareEntity):
     WRITABLE_FIELDS = [
         "name",
@@ -260,6 +259,11 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
             202
         )
 
+    def get_note(self, object_id, note_id):
+        note = \
+            self._data_connector.get_note(object_id=object_id, note_id=note_id, serialize=True)
+        return jsonify(note)
+
 
 class CollectionMiddlwareEntity(AbsMiddlwareEntity):
     WRITABLE_FIELDS = [
@@ -419,6 +423,13 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         current_project = self._data_connector.get(id, serialize=True)
 
         if current_project:
+            serialized_project_notes = self.serialize_project_notes(
+                current_project.get("notes", []),
+                project_id=id
+            )
+            if serialized_project_notes:
+                current_project['notes'] = serialized_project_notes
+
             for obj in current_project['objects']:
                 obj['routes'] = {
                     "frontend": url_for("page_project_object_details",
@@ -428,14 +439,21 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
                                     project_id=id,
                                     object_id=obj['object_id'])
                 }
-                obj['notes'] = self.serialize_notes(obj['notes'])
+
+                obj['notes'] = self.serialize_object_notes(
+                    obj['notes'],
+                    project_id=id,
+                    object_id=obj['object_id'],
+                )
             return current_project
 
         return abort(404)
 
-    def serialize_notes(
+    def serialize_object_notes(
             self,
             notes: Iterator[Dict[str, Any]],
+            project_id,
+            object_id,
             notes_middleware: typing.Optional[AbsMiddlwareEntity] = None
     ):
         serialize_notes = []
@@ -445,8 +463,17 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
 
         for note in notes:
             note_id = note['note_id']
+            serialize_note = note_mw.get(id=note_id, resolve_parents=False)
+            serialize_note["route"] = {
+                'api': url_for(
+                    "object_notes",
+                    note_id=note_id,
+                    object_id=object_id,
+                    project_id=project_id
+                )
+            }
             serialize_notes.append(
-                note_mw.get(id=note_id, resolve_parents=False)
+                serialize_note
             )
 
         return serialize_notes
@@ -516,6 +543,11 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
                 "id": new_project_id,
                 "url": url_for("project", project_id=new_project_id)
             }
+        )
+
+    def get_note(self, project_id, note_id):
+        return jsonify(
+            self._data_connector.get_note(project_id=project_id, note_id=note_id, serialize=True)
         )
 
     def update_note(self, project_id, note_id):
@@ -611,6 +643,19 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             new_data['collection_id'] = int(data['collectionId'])
 
         return new_data
+
+    def serialize_project_notes(self, notes, project_id):
+        serialized_notes = []
+        for note in notes.copy():
+            note["route"] = {
+                'api': url_for(
+                    "project_notes",
+                    note_id=note['note_id'],
+                    project_id=project_id
+                )
+            }
+            serialized_notes.append(note)
+        return serialized_notes
 
 
 class ItemMiddlwareEntity(AbsMiddlwareEntity):
@@ -774,6 +819,10 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             {"item": updated_object}
         )
 
+    def get_note(self, item_id, note_id):
+        note = self._data_connector.get_note(item_id=item_id,
+                                             note_id=note_id)
+        return jsonify(note)
 
 class NotestMiddlwareEntity(AbsMiddlwareEntity):
     WRITABLE_FIELDS = [
@@ -889,3 +938,9 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
                 "url": url_for("note", note_id=new_note_id)
             }
         )
+
+    def list_types(self):
+        types = self._data_connector.list_types()
+        return {
+            "types": types
+        }

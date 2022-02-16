@@ -10,6 +10,8 @@ Feature: database
 
   Scenario: Create a new collection
     Given a blank database
+    And a contact for a collection
+    And a new collection
     When a new collection is created with a contact
     Then the new collection can be found in the database
     And the database has 1 Contact records
@@ -17,14 +19,21 @@ Feature: database
     And the contact to the collection is expected value
 
   Scenario: Create a new project
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
     And a new Project
     When the project is added to the collection
     Then the database has 1 Project records
     And the collection contains the new project
 
   Scenario: Create a new project with a note
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
+    And a new Project
     And a new Project note is created
     When a new Project with a project note
     Then the database has 1 Project records
@@ -35,8 +44,12 @@ Feature: database
 
 
   Scenario: Create a new object
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
     And a staff contact named Henry Borchers
+    And a new Project
     And a new object for the collection with a barcode
     When a object is added to the collection
     Then the database has 1 Project records
@@ -49,8 +62,12 @@ Feature: database
     And all the Contact records can be serialize
 
   Scenario: Create a new item
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
     And a staff contact named Henry Borchers
+    And a new Project
     And a new object for the collection with a barcode
     And a new audio video item is created by the staff
     When the item is added to the object
@@ -61,8 +78,12 @@ Feature: database
 
 
   Scenario: Create a new inspection note for item
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
     And a staff contact named Henry Borchers
+    And a new Project
     And a new object for the collection with a barcode
     And a new audio video item is created by the staff
     And a new Inspection note is created
@@ -72,8 +93,12 @@ Feature: database
     And the CollectionItem record has the new note
 
   Scenario: Create a new inspection note for project
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
     And a staff contact named Henry Borchers
+    And a new Project
     And a new object for the collection with a barcode
     And a new audio video item is created by the staff
     And a new Inspection note is created
@@ -83,8 +108,12 @@ Feature: database
     And the Project record has the new note
 
   Scenario: Create a new inspection note for CollectionObject
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
     And a staff contact named Henry Borchers
+    And a new Project
     And a new object for the collection with a barcode
     And a new audio video item is created by the staff
     And a new Inspection note is created
@@ -94,8 +123,12 @@ Feature: database
     And the CollectionObject record has the new note
 
   Scenario: Item is sent for treatment
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
     And a staff contact named Henry Borchers
+    And a new Project
     And a new object for the collection with a barcode
     And a new audio video item is created by the staff
     And a new treatment record is created that needs "X, Y, Z treatment" and got "Y treatment only"
@@ -108,8 +141,12 @@ Feature: database
 
 
   Scenario Outline: Create a new media project
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
     And a staff contact named <first_name> <last_name>
+    And a new Project
     And a new object for the collection with a barcode
     And a new <media_type> item with <file_name> added to the object
     Then the database has 1 CollectionObject records
@@ -125,8 +162,12 @@ Feature: database
 
 
   Scenario Outline: Create a open reel project
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
     And a staff contact named <first_name> <last_name>
+    And a new Project
     And a new object for the collection with a barcode
     When a new open reel item recorded on <date_recorded> to <tape_size> tape on a <base> base with <file_name> added to the object
     Then the database has 1 OpenReel records
@@ -142,7 +183,8 @@ Feature: database
 
 
   Scenario Outline: Create a vendor
-    Given an empty database
+    Given a blank database
+    And an empty database
     When a new vendor named <vendor_name> from <address> in <city>, <state> <zipcode> is added
     Then the database has 1 Vendor records
     And the newly created vendor has the name <vendor_name>
@@ -156,7 +198,8 @@ Feature: database
     | Alias AV Vendor  | 123 Fake Street  | Gothum  | NY    | 12345   |
 
   Scenario Outline: Create a vendor contacts
-    Given an empty database
+    Given a blank database
+    And an empty database
     When a new vendor named <vendor_name> from <address> in <city>, <state> <zipcode> is added
     And <contact_first_name> <contact_last_name> is added as a contact to the vendor named <vendor_name>
     Then the vendor named <vendor_name> has a contact named <contact_first_name> <contact_last_name>
@@ -168,8 +211,12 @@ Feature: database
 
 
   Scenario Outline: Send an object to a vendor
-    Given an empty database
+    Given a blank database
+    And an empty database
+    And a contact for a collection
     And a staff contact named <staff_first_name> <staff_last_name>
+    And a new collection
+    And a new Project
     And a new object for the collection with a barcode
     When a new vendor named <vendor_name> from <address> in <city>, <state> <zipcode> is added
     And the object is sent to the vendor <vendor_name>
@@ -182,25 +229,41 @@ Feature: database
   | John               | Smith             | Alias AV Vendor  | 123 Fake Street  | Gothum  | NY    | 12345   |
 
   Scenario: Create a new Groove Disc object
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
+    And a new Project
     And a new object for the collection with a barcode
     And a new GroovedDisc item is created
     Then all the GroovedDisc items in the database can be serialized
 
   Scenario: Create a new Film object
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
+    And a new Project
     And a new object for the collection with a barcode
     And a new Film item is created
     Then all the Film items in the database can be serialized
 
   Scenario: Create a new OpenReel object
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a new Project
+    And a database with a collection
     And a new object for the collection with a barcode
     And a new OpenReel item is created
     Then all the OpenReel items in the database can be serialized
 
 Scenario Outline: Create a new media project where a file has a note and an annotation
-    Given a database with a collection
+    Given a blank database
+    And a contact for a collection
+    And a new collection
+    And a database with a collection
+    And a new Project
     And a new object for the collection with a barcode
     And annotations for <annotation_type> configured in the database
     When a new <media_type> item with <file_name> with <note> and an annotation of <annotation_type> and <annotation_content> added to the object
@@ -214,14 +277,15 @@ Scenario Outline: Create a new media project where a file has a note and an anno
     | film         |  myfilm.mkv   | another note | Video Capture Card   | AJA KONA LHe Plus HD-SDI |
 
 Scenario Outline: Create a new media project with audio cassettes
-    Given a database with a project and a collection
-    And a new <object_title> audio recording is added
-    When a tape named <item_title> recorded on <date_recorded> using a <audio_type> type <tape_type> and <tape_thickness> which was inspected on <inspection_date>
-    Then the database has 1 AudioCassette records
-    And the database has a an object entitled <object_title> with an AudioCassette
-    And AudioCassette in <object_title> is titled <item_title> was recorded on the date <date_recorded>
-    And AudioCassette in <object_title> with title <item_title> used type <tape_type> cassette and with <tape_thickness>
-    And AudioCassette in <object_title> with title <item_title> was inspected on <inspection_date>
+  Given a blank database
+  And a database with a project and a collection
+  And a new <object_title> audio recording is added
+  When a tape named <item_title> recorded on <date_recorded> using a <audio_type> type <tape_type> and <tape_thickness> which was inspected on <inspection_date>
+  Then the database has 1 AudioCassette records
+  And the database has a an object entitled <object_title> with an AudioCassette
+  And AudioCassette in <object_title> is titled <item_title> was recorded on the date <date_recorded>
+  And AudioCassette in <object_title> with title <item_title> used type <tape_type> cassette and with <tape_thickness>
+  And AudioCassette in <object_title> with title <item_title> was inspected on <inspection_date>
 
     Examples:
     | object_title           | item_title         | date_recorded | audio_type       | tape_type | tape_thickness | inspection_date |

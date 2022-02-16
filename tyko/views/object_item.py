@@ -17,6 +17,9 @@ class ObjectItemNotesAPI(views.MethodView):
     def delete(self, project_id, object_id, item_id, note_id):  # noqa: E501  pylint: disable=W0613,C0301
         return self._item.remove_note(item_id, note_id)
 
+    def get(self,  project_id, object_id, item_id, note_id):  # noqa: E501  pylint: disable=W0613,C0301
+        return self._item.get_note(item_id, note_id)
+
 
 class ObjectItemAPI(views.MethodView):
     def __init__(self, provider) -> None:
@@ -103,6 +106,9 @@ class ObjectItemAPI(views.MethodView):
         i = connector.get(id=item_id, serialize=True)
         if i['parent_object_id'] != object_id:
             raise AttributeError("object id doesn't match item id")
+        i['files'] = self._add_routes_to_files(
+            files=i['files'], item_id=item_id, object_id=object_id, project_id=project_id
+        )
         for note in i['notes']:
             note['route'] = self.get_note_routes(
                 note,
@@ -136,6 +142,25 @@ class ObjectItemAPI(views.MethodView):
         item_id = int(request.args.get("item_id"))
         parent_object = middleware.ObjectMiddlwareEntity(self._provider)
         return parent_object.remove_item(object_id=object_id, item_id=item_id)
+
+    def _add_routes_to_files(self, files, item_id, object_id, project_id):
+        new_files = []
+        for file_entry in files:
+            updated_file_entry = file_entry.copy()
+            updated_file_entry['routes'] = {
+                "api": url_for("item_files",
+                               item_id=item_id,
+                               object_id=object_id,
+                               project_id=project_id,
+                               id=file_entry['id']
+                               ),
+                "frontend": url_for("page_file_details", item_id=item_id,
+                               object_id=object_id,
+                               project_id=project_id,
+                               file_id=file_entry['id'])
+            }
+            new_files.append(updated_file_entry)
+        return new_files
 
 
 class ItemAPI(views.MethodView):

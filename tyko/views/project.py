@@ -15,6 +15,9 @@ class ProjectNotesAPI(views.MethodView):
     def delete(self, project_id, note_id):
         return self._project.remove_note(project_id, note_id)
 
+    def get(self, project_id, note_id):
+        return self._project.get_note(project_id, note_id)
+
 
 class ProjectsAPI(views.MethodView):
     def __init__(self, project: middleware.ProjectMiddlwareEntity) -> None:
