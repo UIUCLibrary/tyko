@@ -312,6 +312,51 @@ class TestProjectDataConnector:
         assert note_retrieved == note_created
 
 
+class TestItemDataConnector:
+    @pytest.fixture()
+    def dummy_session(self):
+        engine = sqlalchemy.create_engine("sqlite:///:memory:")
+        tyko.database.init_database(engine)
+        return sessionmaker(bind=engine)
+
+    @pytest.fixture()
+    def item_provider(self, dummy_session):
+
+        return data_provider.ItemDataConnector(dummy_session)
+
+    def test_get_note(self, item_provider):
+        new_item_data = item_provider.create(name="dummy", format_id=1)
+
+        item_provider.add_note(
+            item_id=new_item_data['item_id'],
+            note_text="spam",
+            note_type_id=1
+        )
+
+        retrieved_note = \
+            item_provider.get_note(new_item_data['item_id'], note_id=1)
+
+        assert retrieved_note["text"] == "spam"
+
+    def test_add_file(self, item_provider, dummy_session):
+        project_provider = data_provider.ProjectDataConnector(dummy_session)
+        project_provider.create(title="dummyProject")
+        new_item_data = item_provider.create(name="dummy", format_id=1)
+        object_provider = data_provider.ObjectDataConnector(dummy_session)
+        object_id = object_provider.create(name="dummyobject")
+        project_id = project_provider.create(title="dummy")
+
+        updated_item = item_provider.add_file(
+            project_id=project_id,
+            object_id=object_id,
+            item_id=new_item_data['item_id'],
+            file_name="spam.mov",
+            generation="Preservation"
+        )
+        file_created = updated_item['files'][0]
+        assert file_created['name'] == "spam.mov"
+
+
 class TestObjectDataConnector:
     @pytest.fixture()
     def dummy_session(self):
