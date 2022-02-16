@@ -287,10 +287,14 @@ def test_project_status_by_name_new_create():
 
 
 class TestProjectDataConnector:
-    def test_get_note(self):
+    @pytest.fixture()
+    def dummy_session(self):
         engine = sqlalchemy.create_engine("sqlite:///:memory:")
         tyko.database.init_database(engine)
-        dummy_session = sessionmaker(bind=engine)
+        return sessionmaker(bind=engine)
+
+    def test_get_note(self, dummy_session):
+
         project_provider = data_provider.ProjectDataConnector(dummy_session)
 
         project_id = project_provider.create(title="dummy")
@@ -306,6 +310,34 @@ class TestProjectDataConnector:
             serialize=False
         )
         assert note_retrieved == note_created
+
+
+class TestObjectDataConnector:
+    @pytest.fixture()
+    def dummy_session(self):
+        engine = sqlalchemy.create_engine("sqlite:///:memory:")
+        tyko.database.init_database(engine)
+        return sessionmaker(bind=engine)
+
+    def test_get_note(self, dummy_session):
+
+        object_provider = data_provider.ObjectDataConnector(dummy_session)
+
+        object_id = object_provider.create(name="dummy")
+
+        object_provider.add_note(
+            object_id,
+            note_text="dummy",
+            note_type_id=1
+        )
+
+        note_retrieved = object_provider.get_note(
+            object_id,
+            1,
+            serialize=False
+        )
+        assert note_retrieved['text'] == "dummy"
+
 
 def test_project_default_status():
     engine = sqlalchemy.create_engine("sqlite:///:memory:")
