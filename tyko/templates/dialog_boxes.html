@@ -130,7 +130,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
-                <iframe name="hiddenFrame" class="hide" hidden></iframe>
+                <iframe name="hiddenFrame" class="hide" title="hidden frame" hidden></iframe>
                 <form id="{{ formId }}" action="{{ submit_url }}" method="post" target="hiddenFrame">
                     <div class="modal-body">
                         <div class="form-group">
@@ -175,7 +175,7 @@
                 </button>
             </div>
             <form id="{{ formId }}" action="{{ submitUrl }}" method="post" target="hiddenFrame">
-                <iframe name="hiddenFrame" class="hide" hidden></iframe>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                 <div class="modal-body">
                     {{ caller() }}
                 </div>
@@ -230,7 +230,7 @@
                         aria-label="Close">
                 </button>
             </div>
-            <iframe name="hiddenFrame" class="hide" hidden></iframe>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
             <form id="notesForm" action="{{ submit_url }}" method="post" target="hiddenFrame">
                 <div class="modal-body">
                     <div class="form-group">
