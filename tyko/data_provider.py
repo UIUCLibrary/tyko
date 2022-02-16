@@ -1153,8 +1153,8 @@ class ItemDataConnector(AbsNotesConnector):
         finally:
             session.close()
 
+    @staticmethod
     def new_file(
-            self,
             session,
             file_name: str,
             generation: str
