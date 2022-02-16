@@ -6,7 +6,8 @@ from flask import jsonify, render_template, views, request
 
 import tyko.views.files
 from . import middleware
-from .data_provider import DataProvider, ItemDataConnector, ObjectDataConnector, \
+from .data_provider import DataProvider, ItemDataConnector, \
+    ObjectDataConnector, \
     ProjectDataConnector
 from . import frontend
 from .views.object_item import ObjectItemNotesAPI, ObjectItemAPI
@@ -104,8 +105,10 @@ class ObjectItemNewNotes(views.MethodView):
         item_id = kwargs['item_id']
         data = request.form
         note_type_id = int(data['note_type_id'])
-        text = data['text']
-        return jsonify(self._data_connector.add_note(item_id, text, note_type_id))
+
+        return jsonify(
+            self._data_connector.add_note(item_id, data['text'], note_type_id)
+        )
 
 
 class ObjectUpdateNotes(views.MethodView):
@@ -154,6 +157,7 @@ class ProjectNoteUpdate(views.MethodView):
             )
         )
 
+
 class ProjectNewNote(views.MethodView):
     def __init__(self, data_connector: ProjectDataConnector) -> None:
         self._data_connector = data_connector
@@ -167,6 +171,7 @@ class ProjectNewNote(views.MethodView):
             self._data_connector.add_note(project_id, text, note_type_id)
         )
 
+
 class ProjectNewObject(views.MethodView):
     def __init__(self, data_connector: ProjectDataConnector) -> None:
         self._data_connector = data_connector
@@ -176,11 +181,7 @@ class ProjectNewObject(views.MethodView):
         data = request.form
         print(data)
         return jsonify(self._data_connector.add_object(project_id, data))
-        # note_type_id = int(data['note_type_id'])
-        # text = data['text']
-        # return jsonify(
-        #     self._data_connector.add_note(project_id, text, note_type_id)
-        # )
+
 
 class ObjectNewNotes(views.MethodView):
     def __init__(self, data_connector: ObjectDataConnector) -> None:
@@ -197,10 +198,6 @@ class ObjectNewNotes(views.MethodView):
                 note_text=data['text']
             )
         )
-        # item_id = kwargs['item_id']
-        # note_type_id = int(data['note_type_id'])
-        # text = data['text']
-        # return jsonify(self._data_connector.add_note(item_id, text, note_type_id))
 
 
 class ObjectItemNewFile(views.MethodView):
@@ -217,6 +214,7 @@ class ObjectItemNewFile(views.MethodView):
             generation=data['generation'],
         ))
 
+
 class ObjectItemNotes(views.MethodView):
     def __init__(self, data_connector: ItemDataConnector) -> None:
         self._data_connector = data_connector
@@ -225,8 +223,10 @@ class ObjectItemNotes(views.MethodView):
         data = request.form
         note_id = int(data['noteId'])
         item_id = kwargs['item_id']
-        return jsonify(self._data_connector.update_note(item_id, note_id, data))
 
+        return jsonify(
+            self._data_connector.update_note(item_id, note_id, data)
+        )
 
 
 class Routes:
@@ -239,10 +239,9 @@ class Routes:
     def init_api_routes(self) -> None:
 
         if self.app:
-            # collection = middleware.CollectionMiddlwareEntity(self.db_engine)
-            # a = ObjectItemNotes(item=middleware.ItemMiddlwareEntity(self.db_engine))
-            # a = ObjectItemNotes()
-            item_data_connector = ItemDataConnector(self.db_engine.db_session_maker)
+            item_data_connector = ItemDataConnector(
+                self.db_engine.db_session_maker
+            )
 
             self.app.add_url_rule(
                 rule="/project/<int:project_id>/object/<int:object_id>/"
@@ -273,10 +272,13 @@ class Routes:
                 ),
                 methods=['POST']
             )
-            object_data_connector = ObjectDataConnector(self.db_engine.db_session_maker)
+
+            object_data_connector = ObjectDataConnector(
+                self.db_engine.db_session_maker
+            )
 
             self.app.add_url_rule(
-                rule="/project/<int:project_id>/object/<int:object_id>/addNote",
+                "/project/<int:project_id>/object/<int:object_id>/addNote",
                 view_func=ObjectNewNotes.as_view(
                     "add_object_note",
                     data_connector=object_data_connector
@@ -324,7 +326,7 @@ class Routes:
                 methods=['POST']
             )
             self.app.add_url_rule(
-                rule="/project/<int:project_id>/object/<int:object_id>/newItem",
+                "/project/<int:project_id>/object/<int:object_id>/newItem",
                 view_func=NewItem.as_view(
                     "object_new_item",
                     data_connector=object_data_connector
@@ -687,7 +689,12 @@ class Routes:
             endpoint="notes",
             view_func=lambda serialize=True: notes.get(serialize),
         )
-        yield UrlRule("/api/note_types", view_func=notes.list_types, endpoint="note_types")
+
+        yield UrlRule(
+            "/api/note_types",
+            view_func=notes.list_types,
+            endpoint="note_types"
+        )
 
     def get_api_collection_routes(self) -> Iterator[UrlRule]:
         collection = middleware.CollectionMiddlwareEntity(self.db_engine)

@@ -1153,8 +1153,18 @@ class ItemDataConnector(AbsNotesConnector):
         finally:
             session.close()
 
-    def new_file(self, session, file_name, generation):
-        new_file = InstantiationFile(file_name=file_name, generation=generation)
+    def new_file(
+            self,
+            session,
+            file_name: str,
+            generation: str
+    ) -> InstantiationFile:
+
+        new_file = InstantiationFile(
+            file_name=file_name,
+            generation=generation
+        )
+
         session.add(new_file)
         return new_file
 

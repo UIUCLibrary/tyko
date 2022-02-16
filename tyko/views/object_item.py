@@ -106,9 +106,14 @@ class ObjectItemAPI(views.MethodView):
         i = connector.get(id=item_id, serialize=True)
         if i['parent_object_id'] != object_id:
             raise AttributeError("object id doesn't match item id")
+
         i['files'] = self._add_routes_to_files(
-            files=i['files'], item_id=item_id, object_id=object_id, project_id=project_id
+            files=i['files'],
+            item_id=item_id,
+            object_id=object_id,
+            project_id=project_id
         )
+
         for note in i['notes']:
             note['route'] = self.get_note_routes(
                 note,
@@ -154,10 +159,13 @@ class ObjectItemAPI(views.MethodView):
                                project_id=project_id,
                                id=file_entry['id']
                                ),
-                "frontend": url_for("page_file_details", item_id=item_id,
-                               object_id=object_id,
-                               project_id=project_id,
-                               file_id=file_entry['id'])
+                "frontend": url_for(
+                    "page_file_details",
+                    item_id=item_id,
+                    object_id=object_id,
+                    project_id=project_id,
+                    file_id=file_entry['id']
+                )
             }
             new_files.append(updated_file_entry)
         return new_files

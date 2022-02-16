@@ -78,6 +78,7 @@ class Middleware:
         formats = self.data_provider.get_formats(id=id, serialize=True)
         return jsonify(formats)
 
+
 class ObjectMiddlwareEntity(AbsMiddlwareEntity):
     WRITABLE_FIELDS = [
         "name",
@@ -260,9 +261,13 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
         )
 
     def get_note(self, object_id, note_id):
-        note = \
-            self._data_connector.get_note(object_id=object_id, note_id=note_id, serialize=True)
-        return jsonify(note)
+        return jsonify(
+            self._data_connector.get_note(
+                object_id=object_id,
+                note_id=note_id,
+                serialize=True
+            )
+        )
 
 
 class CollectionMiddlwareEntity(AbsMiddlwareEntity):
@@ -547,7 +552,11 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
 
     def get_note(self, project_id, note_id):
         return jsonify(
-            self._data_connector.get_note(project_id=project_id, note_id=note_id, serialize=True)
+            self._data_connector.get_note(
+                project_id=project_id,
+                note_id=note_id,
+                serialize=True
+            )
         )
 
     def update_note(self, project_id, note_id):
@@ -823,6 +832,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
         note = self._data_connector.get_note(item_id=item_id,
                                              note_id=note_id)
         return jsonify(note)
+
 
 class NotestMiddlwareEntity(AbsMiddlwareEntity):
     WRITABLE_FIELDS = [
