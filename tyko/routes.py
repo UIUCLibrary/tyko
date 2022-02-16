@@ -79,15 +79,6 @@ class CollectionsAPI(views.MethodView):
         return self._collection.delete(id=collection_id)
 
 
-class NoteTypesAPI(views.MethodView):
-    def __init__(self, item: middleware.ItemMiddlwareEntity) -> None:
-        self._item = item
-
-    def get(self, *args, **kwargs):
-        # self._item.get
-        return jsonify()
-
-
 class NewItem(views.MethodView):
     def __init__(self, data_connector: ObjectDataConnector) -> None:
         self._data_connector = data_connector
@@ -104,10 +95,12 @@ class ObjectItemNewNotes(views.MethodView):
     def post(self, *args, **kwargs):
         item_id = kwargs['item_id']
         data = request.form
-        note_type_id = int(data['note_type_id'])
-
         return jsonify(
-            self._data_connector.add_note(item_id, data['text'], note_type_id)
+            self._data_connector.add_note(
+                item_id=item_id,
+                note_text=data['text'],
+                note_type_id=data['note_type_id']
+            )
         )
 
 
