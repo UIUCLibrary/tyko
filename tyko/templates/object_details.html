@@ -107,17 +107,10 @@
 {% block secondary_details %}
     {% call card("Items", 'my-1') %}
         {{ itemsTable( api_path, object['parent_project_id'], object['object_id']  )}}
-{#                    {{#}
-{#                            item_new_button_row(#}
-{#                                url_for("object_item", object_id=object['object_id'], project_id=object['parent_project_id']),#}
-{#                                "newItemtModal"#}
-{#                            )#}
-{#                    }}#}
                 <tr>
                     <td></td>
                     <td>
                         <div class="btn-group float-end" role="group">
-{#                            <button type="button" class="btn btn-sm btn-primary">Add</button>#}
                             <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newItemModal">Add</button>
                         </div>
                     </td>

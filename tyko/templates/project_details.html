@@ -37,9 +37,11 @@
                         url_for('project_object', project_id=project_id, object_id=child_object.object_id)
                         ) }}
                 {%- endfor %}
-                {{ object_new_button_row(api_path + "/object", "newObjectModal") }}
             </tbody>
         </table>
+        <div class="btn-group float-end" role="group">
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newObjectModal">Add</button>
+        </div>
         {{ confirm_remove_entity_modal("removeObjectModal") }}
         {% call newEntityModal('newObjectModal', title="New Object", submitUrl=url_for("add_new_object", project_id=project_id), formId="newEdityForm") %}
             <div class="mb-3 row">
