@@ -1,7 +1,6 @@
 {% extends "panel_details.html" %}
 {% from "_macros.html" import notes_table_row, note_editor, notes_table, notes_table2, metadata_table %}
 {% from "_details_macros.html" import confirm_remove_entity_modal, add_field_row, child_entity_row, remove_modal_event_scripts, metadata_text_edit_widget, metadata_select_edit_widget, card %}
-{% from "_object_macros.html" import object_new_button_row, new_object_modal%}
 {% from "dialog_boxes.html" import newEntityModal, editNoteModal, newNoteModal, removeNoteModal %}
 {% block main_details -%}
 {% call card("Details", card_class="my-1 h-100") %}
@@ -71,7 +70,7 @@
                 <div class="col-sm-10">
                     <div class="input-group">
                         <input id="datepickerOriginalsRecInput" class="form-control tyko-date-selector" name="originals_rec_date" pattern="^([0-9]{4})-([0-9]{2})-([0-9]{2})$"/>
-                        <button type="button" onclick="tyko.openDateSelect('datepickerOriginalsRecInput')" class="btn btn-outline-secondary"> <i class="bi bi-calendar-event"></i></button>
+                        <button type="button" onclick="tyko.openDateSelect('datepickerOriginalsRecInput')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
                     </div>
                 </div>
             </div>
