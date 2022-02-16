@@ -286,6 +286,27 @@ def test_project_status_by_name_new_create():
     assert status.name == "new status"
 
 
+class TestProjectDataConnector:
+    def test_get_note(self):
+        engine = sqlalchemy.create_engine("sqlite:///:memory:")
+        tyko.database.init_database(engine)
+        dummy_session = sessionmaker(bind=engine)
+        project_provider = data_provider.ProjectDataConnector(dummy_session)
+
+        project_id = project_provider.create(title="dummy")
+
+        note_created = project_provider.add_note(
+            project_id,
+            text="dummy",
+            note_type_id=1
+        )
+
+        note_retrieved = project_provider.get_note(
+            project_id, note_created['note_id'],
+            serialize=False
+        )
+        assert note_retrieved == note_created
+
 def test_project_default_status():
     engine = sqlalchemy.create_engine("sqlite:///:memory:")
     tyko.database.init_database(engine)
