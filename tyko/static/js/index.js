@@ -1,6 +1,5 @@
 import $ from "expose-loader?exposes=$,jQuery!jquery";
 import('bootstrap');
-// import {} from 'bootstrap';
 import { Tooltip, Toast, Popover, Dropdown, Button, Modal } from 'bootstrap';
 import {Datepicker} from 'vanillajs-datepicker';
 import('bootstrap-table');
@@ -8,6 +7,8 @@ import bootstrapTable from "bootstrap-table/src/bootstrap-table";
 import '../css/main.scss'
 import {loadNoteTypes, loadNotesTable} from "./notes.mjs";
 import {configureNoteEditor, RemoveConfirm} from "./editors.mjs"
+import * as tyko from "./tyko.mjs"
+
 import el from "vanillajs-datepicker/locales/el";
 window.$ = $
 /**
@@ -56,9 +57,13 @@ function loadTableFiles(element){
 
 function loadTykoTypes(){
     for(const element of document.getElementsByClassName('tyko')){
-        if(element.classList.contains('tyko-table-files')){
-            loadTableFiles(element)
-        }
+      if(element.classList.contains('tyko-editor')){
+        tyko.configureTykoEditorTags(element);
+      }
+
+      if(element.classList.contains('tyko-table-files')){
+          loadTableFiles(element)
+      }
     }
 }
 
