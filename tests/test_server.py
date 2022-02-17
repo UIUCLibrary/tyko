@@ -338,6 +338,13 @@ class TestItemDataConnector:
 
         assert retrieved_note["text"] == "spam"
 
+    def test_get_invalid_note(self, item_provider):
+        new_item_data = item_provider.create(name="dummy", format_id=1)
+
+        with pytest.raises(ValueError):
+            # No note with id 2
+            item_provider.get_note(new_item_data['item_id'], note_id=2)
+
     def test_add_file(self, item_provider, dummy_session):
         project_provider = data_provider.ProjectDataConnector(dummy_session)
         project_provider.create(title="dummyProject")
