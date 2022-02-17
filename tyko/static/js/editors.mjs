@@ -7,6 +7,7 @@ import {Modal} from 'bootstrap';
  * @param {HTMLInputElement} noteIdElement
  * @param {HTMLSelectElement} noteTypeElement
  * @param {HTMLTextAreaElement} noteMessageElement
+ * @return {Promise}
  */
 export function configureNoteEditor(
     apiUrl,
@@ -14,7 +15,7 @@ export function configureNoteEditor(
     noteIdElement,
     noteTypeElement,
     noteMessageElement) {
-  fetch(apiUrl)
+  return fetch(apiUrl)
       .then((response)=>response.json())
       .then((json)=>{
         const modal = new Modal(modalElement);

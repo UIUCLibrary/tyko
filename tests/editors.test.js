@@ -4,17 +4,72 @@
 'use strict';
 require('jest-fetch-mock').enableMocks();
 import * as editor from '../tyko/static/js/editors.mjs';
-// describe('module', () => {
-//   beforeEach(() => {
-//     fetch.resetMocks();
-//   });
-//   test('ssss', ()=>{
-//     document.body.innerHTML = ``;
-//     fetch.mockResponseOnce(JSON.stringify({data: '12345'}));
-//     const a = document.getElementById('dummy');
-//     // editor.configureNoteEditor('onetwothree', a);
-//   });
-// });
+describe('module', () => {
+  beforeEach(() => {
+    fetch.resetMocks();
+  });
+  test('test configureNoteEditor', async ()=> {
+    document.body.innerHTML = `
+        <div class="modal fade tyko-editor"
+             id="noteEditor" 
+             tabindex="-1" 
+             role="dialog" 
+             aria-labelledby="exampleModalLabel" 
+             aria-hidden="true">
+          <form id="notesForm">
+            <div class="modal-body">
+              <div class="form-group">
+                   <input type="hidden" id="noteId" name="noteId" value="">
+              </div>
+              <div class="form-group">
+                <div class="mb-3 row">
+                  <label for="noteTypeSelect" 
+                         class="col-sm-2 col-form-label" >Type:</label>
+                  <div class="col-sm-10">
+                    <select class="form-select tyko-notes" name="note_type_id"
+                            id="noteTypeSelect"></select>
+                  </div>
+                </div>
+                <div class="mb-3 row">
+                  <label for="message-text" 
+                         class="col-sm-2 col-form-label">Note:</label>
+                  <div class="col-sm-10">
+                    <textarea class="form-control" name="text"
+                              id="message-text" required></textarea>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary"
+                      data-bs-dismiss="modal">Cancel
+              </button>
+              <button type="submit" class="btn btn-primary tyko-accept"
+                      id="saveNoteButton" data-bs-dismiss="modal">Save
+              </button>
+            </div>
+          </form>
+        </div>`;
+    const editorElement = document.getElementById('noteEditor');
+    fetch.mockResponseOnce(
+        JSON.stringify(
+            {
+              text: '12345',
+              note_type_id: 1,
+              note_id: 1,
+            },
+        ));
+    await editor.configureNoteEditor(
+        'onetwothree',
+        editorElement,
+        editorElement.querySelector('#noteId'),
+        editorElement.querySelector('#noteTypeSelect'),
+        editorElement.querySelector('#message-text'),
+    );
+    expect(editorElement.querySelector('#message-text').value)
+        .toBe('12345');
+  });
+});
 
 describe('RemoveConfirm', () => {
   document.body.innerHTML = `
