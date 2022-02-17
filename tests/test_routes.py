@@ -174,3 +174,105 @@ class TestProjectNoteUpdate:
                 "noteId": 1
             })
         data_connector.update_note.assert_called()
+
+
+class TestObjectItemNewFile:
+    def test_add_file_called(self):
+        app = Flask(__name__, template_folder="../tyko/templates")
+        data_connector = Mock(spec=data_provider.ItemDataConnector)
+
+        user_view = \
+            tyko.routes.ObjectItemNewFile.as_view(
+                "api",
+                data_connector=data_connector
+            )
+
+        app.add_url_rule(
+            rule="/project/<int:project_id>/object/<int:object_id>/"
+                 "item/<int:item_id>/addFile",
+            view_func=user_view,
+            methods=["POST"]
+        )
+
+        with app.test_client() as client:
+            client.post('/project/1/object/1/item/1/addFile', data={
+                "file_name": "dummy.mov",
+                "generation": "Preservation",
+            })
+        data_connector.add_file.assert_called()
+
+
+class TestProjectNewObject:
+    def test_add_object_called(self):
+        app = Flask(__name__, template_folder="../tyko/templates")
+        data_connector = Mock(spec=data_provider.ProjectDataConnector)
+
+        user_view = \
+            tyko.routes.ProjectNewObject.as_view(
+                "api",
+                data_connector=data_connector
+            )
+
+        app.add_url_rule(
+            rule="/project/<int:project_id>/addObject",
+            view_func=user_view,
+            methods=["POST"]
+        )
+
+        with app.test_client() as client:
+            client.post('/project/1/addObject', data={
+                "name": "dummy",
+            })
+        data_connector.add_object.assert_called()
+
+
+class TestObjectNewNotes:
+    def test_add_note_called(self):
+        app = Flask(__name__, template_folder="../tyko/templates")
+        data_connector = Mock(spec=data_provider.ProjectDataConnector)
+
+        user_view = \
+            tyko.routes.ObjectNewNotes.as_view(
+                "api",
+                data_connector=data_connector
+            )
+
+        app.add_url_rule(
+            "/project/<int:project_id>/object/<int:object_id>/addNote",
+            view_func=user_view,
+            methods=["POST"]
+        )
+
+        with app.test_client() as client:
+            client.post('/project/1/object/1/addNote', data={
+                "text": "Spam spam bacon spam",
+                "note_type_id": 1
+            })
+        data_connector.add_note.assert_called()
+
+
+class TestObjectItemNotes:
+    def test_update_note_called(self):
+        app = Flask(__name__, template_folder="../tyko/templates")
+        data_connector = Mock(spec=data_provider.ItemDataConnector)
+
+        user_view = \
+            tyko.routes.ObjectItemNotes.as_view(
+                "api",
+                data_connector=data_connector
+            )
+
+        app.add_url_rule(
+            rule="/project/<int:project_id>/object/<int:object_id>/"
+                 "item/<int:item_id>/updateNote",
+            view_func=user_view,
+            methods=["POST"]
+        )
+
+        with app.test_client() as client:
+            client.post('/project/1/object/1/item/1/updateNote', data={
+                "noteId": 1,
+                "text": "Spam spam bacon spam",
+                "note_type_id": 1
+            })
+        data_connector.update_note.assert_called()
