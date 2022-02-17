@@ -465,3 +465,71 @@
         </div>
     </div>
 {% endmacro %}
+
+{% macro setupNoteTableJS(notesTableId, noteEditorId, newNoteId, newNotesFormId, noteTypesUrl) %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function(event) {
+        const notesTable = document.getElementById("{{notesTableId}}")
+        const editorElement = document.querySelector('#{{noteEditorId}}');
+        const newNoteElement = document.querySelector('#{{newNoteId}}');
+        const noteTypesAPI = "{{ noteTypesUrl }}"
+
+        fetch(notesTable.dataset.tykoApiUrl)
+            .then(response => response.json())
+            .then(json => {
+                tyko.notes.loadNotesTable(json['notes'], notesTable);
+            });
+
+        fetch(noteTypesAPI)
+            .then(response => response.json()).then(typesData => {
+              for (const element of [editorElement, newNoteElement]){
+                tyko.notes.loadNoteTypes(
+                    typesData['types'],
+                    element.querySelector('#noteTypeSelect')
+                );
+              }
+            });
+
+        document.getElementById('{{notesTableId}}')
+            .addEventListener('openForEditing', (e)=>{
+              const editorElement = document.querySelector('#noteEditor');
+              tyko.editor.configureNoteEditor(
+                  e.detail,
+                  editorElement,
+                  editorElement.querySelector('#noteId'),
+                  editorElement.querySelector('#noteTypeSelect'),
+                  editorElement.querySelector('#message-text')
+            )
+
+            document.querySelector('#notesForm')
+                .addEventListener('submit', (e)=>location.reload());
+        });
+      });
+
+      document.getElementById('{{newNotesFormId}}')
+        .addEventListener('submit', (e)=>{
+            location.reload();
+        });
+
+      document.getElementById('{{notesTableId}}')
+          .addEventListener('removeNoteRequested', (e)=>{
+            const apiUrl = e.detail;
+            const dialog = new tyko.editor.RemoveConfirm(
+                document.querySelector('#removeNoteModal')
+            );
+
+            dialog.setTitle('Are you Sure?')
+            dialog.setConfirmButton(
+                document.querySelector('#confirmRemoveNoteButton')
+            );
+
+            dialog.onAccepted = ()=>{
+                fetch(apiUrl, {method: 'DELETE'}).then(()=>{
+                    console.log("accepted")
+                    location.reload();
+                })
+            }
+            dialog.show();
+          });
+    </script>
+{% endmacro %}

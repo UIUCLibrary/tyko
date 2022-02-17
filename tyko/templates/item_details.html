@@ -3,7 +3,7 @@
 {% from "_macros.html" import notes_table_row, notes_table, metadata_table, note_editor, notes_table2 %}
 {% import  "_details_macros.html" as widgets%}
 {% import "_item_macros.html" as item_widgets %}
-{% from "dialog_boxes.html" import newEntityModal, editNoteModal, newNoteModal, removeNoteModal %}
+{% from "dialog_boxes.html" import newEntityModal, editNoteModal, newNoteModal, removeNoteModal, setupNoteTableJS %}
 {% block main_details %}
     {%  call widgets.card("Details", "my-1")  %}
         {% call metadata_table() %}
@@ -259,67 +259,7 @@
         {{ removeNoteModal(modalId="removeNoteModal") }}
         {{ newNoteModal(url_for('add_item_note', project_id=project_id, object_id=object_id, item_id=item['item_id']), modalId='newNote', formId='newNotesForm') }}
         {{ editNoteModal(url_for('update_item_note',project_id=project_id, object_id=object_id, item_id=item['item_id']), modalId="noteEditor") }}
-        <script>
-            document.addEventListener("DOMContentLoaded", function(event) {
-                const notesTable = document.getElementById("notesTable")
-                const editorElement = document.querySelector('#noteEditor');
-                const newNoteElement = document.querySelector('#newNote');
-                const noteTypesAPI = "{{ url_for('note_types') }}"
-
-                fetch(noteTypesAPI)
-                    .then(response => response.json()).then(typesData => {
-                        for (const element of [editorElement, newNoteElement]){
-                            tyko.notes.loadNoteTypes(
-                                typesData['types'],
-                                element.querySelector('#noteTypeSelect'));
-                        }
-                });
-
-                fetch(notesTable.dataset.tykoApiUrl)
-                    .then(response => response.json())
-                    .then(json => {
-                        tyko.notes.loadNotesTable(json['notes'], notesTable);
-                    });
-
-                document.getElementById('newNotesForm')
-                    .addEventListener('submit', (e)=>{
-                        location.reload();
-                    });
-
-                document.getElementById('notesTable')
-                    .addEventListener('removeNoteRequested', (e)=>{
-                        const apiUrl = e.detail;
-                        const dialog = new tyko.editor.RemoveConfirm(
-                            document.querySelector('#removeNoteModal')
-                        );
-
-                        dialog.setTitle('Are you Sure?')
-                        dialog.setConfirmButton(
-                            document.querySelector('#confirmRemoveNoteButton')
-                        );
-
-                        dialog.onAccepted = ()=>{
-                            fetch(apiUrl, {method: 'DELETE'}).then(()=>{
-                                console.log("accepted")
-                                location.reload();
-                            })
-                        }
-                        dialog.show();
-                    });
-                document.getElementById('notesTable').addEventListener('openForEditing', (e)=>{
-                    const editorElement = document.querySelector('#noteEditor');
-                    tyko.editor.configureNoteEditor(
-                        e.detail,
-                        editorElement,
-                        editorElement.querySelector('#noteId'),
-                        editorElement.querySelector('#noteTypeSelect'),
-                        editorElement.querySelector('#message-text')
-                    )
-                    document.querySelector('#notesForm')
-                        .addEventListener('submit', (e)=>location.reload());
-                });
-            });
-        </script>
+        {{ setupNoteTableJS(notesTableId="notesTable", noteEditorId='noteEditor', newNoteId='newNote', newNotesFormId='newNotesForm', noteTypesUrl=url_for('note_types')) }}
     {% endcall %}
 
 {% include "edit_note.html" %}
