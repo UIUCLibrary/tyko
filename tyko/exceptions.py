@@ -1,4 +1,5 @@
 """Exception used by Tyko"""
+import typing
 
 
 class DataError(Exception):
@@ -6,8 +7,12 @@ class DataError(Exception):
 
     status_code = 500
 
-    def __init__(self, *args, message="Problem accessing data",
-                 status_code=None, payload=None, **kwargs):
+    def __init__(self,
+                 *args,
+                 message: str = "Problem accessing data",
+                 status_code: typing.Optional[int] = None,
+                 payload=None,
+                 **kwargs) -> None:
 
         super().__init__(*args, **kwargs)
         self.message = message
