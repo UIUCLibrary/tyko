@@ -38,17 +38,32 @@ describe('RemoveConfirm', () => {
                   data-bs-dismiss="modal">Cancel</button>
           <button type="button"
                   class="btn btn-primary"
-                  id="confirmButtonId" 
+                  id="confirmButton" 
                   data-bs-dismiss="modal">Remove</button>
         </div>
       </div>
     </div>
 </div>`;
+
   const baseDiv = document.getElementById('dummy');
   const confirmEditor = new editor.RemoveConfirm(baseDiv);
+
   test('setTitle', ()=> {
     confirmEditor.setTitle('hello');
     const titleElement = baseDiv.querySelector('#title');
     expect(titleElement.innerHTML).toEqual('hello');
+  });
+
+  describe('setConfirmButton', ()=> {
+    const confirmButton = baseDiv.querySelector('#confirmButton');
+    confirmEditor.setConfirmButton(confirmButton);
+
+    test('clicking confirm signals okay', ()=> {
+      confirmEditor.onAccepted = jest.fn();
+      confirmButton.click();
+
+      expect(confirmEditor.onAccepted.mock.calls.length)
+          .toBeGreaterThanOrEqual(1);
+    });
   });
 });
