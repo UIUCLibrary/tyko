@@ -468,11 +468,13 @@
 
 {% macro setupNoteTableJS(notesTableId, noteEditorId, newNoteId, newNotesFormId, noteTypesUrl) %}
     <script>
+      const noteTypesAPI = "{{ noteTypesUrl }}"
+      const noteTypesData = fetch(noteTypesAPI)
+            .then(response => response.json())
       document.addEventListener("DOMContentLoaded", function(event) {
         const notesTable = document.getElementById("{{notesTableId}}")
         const editorElement = document.querySelector('#{{noteEditorId}}');
         const newNoteElement = document.querySelector('#{{newNoteId}}');
-        const noteTypesAPI = "{{ noteTypesUrl }}"
 
         fetch(notesTable.dataset.tykoApiUrl)
             .then(response => response.json())
@@ -481,7 +483,7 @@
             });
 
         fetch(noteTypesAPI)
-            .then(response => response.json()).then(typesData => {
+            noteTypesData.then(typesData => {
               for (const element of [editorElement, newNoteElement]){
                 tyko.notes.loadNoteTypes(
                     typesData['types'],

@@ -140,14 +140,17 @@
                 location.reload();
             });
 
+        const noteTypesAPI = "{{ url_for('note_types') }}"
+        const noteTypesData = fetch(noteTypesAPI)
+            .then(response => response.json());
+
         document.addEventListener("DOMContentLoaded", function(event) {
             const notesTable = document.getElementById("notesTable")
             const editorElement = document.querySelector('#noteEditor');
             const newNoteElement = document.querySelector('#newNote');
-            const noteTypesAPI = "{{ url_for('note_types') }}"
 
-            fetch(noteTypesAPI)
-                .then(response => response.json()).then(typesData => {
+
+            noteTypesData.then(typesData => {
                     for (const element of [editorElement, newNoteElement]){
                         tyko.notes.loadNoteTypes(
                             typesData['types'],
