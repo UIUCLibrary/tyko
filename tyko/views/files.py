@@ -32,13 +32,13 @@ class ItemFilesAPI(views.MethodView):
         return self._data_connector.get(int(file_id), serialize=True)
 
     @Decorators.validate
-    def get(self, project_id, object_id, item_id) -> flask.Response:  # noqa: E501 pylint: disable=W0613
+    def get(self, project_id: int, object_id: int, item_id: int) -> flask.Response:  # noqa: E501 pylint: disable=W0613
         file_id = request.args.get("id")
         if file_id is not None:
             return self.get_by_id(int(file_id))
         return self.get_all(item_id)
 
-    def get_all(self, item_id):
+    def get_all(self, item_id: int) -> flask.Response:
         items_dp = data_provider.ItemDataConnector(
             self._data_provider.db_session_maker)
         item = items_dp.get(item_id, serialize=True)
@@ -48,7 +48,12 @@ class ItemFilesAPI(views.MethodView):
 
         })
 
-    def post(self, project_id, object_id, item_id) -> flask.Response:
+    def post(
+            self,
+            project_id: int,
+            object_id: int,
+            item_id: int
+    ) -> flask.Response:
         json_request = request.get_json()
         if json_request is None:
             raise ValueError(NO_JSON_DATA_LOCATED_MESSAGE)
@@ -72,14 +77,14 @@ class ItemFilesAPI(views.MethodView):
         })
 
     @Decorators.validate
-    def put(self, project_id, object_id, item_id) -> flask.Response:  # noqa: E501 pylint: disable=W0613
+    def put(self, project_id: int, object_id: int, item_id: int) -> flask.Response:  # noqa: E501 pylint: disable=W0613
         file_id = int(request.args['id'])
         json_request = request.get_json()
         return self._data_connector.update(file_id,
                                            changed_data=json_request)
 
     @Decorators.validate
-    def delete(self, project_id, object_id, item_id) -> flask.Response:  # noqa: E501 pylint: disable=W0613
+    def delete(self, project_id: int, object_id: int, item_id: int) -> flask.Response:  # noqa: E501 pylint: disable=W0613
         file_id = int(request.args['id'])
 
         self._data_connector.remove(item_id, file_id)
@@ -128,14 +133,14 @@ class FileNotesAPI(views.MethodView):
             return self.get_one_by_id(file_id, int(note_id))
         return self.get_all(file_id)
 
-    def get_one_by_id(self, file_id, note_id):
+    def get_one_by_id(self, file_id: int, note_id: int):
         if self._file_has_matching_note(file_id, note_id) is False:
             raise AttributeError(
                 f"File {file_id} has no note with id {note_id}")
 
         return self._data_connector.get(note_id, serialize=True)
 
-    def get_all(self, file_id):
+    def get_all(self, file_id: int) -> flask.Response:
         data_connector = \
             data_provider.FilesDataConnector(
                 self._data_provider.db_session_maker)
