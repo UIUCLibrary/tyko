@@ -1,10 +1,9 @@
-import * as metadataWidgets from './metadataWidgets.mjs';
 /**
  *  Assign element with tyko-editor class
  *  This provides saveEdit event
  * @param {HTMLDivElement} element
  */
-function configureTykoEditorTags(element) {
+export function configureTykoEditorTags(element) {
   const saveNoteButton = element.querySelector('.tyko-accept');
   const form = element.querySelector('form');
   if (saveNoteButton) {
@@ -36,13 +35,3 @@ function packageElements(elements) {
   return data;
 }
 
-/**
- * Set elements used by Tyko
- */
-function setTykoClasses() {
-  for (const element of document.getElementsByClassName('tyko-editor')) {
-    configureTykoEditorTags(element);
-  }
-}
-
-setTykoClasses();
