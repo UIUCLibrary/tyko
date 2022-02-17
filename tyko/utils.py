@@ -30,7 +30,10 @@ def create_precision_datetime(date: str, precision: int = 3):
     return datetime.strptime(date, formatter)
 
 
-def serialize_precision_datetime(date: Union[date, Column[Date]], precision=3) -> str:
+def serialize_precision_datetime(
+        date: Union[date, Column[Date]],
+        precision=3
+) -> str:
     formatter = DATE_FORMATS.get(precision)
     if formatter is None:
         raise AttributeError("Invalid precision type")
