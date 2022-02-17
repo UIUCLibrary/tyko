@@ -286,6 +286,111 @@ def test_project_status_by_name_new_create():
     assert status.name == "new status"
 
 
+class TestProjectDataConnector:
+    @pytest.fixture()
+    def dummy_session(self):
+        engine = sqlalchemy.create_engine("sqlite:///:memory:")
+        tyko.database.init_database(engine)
+        return sessionmaker(bind=engine)
+
+    def test_get_note(self, dummy_session):
+
+        project_provider = data_provider.ProjectDataConnector(dummy_session)
+
+        project_id = project_provider.create(title="dummy")
+
+        note_created = project_provider.add_note(
+            project_id,
+            text="dummy",
+            note_type_id=1
+        )
+
+        note_retrieved = project_provider.get_note(
+            project_id, note_created['note_id'],
+            serialize=False
+        )
+        assert note_retrieved == note_created
+
+
+class TestItemDataConnector:
+    @pytest.fixture()
+    def dummy_session(self):
+        engine = sqlalchemy.create_engine("sqlite:///:memory:")
+        tyko.database.init_database(engine)
+        return sessionmaker(bind=engine)
+
+    @pytest.fixture()
+    def item_provider(self, dummy_session):
+
+        return data_provider.ItemDataConnector(dummy_session)
+
+    def test_get_note(self, item_provider):
+        new_item_data = item_provider.create(name="dummy", format_id=1)
+
+        item_provider.add_note(
+            item_id=new_item_data['item_id'],
+            note_text="spam",
+            note_type_id=1
+        )
+
+        retrieved_note = \
+            item_provider.get_note(new_item_data['item_id'], note_id=1)
+
+        assert retrieved_note["text"] == "spam"
+
+    def test_get_invalid_note(self, item_provider):
+        new_item_data = item_provider.create(name="dummy", format_id=1)
+
+        with pytest.raises(ValueError):
+            # No note with id 2
+            item_provider.get_note(new_item_data['item_id'], note_id=2)
+
+    def test_add_file(self, item_provider, dummy_session):
+        project_provider = data_provider.ProjectDataConnector(dummy_session)
+        project_provider.create(title="dummyProject")
+        new_item_data = item_provider.create(name="dummy", format_id=1)
+        object_provider = data_provider.ObjectDataConnector(dummy_session)
+        object_id = object_provider.create(name="dummyobject")
+        project_id = project_provider.create(title="dummy")
+
+        updated_item = item_provider.add_file(
+            project_id=project_id,
+            object_id=object_id,
+            item_id=new_item_data['item_id'],
+            file_name="spam.mov",
+            generation="Preservation"
+        )
+        file_created = updated_item['files'][0]
+        assert file_created['name'] == "spam.mov"
+
+
+class TestObjectDataConnector:
+    @pytest.fixture()
+    def dummy_session(self):
+        engine = sqlalchemy.create_engine("sqlite:///:memory:")
+        tyko.database.init_database(engine)
+        return sessionmaker(bind=engine)
+
+    def test_get_note(self, dummy_session):
+
+        object_provider = data_provider.ObjectDataConnector(dummy_session)
+
+        object_id = object_provider.create(name="dummy")
+
+        object_provider.add_note(
+            object_id,
+            note_text="dummy",
+            note_type_id=1
+        )
+
+        note_retrieved = object_provider.get_note(
+            object_id,
+            1,
+            serialize=False
+        )
+        assert note_retrieved['text'] == "dummy"
+
+
 def test_project_default_status():
     engine = sqlalchemy.create_engine("sqlite:///:memory:")
     tyko.database.init_database(engine)

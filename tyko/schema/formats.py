@@ -1,4 +1,5 @@
 import datetime
+import typing
 import warnings
 from abc import ABC
 
@@ -75,17 +76,14 @@ class AVFormat(AVTables):
 
     def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
 
-        data = {
+        data: typing.Dict[str, SerializedData] = {
             "item_id": self.table_id,
             "name": self.name,
             "files": list(self._iter_files(recurse)),
             "parent_object_id": self.object_id,
             "obj_sequence": self.obj_sequence,
+            "notes": [note.serialize() for note in self._iter_notes()]
         }
-        notes = []
-        for note in self._iter_notes():
-            notes.append(note.serialize())
-        data['notes'] = notes
         try:
             data["format"] = self.format_type.serialize()
             data["format_id"] = self.format_type_id

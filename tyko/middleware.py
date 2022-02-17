@@ -8,6 +8,7 @@ import traceback
 import typing
 from typing import List, Dict, Any, Iterator
 
+import flask
 from flask import jsonify, make_response, abort, request, url_for
 
 from . import data_provider as dp
@@ -94,7 +95,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
         self._data_connector = \
             dp.ObjectDataConnector(data_provider.db_session_maker)
 
-    def get(self, serialize=False, **kwargs):
+    def get(self, serialize=False, **kwargs) -> flask.Response:
         if "id" in kwargs:
             return self.object_by_id(id=kwargs["id"])
 
@@ -112,7 +113,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
         result = objects
         return result
 
-    def object_by_id(self, id):
+    def object_by_id(self, id: int) -> flask.Response:
 
         current_object = self._data_connector.get(id, serialize=True)
 
@@ -138,7 +139,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
 
         return abort(404)
 
-    def pbcore(self, id):
+    def pbcore(self, id: int) -> flask.Response:
         xml = pbcore.create_pbcore_from_object(
             object_id=id,
             data_provider=self._data_provider)
@@ -146,13 +147,13 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
         response.headers["Content-type"] = "text/xml"
         return response
 
-    def delete(self, id):
+    def delete(self, id: int) -> flask.Response:
         if self._data_connector.delete(id):
             return make_response("", 204)
 
         return make_response("", 404)
 
-    def update(self, id):
+    def update(self, id: int) -> flask.Response:
         json_request = request.json
         try:
             new_object = self.create_changed_data(json_request)
@@ -222,7 +223,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
             traceback.print_exc(file=sys.stderr)
             return make_response("Invalid note data", 400)
 
-    def remove_note(self, object_id, note_id):
+    def remove_note(self, object_id: int, note_id: int) -> flask.Response:
         updated_object = self._data_connector.remove_note(
             object_id=object_id,
             note_id=note_id
@@ -235,7 +236,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
             202
         )
 
-    def update_note(self, object_id, note_id):
+    def update_note(self, object_id: int, note_id: int) -> flask.Response:
         data = request.get_json()
         updated_object = \
             self._data_connector.update_note(object_id=object_id,
@@ -248,7 +249,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
             {"object": updated_object}
         )
 
-    def remove_item(self, object_id, item_id):
+    def remove_item(self, object_id: int, item_id: int) -> flask.Response:
         updated_object = self._data_connector.remove_item(
             object_id=object_id,
             item_id=item_id
@@ -258,6 +259,15 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
                 "object": updated_object
             }),
             202
+        )
+
+    def get_note(self, object_id: int, note_id: int) -> flask.Response:
+        return jsonify(
+            self._data_connector.get_note(
+                object_id=object_id,
+                note_id=note_id,
+                serialize=True
+            )
         )
 
 
@@ -327,7 +337,7 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
             new_collection["record_series"] = json_request["record_series"]
         return new_collection
 
-    def update(self, id):
+    def update(self, id: int) -> flask.Response:
         json_request = request.get_json()
 
         try:
@@ -347,7 +357,7 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
             {"collection": updated_collection}
         )
 
-    def create(self):
+    def create(self) -> flask.Response:
         data = request.get_json()
         collection_name = data["collection_name"]
         department = data.get("department")
@@ -415,10 +425,17 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         result = projects
         return result
 
-    def get_project_by_id(self, id):
+    def get_project_by_id(self, id: int):
         current_project = self._data_connector.get(id, serialize=True)
 
         if current_project:
+            serialized_project_notes = self.serialize_project_notes(
+                current_project.get("notes", []),
+                project_id=id
+            )
+            if serialized_project_notes:
+                current_project['notes'] = serialized_project_notes
+
             for obj in current_project['objects']:
                 obj['routes'] = {
                     "frontend": url_for("page_project_object_details",
@@ -428,14 +445,21 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
                                     project_id=id,
                                     object_id=obj['object_id'])
                 }
-                obj['notes'] = self.serialize_notes(obj['notes'])
+
+                obj['notes'] = self.serialize_object_notes(
+                    obj['notes'],
+                    project_id=id,
+                    object_id=obj['object_id'],
+                )
             return current_project
 
         return abort(404)
 
-    def serialize_notes(
+    def serialize_object_notes(
             self,
             notes: Iterator[Dict[str, Any]],
+            project_id,
+            object_id,
             notes_middleware: typing.Optional[AbsMiddlwareEntity] = None
     ):
         serialize_notes = []
@@ -445,13 +469,22 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
 
         for note in notes:
             note_id = note['note_id']
+            serialize_note = note_mw.get(id=note_id, resolve_parents=False)
+            serialize_note["route"] = {
+                'api': url_for(
+                    "object_notes",
+                    note_id=note_id,
+                    object_id=object_id,
+                    project_id=project_id
+                )
+            }
             serialize_notes.append(
-                note_mw.get(id=note_id, resolve_parents=False)
+                serialize_note
             )
 
         return serialize_notes
 
-    def delete(self, id):
+    def delete(self, id: int) -> flask.Response:
         if self._data_connector.delete(id):
             return make_response("", 204)
 
@@ -475,7 +508,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             new_project["title"] = json_request.get("title")
         return new_project
 
-    def update(self, id):
+    def update(self, id: int) -> flask.Response:
 
         json_request = request.json
         try:
@@ -495,7 +528,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             {"project": updated_project}
         )
 
-    def create(self):
+    def create(self) -> flask.Response:
         data = request.get_json()
         title = data['title']
         project_code = data.get('project_code')
@@ -518,7 +551,16 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             }
         )
 
-    def update_note(self, project_id, note_id):
+    def get_note(self, project_id: int, note_id: int) -> flask.Response:
+        return jsonify(
+            self._data_connector.get_note(
+                project_id=project_id,
+                note_id=note_id,
+                serialize=True
+            )
+        )
+
+    def update_note(self, project_id: int, note_id: int) -> flask.Response:
 
         data = request.get_json()
         note_id_value = int(note_id)
@@ -533,7 +575,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             {"project": updated_project}
         )
 
-    def remove_note(self, project_id, note_id):
+    def remove_note(self, project_id: int, note_id: int) -> flask.Response:
         updated_project = self._data_connector.remove_note(
             project_id=project_id,
             note_id=note_id
@@ -546,7 +588,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             202
         )
 
-    def add_note(self, project_id):
+    def add_note(self, project_id: int) -> flask.Response:
 
         data = request.get_json()
         try:
@@ -571,7 +613,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             traceback.print_exc(file=sys.stderr)
             return make_response("Invalid note data", 400)
 
-    def add_object(self, project_id):
+    def add_object(self, project_id: int) -> flask.Response:
         try:
 
             new_data = self.get_new_data(request.get_json())
@@ -590,7 +632,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             traceback.print_exc(file=sys.stderr)
             return make_response("Missing required data: {}".format(e), 400)
 
-    def remove_object(self, project_id, object_id):
+    def remove_object(self, project_id: int, object_id: int) -> flask.Response:
         try:
             updated_project = self._data_connector.remove_object(
                 project_id=project_id, object_id=object_id)
@@ -611,6 +653,19 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             new_data['collection_id'] = int(data['collectionId'])
 
         return new_data
+
+    def serialize_project_notes(self, notes, project_id: int):
+        serialized_notes = []
+        for note in notes.copy():
+            note["route"] = {
+                'api': url_for(
+                    "project_notes",
+                    note_id=note['note_id'],
+                    project_id=project_id
+                )
+            }
+            serialized_notes.append(note)
+        return serialized_notes
 
 
 class ItemMiddlwareEntity(AbsMiddlwareEntity):
@@ -651,7 +706,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
         result = items
         return result
 
-    def item_by_id(self, id):
+    def item_by_id(self, id: int) -> flask.Response:
         current_item = self._data_connector.get(id, serialize=True)
 
         if current_item:
@@ -663,7 +718,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
 
         return abort(404)
 
-    def delete(self, id):
+    def delete(self, id: int) -> flask.Response:
 
         res = self._data_connector.delete(id)
 
@@ -686,7 +741,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             new_item["obj_sequence"] = int(obj_sequence)
         return new_item
 
-    def update(self, id):
+    def update(self, id: int) -> flask.Response:
         json_request = request.json
         try:
             new_item = self.create_changed_data(json_request)
@@ -706,12 +761,17 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             }
         )
 
-    def add_file(self, project_id, object_id, item_id):
+    def add_file(
+            self,
+            project_id: int,
+            object_id: int,
+            item_id: int
+    ) -> flask.Response:
         return files.ItemFilesAPI(self._data_provider).post(project_id,
                                                             object_id,
                                                             item_id)
 
-    def add_note(self, item_id):
+    def add_note(self, item_id: int) -> flask.Response:
         data = request.get_json()
         try:
             note_type_id = int(data.get("note_type_id"))
@@ -730,7 +790,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             traceback.print_exc(file=sys.stderr)
             return make_response("Invalid data", 400)
 
-    def create(self):
+    def create(self) -> flask.Response:
         data = request.get_json()
         name = data['name']
         format_id = data['format_id']
@@ -748,7 +808,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             }
         )
 
-    def remove_note(self, item_id, note_id):
+    def remove_note(self, item_id: int, note_id: int) -> flask.Response:
         updated_item = self._data_connector.remove_note(
             item_id=item_id,
             note_id=note_id
@@ -761,7 +821,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             202
         )
 
-    def update_note(self, item_id, note_id):
+    def update_note(self, item_id: int, note_id: int) -> flask.Response:
         data = request.get_json()
         updated_object = \
             self._data_connector.update_note(item_id=item_id,
@@ -773,6 +833,11 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
         return jsonify(
             {"item": updated_object}
         )
+
+    def get_note(self, item_id: int, note_id: int) -> flask.Response:
+        note = self._data_connector.get_note(item_id=item_id,
+                                             note_id=note_id)
+        return jsonify(note)
 
 
 class NotestMiddlwareEntity(AbsMiddlwareEntity):
@@ -845,14 +910,14 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
             return response
         return notes
 
-    def delete(self, id):
+    def delete(self, id: int) -> flask.Response:
         res = self._data_connector.delete(id)
 
         if res is True:
             return make_response("", 204)
         return make_response("", 404)
 
-    def update(self, id):
+    def update(self, id: int) -> flask.Response:
         new_object = {}
         json_request = request.get_json()
         for k, _ in json_request.items():
@@ -876,7 +941,7 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
             {"note": updated_note}
         )
 
-    def create(self):
+    def create(self) -> flask.Response:
         data = request.get_json()
         note_type = int(data['note_type_id'])
         text = data['text']
@@ -889,3 +954,9 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
                 "url": url_for("note", note_id=new_note_id)
             }
         )
+
+    def list_types(self):
+        types = self._data_connector.list_types()
+        return {
+            "types": types
+        }

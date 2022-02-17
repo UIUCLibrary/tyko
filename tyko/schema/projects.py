@@ -43,7 +43,7 @@ class Project(AVTables):
 
     objects = relationship(
         "CollectionObject",
-        backref="object_source"
+        back_populates="project",
     )
 
     def serialize(self, recurse=False) -> Mapping[str, SerializedData]:

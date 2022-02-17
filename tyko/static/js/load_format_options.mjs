@@ -32,20 +32,6 @@ function updateOptions(url, optionId, displayCallback = null) {
 }
 
 /**
- * Load the CSS class for <input> that have use a date selector
- *
- * @param {string} className - defaults to tyko-input-fulldate
- */
-function loadInputDatePickerClass(className = 'tyko-input-fulldate') {
-  $.each($(`.${className}`), function(i, element) {
-    $(element).datepicker({
-      format: 'mm-dd-yyyy',
-      uiLibrary: 'bootstrap4',
-    });
-  });
-}
-
-/**
  * @callback successCallback
  * @param {Object} response
  */
@@ -132,7 +118,6 @@ function loadNewEntityFormClass(
 export function loadTykoClasses() {
   loadNewEntityFormClass();
   loadInputEnumOptionClass();
-  loadInputDatePickerClass();
 
   if (window.hasOwnProperty('CASSETTE_TAPE_THICKNESS_URL')) {
     updateOptions(CASSETTE_TAPE_THICKNESS_URL, 'cassetteTapeThicknessInput',

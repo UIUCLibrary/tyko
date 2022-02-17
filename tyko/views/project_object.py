@@ -12,22 +12,19 @@ class ProjectObjectAPI(views.MethodView):
         project = self._project.get_project_by_id(id=project_id)
         for project_object in project['objects']:
             if object_id == project_object['object_id']:
-                for item in project_object['items']:
-                    routes = {
-                        "frontend": url_for(
-                            "page_project_object_item_details",
-                            project_id=project_id,
-                            object_id=object_id,
-                            item_id=item['item_id']
-                        ),
+                for item in project_object.get('items', []):
+                    item['routes'] = \
+                        self._add_item_routes(item, object_id, project_id)
+
+                for note in project_object.get('notes', []):
+                    note['route'] = {
                         "api": url_for(
-                            "object_item",
+                            'object_notes',
                             project_id=project_id,
                             object_id=object_id,
-                            item_id=item['item_id']
+                            note_id=note['note_id']
                         )
                     }
-                    item['routes'] = routes
                 return jsonify(
                     {
                         **project_object,
@@ -35,6 +32,22 @@ class ProjectObjectAPI(views.MethodView):
                     }
                 )
         return make_response("no matching item", 404)
+
+    def _add_item_routes(self, item, object_id, project_id):
+        return {
+            "frontend": url_for(
+                "page_project_object_item_details",
+                project_id=project_id,
+                object_id=object_id,
+                item_id=item['item_id']
+            ),
+            "api": url_for(
+                "object_item",
+                project_id=project_id,
+                object_id=object_id,
+                item_id=item['item_id']
+            )
+        }
 
     def delete(self, project_id, object_id):
         return self._project.remove_object(project_id, object_id)
@@ -68,3 +81,6 @@ class ProjectObjectNotesAPI(views.MethodView):
 
     def put(self, project_id, object_id, note_id):  # pylint: disable=W0613
         return self._project_object.update_note(object_id, note_id)
+
+    def get(self, project_id, object_id, note_id):
+        return self._project_object.get_note(object_id, note_id)

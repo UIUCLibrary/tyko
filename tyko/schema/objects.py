@@ -1,7 +1,7 @@
 from typing import Dict, Optional, List, TYPE_CHECKING, Union, Mapping
 
 import sqlalchemy as db
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 from tyko.schema.avtables import AVTables, SerializedData
 
@@ -42,15 +42,15 @@ class CollectionObject(AVTables):
     collection_id = \
         db.Column(db.Integer, db.ForeignKey("collection.collection_id"))
 
-    collection = relationship("Collection", foreign_keys=[collection_id])
+    collection = relationship("Collection")
 
     project_id = db.Column(db.Integer, db.ForeignKey("project.project_id"))
-    project = relationship("Project", foreign_keys=[project_id])
+    project = relationship("Project")
     originals_rec_date = db.Column("originals_rec_date", db.Date)
     originals_return_date = db.Column("originals_return_date", db.Date)
     notes = relationship("Note",
                          secondary=object_has_notes_table,
-                         backref="object_sources"
+                         backref=backref("object_sources", viewonly=True)
                          )
 
     contact_id = db.Column(db.Integer, db.ForeignKey("contact.contact_id"))

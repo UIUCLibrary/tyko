@@ -1,9 +1,9 @@
 {% extends "panel_details.html" %}
 {% from "_file_macros.html" import filesTable, newFileModal %}
-{% from "_macros.html" import notes_table_row, notes_table, metadata_table, note_editor%}
+{% from "_macros.html" import notes_table_row, notes_table, metadata_table, note_editor, notes_table2 %}
 {% import  "_details_macros.html" as widgets%}
 {% import "_item_macros.html" as item_widgets %}
-
+{% from "dialog_boxes.html" import newEntityModal, editNoteModal, newNoteModal, removeNoteModal, setupNoteTableJS %}
 {% block main_details %}
     {%  call widgets.card("Details", "my-1")  %}
         {% call metadata_table() %}
@@ -40,7 +40,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for field_name,field_value in item['format_details'].items() %}
+                                {% for field_name, field_value in item['format_details'].items() %}
                                 <tr>
                                     <th scope="row" style="width: 16.66%">
                                         {{field_name}}
@@ -117,21 +117,6 @@
                 data-metadatakey="format_details.tape_thickness_id"
             >
             </tr>
-            <script id="glue" type="module">
-                import * as loader from "{{ url_for("static", filename='js/item_details.mjs') }}";
-                loader.urls['tapeTypesUrl'] = "{{ url_for('cassette_tape_tape_types') }}";
-                loader.urls['cassetteTypesUrl'] = "{{ url_for('cassette_tape_format_types') }}";
-                loader.urls['cassetteTapeTapeThicknessURL'] = "{{ url_for('cassette_tape_tape_thickness') }}"
-                async function start(){
-                    await loader.load();
-                    loader.refresh()
-                }
-                try{
-                  start();
-                } catch (err) {
-                  alert(err)
-                }
-            </script>
         </tbody>
     </table>
     <script type="module" src="{{ url_for('static', filename='js/metadataWidgets.mjs')}}"></script>
@@ -140,32 +125,145 @@
 {% endmacro %}
 {% block secondary_details %}
     {%  call widgets.card("Files", "my-1")  %}
-        {{ filesTable(api_path, item_id=item['item_id'], object_id=object_id, project_id=project_id) }}
-        {{ newFileModal("fileModal", url_for('item_files', item_id=item['item_id'], object_id=object_id, project_id=project_id)) }}
+        <div class="flex-column">
+
+            <table id="filesTable"
+                   class="tyko tyko-table-files"
+                   aria-describedby="FilesHeader"
+                   data-detail-formatter="detailFormatter"
+                   data-cache="false"
+                   data-sort-name="generation"
+                   data-classes="table table-sm"
+                   data-tyko-api-url="{{ api_path }}"
+            >
+                <thead>
+                    <tr>
+                        <th scope="col"
+                            data-sortable="true"
+                            data-width="100"
+                            data-field="generation">Generation</th>
+                        <th scope="col"
+                            data-sortable="true"
+                            data-width="1000"
+                            data-formatter="fileNameFormatter"
+                            data-field="name">File Name</th>
+                        <th id="itemOptions"
+                            scope="col"
+                            data-width="10"
+                            data-sortable="false"
+                            data-formatter="fileOptionsFormatter"
+                            data-field="routes"
+                            data-align="right"></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div>
+            <div class="btn-group float-end" role="group">
+                <button class="btn btn-primary btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#newFileModal">Add</button>
+            </div>
+        </div>
+    {{ widgets.confirm_remove_entity_modal2("removeFileModal") }}
+    {% call newEntityModal('newFileModal', title="New File", submitUrl=url_for('item_new_file', item_id=item['item_id'], object_id=object_id, project_id=project_id), formId="newEndityForm") %}
+        <div class="mb-3 row">
+            <label for="objectNameInput" class="col-sm-2 col-form-label">File Name</label>
+            <div class="col-sm-10">
+                <input type="text" id="objectNameInput" class="form-control" name="file_name" required>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="generationSelection" class="col-sm-2 col-form-label">Generation</label>
+            <div class="col-sm-10">
+                <select class="form-select" name="generation" id="generationSelection" required>
+                    <option>Access</option>
+                    <option>Preservation</option>
+                    <option>Mezzanine</option>
+                </select>
+            </div>
+        </div>
+    {% endcall %}
+    <script>
+        let filesTable = document.getElementById('filesTable');
+
+        filesTable.addEventListener(
+            'openEntityDetails', (e)=>{window.location = e.detail}
+        )
+
+        document.getElementById('removeFileModal')
+            .addEventListener('accept', (e)=> {
+                fetch(e.detail.apiUrl, {method: 'DELETE'}).then(()=>{
+                    console.log("accepted")
+                    location.reload();
+                }).catch((e)=>{console.error(`Failed to delete: "${e.detail.entityName}"`)})
+            console.log("Deleting " + e.detail.entityName )
+        })
+
+        function fileNameFormatter(value, row, index) {
+            return `<a href="${row.routes.frontend}">${value}</a>`
+        }
+        function fileOptionsFormatter(value, row, index) {
+            const onEditFunction =
+                'filesTable.dispatchEvent(' +
+                    `new CustomEvent('openEntityDetails',
+                        {detail: '${value.frontend}'}
+                ))`;
+            return `
+                <div class="btn-group-sm d-flex justify-content-end" role="group" aria-label="Edit">
+                <button class="btn btn-sm btn-secondary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        ></button>
+                <div class="dropdown-menu dropdown-menu-end">
+                  <button class="btn btn-secondary btn-sm dropdown-item" onclick="${onEditFunction}">Edit</button>
+                  <button class='btn btn-secondary btn-danger btn-sm dropdown-item' data-entity-name='${row.name}' data-removeurl='${value.api}' data-bs-target='#removeFileModal' data-bs-toggle='modal'>Remove</button>
+                </div>
+              </div>
+                `
+        }
+        </script>
+{#        {{ filesTable(api_path, item_id=item['item_id'], object_id=object_id, project_id=project_id) }}#}
+{#        {{ newFileModal("fileModal", url_for('item_files', item_id=item['item_id'], object_id=object_id, project_id=project_id)) }}#}
     {% endcall %}
 
     {% call widgets.card("Notes", "my-1")  %}
-        {% call(note) notes_table(item['notes'], api_path) %}
-            {{ notes_table_row(note, note['routes']['api']) }}
-        {% endcall %}
-        {{ note_editor("/api/project/" ~ project_id ~ "/object/" ~ object_id ~ "/item/" ~ item.item_id, valid_note_types) }}
+        <div class="flex-column" id="noteCard">
+            {{
+                notes_table2(
+                    url_for(
+                        "object_item",
+                        project_id=project_id,
+                        object_id=object_id,
+                        item_id=item['item_id']
+                        ),
+                    table_id="notesTable"
+                )
+            }}
+        </div>
+        <div>
+            <div class="btn-group float-end" role="group">
+                <button
+                    class="btn btn-primary btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#newNote"
+                    data-title="Create New Note"
+                    data-dialogtype="new"
+                    data-source="{{ note_api_route }}">
+                    Add
+                </button>
+            </div>
+        </div>
+        {{ removeNoteModal(modalId="removeNoteModal") }}
+        {{ newNoteModal(url_for('add_item_note', project_id=project_id, object_id=object_id, item_id=item['item_id']), modalId='newNote', formId='newNotesForm') }}
+        {{ editNoteModal(url_for('update_item_note',project_id=project_id, object_id=object_id, item_id=item['item_id']), modalId="noteEditor") }}
+        {{ setupNoteTableJS(notesTableId="notesTable", noteEditorId='noteEditor', newNoteId='newNote', newNotesFormId='newNotesForm', noteTypesUrl=url_for('note_types')) }}
     {% endcall %}
 
 {% include "edit_note.html" %}
 {% endblock %}
 {% block scripts %}
     {{ super() }}
-    <script type="application/javascript">
-        let $table = $('#filesTable');
-        $table.ready(()=>{
-            $table.bootstrapTable({
-                onLoadSuccess: function (data, status, jqXHR) {
-                    $table.bootstrapTable('load', data.item.files);
-                }
-            })
-        })
-
-
-    </script>
-
 {% endblock %}

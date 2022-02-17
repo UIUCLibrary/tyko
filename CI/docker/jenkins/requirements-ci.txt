@@ -1,6 +1,6 @@
 tox<3.10
 pytest
-pytest-bdd<4.0
+pytest-bdd<5.0
 bandit
 mypy
 types-setuptools
@@ -8,10 +8,9 @@ flake8
 coverage
 pylint
 pydocstyle
-sqlalchemy-stubs
 types-Flask
-cmake
 sphinx
 sphinx-js
 paramiko
 build
+sqlalchemy[mypy]

@@ -1,7 +1,8 @@
 import sys
 import logging
+import typing
 
-from flask import Flask, make_response
+from flask import Flask, make_response, Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import OperationalError
 
@@ -21,14 +22,17 @@ def is_correct_db_version(app, database) -> bool:
     except OperationalError as exc:
         app.logger.error(
             "Problem getting version information. "
-            "Reason given: {}".format(exc))
+            f"Reason given: {exc}")
         if "no such table" in str(exc):
             raise NoTable() from exc
         return False
     return version == ALEMBIC_VERSION
 
 
-def create_app(app=None, verify_db=True) -> Flask:
+def create_app(
+        app: typing.Optional[Flask] = None,
+        verify_db: bool = True
+) -> Flask:
     """Create a new flask app."""
 
     if app is None:
@@ -65,7 +69,7 @@ def create_app(app=None, verify_db=True) -> Flask:
     return app
 
 
-def page_failed_on_startup():
+def page_failed_on_startup() -> Response:
     return make_response("Tyko failed during started", 503)
 
 
@@ -86,5 +90,5 @@ def main() -> None:
         my_app.run()
 
 
-def handle_error(error):
+def handle_error(error) -> Response:
     return make_response(error.message, error.status_code)

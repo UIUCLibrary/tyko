@@ -33,6 +33,16 @@
                 </tr>
             </thead>
             <script type="application/javascript">
+                fetch("{{ api_path }}")
+                .then(response => response.json())
+                .then(json => {
+                    console.log(json['item']['files'])
+                    const z = document.getElementById('filesTable');
+                    z.data = [{generation: "sssss"}]
+                }
+                );
+            </script>
+            <script type="application/javascript">
                 let dataRoutes = {};
 
                 function fileNameFormatter(value, row, index) {

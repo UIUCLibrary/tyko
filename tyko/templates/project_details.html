@@ -1,7 +1,7 @@
 {% extends "panel_details.html" %}
-{% from "_macros.html" import notes_table_row, note_editor, notes_table, metadata_table %}
+{% from "_macros.html" import notes_table_row, note_editor, notes_table, notes_table2, metadata_table %}
 {% from "_details_macros.html" import confirm_remove_entity_modal, add_field_row, child_entity_row, remove_modal_event_scripts, metadata_text_edit_widget, metadata_select_edit_widget, card %}
-{% from "_object_macros.html" import object_new_button_row, new_object_modal%}
+{% from "dialog_boxes.html" import newEntityModal, editNoteModal, newNoteModal, removeNoteModal %}
 {% block main_details -%}
 {% call card("Details", card_class="my-1 h-100") %}
     {%  call metadata_table() %}
@@ -37,19 +37,140 @@
                         url_for('project_object', project_id=project_id, object_id=child_object.object_id)
                         ) }}
                 {%- endfor %}
-                {{ object_new_button_row(api_path + "/object", "newObjectModal") }}
             </tbody>
         </table>
+        <div class="btn-group float-end" role="group">
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newObjectModal">Add</button>
+        </div>
         {{ confirm_remove_entity_modal("removeObjectModal") }}
-
+        {% call newEntityModal('newObjectModal', title="New Object", submitUrl=url_for("add_new_object", project_id=project_id), formId="newEdityForm") %}
+            <div class="mb-3 row">
+                <label for="objectNameInput" class="col-sm-2 col-form-label">Name</label>
+                <div class="col-sm-10">
+                    <input type="text" id="objectNameInput" class="form-control" name="name" required>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="objectCollectionSelection" class="col-sm-2 col-form-label">Collection</label>
+                <div class="col-sm-10">
+                    <select class="form-select" class="form-control" name="collection_id" id="objectCollectionSelection" required>
+                        <option value="" disabled selected>Select a collection</option>
+                        {%- for collection in collections%}
+                            <option value="{{collection.collection_id}}">{{ collection.collection_name }}</option>
+                        {%- endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="objectBarcodeInput" class="col-sm-2 col-form-label">Barcode</label>
+                <div class="col-sm-10">
+                    <input type="text" id="objectBarcodeInput" class="form-control" name="objectBarcode">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="datepickerOriginalsRecInput" class="col-sm-2 col-form-label">Originals Received Date</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input id="datepickerOriginalsRecInput" class="form-control tyko-date-selector" name="originals_rec_date" pattern="^([0-9]{4})-([0-9]{2})-([0-9]{2})$"/>
+                        <button type="button" onclick="tyko.openDateSelect('datepickerOriginalsRecInput')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+                    </div>
+                </div>
+            </div>
+        {% endcall %}
     {% endcall %}
     {% call card("Notes", card_class="my-1") %}
-        {% call(note) notes_table(project['notes'], api_path) %}
-                {{ notes_table_row(note, url_for('project_notes', project_id=project_id, note_id=note['note_id'])) }}
-        {% endcall %}
-        {{ note_editor(api_path, valid_note_types) }}
+        <div class="flex-column" id="noteCard">
+            {{ notes_table2(api_path, table_id="notesTable") }}
+        </div>
+        <div>
+            <div class="btn-group float-end" role="group">
+                <button
+                    class="btn btn-primary btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#newNote"
+                    data-title="Create New Note"
+                    data-dialogtype="new"
+                    data-source="{{ note_api_route }}">
+                    Add
+                </button>
+            </div>
+        </div>
+        {{ removeNoteModal(modalId="removeNoteModal") }}
+        {{ newNoteModal(url_for('add_project_note', project_id=project_id), modalId='newNote', formId='newNotesForm') }}
+        {{ editNoteModal(url_for('update_project_note',project_id=project_id), modalId="noteEditor") }}
+
     {% endcall %}
-    {{ new_object_modal("newObjectModal", collections, api_path + "/object") }}
+    <script>
+        const notesTable = document.getElementById('notesTable');
+        notesTable.addEventListener('removeNoteRequested', (e)=>{
+                const apiUrl = e.detail;
+                const dialog = new tyko.editor.RemoveConfirm(
+                    document.querySelector('#removeNoteModal')
+                );
+
+                dialog.setTitle('Are you Sure?')
+                dialog.setConfirmButton(
+                    document.querySelector('#confirmRemoveNoteButton')
+                );
+
+                dialog.onAccepted = ()=>{
+                    fetch(apiUrl, {method: 'DELETE'}).then(()=>{
+                        console.log("accepted")
+                        location.reload();
+                    })
+                }
+                dialog.show();
+            });
+
+        notesTable.addEventListener('openForEditing', (e)=>{
+            const editorElement = document.querySelector('#noteEditor');
+            tyko.editor.configureNoteEditor(
+                e.detail,
+                editorElement,
+                editorElement.querySelector('#noteId'),
+                editorElement.querySelector('#noteTypeSelect'),
+                editorElement.querySelector('#message-text')
+            )
+            document.querySelector('#notesForm')
+                .addEventListener('submit', (e)=>location.reload());
+        });
+
+        document.getElementById('newNotesForm')
+            .addEventListener('submit', (e)=>{
+                location.reload();
+            });
+
+        const noteTypesAPI = "{{ url_for('note_types') }}"
+        const noteTypesData = fetch(noteTypesAPI)
+            .then(response => response.json());
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            const notesTable = document.getElementById("notesTable")
+            const editorElement = document.querySelector('#noteEditor');
+            const newNoteElement = document.querySelector('#newNote');
+
+
+            noteTypesData.then(typesData => {
+                    for (const element of [editorElement, newNoteElement]){
+                        tyko.notes.loadNoteTypes(
+                            typesData['types'],
+                            element.querySelector('#noteTypeSelect')
+                        );
+                    }
+            });
+
+            fetch(notesTable.dataset.tykoApiUrl)
+                .then(response => response.json())
+                .then(json => {
+                    tyko.notes.loadNotesTable(
+                        json['project']['notes'],
+                        notesTable
+                    );
+                });
+
+        })
+    </script>
+{#    {{ new_object_modal("newObjectModal", collections, api_path + "/object") }}#}
 {%- endblock -%}
 {% block scripts %}
     {{ super() }}

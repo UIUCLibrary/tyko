@@ -100,7 +100,7 @@
                 </button>
             </div>
             <div class="modal-body" id="{{ modalName }}lRemovalBody">
-                <p id="{{ modalName }}message">
+                <p id="{{ modalName }}Message">
                     This action is permanent! Are you sure you want to remove this?
                 </p>
             </div>
@@ -120,7 +120,6 @@
 
 {% macro confirm_remove_entity_modal2(modalName, confirmButtonID="confirmButton") %}
 <div class="modal fade" id="{{ modalName }}" tabindex="-1" role="dialog"
-{#     aria-labelledby="exampleModalCenterTitle" #}
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -130,11 +129,10 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body" id="{{ modalName }}lRemovalBody">
-                <p id="{{ modalName }}message">
+                <p id="{{ modalName }}Message">
                     Are you sure you want to remove this?
                 </p>
             </div>
@@ -156,28 +154,21 @@
 </div>
 <script type="module">
     let d = $('#{{modalName}}');
+    let m = document.getElementById("{{modalName}}");
     let confirmButton = document.getElementById("{{ confirmButtonID }}");
-    d.on('accept', function () {
-        console.log("ACCEPTEd")
-    })
-    {#confirmButton.addEventListener('click');#}
-{#let newEvent = new CustomEvent('accept', )#}
     d.on('show.bs.modal', function (event) {
         let button = $(event.relatedTarget)
         const entityName = button.data('entity-name');
         let modal = $(this);
         if (entityName){
-            modal.find('.modal-body p').text(`Are you sure you want to remove ${entityName}?`);
+            modal.find('.modal-body p').text(`Are you sure you want to remove: "${entityName}" ?`);
 
         } else{
             modal.find('.modal-body p').text(`Are you sure you want to remove this?`);
         }
         modal.find('.modal-footer #{{ confirmButtonID }}').on('click', function () {
-            console.log("click footer")
-            modal.trigger("accept", {apiUrl: button.data('removeurl')});
-            {#let newEvent = new CustomEvent("accept")#}
-            {#this.dispatchEvent(newEvent);#}
-        })
+            m.dispatchEvent(new CustomEvent("accept", {detail: {apiUrl: button.data('removeurl'), "entityName": entityName }}))
+        });
     })
 
 

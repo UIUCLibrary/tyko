@@ -1,3 +1,5 @@
+import {Modal} from 'bootstrap';
+
 import {requests} from './request.js';
 import * as metadataWidgets from './metadataWidgets.mjs';
 import {parseUpdateRequestData} from './utils.mjs';
@@ -118,35 +120,46 @@ $(metadataWidgets).ready(() => {
 export function loadNotes(notes, notesTable) {
   notes.forEach((note) => {
     const apiRoute = note['route']['api'];
-    const onclickFunction =
+    const onEditFunction =
         'notesTable.dispatchEvent(' +
         `new CustomEvent('openForEditing', {detail: '${apiRoute}'})` +
         ')';
 
-    $(notesTable).append(`
-      <tr>
-        <td>${note['note_type']}</td>
-        <td>${note['text']}</td>
-        <td>
-          <div class="btn-group float-end" role="group">
-            <button 
-              class="btn btn-primary btn-sm"
-              data-title="Create New Note"
-              data-noteId="${note['note_id']}"
-              onclick="${onclickFunction}"
-              >
-              Edit
-            </button>
-          </div>
-        </td>
-      </tr>`,
-    );
+    const onRemoveFunction =
+        'notesTable.dispatchEvent(' +
+        `new CustomEvent('removeNoteRequested', {detail: '${apiRoute}'})` +
+        ')';
+
+    const row = notesTable.querySelector('tbody').insertRow(-1);
+    const notesTypeCell = row.insertCell(0);
+    const noteMessageCell = row.insertCell(1);
+    const editor = row.insertCell(2);
+    notesTypeCell.innerHTML = `<td>${note['note_type']}</td>`;
+    noteMessageCell.innerHTML = `<td>${note['text']}</td>`;
+    editor.innerHTML = `
+    <td>
+      <div class="btn-group-sm d-flex justify-content-end" 
+           role="group" aria-label="Edit">
+        <button class="btn btn-sm btn-secondary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                ></button>
+        <div class="dropdown-menu dropdown-menu-end">
+          <button class="btn btn-secondary btn-sm dropdown-item" 
+                  onclick="${onEditFunction}">Edit</button>
+          <button class="btn btn-secondary btn-danger btn-sm dropdown-item" 
+                  onclick="${onRemoveFunction}">Remove</button>
+        </div>
+      </div>
+    </td>`;
   });
 }
 /**
  * Controls a Note editor
  */
-export class NoteEditor extends bootstrap.Modal {
+export class NoteEditor extends Modal {
   /**
    * Create a Note Editor
    * @param {HTMLTableElement} base
@@ -167,6 +180,11 @@ export class NoteEditor extends bootstrap.Modal {
     const self = this;
     item.addEventListener('hidden.bs.modal', function(event) {
       self.clearNoteTypes();
+    });
+
+    const notesForm = item.querySelector('#notesForm');
+    notesForm.addEventListener('submit', (e)=>{
+      location.reload();
     });
   }
 
@@ -222,6 +240,8 @@ export class NoteEditor extends bootstrap.Modal {
    * @param {HTMLDivElement} item
    */
   #setData(newData, item) {
+    const noteId = item.querySelector('#noteId');
+    noteId.value = newData['note_id'];
     const noteTypeSelection = item.querySelector('#noteTypeSelect');
     if (noteTypeSelection) {
       for (const optionData of this.#options) {

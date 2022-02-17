@@ -1,2 +1,2 @@
-include tox.ini LICENSE requirements.txt package.json package-lock.json webpack.config.js
+include tox.ini LICENSE requirements.txt package.json package-lock.json webpack.config.js tyko/static/css/main.scss
 recursive-include tests *.py *.feature

@@ -2,11 +2,13 @@
 
 from dataclasses import dataclass, field
 from typing import Any, List, Iterator, Tuple, Callable, Optional, Union
-from flask import jsonify, render_template, views
+from flask import jsonify, render_template, views, request
 
 import tyko.views.files
 from . import middleware
-from .data_provider import DataProvider
+from .data_provider import DataProvider, ItemDataConnector, \
+    ObjectDataConnector, \
+    ProjectDataConnector
 from . import frontend
 from .views.object_item import ObjectItemNotesAPI, ObjectItemAPI
 from .views.object_item import ItemAPI
@@ -77,6 +79,149 @@ class CollectionsAPI(views.MethodView):
         return self._collection.delete(id=collection_id)
 
 
+class NewItem(views.MethodView):
+    def __init__(self, data_connector: ObjectDataConnector) -> None:
+        self._data_connector = data_connector
+
+    def post(self, project_id, object_id):
+        data = request.form
+        return jsonify(self._data_connector.add_item(object_id, data))
+
+
+class ObjectItemNewNotes(views.MethodView):
+    def __init__(self, data_connector: ItemDataConnector) -> None:
+        self._data_connector = data_connector
+
+    def post(self, *args, **kwargs):
+        item_id = kwargs['item_id']
+        data = request.form
+        return jsonify(
+            self._data_connector.add_note(
+                item_id=item_id,
+                note_text=data['text'],
+                note_type_id=data['note_type_id']
+            )
+        )
+
+
+class ObjectUpdateNotes(views.MethodView):
+    def __init__(self, data_connector: ObjectDataConnector) -> None:
+        self._data_connector = data_connector
+
+    def post(self, *args, **kwargs):
+        data = request.form
+
+        changed_data = {}
+
+        if "text" in data:
+            changed_data['text'] = data['text']
+
+        if "note_type_id" in data:
+            changed_data['note_type_id'] = data['note_type_id']
+        return jsonify(
+            self._data_connector.update_note(
+                object_id=kwargs['object_id'],
+                note_id=int(data['noteId']),
+                changed_data=changed_data
+            )
+        )
+
+
+class ProjectNoteUpdate(views.MethodView):
+    def __init__(self, data_connector: ProjectDataConnector) -> None:
+        self._data_connector = data_connector
+
+    def post(self, *args, **kwargs):
+        project_id = kwargs['project_id']
+        data = request.form
+
+        changed_data = {}
+
+        if "text" in data:
+            changed_data['text'] = data['text']
+
+        if "note_type_id" in data:
+            changed_data['note_type_id'] = data['note_type_id']
+        return jsonify(
+            self._data_connector.update_note(
+                project_id=project_id,
+                note_id=int(data['noteId']),
+                changed_data=changed_data
+            )
+        )
+
+
+class ProjectNewNote(views.MethodView):
+    def __init__(self, data_connector: ProjectDataConnector) -> None:
+        self._data_connector = data_connector
+
+    def post(self, *args, **kwargs):
+        project_id = kwargs['project_id']
+        data = request.form
+        note_type_id = int(data['note_type_id'])
+        text = data['text']
+        return jsonify(
+            self._data_connector.add_note(project_id, text, note_type_id)
+        )
+
+
+class ProjectNewObject(views.MethodView):
+    def __init__(self, data_connector: ProjectDataConnector) -> None:
+        self._data_connector = data_connector
+
+    def post(self, *args, **kwargs):
+        project_id = kwargs['project_id']
+        data = request.form
+        print(data)
+        return jsonify(self._data_connector.add_object(project_id, data))
+
+
+class ObjectNewNotes(views.MethodView):
+    def __init__(self, data_connector: ObjectDataConnector) -> None:
+        self._data_connector = data_connector
+
+    def post(self, *args, **kwargs):
+        data = request.form
+        note_type_id = int(data['note_type_id'])
+        object_id = kwargs['object_id']
+        return jsonify(
+            self._data_connector.add_note(
+                object_id=object_id,
+                note_type_id=note_type_id,
+                note_text=data['text']
+            )
+        )
+
+
+class ObjectItemNewFile(views.MethodView):
+    def __init__(self, data_connector: ItemDataConnector) -> None:
+        self._data_connector = data_connector
+
+    def post(self, project_id, object_id, item_id):
+        data = request.form
+        return jsonify(self._data_connector.add_file(
+            project_id,
+            object_id,
+            item_id,
+            file_name=data['file_name'],
+            generation=data['generation'],
+        ))
+
+
+class ObjectItemNotes(views.MethodView):
+    def __init__(self, data_connector: ItemDataConnector) -> None:
+        self._data_connector = data_connector
+
+    def post(self, *args, **kwargs):
+        data = request.form
+        note_id = int(data['noteId'])
+        item_id = kwargs['item_id']
+
+        return jsonify(
+            self._data_connector.update_note(item_id, note_id, data)
+        )
+
+
 class Routes:
 
     def __init__(self, db_engine: DataProvider, app) -> None:
@@ -87,6 +232,101 @@ class Routes:
     def init_api_routes(self) -> None:
 
         if self.app:
+            item_data_connector = ItemDataConnector(
+                self.db_engine.db_session_maker
+            )
+
+            self.app.add_url_rule(
+                rule="/project/<int:project_id>/object/<int:object_id>/"
+                     "item/<int:item_id>/addFile",
+                view_func=ObjectItemNewFile.as_view(
+                    "item_new_file",
+                    data_connector=item_data_connector
+                ),
+                methods=['POST']
+            )
+
+            self.app.add_url_rule(
+                    rule="/project/<int:project_id>/object/<int:object_id>/"
+                         "item/<int:item_id>/updateNote",
+                    view_func=ObjectItemNotes.as_view(
+                        "update_item_note",
+                        data_connector=item_data_connector
+                    ),
+                    methods=['POST']
+            )
+
+            self.app.add_url_rule(
+                rule="/project/<int:project_id>/object/<int:object_id>/"
+                     "item/<int:item_id>/addNote",
+                view_func=ObjectItemNewNotes.as_view(
+                    "add_item_note",
+                    data_connector=item_data_connector
+                ),
+                methods=['POST']
+            )
+
+            object_data_connector = ObjectDataConnector(
+                self.db_engine.db_session_maker
+            )
+
+            self.app.add_url_rule(
+                "/project/<int:project_id>/object/<int:object_id>/addNote",
+                view_func=ObjectNewNotes.as_view(
+                    "add_object_note",
+                    data_connector=object_data_connector
+                ),
+                methods=['POST']
+            )
+
+            self.app.add_url_rule(
+                rule="/project/<int:project_id>/object/<int:object_id>/"
+                     "updateNote",
+                view_func=ObjectUpdateNotes.as_view(
+                    "update_object_note",
+                    data_connector=object_data_connector
+                ),
+                methods=['POST']
+            )
+
+            project_data_connector = ProjectDataConnector(
+                self.db_engine.db_session_maker)
+
+            self.app.add_url_rule(
+                rule="/project/<int:project_id>/addNote",
+                view_func=ProjectNewNote.as_view(
+                    "add_project_note",
+                    data_connector=project_data_connector
+                ),
+                methods=['POST']
+            )
+
+            self.app.add_url_rule(
+                rule="/project/<int:project_id>/addObject",
+                view_func=ProjectNewObject.as_view(
+                    "add_new_object",
+                    data_connector=project_data_connector
+                ),
+                methods=['POST']
+            )
+
+            self.app.add_url_rule(
+                rule="/project/<int:project_id>/updateNote",
+                view_func=ProjectNoteUpdate.as_view(
+                    "update_project_note",
+                    data_connector=project_data_connector
+                ),
+                methods=['POST']
+            )
+            self.app.add_url_rule(
+                "/project/<int:project_id>/object/<int:object_id>/newItem",
+                view_func=NewItem.as_view(
+                    "object_new_item",
+                    data_connector=object_data_connector
+                ),
+                methods=['POST']
+            )
+
             for url_rule in self.get_api_routes():
                 self.app.logger.debug(f"Loading rule {url_rule.rule}")
                 self.app.add_url_rule(
@@ -240,7 +480,7 @@ class Routes:
             "/api/project/<int:project_id>/notes/<int:note_id>",
             view_func=ProjectNotesAPI.as_view("project_notes",
                                               project=project),
-            methods=["PUT", "DELETE"]
+            methods=["GET", "PUT", "DELETE"]
         )
 
     def get_api_object_routes(self) -> Iterator[UrlRule]:
@@ -269,7 +509,7 @@ class Routes:
             "/<int:note_id>",
             view_func=ProjectObjectNotesAPI.as_view(
                 "object_notes", project_object=project_object),
-            methods=["PUT", "DELETE"]
+            methods=["GET", "PUT", "DELETE"]
         )
 
         yield UrlRule(
@@ -365,7 +605,7 @@ class Routes:
             view_func=ObjectItemNotesAPI.as_view(
                 "item_notes",
                 item=item),
-            methods=["PUT", "DELETE"]
+            methods=["GET", "PUT", "DELETE"]
         )
 
         yield UrlRule(
@@ -441,6 +681,12 @@ class Routes:
             rule="/api/notes",
             endpoint="notes",
             view_func=lambda serialize=True: notes.get(serialize),
+        )
+
+        yield UrlRule(
+            "/api/note_types",
+            view_func=notes.list_types,
+            endpoint="note_types"
         )
 
     def get_api_collection_routes(self) -> Iterator[UrlRule]:

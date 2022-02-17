@@ -17,6 +17,7 @@ class WebPackCommand(Command):
 
     user_options = [
         ("inplace", "i", "install javascript files inplace"),
+        ("mode=", "i", "package mode"),
         (
             "npm-path=",
             None,
@@ -30,15 +31,21 @@ class WebPackCommand(Command):
         self.node_modules_path = './node_modules'
         self.inplace = None
         self.npm_path = None
+        self.mode = None
 
     def initialize_options(self):
         self.output_path = ''
         self.inplace = None
         self.npm_path = None
+        self.mode = None
 
     def finalize_options(self):
+        if self.mode is None:
+            self.mode = "production"
+
         if self.npm_path is None:
             self.npm_path = shutil.which('npm')
+
         build_py_command = self.get_finalized_command('build_py')
         output_root = "" if self.inplace == 1 else build_py_command.build_lib
         self.output_path = os.path.join(
@@ -63,7 +70,8 @@ class WebPackCommand(Command):
         command = [
             self.npm_path,
             'run', 'env', '--',
-            'webpack', f'--output-path={self.output_path}'
+            'webpack', f'--output-path={self.output_path}',
+            f'--mode={self.mode}'
         ]
         self.announce("Running webpack")
         self.spawn(command)
@@ -102,12 +110,12 @@ setup(
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "pytest-bdd"],
     install_requires=[
-        "SQLAlchemy<1.4",
+        "SQLAlchemy>1.4",
         # "mysqlclient",
         "flask",
         "Flask-SQLAlchemy",
         "lxml",
-        "Jinja2"
+        "Jinja2<3.0,>2.0"
         ],
     python_requires='>3.7',
     entry_points={
