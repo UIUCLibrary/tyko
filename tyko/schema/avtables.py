@@ -3,10 +3,14 @@ import datetime
 from typing import Union, List, Optional, Mapping
 
 from sqlalchemy.orm import DeclarativeMeta, declarative_base
+from sqlalchemy import Column, Date, Text, Integer, Boolean
 
 
 SerializedData = \
     Optional[Union[int,
+                   Column[Text],
+                   Column[Integer],
+                   Column[Boolean],
                    str,
                    List['SerializedData'],
                    Mapping[str, 'SerializedData']]]
@@ -25,8 +29,5 @@ class AVTables(declarative_base(metaclass=DeclarativeABCMeta)):
         return {}
 
     @classmethod
-    def serialize_date(cls, date: Optional[datetime.date]):
-        if isinstance(date, datetime.date):
-            return date.isoformat()
-
-        return None
+    def serialize_date(cls, date: Column[Date]):
+        return date.isoformat() if isinstance(date, datetime.date) else None

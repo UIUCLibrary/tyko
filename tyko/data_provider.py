@@ -2,7 +2,7 @@
 import abc
 from abc import ABC, ABCMeta
 from datetime import datetime
-from typing import List, Optional, Iterator
+from typing import List, Optional, Iterator, Dict, Any
 
 import sqlalchemy
 from sqlalchemy.sql.expression import true
@@ -505,7 +505,7 @@ class ObjectDataConnector(AbsNotesConnector):
             session.close()
 
     def add_note(self, object_id: int,
-                 note_type_id: int, note_text) -> None:
+                 note_type_id: int, note_text) -> Dict[str, Any]:
 
         session = self.session_maker()
         try:
@@ -810,7 +810,7 @@ class FilesDataConnector(AbsDataProviderConnector):
 
     def create(self, item_id, *args, **kwargs):
         name = kwargs['file_name']
-        generation = kwargs['generation']
+        generation = kwargs.get('generation')
         session = self.session_maker()
         try:
             matching_item = session.query(CollectionItem)\

@@ -5,6 +5,8 @@ from flask import views, request, url_for, jsonify, make_response
 from tyko import data_provider
 from tyko.data_provider import DataProvider
 
+NO_JSON_DATA_LOCATED_MESSAGE = 'No JSON data Located'
+
 
 class ItemFilesAPI(views.MethodView):
     class Decorators:  # pylint: disable=too-few-public-methods
@@ -48,6 +50,9 @@ class ItemFilesAPI(views.MethodView):
 
     def post(self, project_id, object_id, item_id) -> flask.Response:
         json_request = request.get_json()
+        if json_request is None:
+            raise ValueError(NO_JSON_DATA_LOCATED_MESSAGE)
+
         new_file_id = self._data_connector.create(
             item_id=item_id,
             file_name=json_request['file_name'],
@@ -143,6 +148,9 @@ class FileNotesAPI(views.MethodView):
 
     def post(self, file_id: int) -> flask.Response:
         json_request = request.get_json()
+        if json_request is None:
+            raise ValueError(NO_JSON_DATA_LOCATED_MESSAGE)
+
         note_data = {
             "file_id": file_id,
             "message": json_request['message']
@@ -172,6 +180,9 @@ class FileNotesAPI(views.MethodView):
                 f"File {file_id} has no note with id {note_id}")
 
         json_request = request.get_json()
+        if json_request is None:
+            raise ValueError(NO_JSON_DATA_LOCATED_MESSAGE)
+
         changed_data = {'message': json_request['message']}
         return self._data_connector.update(note_id, changed_data)
 
@@ -235,6 +246,9 @@ class FileAnnotationsAPI(views.MethodView):
     @Decorators.validate
     def post(self, file_id: int) -> flask.Response:
         json_request = request.get_json()
+        if json_request is None:
+            raise ValueError(NO_JSON_DATA_LOCATED_MESSAGE)
+
         annotation_connector = \
             data_provider.FileAnnotationsConnector(
                 self._data_provider.db_session_maker)
@@ -270,6 +284,9 @@ class FileAnnotationsAPI(views.MethodView):
     def put(self, file_id: int) -> flask.Response:  # pylint: disable=W0613
         annotation_id = request.args["id"]
         json_request = request.get_json()
+        if json_request is None:
+            raise ValueError(NO_JSON_DATA_LOCATED_MESSAGE)
+
         changed_data = {
             'content': json_request.get('content'),
             'type_id': int(json_request.get('type_id')),
@@ -304,6 +321,9 @@ class FileAnnotationTypesAPI(views.MethodView):
 
     def post(self) -> flask.Response:
         json_request = request.get_json()
+        if json_request is None:
+            raise ValueError('No JSON data Located')
+
         annotation_connector = \
             data_provider.FileAnnotationTypeConnector(
                 self._data_provider.db_session_maker)
