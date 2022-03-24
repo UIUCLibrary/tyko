@@ -113,6 +113,7 @@ setup(
         "SQLAlchemy>1.4",
         # "mysqlclient",
         "flask",
+        "MarkupSafe<2",
         "Flask-SQLAlchemy",
         "lxml",
         "Jinja2<3.0,>2.0"
