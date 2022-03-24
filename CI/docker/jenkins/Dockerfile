@@ -76,7 +76,8 @@ ENV SONAR_SCANNER_OPTS="-server"
 
 COPY CI/docker/jenkins/requirements-ci.txt requirements.txt ./
 COPY --from=wheel_builder /wheels /wheels/
-
+RUN mkdir -p /.cache/pip && \
+    chmod -R 777 /.cache
 RUN python3 -m pip install --no-cache-dir  --find-links=/wheels/ \
     -r requirements-ci.txt \
     -r requirements.txt
