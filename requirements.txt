@@ -1,5 +1,6 @@
-flask
+flask<2
 Flask-SQLAlchemy
 jinja2<3.0,>2.0
 lxml
+MarkupSafe<2
 SQLAlchemy>1.4
