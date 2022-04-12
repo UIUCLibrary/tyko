@@ -22,7 +22,7 @@ def startup(){
                 }
             },
             'Getting Distribution Info': {
-                node('linux && docker') {
+                node('linux && docker && x86') {
                     ws{
                         checkout scm
                         try{
@@ -95,7 +95,7 @@ pipeline {
             agent {
               dockerfile {
                 filename 'CI/docker/jenkins/Dockerfile'
-                label "linux && docker"
+                label "linux && docker && x86"
               }
             }
             stages{
@@ -160,7 +160,7 @@ pipeline {
                     agent {
                       dockerfile {
                         filename 'CI/docker/jenkins/Dockerfile'
-                        label "linux && docker"
+                        label "linux && docker && x86"
                         additionalBuildArgs '--build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)'
                         args '--mount source=sonar-cache-tyko,target=/opt/sonar/.sonar/cache'
                       }
@@ -501,7 +501,7 @@ pipeline {
                     agent {
                         dockerfile {
                             filename 'CI/docker/jenkins/Dockerfile'
-                            label "linux && docker"
+                            label "linux && docker && x86"
                         }
                     }
                     steps {
@@ -545,7 +545,7 @@ pipeline {
             agent {
                 dockerfile {
                     filename 'CI/docker/jenkins/Dockerfile'
-                    label "linux && docker"
+                    label "linux && docker && x86"
                 }
             }
             steps{
@@ -588,7 +588,7 @@ pipeline {
                     agent {
                       dockerfile {
                         filename 'CI/docker/jenkins/Dockerfile'
-                        label "linux && docker"
+                        label "linux && docker && x86"
                       }
                     }
                     options{
