@@ -281,12 +281,59 @@ class Optical(AVFormat, ABC):
         }
 
 
+class VideoCassetteGenerations(AVTables):
+    __tablename__ = 'video_cassette_generations'
+    table_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column("name", db.Text)
+
+    def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
+        return {
+            "name": self.name,
+            "id": self.table_id
+        }
+
+
+class VideoCassetteTypes(AVTables):
+    __tablename__ = 'video_cassette_cassette_types'
+    table_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column("name", db.Text)
+
+    def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
+        return {
+            "name": self.name,
+            "id": self.table_id
+        }
+
+
 class VideoCassette(AVFormat, ABC):
     __tablename__ = 'video_cassette'
     __mapper_args__ = {'polymorphic_identity': 'video_cassette'}
 
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.FK_TABLE_ID),
                          primary_key=True)
+
+    title_of_cassette = db.Column("title_of_cassette", db.Text)
+    label = db.Column("label", db.Text)
+    date_of_cassette = db.Column("date_of_cassette", db.Date)
+
+    cassette_type_id = \
+        db.Column(
+            db.Integer,
+            db.ForeignKey("video_cassette_cassette_types.table_id")
+        )
+    cassette_type = relationship("VideoCassetteTypes")
+
+    duration = db.Column("duration", db.Text)
+    inspection_date = db.Column("inspection_date", db.Date)
+
+    generation_id = \
+        db.Column(
+            db.Integer,
+            db.ForeignKey("video_cassette_generations.table_id")
+        )
+    generation = relationship('VideoCassetteGenerations')
+
+    transfer_date = db.Column("transfer_date", db.Date)
 
     def format_details(self) -> Mapping[str, SerializedData]:
         return {
