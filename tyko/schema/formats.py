@@ -268,6 +268,32 @@ class AudioVideo(AVFormat):
         }
 
 
+class Optical(AVFormat, ABC):
+    __tablename__ = 'optical'
+    __mapper_args__ = {'polymorphic_identity': 'optical'}
+
+    table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.FK_TABLE_ID),
+                         primary_key=True)
+
+    def format_details(self) -> Mapping[str, SerializedData]:
+        return {
+
+        }
+
+
+class VideoCassette(AVFormat, ABC):
+    __tablename__ = 'video_cassette'
+    __mapper_args__ = {'polymorphic_identity': 'video_cassette'}
+
+    table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.FK_TABLE_ID),
+                         primary_key=True)
+
+    def format_details(self) -> Mapping[str, SerializedData]:
+        return {
+
+        }
+
+
 class AudioCassette(AVFormat, ABC):
     __tablename__ = 'audio_cassettes'
     __mapper_args__ = {'polymorphic_identity': 'audio_cassettes'}
@@ -449,11 +475,13 @@ item_has_contacts_table = db.Table(
 
 
 format_types = {
-    "audio video": (1, AudioVideo),
-    "audio": (2,),
-    "video": (3,),
+    # "audio video": (1, AudioVideo),
+    # "audio": (2,),
+    # "video": (3,),
     "open reel": (4, OpenReel),
     "grooved disc": (5, GroovedDisc),
     "film": (6, Film),
-    "audio cassette": (7, AudioCassette)
+    "audio cassette": (7, AudioCassette),
+    "optical": (8, Optical),
+    "video cassette": (9, VideoCassette),
 }

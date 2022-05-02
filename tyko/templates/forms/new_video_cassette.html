@@ -1,0 +1,91 @@
+<div class="mb-3 row">
+    <label for="videoCassetteTitleOfCassette" class="col-sm-2 col-form-label">Title of cassette</label>
+    <div class="col-sm-10">
+        <input type="text" id="videoCassetteTitleOfCassette" class="form-control" name="videoCassetteTitleOfCassette">
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="videoCassetteLabel" class="col-sm-2 col-form-label">Label</label>
+    <div class="col-sm-10">
+        <input type="text" id="videoCassetteLabel" class="form-control" name="videoCassetteLabel">
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="videoCassetteDateOfCassette" class="col-sm-2 col-form-label">Date of cassette (M/D/YYYY)</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" id="videoCassetteDateOfCassette" class="form-control tyko-date-selector" name="videoCassetteDateOfCassette">
+            <button type="button" onclick="tyko.openDateSelect('videoCassetteDateOfCassette')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="videoCassetteCassetteType" class="col-sm-2 col-form-label">cassette type</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="videoCassetteCassetteType" id="videoCassetteCassetteType">
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>VHS</option>
+            <option>3/4″ U-matic</option>
+            <option>1″ Type C</option>
+            <option>Betamax</option>
+            <option>Betacam</option>
+            <option>Betacam SP</option>
+            <option>Digital Betacam</option>
+            <option>Mini DV</option>
+            <option>Dvcam</option>
+            <option>DVCPro</option>
+            <option>HDV</option>
+            <option>Hi-8</option>
+            <option>other</option>
+        </select>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="videoCassetteDuration" class="col-sm-2 col-form-label">Duration (HH:MM:SS)</label>
+    <div class="col-sm-10">
+        <input type="text" id="videoCassetteDuration" class="form-control" name="videoCassetteDuration">
+    </div>
+</div>
+
+
+<div class="mb-3 row">
+    <label for="videoCassetteInspectionDate" class="col-sm-2 col-form-label">Inspection Date (M/D/YYYY)</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" id="videoCassetteInspectionDate" class="form-control tyko-date-selector" name="videoCassetteInspectionDate">
+            <button type="button" onclick="tyko.openDateSelect('videoCassetteInspectionDate')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="videoCassetteGeneration" class="col-sm-2 col-form-label">Generation</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="videoCassetteGeneration" id="videoCassetteGeneration">
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>source (original)</option>
+            <option>dub</option>
+            <option>master</option>
+            <option>commercial</option>
+            <option>other</option>
+        </select>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="videoCassetteTransferDate" class="col-sm-2 col-form-label">Transfer Date (M/D/YYYY)</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" id="videoCassetteTransferDate" class="form-control tyko-date-selector" name="videoCassetteTransferDate">
+            <button type="button" onclick="tyko.openDateSelect('videoCassetteTransferDate')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+
+

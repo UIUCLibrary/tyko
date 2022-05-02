@@ -1,0 +1,182 @@
+<div class="mb-3 row">
+    <label for="openReelReelTitle" class="col-sm-2 col-form-label">Title of reel</label>
+    <div class="col-sm-10">
+        <input type="text" id="openReelReelTitle" class="form-control" name="openReelReelTitle" required>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="openReelReelSubType" class="col-sm-2 col-form-label">Reel type</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="openReelReelSubType" id="openReelReelSubType" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>Video</option>
+            <option>Audio</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="openReelReelWidth" class="col-sm-2 col-form-label">Reel width (inches)</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="openReelReelWidth" id="openReelReelWidth">
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>1/4</option>
+            <option>1/2</option>
+            <option>1</option>
+            <option>2</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="openReelDateOfReel" class="col-sm-2 col-form-label">Date of reel (M/D/YYYY)</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" id="openReelDateOfReel" class="form-control tyko-date-selector" name="openReelDateOfReel">
+            <button type="button" onclick="tyko.openDateSelect('openReelDateOfReel')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="openReelTrackCount" class="col-sm-2 col-form-label">Track count</label>
+    <div class="col-sm-10">
+        <input type="text" id="openReelTrackCount" class="form-control" name="openReelTrackCount">
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="openReelReelSize" class="col-sm-2 col-form-label">Reel size (inches)</label>
+    <div class="col-sm-10">
+        <input type="text" id="openReelReelSize" class="form-control" name="openReelReelSize">
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="openReelReelDiameter" class="col-sm-2 col-form-label">Reel diameter (inches)</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="openReelReelDiameter" id="openReelReelDiameter">
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>5</option>
+            <option>7</option>
+            <option>10.5</option>
+        </select>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="openReelReelType" class="col-sm-2 col-form-label">Reel type</label>
+    <div class="col-sm-10">
+        <input type="text" id="openReelReelSize" class="form-control" name="openReelReelSize">
+    </div>
+</div>
+
+
+<div class="mb-3 row">
+    <label for="openReelReelThickness" class="col-sm-2 col-form-label">Reel thickness (mil)</label>
+    <div class="col-sm-10">
+        <input type="text" id="openReelReelThickness" class="form-control" name="openReelReelThickness">
+    </div>
+</div>
+
+
+<div class="mb-3 row">
+    <label for="openReelReelBrand" class="col-sm-2 col-form-label">Reel brand</label>
+    <div class="col-sm-10">
+        <input type="text" id="openReelReelBrand" class="form-control" name="openReelReelBrand">
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="openReelBase" class="col-sm-2 col-form-label">Base</label>
+    <div class="col-sm-10">
+        <select class="form-select" name=openReelBase" id="openReelBase">
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>Acetate</option>
+            <option>Polyester</option>
+        </select>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="openReelWind" class="col-sm-2 col-form-label">Wind</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="openReelWind" id="openReelWind" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>Heads out</option>
+            <option>Tails out</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="openReelReelSpeed" class="col-sm-2 col-form-label">Reel speed (ips)</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="openReelReelSpeed" id="openReelReelSpeed" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>1 7/8</option>
+            <option>3 3/4</option>
+            <option>7 1/2</option>
+            <option>15</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="openReelTrackConfiguration" class="col-sm-2 col-form-label">Track configuration</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="openReelTrackConfiguration" id="openReelTrackConfiguration" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>Full track</option>
+            <option>1/4 track mono</option>
+            <option>1/4 stereo</option>
+            <option>1/2 track mono</option>
+            <option>1/2 track stereo</option>
+        </select>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="openReelDuration" class="col-sm-2 col-form-label">Duration (HH:MM:SS)</label>
+    <div class="col-sm-10">
+        <input type="text" id="openReelDuration" class="form-control" name="openReelDuration">
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="openReelGeneration" class="col-sm-2 col-form-label">Generation</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="openReelGeneration" id="openReelGeneration" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>source (original)</option>
+            <option>dub</option>
+            <option>master</option>
+            <option>commercial</option>
+            <option>other</option>
+        </select>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="openReelInspectionDate" class="col-sm-2 col-form-label">Inspection Date (M/D/YYYY)</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" id="openReelInspectionDate" class="form-control tyko-date-selector" name="openReelInspectionDate">
+            <button type="button" onclick="tyko.openDateSelect('openReelInspectionDate')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="openReelTransferDate" class="col-sm-2 col-form-label">Transfer Date (M/D/YYYY)</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" id="openReelTransferDate" class="form-control tyko-date-selector" name="openReelTransferDate">
+            <button type="button" onclick="tyko.openDateSelect('openReelTransferDate')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+

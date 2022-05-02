@@ -1,0 +1,119 @@
+<div class="mb-3 row">
+    <label for="filmBase" class="col-sm-2 col-form-label">Base</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="filmBase" id="filmBase" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>Acetate</option>
+            <option>Nitrate</option>
+            <option>Polyester</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmEdgeCodeDate" class="col-sm-2 col-form-label">Edge code date</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" id="filmEdgeCodeDate" class="form-control tyko-date-selector" name="filmEdgeCodeDate">
+            {# todo: make this year only, remove day and month#}
+            <button type="button" onclick="tyko.openDateSelect('filmEdgeCodeDate')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmSoundtrack" class="col-sm-2 col-form-label">Soundtrack</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="filmSoundtrack" id="filmSoundtrack" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>Optical</option>
+            <option>Magnetic</option>
+            <option>Silent</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmColor" class="col-sm-2 col-form-label">Color</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="filmColor" id="filmColor" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>Color</option>
+            <option>Black & White</option>
+            <option>Color/Black & White</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmImageType" class="col-sm-2 col-form-label">Image Type</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="filmImageType" id="filmImageType" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>Positive</option>
+            <option>Negative</option>
+            <option>Reversal</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmWind" class="col-sm-2 col-form-label">Wind</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="filmWind" id="filmWind" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>A</option>
+            <option>B</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmEmulsion" class="col-sm-2 col-form-label">Emulsion</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="filmEmulsion" id="filmEmulsion" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>In</option>
+            <option>Out</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmADStripTest" class="col-sm-2 col-form-label">A-D Strip Test</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="filmADStripTest" id="filmADStripTest" required>
+            <option></option>
+            <option>Yes</option>
+            <option>No</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmADStripTestDate" class="col-sm-2 col-form-label">A-D Strip Test Date</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" id="filmADStripTestDate" class="form-control tyko-date-selector" name="filmADStripTestDate">
+            <button type="button" onclick="tyko.openDateSelect('filmEdgeCodeDate')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmADStripTestLevel" class="col-sm-2 col-form-label">A-D Strip Level</label>
+    <div class="col-sm-10">
+        <select class="form-select" name="filmADStripTestLevel" id="filmADStripTestLevel" required>
+            {#todo: populate dynamically#}
+            <option></option>
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+        </select>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="filmShrinkage" class="col-sm-2 col-form-label">Shrinkage (%)</label>
+    <div class="col-sm-10">
+        <input type="text" id="filmShrinkage" class="form-control" name="filmShrinkage">
+    </div>
+</div>
