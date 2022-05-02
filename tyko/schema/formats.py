@@ -293,7 +293,7 @@ class VideoCassetteGenerations(AVTables):
         }
 
 
-class VideoCassetteTypes(AVTables):
+class VideoCassetteType(AVTables):
     __tablename__ = 'video_cassette_cassette_types'
     table_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column("name", db.Text)
@@ -321,7 +321,7 @@ class VideoCassette(AVFormat, ABC):
             db.Integer,
             db.ForeignKey("video_cassette_cassette_types.table_id")
         )
-    cassette_type = relationship("VideoCassetteTypes")
+    cassette_type = relationship("VideoCassetteType")
 
     duration = db.Column("duration", db.Text)
     inspection_date = db.Column("inspection_date", db.Date)
@@ -532,3 +532,19 @@ format_types = {
     "optical": (8, Optical),
     "video cassette": (9, VideoCassette),
 }
+
+video_cassette_types = [
+    'VHS',
+    '3/4″ U-matic',
+    '1″ Type C',
+    'Betamax',
+    'Betacam',
+    'Betacam SP',
+    'Digital Betacam',
+    'Mini DV',
+    'Dvcam',
+    'DVCPro',
+    'HDV',
+    'Hi-8',
+    'other',
+]
