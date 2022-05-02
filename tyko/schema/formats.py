@@ -475,9 +475,9 @@ item_has_contacts_table = db.Table(
 
 
 format_types = {
-    # "audio video": (1, AudioVideo),
-    # "audio": (2,),
-    # "video": (3,),
+    "audio video": (1, AudioVideo),
+    "audio": (2,),
+    "video": (3,),
     "open reel": (4, OpenReel),
     "grooved disc": (5, GroovedDisc),
     "film": (6, Film),
