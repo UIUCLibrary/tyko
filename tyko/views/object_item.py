@@ -64,7 +64,7 @@ class ObjectItemAPI(views.MethodView):
             new_data = {
                 "name": request_data['name'],
                 "format_id": int(request_data['format_id']),
-                "format_details": request_data.get('format_details')
+                "format_details": request_data.get('format_details', {})
             }
             new_item = connector.create(**new_data, object_id=object_id)
         else:

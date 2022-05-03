@@ -65,7 +65,7 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
         session.delete(i)
 
     _populate_format_types_table(session)
-    
+
     _populate_video_cassette_types_table(session)
 
     _populate_starting_project_status(

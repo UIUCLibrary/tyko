@@ -2,6 +2,8 @@ import json
 import pytest
 from flask import url_for
 
+from tyko.schema.formats import format_types
+
 
 def test_project_create_and_delete(app):
     with app.test_client() as server:
@@ -118,7 +120,7 @@ def test_item_delete(app):
                             "name": "changed_dummy.txt",
                         }
                     ],
-                    "format_id": 1
+                    "format_id": format_types['audio cassette'][0]
                 }
             ),
             content_type='application/json'

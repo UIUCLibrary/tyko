@@ -56,21 +56,7 @@ class CollectionObject(AVTables):
     contact_id = db.Column(db.Integer, db.ForeignKey("contact.contact_id"))
 
     contact = relationship("Contact", foreign_keys=[contact_id])
-    audio_cassettes = relationship("AudioCassette", back_populates="object")
-    collection_items = relationship("CollectionItem", back_populates="object")
-    open_reels = relationship("OpenReel", back_populates="object")
-    films = relationship("Film", back_populates="object")
-    audio_videos = relationship("AudioVideo", back_populates="object")
-    groove_disks = relationship("GroovedDisc", back_populates="object")
-
-    def all_items(self):
-        return self.collection_items \
-            + self.audio_cassettes \
-            + self.films \
-            + self.audio_videos \
-            + self.groove_disks \
-            + self.open_reels \
-            + self.collection_items
+    items = relationship('AVFormat', back_populates='object')
 
     def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
 
@@ -138,7 +124,7 @@ class CollectionObject(AVTables):
 
         items: List[SerializedData] = []
 
-        for item in sorter(self.all_items()):
+        for item in sorter(self.items):
             if recurse is True:
                 item_data = item.serialize()
                 del item_data['parent_object_id']

@@ -13,6 +13,7 @@ import tyko
 import tyko.exceptions
 import tyko.database
 from tyko import pbcore, data_provider, schema
+from tyko.schema.formats import format_types
 
 PBCORE_XSD_URL = "https://raw.githubusercontent.com/PBCore-AV-Metadata/PBCore_2.1/master/pbcore-2.1.xsd"
 if os.path.exists("pbcore-2.1.xsd"):
@@ -71,7 +72,7 @@ def test_pbcore_valid_id(tmpdir):
             content_type='application/json'
         ).get_json()
 
-        sample_object = server.post(
+        sample_object_response = server.post(
             flask.url_for("project_add_object", project_id=sample_project['id']),
             data=json.dumps(
                 {
@@ -80,27 +81,27 @@ def test_pbcore_valid_id(tmpdir):
                 }
             ),
             content_type='application/json'
-        ).get_json()['object']
+        )
+        assert sample_object_response.status_code == 200
+        sample_object_response = sample_object_response.get_json()['object']
 
         sample_item = server.post(
             flask.url_for(
                 "object_item",
                 project_id=sample_project['id'],
-                object_id=sample_object['object_id']
+                object_id=sample_object_response['object_id']
             ),
             data=json.dumps(
                 {
                     "name": "My dummy item",
-                    "format_id": 1
+                    "format_id": format_types['audio cassette'][0]
                 }
             ),
             content_type='application/json'
         ).get_json()
 
-
-
         pbcore_xml = server.get(
-            flask.url_for("object_pbcore", id=sample_object['object_id'])
+            flask.url_for("object_pbcore", id=sample_object_response['object_id'])
         ).get_data()
         doc = etree.fromstring(pbcore_xml)
         print(str(etree.tostring(doc, pretty_print=True), encoding="utf-8"))

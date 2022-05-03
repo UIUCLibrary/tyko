@@ -9,6 +9,7 @@ import pytest
 import tyko
 import tyko.database
 from tyko import frontend
+from tyko.schema.formats import format_types
 
 
 @pytest.fixture()
@@ -176,7 +177,6 @@ def test_view_web_file(app):
         assert file_page_resp.status_code == 200
 
 
-
 def test_view_web_item(app):
     with app.test_client() as server:
         project_id = server.post(
@@ -213,7 +213,7 @@ def test_view_web_item(app):
                         }
                     ],
                     "medusa_uuid": "03de08f0-dada-0136-5326-0050569601ca-4",
-                    "format_id": 1
+                    "format_id": format_types['audio cassette'][0]
                 }
             ),
             content_type='application/json'

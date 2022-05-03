@@ -2,7 +2,7 @@
 import abc
 from abc import ABC, ABCMeta
 from datetime import datetime
-from typing import List, Optional, Iterator, Dict, Any
+from typing import List, Optional, Iterator, Dict, Any, Type
 
 import sqlalchemy
 from sqlalchemy.sql.expression import true
@@ -619,7 +619,7 @@ class ObjectDataConnector(AbsNotesConnector):
             item_connector = ItemDataConnector(self.session_maker)
             new_item_id = item_connector.create(**data)['item_id']
 
-            matching_object.collection_items.append(
+            matching_object.items.append(
                 item_connector.get(id=new_item_id)
             )
 
@@ -651,7 +651,7 @@ class ObjectDataConnector(AbsNotesConnector):
             session.close()
 
     @staticmethod
-    def _find_item(item_id, session) -> CollectionItem:
+    def _find_item(item_id, session) -> AVFormat:
         matching_items = \
             session.query(AVFormat).filter(
                 AVFormat.table_id == item_id).all()
@@ -698,19 +698,10 @@ class ObjectDataConnector(AbsNotesConnector):
     @staticmethod
     def _find_matching_section(matching_item,
                                matching_object) -> Optional[List[AVFormat]]:
-        subtypes = [
-            'audio_cassettes',
-            'audio_videos',
-            'collection_items',
-            'films',
-            'grooved_disc',
-            'open_reels',
-        ]
 
-        for subtype_name in subtypes:
-            subtype = getattr(matching_object, subtype_name)
-            if matching_item in subtype:
-                return subtype
+        subtype = matching_object.items
+        if matching_item in subtype:
+            return subtype
         return None
 
     def get_note(self, object_id, note_id, serialize=False):
@@ -813,8 +804,8 @@ class FilesDataConnector(AbsDataProviderConnector):
         generation = kwargs.get('generation')
         session = self.session_maker()
         try:
-            matching_item = session.query(CollectionItem)\
-                .filter(CollectionItem.table_id == item_id).one()
+            matching_item = session.query(AVFormat)\
+                .filter(AVFormat.table_id == item_id).one()
 
             new_file = InstantiationFile(file_name=name)
 
@@ -857,8 +848,8 @@ class FilesDataConnector(AbsDataProviderConnector):
     def remove(self, item_id: int, file_id: int):
         session = self.session_maker()
         try:
-            item = session.query(CollectionItem)\
-                .filter(CollectionItem.table_id == item_id).one()
+            item = session.query(AVFormat)\
+                .filter(AVFormat.table_id == item_id).one()
 
             for f in item.files:
                 if f.file_id == file_id:
@@ -893,6 +884,7 @@ class ItemDataConnector(AbsNotesConnector):
         yield from session.query(formats.GroovedDisc).all()
         yield from session.query(formats.OpenReel).all()
         yield from session.query(formats.CollectionItem).all()
+        yield from session.query(formats.VideoCassette).all()
 
     @staticmethod
     def _get_one(session, table_id: int):
@@ -910,6 +902,9 @@ class ItemDataConnector(AbsNotesConnector):
                    .filter(formats.AVFormat.table_id == table_id)
                    .all()) + \
               list(session.query(formats.OpenReel)
+                   .filter(formats.AVFormat.table_id == table_id)
+                   .all()) + \
+              list(session.query(formats.VideoCassette)
                    .filter(formats.AVFormat.table_id == table_id)
                    .all()) + \
               list(session.query(formats.CollectionItem)
@@ -970,7 +965,22 @@ class ItemDataConnector(AbsNotesConnector):
             format_type = session.query(formats.FormatTypes)\
                 .filter(formats.FormatTypes.id == format_id).one()
 
-            new_item = CollectionItem(
+            # new_item = CollectionItem(
+            #     name=name,
+            #     format_type=format_type
+            # )
+            # new_item_type: Type[AVFormat] = CassetteType
+            new_item_type_tuple: Optional[Type[AVFormat]] \
+                = formats.format_types.get(format_type.name)
+            if new_item_type_tuple is None:
+                new_item_type = CollectionItem
+            else:
+                if len(new_item_type_tuple) == 2:
+                    new_item_type = new_item_type_tuple[1]
+                else:
+                    new_item_type = CollectionItem
+
+            new_item: AVFormat = new_item_type(
                 name=name,
                 format_type=format_type
             )
@@ -1046,8 +1056,8 @@ class ItemDataConnector(AbsNotesConnector):
             session = self.session_maker()
             try:
 
-                items_deleted = session.query(CollectionItem)\
-                    .filter(CollectionItem.table_id == id).delete()
+                items_deleted = session.query(AVFormat)\
+                    .filter(AVFormat.table_id == id).delete()
 
                 success = items_deleted > 0
                 session.commit()
@@ -1120,8 +1130,8 @@ class ItemDataConnector(AbsNotesConnector):
 
             session.commit()
             new_item = \
-                session.query(CollectionItem).filter(
-                    CollectionItem.table_id == item_id).one()
+                session.query(AVFormat).filter(
+                    AVFormat.table_id == item_id).one()
 
             return new_item.serialize()
 
@@ -1175,7 +1185,7 @@ class AudioCassetteDataConnector(ItemDataConnector):
         new_base_item = super().create(*args, **kwargs)
         session = self.session_maker()
         try:
-            format_details = kwargs['format_details']
+            format_details = kwargs.get('format_details', {})
             base_object = session.query(CollectionObject)\
                 .filter(CollectionObject.id == kwargs['object_id'])\
                 .one()
@@ -1193,7 +1203,7 @@ class AudioCassetteDataConnector(ItemDataConnector):
 
             self._add_optional_args(new_cassette, **format_details)
 
-            base_object.audio_cassettes.append(new_cassette)
+            base_object.items.append(new_cassette)
             session.add(new_cassette)
             session.commit()
             i = new_cassette.serialize()
