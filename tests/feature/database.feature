@@ -153,12 +153,11 @@ Feature: database
     And the database has item record with the <file_name> and has a corresponding <media_type> record in a <format_class> with the same item id
 
     Examples:
-    | first_name | last_name | media_type         |  file_name    | format_class |
-    | Henry      | Borchers  | open reel          |  myfile.wav   | OpenReel     |
-    | John       | Smith     | open reel          |  my2file.wav  | OpenReel     |
-    | John       | Smith     | film               |  myfilm.mov   | Film         |
-#    | John       | Smith     | grooved disc       |  mydisc.wav   |
-#    | John       | Smith     | audio video        |  myvideo.mov  |
+    | first_name | last_name | media_type         |  file_name     | format_class |
+    | Henry      | Borchers  | open reel          |  myfile.wav    | OpenReel     |
+    | John       | Smith     | open reel          |  my2file.wav   | OpenReel     |
+    | John       | Smith     | film               |  myfilm.mov    | Film         |
+
 
 
   Scenario Outline: Create a open reel project
@@ -172,7 +171,7 @@ Feature: database
     When a new open reel item recorded on <date_recorded> to <tape_size> tape on a <base> base with <file_name> added to the object
     Then the database has 1 OpenReel records
     And the database has 1 CollectionObject records
-    And the database has item record with the <file_name>
+    And the updated database has item record with the <file_name>
     And the database has open reel record with a <tape_size> sized tape
     And the database has open reel record with a <base> base
 
@@ -290,5 +289,5 @@ Scenario Outline: Create a new media project with audio cassettes
     Examples:
     | object_title           | item_title         | date_recorded | audio_type       | tape_type | tape_thickness | inspection_date |
     | John Doe Oral history  | The beginning part | 11-26-1999    | compact cassette | I         | "0.5"          | 12-10-2019      |
-    | Brass Band Recording   |                    | 01-1997       | ADAT             |           | "0.5"          | 12-12-2019      |
-    | Famous Amazing Speech  |                    | 1997          | DAT              |           | NA             | 12-11-2019      |
+    | Brass Band Recording   | The recording      | 01-1997       | ADAT             | NA        | "0.5"          | 12-12-2019      |
+    | Famous Amazing Speech  | The Speech         | 1997          | DAT              | NA        | NA             | 12-11-2019      |

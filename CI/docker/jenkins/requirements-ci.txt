@@ -1,6 +1,6 @@
 tox<3.10
 pytest
-pytest-bdd<5.0
+pytest-bdd
 bandit
 mypy
 types-setuptools

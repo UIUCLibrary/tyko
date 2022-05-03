@@ -1,5 +1,3 @@
-import pytest
-
 import tyko.database
 import tyko.schema.formats
 from tyko import schema
@@ -13,7 +11,8 @@ SAMPLE_TREATMENT_GIVEN = "This item got only y treatment"
 
 SAMPLE_TREATMENT_NEEDED = "This item needs x, y, and z treatment"
 
-SAMPLE_INSPECTION_NOTE = "This is a sample long form notes about the inspection"
+SAMPLE_INSPECTION_NOTE = \
+    "This is a sample long form notes about the inspection"
 
 SAMPLE_OBJ_SEQUENCE = 12
 
@@ -137,7 +136,10 @@ def new_collection(dummy_database, collection_contact):
     )
 
 
-@given("a database with a collection", target_fixture='database_with_collection')
+@given(
+    "a database with a collection",
+    target_fixture='database_with_collection'
+)
 def database_with_collection(dummy_database, new_collection):
 
     dummy_database.add(new_collection)
@@ -152,7 +154,10 @@ def add_new_object(dummy_database, create_new_object):
     return dummy_database
 
 
-@given(parsers.parse("a new object for the collection with a barcode"), target_fixture="create_new_object")
+@given(
+    parsers.parse("a new object for the collection with a barcode"),
+    target_fixture="create_new_object"
+)
 def create_new_object(dummy_database, new_collection, new_project):
 
     new_object = schema.CollectionObject(
@@ -198,8 +203,10 @@ def collection_has_project(dummy_database):
     assert new_added_project.specs == SAMPLE_PROJECT_SPECS
 
 
-@given(parsers.parse(
-    "a staff contact named {staff_first_name} {staff_last_name}"), target_fixture='staff_contact')
+@given(
+    parsers.parse(
+        "a staff contact named {staff_first_name} {staff_last_name}"
+    ), target_fixture='staff_contact')
 def staff_contact(dummy_database, staff_first_name, staff_last_name):
     new_contact = schema.Contact(
         first_name=staff_first_name,
@@ -214,7 +221,10 @@ def staff_contact(dummy_database, staff_first_name, staff_last_name):
 def count_database_items(dummy_database, count, data_type):
     my_data_type = getattr(schema, data_type)
     records_found = len(dummy_database.query(my_data_type).all())
-    assert records_found == count, "database doesn't have {} {} records, it has {}".format(count, data_type, records_found)
+    assert \
+        records_found == count, \
+        f"database doesn't have {count} {data_type} records, " \
+        f"it has {records_found}"
 
 
 @scenario("database.feature", "Create a new item")
@@ -222,7 +232,10 @@ def test_newitem():
     pass
 
 
-@given(parsers.parse("a new {media_format_name} item is created by the staff"), target_fixture='new_item')
+@given(
+    parsers.parse("a new {media_format_name} item is created by the staff"),
+    target_fixture='new_item'
+)
 def new_item(dummy_database, new_collection, new_project, staff_contact,
              create_new_object, media_format_name):
 
@@ -265,7 +278,10 @@ def test_database_note():
     pass
 
 
-@given(parsers.parse("a new {note_type} note is created"), target_fixture='new_note')
+@given(
+    parsers.parse("a new {note_type} note is created"),
+    target_fixture='new_note'
+)
 def new_note(dummy_database, note_type):
     inspection_note = \
         dummy_database.query(schema.NoteTypes).filter(
@@ -308,8 +324,6 @@ def test_project_node():
     pass
 
 
-
-
 @scenario("database.feature", "Item is sent for treatment")
 def test_add_treatment():
     pass
@@ -322,8 +336,13 @@ def treatment_add_to_item(dummy_database, new_item, treatment_record):
     return dummy_database
 
 
-@given(parsers.parse('a new treatment record is created that '
-                     'needs "{needs}" and got "{given}"'), target_fixture='treatment_record')
+@given(
+    parsers.parse(
+        'a new treatment record is created that needs "{needs}" and '
+        'got "{given}"'
+    ),
+    target_fixture='treatment_record'
+)
 def treatment_record(needs, given):
     return schema.Treatment(
         needed=needs,
@@ -353,7 +372,12 @@ def test_new_media_project():
     pass
 
 
-@given("a new <media_type> item with <file_name> added to the object", target_fixture='add_new_item_to_object')
+@given(
+    parsers.parse(
+        "a new {media_type} item with {file_name} added to the object"
+    ),
+    target_fixture='add_new_item_to_object'
+)
 def add_new_item_to_object(dummy_database, create_new_object, media_type,
                            file_name):
 
@@ -382,16 +406,30 @@ def add_new_item_to_object(dummy_database, create_new_object, media_type,
 
     # media_table_type = media_type_info[1](item=new_item)
 
-    getattr(create_new_object, media_table_type.__tablename__).append(media_table_type)
+    getattr(
+        create_new_object,
+        media_table_type.__tablename__
+    ).append(media_table_type)
+
     # create_new_object.items.append(media_table_type)
     dummy_database.add(create_new_object)
     dummy_database.add(media_table_type)
     dummy_database.commit()
 
 
-@then("the database has item record with the <file_name> and has a "
-      "corresponding <media_type> record in a <format_class> with the same item id")
-def has_a_record_with_media_item(dummy_database, file_name, media_type, format_class):
+@then(
+    parsers.parse(
+        "the database has item record with the {file_name} and has a "
+        "corresponding {media_type} record in a {format_class} with the same "
+        "item id"
+    )
+)
+def has_a_record_with_media_item(
+        dummy_database,
+        file_name,
+        media_type,
+        format_class
+):
     format_type = getattr(tyko.schema.formats, format_class)
     items = dummy_database.query(
         schema.InstantiationFile)\
@@ -419,15 +457,12 @@ def test_new_open_reel_project():
     pass
 
 
-@when("a new open reel item recorded on <date_recorded> to <tape_size> tape "
-      "on a <base> base with <file_name> added to the object")
+@when(
+    parsers.parse("a new open reel item recorded on {date_recorded} to "
+                  "{tape_size} tape on a {base} base with {file_name} added "
+                  "to the object"))
 def new_open_reel(dummy_database, create_new_object, date_recorded,
                   tape_size, base, file_name):
-
-    # new_item = tyko.schema.formats.CollectionItem(
-    #     name=SAMPLE_ITEM_NAME,
-    # )
-
 
     open_reel = schema.OpenReel(
         name=SAMPLE_ITEM_NAME,
@@ -436,9 +471,7 @@ def new_open_reel(dummy_database, create_new_object, date_recorded,
         base=base,
 
     )
-    # # open_reel.files.append(
-    # #     schema.InstantiationFile(file_name=file_name)
-    # # )
+
     dummy_database.add(open_reel)
     dummy_database.flush()
     # # FIXME: OPEN reel is not getiting the files
@@ -454,15 +487,21 @@ def new_open_reel(dummy_database, create_new_object, date_recorded,
     dummy_database.commit()
 
 
-@then("the database has item record with the <file_name>")
+@then(
+    parsers.parse("the updated database has item record with the {file_name}")
+)
 def database_has_item_record_w_filename(dummy_database, file_name):
     collection_items = dummy_database.query(tyko.schema.InstantiationFile)\
         .filter(tyko.schema.InstantiationFile.file_name == file_name)
 
-    assert len(collection_items.all()) > 0, "No file matched {}".format(file_name)
+    assert len(collection_items.all()) > 0, f'No file matched "{file_name}"'
 
 
-@then("the database has open reel record with a <tape_size> sized tape")
+@then(
+    parsers.parse(
+        "the database has open reel record with a {tape_size} sized tape"
+    )
+)
 def check_open_reel_tape_size(dummy_database, tape_size):
     open_reel_items = dummy_database.query(schema.OpenReel)
     open_reel_item = open_reel_items.filter(
@@ -471,7 +510,7 @@ def check_open_reel_tape_size(dummy_database, tape_size):
     assert open_reel_item.tape_size == tape_size
 
 
-@then("the database has open reel record with a <base> base")
+@then(parsers.parse("the database has open reel record with a {base} base"))
 def check_open_reel_base(dummy_database, base):
     open_reel_items = dummy_database.query(schema.OpenReel)
     open_reel_item = open_reel_items.filter(
@@ -490,8 +529,11 @@ def empty_database(dummy_database):
     return dummy_database
 
 
-@when("a new vendor named <vendor_name> from <address> in <city>, <state> "
-      "<zipcode> is added")
+@when(
+    parsers.parse(
+        "a new vendor named {vendor_name} from {address} in {city}, {state} "
+        "{zipcode} is added")
+)
 def add_vendor(empty_database, vendor_name, address, city, state, zipcode):
     new_vendor = schema.Vendor(
         name=vendor_name,
@@ -504,35 +546,35 @@ def add_vendor(empty_database, vendor_name, address, city, state, zipcode):
     empty_database.commit()
 
 
-@then("the newly created vendor has the name <vendor_name>")
+@then(parsers.parse("the newly created vendor has the name {vendor_name}"))
 def vendor_has_name(dummy_database, vendor_name):
     vendors = dummy_database.query(schema.Vendor)
     vendor = vendors.filter(schema.Vendor.name == vendor_name).one()
     assert vendor.name == vendor_name
 
 
-@then("the newly created vendor has the address <address>")
+@then(parsers.parse("the newly created vendor has the address {address}"))
 def vendor_has_address(dummy_database, address):
     vendors = dummy_database.query(schema.Vendor)
     vendor = vendors.filter(schema.Vendor.address == address).one()
     assert vendor.address == address
 
 
-@then("the newly created vendor is located in <city> city")
+@then(parsers.parse("the newly created vendor is located in {city} city"))
 def vendor_is_in_city(dummy_database, city):
     vendors = dummy_database.query(schema.Vendor)
     vendor = vendors.filter(schema.Vendor.city == city).one()
     assert vendor.city == city
 
 
-@then("the newly created vendor is located in <state> state")
+@then(parsers.parse("the newly created vendor is located in {state} state"))
 def vendor_is_in_city(dummy_database, state):
     vendors = dummy_database.query(schema.Vendor)
     vendor = vendors.filter(schema.Vendor.state == state).one()
     assert vendor.state == state
 
 
-@then("the newly created vendor is has a <zipcode> zipcode")
+@then(parsers.parse("the newly created vendor is has a {zipcode} zipcode"))
 def vendor_is_in_city(dummy_database, zipcode):
     vendors = dummy_database.query(schema.Vendor)
     vendor = vendors.filter(schema.Vendor.zipcode == zipcode).one()
@@ -544,8 +586,12 @@ def test_vendor_contact():
     pass
 
 
-@when("<contact_first_name> <contact_last_name> is added as a contact to the "
-      "vendor named <vendor_name>")
+@when(
+    parsers.parse(
+        "{contact_first_name} {contact_last_name} is added as a contact to "
+        "the vendor named {vendor_name}"
+    )
+)
 def contact_to_vendor(dummy_database, contact_first_name, contact_last_name,
                       vendor_name):
     vendors = dummy_database.query(schema.Vendor)
@@ -559,8 +605,8 @@ def contact_to_vendor(dummy_database, contact_first_name, contact_last_name,
     dummy_database.commit()
 
 
-@then("the vendor named <vendor_name> has a contact named "
-      "<contact_first_name> <contact_last_name>")
+@then(parsers.parse("the vendor named {vendor_name} has a contact named "
+      "{contact_first_name} {contact_last_name}"))
 def vendor_has_contact(dummy_database, vendor_name, contact_first_name,
                        contact_last_name):
 
@@ -583,7 +629,7 @@ def test_vendor_gets_object():
     pass
 
 
-@when("the object is sent to the vendor <vendor_name>")
+@when(parsers.parse("the object is sent to the vendor {vendor_name}"))
 def vendor_gets_object(dummy_database, create_new_object, vendor_name):
     vendors = dummy_database.query(schema.Vendor)
     vendor = vendors.filter(schema.Vendor.name == vendor_name).one()
@@ -598,7 +644,11 @@ def vendor_gets_object(dummy_database, create_new_object, vendor_name):
     dummy_database.commit()
 
 
-@then("there is a new transfer for the new object sent to <vendor_name>")
+@then(
+    parsers.parse(
+        "there is a new transfer for the new object sent to {vendor_name}"
+    )
+)
 def new_transfer_for_vendor(dummy_database, vendor_name, create_new_object):
     vendors = dummy_database.query(schema.Vendor)
     vendor = vendors.filter(schema.Vendor.name == vendor_name).one()
@@ -655,7 +705,11 @@ def test_database_groove_disc():
     pass
 
 
-@then(parsers.parse("all the {media_type} items in the database can be serialized"))
+@then(
+    parsers.parse(
+        "all the {media_type} items in the database can be serialized"
+    )
+)
 def media_type_can_be_serialize(dummy_database, media_type):
     my_data_type = getattr(schema, media_type)
     data_entry = dummy_database.query(my_data_type).all()
@@ -686,7 +740,6 @@ def new_film(dummy_database):
     dummy_database.commit()
 
 
-
 @given("a new OpenReel item is created")
 def new_open_reel(dummy_database):
     new_reel = schema.OpenReel(track_count="2")
@@ -699,12 +752,21 @@ def test_database_open_reel():
     pass
 
 
-@scenario("database.feature", "Create a new media project where a file has a note and an annotation")
+@scenario(
+    "database.feature",
+    "Create a new media project where a file has a note and an annotation"
+)
 def test_file_note():
     pass
 
 
-@when("a new <media_type> item with <file_name> with <note> and an annotation of <annotation_type> and <annotation_content> added to the object")
+@when(
+    parsers.parse(
+        "a new {media_type} item with {file_name} with {note} and an "
+        "annotation of {annotation_type} and {annotation_content} added to "
+        "the object"
+    )
+)
 def new_media_with_file_note(dummy_database, create_new_object, media_type,
                              file_name, note,
                              annotation_type, annotation_content):
@@ -715,7 +777,6 @@ def new_media_with_file_note(dummy_database, create_new_object, media_type,
     format_type = all_format_types.filter(
         schema.FormatTypes.name == media_type
     ).one()
-
 
     new_file = schema.InstantiationFile(file_name=file_name)
     new_file.notes.append(schema.FileNotes(message=note))
@@ -742,12 +803,15 @@ def new_media_with_file_note(dummy_database, create_new_object, media_type,
     dummy_database.commit()
 
 
-@then("the database has item record with the <file_name> that contains a note "
-      "that reads <note>")
+@then(
+    parsers.parse(
+        "the database has item record with the {file_name} that contains a "
+        "note that reads {note}"
+    )
+)
 def file_with_note(dummy_database, file_name, note):
     files = \
-        dummy_database.query(schema.InstantiationFile)\
-            .filter(
+        dummy_database.query(schema.InstantiationFile).filter(
             schema.InstantiationFile.file_name == file_name)
     for file in files:
         if file.file_name == file_name:
@@ -756,15 +820,19 @@ def file_with_note(dummy_database, file_name, note):
     assert False
 
 
-@then("the database has item record with the <file_name> that contains "
-      "a <annotation_type> annotation containing <annotation_content>")
+@then(
+    parsers.parse(
+        "the database has item record with the {file_name} that contains "
+        "a {annotation_type} annotation containing {annotation_content}"
+    )
+)
 def file_with_note(dummy_database, file_name, annotation_type,
                    annotation_content):
 
     files = \
         dummy_database.query(schema.InstantiationFile).filter(
             schema.InstantiationFile.file_name == file_name)
-    
+
     for file in files:
         if file.file_name == file_name:
             assert file.annotations[0].annotation_type.name == annotation_type
@@ -773,19 +841,30 @@ def file_with_note(dummy_database, file_name, annotation_type,
     assert False
 
 
-@given("annotations for <annotation_type> configured in the database", target_fixture='add_file_annotation_type')
+@given(
+    parsers.parse(
+        "annotations for {annotation_type} configured in the database"
+    ),
+    target_fixture='add_file_annotation_type'
+)
 def add_file_annotation_type(dummy_database, annotation_type):
     dummy_database.add(
         schema.FileAnnotationType(name=annotation_type))
     return dummy_database
 
 
-@scenario("database.feature", "Create a new media project with audio cassettes")
+@scenario(
+    "database.feature",
+    "Create a new media project with audio cassettes"
+)
 def test_audio_cassette_feature():
     pass
 
 
-@given("a database with a project and a collection", target_fixture='project_and_collection')
+@given(
+    "a database with a project and a collection",
+    target_fixture='project_and_collection'
+)
 def project_and_collection(dummy_database):
     new_collection = schema.Collection(collection_name="simple collection")
     dummy_database.add(new_collection)
@@ -795,8 +874,13 @@ def project_and_collection(dummy_database):
     dummy_database.commit()
     return new_collection, new_project
 
-#
-@given("a new <object_title> audio recording is added", target_fixture='new_audio_object')
+
+@given(
+    parsers.parse(
+        "a new {object_title} audio recording is added"
+    ),
+    target_fixture='new_audio_object'
+)
 def new_audio_object(dummy_database, project_and_collection, object_title):
     collection, project = project_and_collection
     new_object = schema.CollectionObject(name=object_title,
@@ -810,10 +894,14 @@ def new_audio_object(dummy_database, project_and_collection, object_title):
         "object": new_object
     }
 
+
 @when(
-    "a tape named <item_title> recorded on <date_recorded> using a "
-    "<audio_type> type <tape_type> and <tape_thickness> which was inspected "
-    "on <inspection_date>")
+    parsers.parse(
+        "a tape named {item_title} recorded on {date_recorded} using "
+        "a {audio_type} type {tape_type} and {tape_thickness} which was "
+        "inspected on {inspection_date}"
+    )
+)
 def new_audio_item(dummy_database, new_audio_object, item_title, date_recorded,
                    audio_type, tape_type, tape_thickness, inspection_date):
     recording_date, recording_date_precision = \
@@ -837,8 +925,11 @@ def new_audio_item(dummy_database, new_audio_object, item_title, date_recorded,
 
 
 @then(
-    "the database has a an object entitled <object_title> with an "
-    "AudioCassette")
+    parsers.parse(
+        "the database has a an object entitled {object_title} with an "
+        "AudioCassette"
+    )
+)
 def object_has_audio_cassette(dummy_database, object_title):
     found_object = dummy_database.query(schema.CollectionObject)\
         .filter(schema.CollectionObject.name == object_title).one()
@@ -847,9 +938,17 @@ def object_has_audio_cassette(dummy_database, object_title):
 
 
 @then(
-    "AudioCassette in <object_title> is titled <item_title> was recorded on "
-    "the date <date_recorded>")
-def audio_cassette_has_a_title(dummy_database, object_title, item_title, date_recorded):
+    parsers.parse(
+        "AudioCassette in {object_title} is titled {item_title} was "
+        "recorded on the date {date_recorded}"
+    )
+)
+def audio_cassette_has_a_title(
+        dummy_database,
+        object_title,
+        item_title,
+        date_recorded
+):
     cassette = dummy_database.query(schema.CollectionObject) \
         .filter(schema.CollectionObject.name == object_title) \
         .one().audio_cassettes[0]
@@ -859,9 +958,18 @@ def audio_cassette_has_a_title(dummy_database, object_title, item_title, date_re
 
 
 @then(
-    "AudioCassette in <object_title> with title <item_title> used type "
-    "<tape_type> cassette and with <tape_thickness>")
-def audio_cassette_has_a_tape_thickness(dummy_database, object_title, item_title, tape_type, tape_thickness):
+    parsers.parse(
+        "AudioCassette in {object_title} with title {item_title} used type "
+        "{tape_type} cassette and with {tape_thickness}"
+    )
+)
+def audio_cassette_has_a_tape_thickness(
+        dummy_database,
+        object_title,
+        item_title,
+        tape_type,
+        tape_thickness
+):
 
     cassette = dummy_database.query(schema.CollectionObject) \
         .filter(schema.CollectionObject.name == object_title) \
@@ -877,11 +985,20 @@ def audio_cassette_has_a_tape_thickness(dummy_database, object_title, item_title
 
 
 @then(
-    "AudioCassette in <object_title> with title <item_title> was inspected on "
-    "<inspection_date>")
-def audio_cassette_inspection_date(dummy_database, object_title, item_title, inspection_date):
+    parsers.parse(
+        "AudioCassette in {object_title} with title {item_title} was "
+        "inspected on {inspection_date}"
+    )
+)
+def audio_cassette_inspection_date(
+        dummy_database,
+        object_title,
+        item_title,
+        inspection_date
+):
     cassette = dummy_database.query(schema.CollectionObject) \
         .filter(schema.CollectionObject.name == object_title) \
         .one().audio_cassettes[0]
     cassette_date = cassette.serialize()
-    assert cassette_date['format_details']['inspection_date'] == inspection_date
+    assert \
+        cassette_date['format_details']['inspection_date'] == inspection_date
