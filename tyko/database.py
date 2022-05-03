@@ -70,7 +70,7 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
 
     _populate_starting_project_status(
         session, project_status_table=projects.ProjectStatus)
-    _create_sample_collection(session)
+    # _create_sample_collection(session)
     session.commit()
     session.close()
 
