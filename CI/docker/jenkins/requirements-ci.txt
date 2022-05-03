@@ -1,4 +1,4 @@
-tox
+tox<3.10
 pytest
 pytest-bdd
 bandit
