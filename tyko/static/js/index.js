@@ -15,11 +15,11 @@ window.$ = $
  * Add a date selection helper
  * @param {String} elementId - ID for the input element
  */
-export function openDateSelect(elementId){
+export function openDateSelect(elementId, format='yyyy-mm-dd'){
     const element = document.getElementById(elementId)
     const datepicker = new Datepicker(element, {
         buttonClass: 'btn',
-        format: 'yyyy-mm-dd'
+        format: format
     });
     datepicker.show()
     element.addEventListener("focusout", () =>{

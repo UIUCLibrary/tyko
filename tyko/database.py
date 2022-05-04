@@ -22,6 +22,14 @@ def alembic_table_exists(engine) -> bool:
         return sqlalchemy.inspect(engine).has_table("alembic_version")
 
 
+def _populate_video_cassette_generations_table(session):
+    print("Populating video generations types Table")
+    for generation in formats.video_cassette_generations:
+        new_type = formats.VideoCassetteGenerations()
+        new_type.name = generation
+        session.add(new_type)
+
+
 def _populate_video_cassette_types_table(session):
     print("Populating video cassette types Table")
     for cassette_type in formats.video_cassette_types:
@@ -67,6 +75,7 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
     _populate_format_types_table(session)
 
     _populate_video_cassette_types_table(session)
+    _populate_video_cassette_generations_table(session)
 
     _populate_starting_project_status(
         session, project_status_table=projects.ProjectStatus)

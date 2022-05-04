@@ -342,19 +342,40 @@ class VideoCassette(AVFormat, ABC):
     transfer_date = db.Column("transfer_date", db.Date)
 
     def format_details(self) -> Mapping[str, SerializedData]:
-        return {
-            'generation': ":",
+        details = {
             'titleOfCassette': self.title_of_cassette,
-            'label': '',
-            'transferDate': '',
-            'duration': '',
-            'dateOfCassette': "",
-            "inspectionDate": "",
-            'cassetteType': ""
         }
 
+        if self.generation is not None:
+            details['generation'] = self.generation.serialize()
 
-class AudioCassette(AVFormat, ABC):
+        if self.label is not None:
+            details['label'] = self.label
+
+        if self.duration is not None:
+            details['duration'] = self.duration
+
+        if self.cassette_type is not None:
+            details['cassetteType'] = self.cassette_type
+
+        if self.date_of_cassette is not None:
+            details['dateOfCassette'] = \
+                utils.serialize_precision_datetime(self.date_of_cassette, 3)
+
+        if self.transfer_date is not None:
+            details['transferDate'] = \
+                utils.serialize_precision_datetime(self.transfer_date, 3)
+
+        if self.inspection_date is not None:
+            details['inspectionDate'] = \
+                utils.serialize_precision_datetime(self.inspection_date, 3)
+        if self.cassette_type is not None:
+            details['cassetteType'] = self.cassette_type.serialize()
+
+        return details
+
+
+class AudioCassette(AVFormat):
     __tablename__ = 'audio_cassettes'
     __mapper_args__ = {'polymorphic_identity': 'audio_cassettes'}
 
@@ -560,4 +581,12 @@ video_cassette_types = [
     'HDV',
     'Hi-8',
     'other',
+]
+
+video_cassette_generations = [
+    'source (original)',
+    'dub',
+    'master',
+    'commercial',
+    'other'
 ]
