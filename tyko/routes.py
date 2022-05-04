@@ -330,13 +330,15 @@ class Routes:
             self.app.add_url_rule(
                 "/api/formats/video_cassette/generations",
                 endpoint='video_cassette_generations',
-                view_func=lambda: middleware.get_video_generations(self.db_engine.db_session_maker)
+                view_func=lambda: middleware.get_video_generations(
+                    self.db_engine.db_session_maker)
             )
 
             self.app.add_url_rule(
                 "/api/formats/video_cassette/cassette_type",
                 endpoint='video_cassette_cassette_type',
-                view_func=lambda: middleware.get_video_cassette_type(self.db_engine.db_session_maker)
+                view_func=lambda: middleware.get_video_cassette_type(
+                    self.db_engine.db_session_maker)
             )
 
             for url_rule in self.get_api_routes():
