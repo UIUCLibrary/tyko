@@ -55,12 +55,27 @@ function loadTableFiles(element){
     })
 }
 
+function loadDynamicEnums(element){
+    fetch(element.dataset.enumUrl).then(response => response.json()).then(newData => {
+        for( let data of newData){
+          const newOption = document.createElement('option')
+          newOption.setAttribute('value', data.id)
+          newOption.innerText = data.name
+          element.appendChild(newOption)
+        }
+
+    })
+}
+
 function loadTykoTypes(){
     for(const element of document.getElementsByClassName('tyko')){
       if(element.classList.contains('tyko-editor')){
         tyko.configureTykoEditorTags(element);
       }
 
+      if(element.classList.contains('tyko-enum-dynamic')){
+          loadDynamicEnums(element)
+      }
       if(element.classList.contains('tyko-table-files')){
           loadTableFiles(element)
       }

@@ -327,7 +327,7 @@ class VideoCassette(AVFormat, ABC):
 
     def format_details(self) -> Mapping[str, SerializedData]:
         details = {
-            'titleOfCassette': self.title_of_cassette,
+            'title_of_cassette': self.title_of_cassette,
         }
 
         if self.generation is not None:
@@ -340,21 +340,21 @@ class VideoCassette(AVFormat, ABC):
             details['duration'] = self.duration
 
         if self.cassette_type is not None:
-            details['cassetteType'] = self.cassette_type
+            details['cassette_type'] = self.cassette_type
 
         if self.date_of_cassette is not None:
-            details['dateOfCassette'] = \
+            details['date_of_cassette'] = \
                 utils.serialize_precision_datetime(self.date_of_cassette, 3)
 
         if self.transfer_date is not None:
-            details['transferDate'] = \
+            details['transfer_date'] = \
                 utils.serialize_precision_datetime(self.transfer_date, 3)
 
         if self.inspection_date is not None:
-            details['inspectionDate'] = \
+            details['inspection_date'] = \
                 utils.serialize_precision_datetime(self.inspection_date, 3)
         if self.cassette_type is not None:
-            details['cassetteType'] = self.cassette_type.serialize()
+            details['cassette_type'] = self.cassette_type.serialize()
 
         return details
 

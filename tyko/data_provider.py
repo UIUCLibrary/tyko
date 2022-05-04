@@ -1793,16 +1793,17 @@ class VideoCassetteDataConnector(ItemDataConnector):
 
     def create_new_format_item(self, session, kwargs):
         metadata = kwargs.copy()
+        self.cleanup_nulls(metadata)
+
         format_type = \
             session.query(formats.FormatTypes).filter(
                 formats.FormatTypes.id == int(metadata.pop("format_id"))
             ).one()
 
         new_item = formats.VideoCassette(
-            name=metadata['name'],
+            name=metadata.pop('name'),
             format_type=format_type
         )
-        del metadata['name']
 
         if 'titleOfCassette' in metadata:
             new_item.title_of_cassette = metadata.pop('titleOfCassette')
@@ -1817,14 +1818,17 @@ class VideoCassetteDataConnector(ItemDataConnector):
                     3
                 )
 
-        if "inspectionDate" in metadata:
+        if "inspectionDate" in metadata and \
+                metadata['inspectionDate'].strip() != '':
             new_item.inspection_date = \
                 utils.create_precision_datetime(
                     metadata.pop('inspectionDate'),
                     3
                 )
 
-        if "transferDate" in metadata:
+        if "transferDate" in metadata and \
+                metadata['transferDate'].strip() != '':
+
             new_item.transfer_date = \
                 utils.create_precision_datetime(
                     metadata.pop('transferDate'),
@@ -1855,3 +1859,25 @@ class VideoCassetteDataConnector(ItemDataConnector):
             raise KeyError(f"Invalid data types: {list(metadata.keys())}")
 
         return new_item
+
+    @staticmethod
+    def cleanup_nulls(metadata):
+        fields = [
+            'dateOfCassette',
+            'inspectionDate',
+            'transferDate',
+            'generationId'
+        ]
+        for field in fields:
+            if field not in metadata:
+                continue
+            if metadata[field].strip() == '':
+                del metadata[field]
+
+
+def enum_getter(session, enum_name):
+    data_type = getattr(formats, enum_name)
+    return [
+        {"id": item.table_id, "name": item.name}
+        for item in session.query(data_type).all()
+    ]

@@ -960,3 +960,21 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         return {
             "types": types
         }
+
+
+def get_video_generations(db_session_maker):
+    session = db_session_maker()
+    try:
+        results = dp.enum_getter(session, "VideoCassetteGenerations")
+    finally:
+        session.close()
+    return jsonify(results)
+
+
+def get_video_cassette_type(db_session_maker):
+    session = db_session_maker()
+    try:
+        results = dp.enum_getter(session, "VideoCassetteType")
+    finally:
+        session.close()
+    return jsonify(results)

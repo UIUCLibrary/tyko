@@ -1,14 +1,14 @@
 <div class="mb-3 row">
-    <label for="videoCassetteTitleOfCassette" class="col-sm-2 col-form-label">Title of cassette</label>
+    <label for="videoCassetteTitleOfCassette" class="col-sm-2 col-form-label">Title of Cassette</label>
     <div class="col-sm-10">
-        <input type="text" id="videoCassetteTitleOfCassette" class="form-control" name="titleOfCassette">
+        <input type="text" id="videoCassetteTitleOfCassette" class="form-control" name="titleOfCassette" placeholder="Item name per finding aid or catalog record">
     </div>
 </div>
 
 <div class="mb-3 row">
     <label for="videoCassetteLabel" class="col-sm-2 col-form-label">Label</label>
     <div class="col-sm-10">
-        <input type="text" id="videoCassetteLabel" class="form-control" name="label">
+        <input type="text" id="videoCassetteLabel" class="form-control" name="label" placeholder="Transcription of information recorded on the side A label">
     </div>
 </div>
 
@@ -16,31 +16,17 @@
     <label for="videoCassetteDateOfCassette" class="col-sm-2 col-form-label">Date of cassette (M/D/YYYY)</label>
     <div class="col-sm-10">
         <div class="input-group">
-            <input type="text" id="videoCassetteDateOfCassette" class="form-control tyko-date-selector" name="dateOfCassette">
+            <input type="text" id="videoCassetteDateOfCassette" class="form-control tyko-date-selector" name="dateOfCassette" placeholder="The date of audio content (date of recording)">
             <button type="button" onclick="tyko.openDateSelect('videoCassetteDateOfCassette', 'mm-dd-yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
         </div>
     </div>
 </div>
 
 <div class="mb-3 row">
-    <label for="videoCassetteCassetteType" class="col-sm-2 col-form-label">cassette type</label>
+    <label for="videoCassetteCassetteType" class="col-sm-2 col-form-label">Cassette Type</label>
     <div class="col-sm-10">
-        <select class="form-select" name="cassetteTypeId" id="videoCassetteCassetteType">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option value="1">VHS</option>
-            <option value="2">3/4″ U-matic</option>
-            <option value="3">1″ Type C</option>
-            <option value="4">Betamax</option>
-            <option value="5">Betacam</option>
-            <option value="6">Betacam SP</option>
-            <option value="7">Digital Betacam</option>
-            <option value="8">Mini DV</option>
-            <option value="9">Dvcam</option>
-            <option value="10">DVCPro</option>
-            <option value="11">HDV</option>
-            <option value="12">Hi-8</option>
-            <option value="13">other</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('video_cassette_cassette_type') }}" name="cassetteTypeId" id="videoCassetteCassetteType">
+            <option disabled selected value=""></option>
         </select>
     </div>
 </div>
@@ -48,7 +34,7 @@
 <div class="mb-3 row">
     <label for="videoCassetteDuration" class="col-sm-2 col-form-label">Duration (HH:MM:SS)</label>
     <div class="col-sm-10">
-        <input type="text" id="videoCassetteDuration" class="form-control" name="duration">
+        <input type="text" id="videoCassetteDuration" class="form-control" name="duration" placeholder="How long the content runs">
     </div>
 </div>
 
@@ -57,7 +43,7 @@
     <label for="videoCassetteInspectionDate" class="col-sm-2 col-form-label">Inspection Date (M/D/YYYY)</label>
     <div class="col-sm-10">
         <div class="input-group">
-            <input type="text" id="videoCassetteInspectionDate" class="form-control tyko-date-selector" name="inspectionDate">
+            <input type="text" id="videoCassetteInspectionDate" class="form-control tyko-date-selector" name="inspectionDate" placeholder="Date of condition inspection">
             <button type="button" onclick="tyko.openDateSelect('videoCassetteInspectionDate', 'mm-dd-yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
         </div>
     </div>
@@ -66,23 +52,18 @@
 <div class="mb-3 row">
     <label for="videoCassetteGeneration" class="col-sm-2 col-form-label">Generation</label>
     <div class="col-sm-10">
-        <select class="form-select" name="generationId" id="videoCassetteGeneration">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option value="1">source (original)</option>
-            <option value="2">dub</option>
-            <option value="3">master</option>
-            <option value="4">commercial</option>
-            <option value="5">other</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('video_cassette_generations') }}" name="generationId" id="videoCassetteGeneration">
+            <option value=""></option>
         </select>
     </div>
 </div>
+
 
 <div class="mb-3 row">
     <label for="videoCassetteTransferDate" class="col-sm-2 col-form-label">Transfer Date (M/D/YYYY)</label>
     <div class="col-sm-10">
         <div class="input-group">
-            <input type="text" id="videoCassetteTransferDate" class="form-control tyko-date-selector" name="transferDate">
+            <input type="text" id="videoCassetteTransferDate" class="form-control tyko-date-selector" name="transferDate" placeholder="Date of digitization">
             <button type="button" onclick="tyko.openDateSelect('videoCassetteTransferDate', 'mm-dd-yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
         </div>
     </div>

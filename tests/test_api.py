@@ -1201,3 +1201,11 @@ def test_api_enum_put_id(endpoint, enum_data, name_key, server_with_enums):
     assert get_resp.status_code == 200, get_resp.status
     get_data = json.loads(get_resp.data)
     assert get_data[name_key] == enum_data[name_key]
+
+
+def test_api_video_cassette_generation(app):
+    with app.test_client() as server:
+        server.get('/')
+        response = server.get(url_for('video_cassette_generations'))
+        assert {'id': 2, 'name': 'dub'} in response.get_json()
+

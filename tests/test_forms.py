@@ -79,7 +79,7 @@ def dummy_object(app, project):
                     'name': 'video cassette'
                 },
                 "format_details": {
-                    'titleOfCassette': 'ssws',
+                    'title_of_cassette': 'ssws',
                     'label': 'This is a label',
                 }
             }
@@ -98,9 +98,9 @@ def dummy_object(app, project):
                     'name': 'video cassette'
                 },
                 "format_details": {
-                    'titleOfCassette': 'Title',
+                    'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'dateOfCassette': '12-03-2003',
+                    'date_of_cassette': '12-03-2003',
                 }
             }
         ),
@@ -119,9 +119,9 @@ def dummy_object(app, project):
                     'name': 'video cassette'
                 },
                 "format_details": {
-                    'titleOfCassette': 'Title',
+                    'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'dateOfCassette': '12-03-2003',
+                    'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
                 }
             }
@@ -142,11 +142,11 @@ def dummy_object(app, project):
                     'name': 'video cassette'
                 },
                 "format_details": {
-                    'titleOfCassette': 'Title',
+                    'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'dateOfCassette': '12-03-2003',
+                    'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspectionDate': '12-03-2003',
+                    'inspection_date': '12-03-2003',
                 }
             }
         ),
@@ -167,12 +167,12 @@ def dummy_object(app, project):
                     'name': 'video cassette'
                 },
                 "format_details": {
-                    'titleOfCassette': 'Title',
+                    'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'dateOfCassette': '12-03-2003',
+                    'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspectionDate': '12-03-2003',
-                    'transferDate': '12-03-2003',
+                    'inspection_date': '12-03-2003',
+                    'transfer_date': '12-03-2003',
                 }
             }
         ),
@@ -196,13 +196,13 @@ def dummy_object(app, project):
                     'name': 'video cassette'
                 },
                 "format_details": {
-                    'titleOfCassette': 'Title',
+                    'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'dateOfCassette': '12-03-2003',
+                    'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspectionDate': '12-03-2003',
-                    'transferDate': '12-03-2003',
-                    'cassetteType': {
+                    'inspection_date': '12-03-2003',
+                    'transfer_date': '12-03-2003',
+                    'cassette_type': {
                         "name": 'Betamax',
                         "id": formats.video_cassette_types.index('Betamax') + 1,
                     }
@@ -230,12 +230,12 @@ def dummy_object(app, project):
                     'name': 'video cassette'
                 },
                 "format_details": {
-                    'titleOfCassette': 'Title',
+                    'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'dateOfCassette': '12-03-2003',
+                    'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspectionDate': '12-03-2003',
-                    'transferDate': '12-03-2003',
+                    'inspection_date': '12-03-2003',
+                    'transfer_date': '12-03-2003',
                     'generation': {
                         'id': formats.video_cassette_generations.index(
                             'source (original)') + 1,
@@ -267,18 +267,18 @@ def dummy_object(app, project):
                     'name': 'video cassette'
                 },
                 "format_details": {
-                    'titleOfCassette': 'Title',
+                    'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'dateOfCassette': '12-03-2003',
+                    'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspectionDate': '12-03-2003',
-                    'transferDate': '12-03-2003',
+                    'inspection_date': '12-03-2003',
+                    'transfer_date': '12-03-2003',
                     'generation': {
                         'id': formats.video_cassette_generations.index(
                             'source (original)') + 1,
                         'name': 'source (original)',
                     },
-                    'cassetteType': {
+                    'cassette_type': {
                         "name": 'Betamax',
                         "id": formats.video_cassette_types.index('Betamax') + 1,
                     }
