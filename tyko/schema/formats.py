@@ -135,9 +135,6 @@ class OpenReel(AVFormat):
     track_duration = db.Column("track_duration", db.Text)
     generation = db.Column("generation", db.Text)
 
-    # object = relationship("CollectionObject",
-    #                       back_populates="open_reels")
-
     def format_details(self) -> Mapping[str, SerializedData]:
         return {
             "date_recorded": utils.serialize_precision_datetime(
@@ -167,9 +164,6 @@ class Film(AVFormat, ABC):
 
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.FK_TABLE_ID),
                          primary_key=True)
-
-    # object = relationship("CollectionObject",
-    #                       back_populates="films")
 
     date_of_film = db.Column("date_of_film", db.Date)
     can_label = db.Column("can_label", db.Text)
@@ -217,9 +211,6 @@ class GroovedDisc(AVFormat, ABC):
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.FK_TABLE_ID),
                          primary_key=True)
 
-    # object = relationship("CollectionObject",
-    #                       back_populates="groove_disks")
-
     # This is a year
     date_recorded = db.Column("date_recorded", db.Integer)
     side = db.Column("side", db.Text)
@@ -248,9 +239,6 @@ class AudioVideo(AVFormat):
     __mapper_args__ = {'polymorphic_identity': 'audio_video'}
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.table_id),
                          primary_key=True)
-
-    # object = relationship("CollectionObject",
-    #                       back_populates="audio_videos")
 
     av_date_recorded = db.Column("date_recorded", db.Date)
     side = db.Column("side", db.Text)
@@ -313,10 +301,6 @@ class VideoCassette(AVFormat, ABC):
 
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.table_id),
                          primary_key=True)
-    #
-    # object = relationship("CollectionObject",
-    #                       # backref="video_cassettes")
-    #                       back_populates="video_cassettes")
 
     title_of_cassette = db.Column("title_of_cassette", db.Text)
     label = db.Column("label", db.Text)
@@ -381,9 +365,6 @@ class AudioCassette(AVFormat):
 
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.table_id),
                          primary_key=True)
-    #
-    # object = relationship("CollectionObject",
-    #                       back_populates="audio_cassettes")
 
     cassette_format_type_id = db.Column(
         db.Integer,
@@ -484,9 +465,6 @@ class CollectionItem(AVFormat):
     __mapper_args__ = {'polymorphic_identity': 'items'}
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.table_id),
                          primary_key=True)
-    #
-    # object = relationship("CollectionObject",
-    #                       back_populates="collection_items")
 
     def format_details(self) -> Mapping[str, SerializedData]:
         return {}
