@@ -345,6 +345,15 @@ class Routes:
                 )
             )
 
+            self.app.add_url_rule(
+                "/api/formats/optical/optical_types",
+                endpoint='optical_optical_types',
+                view_func=lambda: middleware.get_enums(
+                    self.db_engine.db_session_maker,
+                    "OpticalType"
+                )
+            )
+
             for url_rule in self.get_api_routes():
                 self.app.logger.debug(f"Loading rule {url_rule.rule}")
                 self.app.add_url_rule(
