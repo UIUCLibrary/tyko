@@ -1,23 +1,9 @@
 import json
 
 import pytest
-import tyko
 from tyko.schema.formats import format_types
 from tyko.schema import formats
-from flask import Flask, url_for
-from flask_sqlalchemy import SQLAlchemy
-
-@pytest.fixture()
-def app():
-    testing_app = Flask(__name__, template_folder="../tyko/templates")
-    testing_app.config["TESTING"] = True
-    testing_app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
-    testing_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db = SQLAlchemy(testing_app)
-    tyko.create_app(testing_app, verify_db=False)
-    tyko.database.init_database(db.engine)
-
-    return testing_app
+from flask import url_for
 
 
 @pytest.fixture()
@@ -33,6 +19,9 @@ def project(app):
             ),
             content_type='application/json'
         ).get_json()
+
+def namer(*args, **kwargs):
+    return str(args[0])
 
 @pytest.fixture()
 def dummy_object(app, project):
@@ -55,6 +44,7 @@ def dummy_object(app, project):
     "post_data, expected_data",
     [
         (
+            # "format: video cassette",
             {
                 "name": "Dummy",
                 "format_id": format_types['video cassette'][0]
@@ -85,6 +75,7 @@ def dummy_object(app, project):
             }
         ),
         (
+            # "format: video cassette",
             {
                 "name": "Dummy3",
                 "format_id": format_types['video cassette'][0],
@@ -105,6 +96,7 @@ def dummy_object(app, project):
             }
         ),
         (
+            # "format: video cassette Duration",
             {
                 "name": "DummyDuration",
                 "format_id": format_types['video cassette'][0],
@@ -146,8 +138,8 @@ def dummy_object(app, project):
                     'label': 'This is a label',
                     'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspection_date': '12-03-2003',
-                }
+                },
+                'inspection_date': '12-03-2003',
             }
         ),
         (
@@ -171,9 +163,9 @@ def dummy_object(app, project):
                     'label': 'This is a label',
                     'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspection_date': '12-03-2003',
-                    'transfer_date': '12-03-2003',
-                }
+                },
+                'inspection_date': '12-03-2003',
+                'transfer_date': '12-03-2003',
             }
         ),
         (
@@ -200,13 +192,13 @@ def dummy_object(app, project):
                     'label': 'This is a label',
                     'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspection_date': '12-03-2003',
-                    'transfer_date': '12-03-2003',
                     'cassette_type': {
                         "name": 'Betamax',
                         "id": formats.video_cassette_types.index('Betamax') + 1,
-                    }
-                }
+                    },
+                },
+                'inspection_date': '12-03-2003',
+                'transfer_date': '12-03-2003',
             }
         ),
         (
@@ -234,14 +226,14 @@ def dummy_object(app, project):
                     'label': 'This is a label',
                     'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspection_date': '12-03-2003',
-                    'transfer_date': '12-03-2003',
                     'generation': {
                         'id': formats.video_cassette_generations.index(
                             'source (original)') + 1,
                         'name': 'source (original)',
                     }
-                }
+                },
+                'inspection_date': '12-03-2003',
+                'transfer_date': '12-03-2003',
             }
         ),
         (
@@ -271,8 +263,6 @@ def dummy_object(app, project):
                     'label': 'This is a label',
                     'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
-                    'inspection_date': '12-03-2003',
-                    'transfer_date': '12-03-2003',
                     'generation': {
                         'id': formats.video_cassette_generations.index(
                             'source (original)') + 1,
@@ -282,11 +272,96 @@ def dummy_object(app, project):
                         "name": 'Betamax',
                         "id": formats.video_cassette_types.index('Betamax') + 1,
                     }
+                },
+                'inspection_date': '12-03-2003',
+                'transfer_date': '12-03-2003',
+            }
+        ),
+        (
+            {
+                'name': 'simple optical',
+                'format_id': '8',
+                'opticalTitleOfItem': 'dfgs',
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'optical'
+                },
+                "format_details": {
+                    'title_of_item': 'dfgs',
                 }
             }
         ),
-
-    ]
+        (
+            {
+                'name': 'duration',
+                'format_id': '8',
+                'opticalTitleOfItem': 'dfgs',
+                'opticalDuration': '01:55:01',
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'optical'
+                },
+                "format_details": {
+                    'title_of_item': 'dfgs',
+                    'duration': '01:55:01',
+                }
+            }
+        ),
+        (
+            {
+                'name': 'optical type',
+                'format_id': '8',
+                'opticalTypeId': formats.optical_types.index('CD') + 1,
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'optical'
+                },
+                "format_details": {
+                    'type': {
+                        "name": 'CD',
+                        "id": formats.optical_types.index('CD') + 1,
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'sdfgsdfgsdg',
+                'format_id': '8',
+                'opticalTitleOfItem': 'dfgs',
+                'opticalLabel': 'ggg',
+                'opticalDateOfItem': '05-23-2022',
+                'opticalTypeId': formats.optical_types.index('CD') + 1,
+                'opticalDuration': '01:55:01',
+                'inspectionDate': '05-26-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'optical'
+                },
+                "format_details": {
+                    'title_of_item': 'dfgs',
+                    'label': 'ggg',
+                    'date_of_item': '05-23-2022',
+                    'type': {
+                        "name": 'CD',
+                        "id": formats.optical_types.index('CD') + 1,
+                    },
+                    'duration': '01:55:01',
+                },
+                'inspection_date': '05-26-2022',
+                'transfer_date': '05-18-2022'
+            }
+        )
+    ], ids=lambda *args: str(args[0].get('name', str(args[0])))
 )
 def test_create_new_video_cassette(
         app,
@@ -331,4 +406,3 @@ def test_create_new_video_cassette(
                 ), f"expected: {dict(value.items())}. Got: {item[key]}"
             else:
                 assert item[key] == value
-

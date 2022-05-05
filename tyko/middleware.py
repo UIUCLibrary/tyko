@@ -962,19 +962,10 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         }
 
 
-def get_video_generations(db_session_maker):
-    session = db_session_maker()
+def get_enums(session_maker, enum_type: str):
+    session = session_maker()
     try:
-        results = dp.enum_getter(session, "VideoCassetteGenerations")
-    finally:
-        session.close()
-    return jsonify(results)
-
-
-def get_video_cassette_type(db_session_maker):
-    session = db_session_maker()
-    try:
-        results = dp.enum_getter(session, "VideoCassetteType")
+        results = dp.enum_getter(session, enum_type)
     finally:
         session.close()
     return jsonify(results)

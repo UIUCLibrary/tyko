@@ -1006,4 +1006,4 @@ def audio_cassette_inspection_date(
     assert isinstance(cassette, schema.AudioCassette)
     cassette_date = cassette.serialize()
     assert \
-        cassette_date['format_details']['inspection_date'] == inspection_date
+        cassette_date['inspection_date'] == inspection_date

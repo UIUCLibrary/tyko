@@ -619,7 +619,9 @@ class ObjectDataConnector(AbsNotesConnector):
 
             connectors = {
                 formats.format_types['video cassette'][0]:
-                    VideoCassetteDataConnector
+                    VideoCassetteDataConnector,
+                formats.format_types['optical'][0]:
+                    OpticalDataConnector,
             }
             connector = connectors.get(
                 int(data['format_id']),
@@ -870,6 +872,13 @@ class FilesDataConnector(AbsDataProviderConnector):
             session.close()
 
 
+def strip_empty_strings(data):
+    for key, value in data.items():
+        if value == '':
+            data[key] = None
+    return data
+
+
 class ItemDataConnector(AbsNotesConnector):
 
     @staticmethod
@@ -966,14 +975,14 @@ class ItemDataConnector(AbsNotesConnector):
         finally:
             session.close()
 
-    def create_new_format_item(self, session, kwargs):
-        format_id = int(kwargs["format_id"])
+    def create_new_format_item(self, session, format_data):
+        format_id = int(format_data["format_id"])
 
         format_type = session.query(formats.FormatTypes) \
             .filter(formats.FormatTypes.id == format_id).one()
 
         new_item = CollectionItem(
-            name=kwargs['name'],
+            name=format_data['name'],
             format_type=format_type
         )
         return new_item
@@ -981,8 +990,25 @@ class ItemDataConnector(AbsNotesConnector):
     def create(self, *args, **kwargs):
         session = self.session_maker()
         try:
-            new_item = self.create_new_format_item(session, kwargs)
+            format_data = kwargs.copy()
+            strip_empty_strings(format_data)
+            transfer_date = format_data.pop('transferDate', None)
+            inspection_date = format_data.pop('inspectionDate', None)
 
+            new_item = self.create_new_format_item(session, format_data)
+
+            if transfer_date:
+                new_item.transfer_date = \
+                    utils.create_precision_datetime(
+                        transfer_date,
+                        3
+                    )
+            if inspection_date:
+                new_item.inspection_date = \
+                    utils.create_precision_datetime(
+                        inspection_date,
+                        3
+                    )
             for instance_file in kwargs.get("files", []):
                 new_file = InstantiationFile(file_name=instance_file['name'])
 
@@ -1177,18 +1203,26 @@ class ItemDataConnector(AbsNotesConnector):
         return new_file
 
 
-class AudioCassetteDataConnector(ItemDataConnector):
+class FormatConnector(ItemDataConnector):
+    @staticmethod
+    def get_format_type(session, format_id: int):
+        return session.query(formats.FormatTypes) \
+            .filter(formats.FormatTypes.id == format_id).one()
 
-    def create_new_format_item(self, session, kwargs):
 
-        format_type = session.query(formats.FormatTypes) \
-            .filter(formats.FormatTypes.id == int(kwargs["format_id"])).one()
+class AudioCassetteDataConnector(FormatConnector):
+
+    def create_new_format_item(self, session, format_data):
+
+        format_type = self.get_format_type(
+            session, int(format_data["format_id"])
+        )
 
         new_cassette = AudioCassette(
-            name=kwargs['name'],
+            name=format_data['name'],
             format_type=format_type
         )
-        format_details = kwargs['format_details']
+        format_details = format_data['format_details']
         self._add_optional_args(new_cassette, **format_details)
         return new_cassette
 
@@ -1789,75 +1823,90 @@ class CassetteTapeThicknessConnector(EnumConnector):
             session.close()
 
 
-class VideoCassetteDataConnector(ItemDataConnector):
+def verify_unused_params(func):
+    def wrapper(connector, session, values):
+        metadata = values.copy()
+        result = func(connector, session, metadata)
+        if metadata:
+            raise KeyError(f"Invalid data types: {list(metadata.keys())}")
 
-    def create_new_format_item(self, session, kwargs):
-        metadata = kwargs.copy()
-        self.cleanup_nulls(metadata)
+        return result
 
-        format_type = \
-            session.query(formats.FormatTypes).filter(
-                formats.FormatTypes.id == int(metadata.pop("format_id"))
-            ).one()
+    return wrapper
 
-        new_item = formats.VideoCassette(
-            name=metadata.pop('name'),
-            format_type=format_type
+
+class OpticalDataConnector(FormatConnector):
+    @verify_unused_params
+    def create_new_format_item(self, session, format_data) -> AVFormat:
+        new_item = formats.Optical(
+            name=format_data.pop('name'),
+            format_type=self.get_format_type(
+                session, int(format_data.pop("format_id"))
+            )
         )
 
-        if 'titleOfCassette' in metadata:
-            new_item.title_of_cassette = metadata.pop('titleOfCassette')
+        new_item.title_of_item = format_data.pop('opticalTitleOfItem', None)
 
-        if 'label' in metadata:
-            new_item.label = metadata.pop('label')
+        new_item.label = format_data.pop('opticalLabel', None)
 
-        if "dateOfCassette" in metadata:
+        date_of_item = format_data.pop('opticalDateOfItem', None)
+        if date_of_item:
+            new_item.date_of_item = \
+                utils.create_precision_datetime(date_of_item, 3)
+
+        new_item.duration = format_data.pop('opticalDuration', None)
+
+        optical_type_id = format_data.pop('opticalTypeId', None)
+        if optical_type_id:
+            new_item.optical_type = \
+                session.query(formats.OpticalType).filter(
+                    formats.OpticalType.table_id == int(
+                        optical_type_id
+                    )
+                ).one()
+        return new_item
+
+
+class VideoCassetteDataConnector(FormatConnector):
+    @verify_unused_params
+    def create_new_format_item(self, session, format_data):
+        self.cleanup_nulls(format_data)
+        new_item = formats.VideoCassette(
+            name=format_data.pop('name'),
+            format_type=self.get_format_type(
+                session, int(format_data.pop("format_id"))
+            )
+        )
+
+        new_item.title_of_cassette = format_data.pop('titleOfCassette', None)
+
+        new_item.label = format_data.pop('label' , None)
+
+        if "dateOfCassette" in format_data:
             new_item.date_of_cassette = \
                 utils.create_precision_datetime(
-                    metadata.pop('dateOfCassette'),
+                    format_data.pop('dateOfCassette'),
                     3
                 )
 
-        if "inspectionDate" in metadata and \
-                metadata['inspectionDate'].strip() != '':
-            new_item.inspection_date = \
-                utils.create_precision_datetime(
-                    metadata.pop('inspectionDate'),
-                    3
-                )
+        new_item.duration = format_data.pop('duration', None)
 
-        if "transferDate" in metadata and \
-                metadata['transferDate'].strip() != '':
-
-            new_item.transfer_date = \
-                utils.create_precision_datetime(
-                    metadata.pop('transferDate'),
-                    3
-                )
-
-        if "duration" in metadata:
-            new_item.duration = metadata.pop('duration')
-
-        if "cassetteTypeId" in metadata:
+        if "cassetteTypeId" in format_data:
             cassette_type = session.query(formats.VideoCassetteType).filter(
-                formats.VideoCassetteType.table_id == metadata.pop(
+                formats.VideoCassetteType.table_id == format_data.pop(
                     'cassetteTypeId'
                 )
             ).one()
             new_item.cassette_type = cassette_type
 
-        if 'generationId' in metadata:
+        if 'generationId' in format_data:
             generation = \
                 session.query(formats.VideoCassetteGenerations).filter(
                     formats.VideoCassetteGenerations.table_id == int(
-                        metadata.pop('generationId')
+                        format_data.pop('generationId')
                     )
                 ).one()
             new_item.generation = generation
-
-        if metadata:
-            raise KeyError(f"Invalid data types: {list(metadata.keys())}")
-
         return new_item
 
     @staticmethod

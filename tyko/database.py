@@ -45,6 +45,22 @@ def _create_sample_collection(session):
     session.add(new_collection)
 
 
+def _populate_optical_types_table(session):
+    print("Populating optical types Table")
+    for new_type_name in formats.optical_types:
+        new_type = formats.OpticalType()
+        new_type.name = new_type_name
+        session.add(new_type)
+
+
+def create_samples(engine: sqlalchemy.engine.Engine):
+    session_maker = sessionmaker(bind=engine)
+    session: sqlalchemy.orm.Session = session_maker()
+    _create_sample_collection(session)
+    session.commit()
+    session.close()
+
+
 def init_database(engine: sqlalchemy.engine.Engine) -> None:
     # if engine.dialect.has_table(engine, "audio_video"):
     #     return
@@ -75,11 +91,12 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
     _populate_format_types_table(session)
 
     _populate_video_cassette_types_table(session)
+    _populate_optical_types_table(session)
     _populate_video_cassette_generations_table(session)
 
     _populate_starting_project_status(
         session, project_status_table=projects.ProjectStatus)
-    # _create_sample_collection(session)
+
     session.commit()
     session.close()
 

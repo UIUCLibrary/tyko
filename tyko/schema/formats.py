@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from tyko.schema.instantiation import InstantiationFile  # noqa: F401
     from tyko.schema.notes import Note  # noqa: F401
 
-
 item_has_notes_table = db.Table(
     "item_has_notes",
     AVTables.metadata,
@@ -55,6 +54,9 @@ class AVFormat(AVTables, abc.ABC):
     format_type_id = db.Column(db.Integer,
                                db.ForeignKey("format_types.format_id"))
 
+    transfer_date = db.Column("transfer_date", db.Date)
+    inspection_date = db.Column("inspection_date", db.Date)
+
     format_type = relationship("FormatTypes", foreign_keys=[format_type_id])
     files = relationship("InstantiationFile", backref="file_source")
     treatment = relationship("Treatment", backref="treatment_id")
@@ -86,13 +88,27 @@ class AVFormat(AVTables, abc.ABC):
             "obj_sequence": self.obj_sequence,
             "notes": [note.serialize() for note in self._iter_notes()]
         }
+
         try:
             data["format"] = self.format_type.serialize()
             data["format_id"] = self.format_type_id
         except AttributeError:
             data["format"] = None
             data["format_id"] = None
+
         data['format_details'] = self.format_details()
+
+        data["inspection_date"] = \
+            utils.serialize_precision_datetime(
+                self.inspection_date
+            ) if self.inspection_date is not None else None
+
+        data['transfer_date'] = \
+            utils.serialize_precision_datetime(
+                self.transfer_date,
+                3
+            ) if self.transfer_date is not None else None
+
         return data
 
 
@@ -156,7 +172,6 @@ class OpenReel(AVFormat):
 
 
 class Film(AVFormat, ABC):
-
     __tablename__ = "films"
     __mapper_args__ = {
         'polymorphic_identity': 'films'
@@ -258,41 +273,64 @@ class AudioVideo(AVFormat):
         }
 
 
+class EnumTable(AVTables):
+    __abstract__ = True
+    table_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    name = db.Column("name", db.Text)
+
+    def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
+        return {
+            "name": self.name,
+            "id": self.table_id
+        }
+
+
+class OpticalType(EnumTable):
+    __tablename__ = 'optical_optical_types'
+
+
 class Optical(AVFormat, ABC):
     __tablename__ = 'optical'
     __mapper_args__ = {'polymorphic_identity': 'optical'}
 
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.FK_TABLE_ID),
                          primary_key=True)
+    title_of_item = db.Column("title_of_cassette", db.Text)
+
+    label = db.Column("label", db.Text)
+    date_of_item = db.Column("date_of_item", db.Date)
+
+    optical_type_id = db.Column(
+        db.Integer,
+        db.ForeignKey("optical_optical_types.table_id")
+    )
+
+    optical_type = relationship("OpticalType")
+
+    duration = db.Column("duration", db.Text)
 
     def format_details(self) -> Mapping[str, SerializedData]:
-        return {
-
+        details = {
+            'title_of_item': self.title_of_item,
+            'label': self.label,
+            'type':
+                self.optical_type.serialize()
+                if self.optical_type is not None else None,
+            'duration': self.duration
         }
 
+        if self.date_of_item:
+            details['date_of_item'] = \
+                utils.serialize_precision_datetime(self.date_of_item, 3)
+        return details
 
-class VideoCassetteGenerations(AVTables):
+
+class VideoCassetteGenerations(EnumTable):
     __tablename__ = 'video_cassette_generations'
-    table_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column("name", db.Text)
-
-    def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
-        return {
-            "name": self.name,
-            "id": self.table_id
-        }
 
 
-class VideoCassetteType(AVTables):
+class VideoCassetteType(EnumTable):
     __tablename__ = 'video_cassette_cassette_types'
-    table_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column("name", db.Text)
-
-    def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
-        return {
-            "name": self.name,
-            "id": self.table_id
-        }
 
 
 class VideoCassette(AVFormat, ABC):
@@ -314,7 +352,6 @@ class VideoCassette(AVFormat, ABC):
     cassette_type = relationship("VideoCassetteType")
 
     duration = db.Column("duration", db.Text)
-    inspection_date = db.Column("inspection_date", db.Date)
 
     generation_id = \
         db.Column(
@@ -322,8 +359,6 @@ class VideoCassette(AVFormat, ABC):
             db.ForeignKey("video_cassette_generations.table_id")
         )
     generation = relationship('VideoCassetteGenerations')
-
-    transfer_date = db.Column("transfer_date", db.Date)
 
     def format_details(self) -> Mapping[str, SerializedData]:
         details = {
@@ -346,13 +381,6 @@ class VideoCassette(AVFormat, ABC):
             details['date_of_cassette'] = \
                 utils.serialize_precision_datetime(self.date_of_cassette, 3)
 
-        if self.transfer_date is not None:
-            details['transfer_date'] = \
-                utils.serialize_precision_datetime(self.transfer_date, 3)
-
-        if self.inspection_date is not None:
-            details['inspection_date'] = \
-                utils.serialize_precision_datetime(self.inspection_date, 3)
         if self.cassette_type is not None:
             details['cassette_type'] = self.cassette_type.serialize()
 
@@ -384,7 +412,6 @@ class AudioCassette(AVFormat):
 
     tape_thickness = relationship("CassetteTapeThickness")
 
-    inspection_date = db.Column("inspection_date", db.Date)
     recording_date = db.Column("recording_date", db.Date)
     recording_date_precision = db.Column("recording_date_precision",
                                          db.Integer, default=3)
@@ -434,10 +461,6 @@ class AudioCassette(AVFormat):
     def format_details(self) -> Mapping[str, SerializedData]:
 
         serialized_data = {
-            "inspection_date":
-                utils.serialize_precision_datetime(
-                    self.inspection_date)
-                if self.inspection_date is not None else None,
             "date_recorded":
                 utils.serialize_precision_datetime(
                     self.recording_date,
@@ -469,31 +492,16 @@ class CollectionItem(AVFormat):
     def format_details(self) -> Mapping[str, SerializedData]:
         return {}
 
+
 # ############################ End of AV Formats ##############################
 
 
-class CassetteType(AVTables):
+class CassetteType(EnumTable):
     __tablename__ = "cassette_types"
-    table_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column("name", db.Text)
-
-    def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
-        return {
-            "name": self.name,
-            "id": self.table_id
-        }
 
 
-class CassetteTapeType(AVTables):
+class CassetteTapeType(EnumTable):
     __tablename__ = "cassette_tape_types"
-    table_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column("name", db.Text)
-
-    def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
-        return {
-            "name": self.name,
-            "id": self.table_id
-        }
 
 
 class CassetteTapeThickness(AVTables):
@@ -516,7 +524,6 @@ item_has_contacts_table = db.Table(
     db.Column("contact_id", db.Integer, db.ForeignKey("formats.item_id")),
     db.Column("item_id", db.Integer, db.ForeignKey("contact.contact_id"))
 )
-
 
 # =============================================================================
 # Enumerated tables
@@ -560,6 +567,8 @@ video_cassette_types = [
     'Hi-8',
     'other',
 ]
+
+optical_types = ['DVD', 'CD']
 
 video_cassette_generations = [
     'source (original)',

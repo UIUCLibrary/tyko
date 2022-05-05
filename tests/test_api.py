@@ -1018,7 +1018,7 @@ def test_create_add_and_remove_cassette(date, server_with_enums):
     assert cassette_type['name'] == "compact cassette"
 
     assert format_details['date_recorded'] == date
-    assert format_details['inspection_date'] == "12-10-2019"
+    assert new_item_get_data['inspection_date'] == "12-10-2019"
 
     assert format_details['tape_thickness']['id'] == \
            data['tape_thicknesses'][0]['id']
@@ -1092,7 +1092,6 @@ def test_create_and_remove_cassette_with_notes(server_with_enums):
 
 cassette_data = [
     ("date_recorded", lambda x: x["date_recorded"], "1993"),
-    ("inspection_date", lambda x: x["inspection_date"], "04-12-2019"),
     ("format_type_id", lambda x: x['cassette_type']["id"], 2),
     ("tape_thickness_id", lambda x: x['tape_thickness']["id"], 2),
     ("tape_type_id", lambda x: x['tape_type']["id"], 2),
