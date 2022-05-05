@@ -106,7 +106,7 @@ class FormatTypes(AVTables):
 
     def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
         return {
-            "format_types_id": self.id,
+            "id": self.id,
             "name": self.name
         }
 

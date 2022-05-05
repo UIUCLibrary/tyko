@@ -247,7 +247,7 @@ def server_with_cassette(server_with_enums):
         data=json.dumps({
             "name": "dummy",
             "format_id":
-                data['format_types']['audio cassette']["format_types_id"],
+                data['format_types']['audio cassette']["id"],
             "format_details": {
                 "format_type_id":
                     data['cassette_tape_formats']['compact cassette']['id'],

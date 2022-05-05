@@ -18,31 +18,31 @@ const sampleNotesData = `
 
 const sampleFormatData = `[
   {
-    "format_types_id": 1,
+    "id": 1,
     "name": "audio video"
   },
   {
-    "format_types_id": 2,
+    "id": 2,
     "name": "audio"
   },
   {
-    "format_types_id": 3,
+    "id": 3,
     "name": "video"
   },
   {
-    "format_types_id": 4,
+    "id": 4,
     "name": "open reel"
   },
   {
-    "format_types_id": 5,
+    "id": 5,
     "name": "grooved disc"
   },
   {
-    "format_types_id": 6,
+    "id": 6,
     "name": "film"
   },
   {
-    "format_types_id": 7,
+    "id": 7,
     "name": "cassette tape"
   }
 ]`;

@@ -626,7 +626,7 @@ def test_add_and_delete_item_to_object(server_with_object):
     server, data = server_with_object
     formats = dict()
     for format_type in server.get(url_for("formats")).get_json():
-        formats[format_type['name']] = format_type['format_types_id']
+        formats[format_type['name']] = format_type['id']
 
     test_project_url = url_for("projects")
     test_project = \
@@ -991,7 +991,7 @@ def test_create_add_and_remove_cassette(date, server_with_enums):
         data=json.dumps({
             "name": "dummy",
             "format_id":
-                data['format_types']['audio cassette']["format_types_id"],
+                data['format_types']['audio cassette']["id"],
             "format_details": {
                 "format_type_id":
                     data['cassette_tape_formats']['compact cassette']['id'],
@@ -1045,7 +1045,7 @@ def test_create_and_remove_cassette_with_notes(server_with_enums):
         data=json.dumps({
             "name": "dummy",
             "format_id":
-                data['format_types']['audio cassette']["format_types_id"],
+                data['format_types']['audio cassette']["id"],
             "format_details": {
                 "format_type_id":
                     data['cassette_tape_formats']['compact cassette']['id'],
