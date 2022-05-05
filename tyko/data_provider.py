@@ -1880,7 +1880,7 @@ class VideoCassetteDataConnector(FormatConnector):
 
         new_item.title_of_cassette = format_data.pop('titleOfCassette', None)
 
-        new_item.label = format_data.pop('label' , None)
+        new_item.label = format_data.pop('label', None)
 
         if "dateOfCassette" in format_data:
             new_item.date_of_cassette = \
