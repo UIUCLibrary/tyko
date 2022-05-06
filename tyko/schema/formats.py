@@ -343,6 +343,8 @@ class EnumTable(AVTables):
     table_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column("name", db.Text)
 
+    default_values = []
+
     def serialize(self, recurse=False) -> Mapping[str, SerializedData]:
         return {
             "name": self.name,
@@ -352,6 +354,7 @@ class EnumTable(AVTables):
 
 class OpticalType(EnumTable):
     __tablename__ = 'optical_optical_types'
+    default_values = ['DVD', 'CD']
 
 
 class Optical(AVFormat, ABC):
@@ -392,10 +395,32 @@ class Optical(AVFormat, ABC):
 
 class VideoCassetteGenerations(EnumTable):
     __tablename__ = 'video_cassette_generations'
+    default_values = [
+        'source (original)',
+        'dub',
+        'master',
+        'commercial',
+        'other'
+    ]
 
 
 class VideoCassetteType(EnumTable):
     __tablename__ = 'video_cassette_cassette_types'
+    default_values = [
+        'VHS',
+        '3/4″ U-matic',
+        '1″ Type C',
+        'Betamax',
+        'Betacam',
+        'Betacam SP',
+        'Digital Betacam',
+        'Mini DV',
+        'Dvcam',
+        'DVCPro',
+        'HDV',
+        'Hi-8',
+        'other',
+    ]
 
 
 class VideoCassette(AVFormat, ABC):
@@ -585,38 +610,59 @@ class CassetteTapeThickness(AVTables):
 
 class OpenReelSubType(EnumTable):
     __tablename__ = "open_reel_sub_type"
+    default_values = ["Video", "Audio"]
 
 
 class OpenReelReelWidth(EnumTable):
     __tablename__ = "open_reel_reel_width"
+    default_values = ["1/4", "1/2", "1", "2"]
 
 
 class OpenReelReelDiameter(EnumTable):
     __tablename__ = "open_reel_reel_diameter"
+    default_values = ["5", "7", "10.5"]
 
 
 class OpenReelReelThickness(EnumTable):
     __tablename__ = "open_reel_reel_thickness"
+    default_values = ["0.5", "1.0", "1.5"]
 
 
 class OpenReelBase(EnumTable):
     __tablename__ = "open_reel_base"
+    default_values = ["Acetate", "Polyester"]
 
 
 class OpenReelSpeed(EnumTable):
     __tablename__ = "open_reel_reel_speed"
+    default_values = ["1 7/8", "3 3/4", "7 1/2", "15"]
 
 
 class OpenReelTrackConfiguration(EnumTable):
     __tablename__ = "open_reel_track_configuration"
+    default_values = [
+        "full track",
+        "1/4 track mono",
+        "1/4 stereo",
+        "1/2 track mono",
+        "1/2 track stereo"
+    ]
 
 
 class OpenReelGeneration(EnumTable):
     __tablename__ = "open_reel_generation"
+    default_values = [
+        "source (original)",
+        "dub",
+        "master",
+        "commercial",
+        "other"
+    ]
 
 
 class OpenReelReelWind(EnumTable):
     __tablename__ = "open_reel_wind"
+    default_values = ["Heads out", "Tails out"]
 
 
 item_has_contacts_table = db.Table(
@@ -652,60 +698,3 @@ format_types = {
     "optical": (8, Optical),
     "video cassette": (9, VideoCassette),
 }
-
-# todo: put these in enum table classes
-video_cassette_types = [
-    'VHS',
-    '3/4″ U-matic',
-    '1″ Type C',
-    'Betamax',
-    'Betacam',
-    'Betacam SP',
-    'Digital Betacam',
-    'Mini DV',
-    'Dvcam',
-    'DVCPro',
-    'HDV',
-    'Hi-8',
-    'other',
-]
-
-optical_types = ['DVD', 'CD']
-
-video_cassette_generations = [
-    'source (original)',
-    'dub',
-    'master',
-    'commercial',
-    'other'
-]
-
-open_reel_sub_type = ["Video", "Audio"]
-
-open_reel_reel_width = ["1/4", "1/2", "1", "2"]
-
-open_reel_reel_diameter = ["5", "7", "10.5"]
-
-open_reel_reel_thickness = ["0.5", "1.0", "1.5"]
-
-open_reel_base = ["Acetate", "Polyester"]
-
-open_reel_wind = ["Heads out", "Tails out"]
-
-open_reel_reel_speed = ["1 7/8", "3 3/4", "7 1/2", "15"]
-
-open_reel_track_configuration = [
-    "full track",
-    "1/4 track mono",
-    "1/4 stereo",
-    "1/2 track mono",
-    "1/2 track stereo"
-]
-
-open_reel_generation = [
-    "source (original)",
-    "dub",
-    "master",
-    "commercial",
-    "other"
-]

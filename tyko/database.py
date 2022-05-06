@@ -24,7 +24,7 @@ def alembic_table_exists(engine) -> bool:
 
 def _populate_video_cassette_generations_table(session):
     print("Populating video generations types Table")
-    for generation in formats.video_cassette_generations:
+    for generation in formats.VideoCassetteGenerations.default_values:
         new_type = formats.VideoCassetteGenerations()
         new_type.name = generation
         session.add(new_type)
@@ -32,7 +32,7 @@ def _populate_video_cassette_generations_table(session):
 
 def _populate_video_cassette_types_table(session):
     print("Populating video cassette types Table")
-    for cassette_type in formats.video_cassette_types:
+    for cassette_type in formats.VideoCassetteType.default_values:
         new_type = formats.VideoCassetteType()
         new_type.name = cassette_type
         session.add(new_type)
@@ -47,7 +47,7 @@ def _create_sample_collection(session):
 
 def _populate_optical_types_table(session):
     print("Populating optical types Table")
-    for new_type_name in formats.optical_types:
+    for new_type_name in formats.OpticalType.default_values:
         new_type = formats.OpticalType()
         new_type.name = new_type_name
         session.add(new_type)
@@ -57,55 +57,55 @@ def _populate_open_reel_enum_tables(session):
     print("Populating open reel tables")
 
     print("Populating open reel subtypes table")
-    for new_type_name in formats.open_reel_sub_type:
+    for new_type_name in formats.OpenReelSubType.default_values:
         new_type = formats.OpenReelSubType()
         new_type.name = new_type_name
         session.add(new_type)
 
     print("Populating open reel reel width table")
-    for new_type_name in formats.open_reel_reel_width:
+    for new_type_name in formats.OpenReelReelWidth.default_values:
         new_type = formats.OpenReelReelWidth()
         new_type.name = new_type_name
         session.add(new_type)
 
     print("Populating open reel reel diameter table")
-    for new_type_name in formats.open_reel_reel_diameter:
+    for new_type_name in formats.OpenReelReelDiameter.default_values:
         new_type = formats.OpenReelReelDiameter()
         new_type.name = new_type_name
         session.add(new_type)
 
     print("Populating open reel reel thickness table")
-    for new_type_name in formats.open_reel_reel_thickness:
+    for new_type_name in formats.OpenReelReelThickness.default_values:
         new_type = formats.OpenReelReelThickness()
         new_type.name = new_type_name
         session.add(new_type)
 
     print("Populating open reel base table")
-    for new_type_name in formats.open_reel_base:
+    for new_type_name in formats.OpenReelBase.default_values:
         new_type = formats.OpenReelBase()
         new_type.name = new_type_name
         session.add(new_type)
 
     print("Populating open reel wind table")
-    for new_type_name in formats.open_reel_wind:
+    for new_type_name in formats.OpenReelReelWind.default_values:
         new_type = formats.OpenReelReelWind()
         new_type.name = new_type_name
         session.add(new_type)
 
     print("Populating open reel reel speed table")
-    for new_type_name in formats.open_reel_reel_speed:
+    for new_type_name in formats.OpenReelSpeed.default_values:
         new_type = formats.OpenReelSpeed()
         new_type.name = new_type_name
         session.add(new_type)
 
     print("Populating open reel track configuration table")
-    for new_type_name in formats.open_reel_track_configuration:
+    for new_type_name in formats.OpenReelTrackConfiguration.default_values:
         new_type = formats.OpenReelTrackConfiguration()
         new_type.name = new_type_name
         session.add(new_type)
 
     print("Populating open reel generation table")
-    for new_type_name in formats.open_reel_generation:
+    for new_type_name in formats.OpenReelGeneration.default_values:
         new_type = formats.OpenReelGeneration()
         new_type.name = new_type_name
         session.add(new_type)

@@ -176,7 +176,9 @@ def dummy_object(app, project):
                 'label':'This is a label',
                 'dateOfCassette': '12-03-2003',
                 'cassetteTypeId':
-                    formats.video_cassette_types.index('Betamax') + 1,
+                    formats.VideoCassetteType.default_values.index(
+                        'Betamax'
+                    ) + 1,
                     # + 1 because the database indexes start at 1 not 0
                 'duration': '00:39:21',
                 'inspectionDate': '12-03-2003',
@@ -194,7 +196,9 @@ def dummy_object(app, project):
                     'duration': '00:39:21',
                     'cassette_type': {
                         "name": 'Betamax',
-                        "id": formats.video_cassette_types.index('Betamax') + 1,
+                        "id": formats.VideoCassetteType.default_values.index(
+                            'Betamax'
+                        ) + 1,
                     },
                 },
                 'inspection_date': '12-03-2003',
@@ -212,7 +216,7 @@ def dummy_object(app, project):
                 'inspectionDate': '12-03-2003',
                 'transferDate':'12-03-2003',
                 'generationId':
-                    formats.video_cassette_generations.index(
+                    formats.VideoCassetteGenerations.default_values.index(
                         'source (original)'
                     ) + 1
             },
@@ -227,8 +231,10 @@ def dummy_object(app, project):
                     'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
                     'generation': {
-                        'id': formats.video_cassette_generations.index(
-                            'source (original)') + 1,
+                        'id':
+                            formats.VideoCassetteGenerations
+                                .default_values
+                                .index('source (original)') + 1,
                         'name': 'source (original)',
                     }
                 },
@@ -242,14 +248,16 @@ def dummy_object(app, project):
                 "format_id": format_types['video cassette'][0],
                 'titleOfCassette': 'Title',
                 'cassetteTypeId':
-                    formats.video_cassette_types.index('Betamax') + 1,
+                    formats.VideoCassetteType.default_values.index(
+                        'Betamax'
+                    ) + 1,
                 'label':'This is a label',
                 'dateOfCassette': '12-03-2003',
                 'duration': '00:39:21',
                 'inspectionDate': '12-03-2003',
                 'transferDate':'12-03-2003',
                 'generationId':
-                    formats.video_cassette_generations.index(
+                    formats.VideoCassetteGenerations.default_values.index(
                         'source (original)'
                     ) + 1
             },
@@ -264,13 +272,17 @@ def dummy_object(app, project):
                     'date_of_cassette': '12-03-2003',
                     'duration': '00:39:21',
                     'generation': {
-                        'id': formats.video_cassette_generations.index(
-                            'source (original)') + 1,
+                        'id':
+                            formats.VideoCassetteGenerations
+                                .default_values
+                                .index('source (original)') + 1,
                         'name': 'source (original)',
                     },
                     'cassette_type': {
                         "name": 'Betamax',
-                        "id": formats.video_cassette_types.index('Betamax') + 1,
+                        "id": formats.VideoCassetteType.default_values.index(
+                            'Betamax'
+                        ) + 1,
                     }
                 },
                 'inspection_date': '12-03-2003',
@@ -315,7 +327,8 @@ def dummy_object(app, project):
             {
                 'name': 'optical type',
                 'format_id': '8',
-                'opticalTypeId': formats.optical_types.index('CD') + 1,
+                'opticalTypeId':
+                    formats.OpticalType.default_values.index('CD') + 1,
             },
             {
                 'files': [],
@@ -325,7 +338,8 @@ def dummy_object(app, project):
                 "format_details": {
                     'type': {
                         "name": 'CD',
-                        "id": formats.optical_types.index('CD') + 1,
+                        "id":
+                            formats.OpticalType.default_values.index('CD') + 1,
                     },
                 },
             }
@@ -337,7 +351,8 @@ def dummy_object(app, project):
                 'opticalTitleOfItem': 'dfgs',
                 'opticalLabel': 'ggg',
                 'opticalDateOfItem': '05-23-2022',
-                'opticalTypeId': formats.optical_types.index('CD') + 1,
+                'opticalTypeId':
+                    formats.OpticalType.default_values.index('CD') + 1,
                 'opticalDuration': '01:55:01',
                 'inspectionDate': '05-26-2022',
                 'transferDate': '05-18-2022'
@@ -353,7 +368,8 @@ def dummy_object(app, project):
                     'date_of_item': '05-23-2022',
                     'type': {
                         "name": 'CD',
-                        "id": formats.optical_types.index('CD') + 1,
+                        "id":
+                            formats.OpticalType.default_values.index('CD') + 1,
                     },
                     'duration': '01:55:01',
                 },
@@ -366,7 +382,8 @@ def dummy_object(app, project):
                 'name': 'open reel simple',
                 'format_id': '4',
                 'openReelReelTitle': 'The title of the reel',
-                'openReelSubTypeId': formats.open_reel_sub_type.index('Video') + 1,
+                'openReelSubTypeId':
+                    formats.OpenReelSubType.default_values.index('Video') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -379,7 +396,9 @@ def dummy_object(app, project):
                     'title_of_reel': 'The title of the reel',
                     'format_subtype': {
                         'name': 'Video',
-                        "id": formats.open_reel_sub_type.index('Video') + 1,
+                        "id": formats.OpenReelSubType.default_values.index(
+                            'Video'
+                        ) + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
@@ -387,11 +406,12 @@ def dummy_object(app, project):
             }
 
         ),
-(
+        (
             {
                 'name': 'open reel width',
                 'format_id': '4',
-                'openReelReelWidthId': formats.open_reel_reel_width.index('1/2') + 1,
+                'openReelReelWidthId':
+                    formats.OpenReelReelWidth.default_values.index('1/2') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -403,7 +423,9 @@ def dummy_object(app, project):
                 "format_details": {
                     'reel_width': {
                         "name": '1/2',
-                        "id": formats.open_reel_reel_width.index('1/2') + 1,
+                        "id": formats.OpenReelReelWidth.default_values.index(
+                            '1/2'
+                        ) + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
@@ -431,7 +453,7 @@ def dummy_object(app, project):
             }
 
         ),
-(
+        (
             {
                 'name': 'open reel date of reel',
                 'format_id': '4',
@@ -475,7 +497,8 @@ def dummy_object(app, project):
             {
                 'name': 'open reel diameter',
                 'format_id': '4',
-                'openReelReelDiameterId': formats.open_reel_reel_diameter.index('7') + 1,
+                'openReelReelDiameterId':
+                    formats.OpenReelReelDiameter.default_values.index('7') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -487,7 +510,10 @@ def dummy_object(app, project):
                 "format_details": {
                     'reel_diameter': {
                         "name": '7',
-                        "id": formats.open_reel_reel_diameter.index('7') + 1,
+                        "id":
+                            formats.OpenReelReelDiameter.default_values.index(
+                                '7'
+                            ) + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
@@ -498,7 +524,10 @@ def dummy_object(app, project):
             {
                 'name': 'open reel reel thickness',
                 'format_id': '4',
-                'openReelReelThicknessId': formats.open_reel_reel_thickness.index('1.0') + 1,
+                'openReelReelThicknessId':
+                    formats.OpenReelReelThickness.default_values.index(
+                        '1.0'
+                    ) + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -510,7 +539,10 @@ def dummy_object(app, project):
                 "format_details": {
                     'reel_thickness': {
                         "name": '1.0',
-                        "id": formats.open_reel_reel_thickness.index('1.0') + 1,
+                        "id":
+                            formats.OpenReelReelThickness.default_values.index(
+                                '1.0'
+                            ) + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
@@ -537,12 +569,13 @@ def dummy_object(app, project):
                 'transfer_date': '05-18-2022',
             }
         ),
-(
+        (
             {
                 'name': 'open reel base',
                 'format_id': '4',
                 'openReelReelTitle': 'open reel title',
-                'openReelBaseId': formats.open_reel_base.index('Acetate') + 1,
+                'openReelBaseId':
+                    formats.OpenReelBase.default_values.index('Acetate') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -554,7 +587,9 @@ def dummy_object(app, project):
                 "format_details": {
                     'base': {
                         "name": 'Acetate',
-                        "id": formats.open_reel_base.index('Acetate') + 1,
+                        "id": formats.OpenReelBase.default_values.index(
+                            'Acetate'
+                        ) + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
@@ -565,7 +600,10 @@ def dummy_object(app, project):
             {
                 'name': 'open reel wind',
                 'format_id': '4',
-                'openReelWindId': formats.open_reel_wind.index('Heads out') + 1,
+                'openReelWindId':
+                    formats.OpenReelReelWind.default_values.index(
+                        'Heads out'
+                    ) + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -577,7 +615,9 @@ def dummy_object(app, project):
                 "format_details": {
                     'wind': {
                         "name": 'Heads out',
-                        "id": formats.open_reel_wind.index('Heads out') + 1,
+                        "id": formats.OpenReelReelWind.default_values.index(
+                            'Heads out'
+                        ) + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
@@ -588,7 +628,8 @@ def dummy_object(app, project):
             {
                 'name': 'open reel reel speed',
                 'format_id': '4',
-                'openReelReelSpeedId': formats.open_reel_reel_speed.index('3 3/4') + 1,
+                'openReelReelSpeedId':
+                    formats.OpenReelSpeed.default_values.index('3 3/4') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -600,7 +641,9 @@ def dummy_object(app, project):
                 "format_details": {
                     'reel_speed': {
                         "name": '3 3/4',
-                        "id": formats.open_reel_reel_speed.index('3 3/4') + 1,
+                        "id": formats.OpenReelSpeed.default_values.index(
+                            '3 3/4'
+                        ) + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
@@ -612,7 +655,7 @@ def dummy_object(app, project):
                 'name': 'open reel track configuration',
                 'format_id': '4',
                 'openReelTrackConfigurationId':
-                    formats.open_reel_track_configuration.index(
+                    formats.OpenReelTrackConfiguration.default_values.index(
                         '1/4 track mono'
                     ) + 1,
                 'inspectionDate': '05-23-2022',
@@ -624,9 +667,12 @@ def dummy_object(app, project):
                     'name': 'open reel'
                 },
                 "format_details": {
-                    'track_configuration':{
+                    'track_configuration': {
                         "name": '1/4 track mono',
-                        "id": formats.open_reel_track_configuration.index('1/4 track mono') + 1,
+                        "id":
+                            formats.OpenReelTrackConfiguration
+                                .default_values
+                                .index('1/4 track mono') + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
@@ -657,7 +703,8 @@ def dummy_object(app, project):
             {
                 'name': 'open reel generation',
                 'format_id': '4',
-                'openReelGenerationId': formats.open_reel_generation.index('dub') + 1,
+                'openReelGenerationId':
+                    formats.OpenReelGeneration.default_values.index('dub') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -669,7 +716,9 @@ def dummy_object(app, project):
                 "format_details": {
                     'generation': {
                         "name": 'dub',
-                        "id": formats.open_reel_generation.index('dub') + 1,
+                        "id": formats.OpenReelGeneration.default_values.index(
+                            'dub'
+                        ) + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
@@ -681,24 +730,36 @@ def dummy_object(app, project):
                 'name': 'open reel all metadata',
                 'format_id': '4',
                 'openReelReelTitle': 'open reel title',
-                'openReelSubTypeId': formats.open_reel_sub_type.index('Video') + 1,
-                'openReelReelWidthId': formats.open_reel_reel_width.index('1/2') + 1,
+                'openReelSubTypeId':
+                    formats.OpenReelSubType.default_values.index('Video') + 1,
+                'openReelReelWidthId':
+                    formats.OpenReelReelWidth.default_values.index('1/2') + 1,
                 'openReelReelType': 'plastic',
                 'openReelDateOfReel': '05-23-2022',
                 'openReelTrackCount': '2',
                 'openReelReelSize': '7',
-                'openReelReelDiameterId': formats.open_reel_reel_diameter.index('7') + 1,
-                'openReelReelThicknessId': formats.open_reel_reel_thickness.index('1.0') + 1,
+                'openReelReelDiameterId':
+                    formats.OpenReelReelDiameter.default_values.index('7') + 1,
+                'openReelReelThicknessId':
+                    formats.OpenReelReelThickness.default_values.index(
+                        '1.0'
+                    ) + 1,
                 'openReelReelBrand': 'some brand',
-                'openReelBaseId': formats.open_reel_base.index('Acetate') + 1,
-                'openReelWindId': formats.open_reel_wind.index('Heads out') + 1,
-                'openReelReelSpeedId': formats.open_reel_reel_speed.index('3 3/4') + 1,
+                'openReelBaseId':
+                    formats.OpenReelBase.default_values.index('Acetate') + 1,
+                'openReelWindId':
+                    formats.OpenReelReelWind.default_values.index(
+                        'Heads out'
+                    ) + 1,
+                'openReelReelSpeedId':
+                    formats.OpenReelSpeed.default_values.index('3 3/4') + 1,
                 'openReelTrackConfigurationId':
-                    formats.open_reel_track_configuration.index(
+                    formats.OpenReelTrackConfiguration.default_values.index(
                         '1/4 track mono'
                     ) + 1,
                 'openReelDuration': '01:23:33',
-                'openReelGenerationId': formats.open_reel_generation.index('dub') + 1,
+                'openReelGenerationId':
+                    formats.OpenReelGeneration.default_values.index('dub') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -711,45 +772,66 @@ def dummy_object(app, project):
                     'title_of_reel': 'open reel title',
                     'format_subtype': {
                         'name': 'Video',
-                        "id": formats.open_reel_sub_type.index('Video') + 1,
+                        "id": formats.OpenReelSubType.default_values.index(
+                            'Video'
+                        ) + 1,
                     },
                     'reel_width': {
                         "name": '1/2',
-                        "id": formats.open_reel_reel_width.index('1/2') + 1,
+                        "id": formats.OpenReelReelWidth.default_values.index(
+                            '1/2'
+                        ) + 1,
                     },
                     'date_of_reel': '05-23-2022',
                     'track_count': 2,
                     'reel_size': 7,
                     'reel_diameter': {
                         "name": "7",
-                        "id": formats.open_reel_reel_diameter.index('7') + 1,
+                        "id":
+                            formats.OpenReelReelDiameter.default_values.index(
+                                '7'
+                            ) + 1,
                     },
                     'reel_type': 'plastic',
                     'reel_thickness': {
                         "name": '1.0',
-                        "id": formats.open_reel_reel_thickness.index('1.0') + 1,
+                        "id":
+                            formats.OpenReelReelThickness.default_values.index(
+                                '1.0'
+                            ) + 1,
                     },
                     'reel_brand': 'some brand',
                     'base': {
                         "name": 'Acetate',
-                        "id": formats.open_reel_base.index('Acetate') + 1,
+                        "id": formats.OpenReelBase.default_values.index(
+                            'Acetate'
+                        ) + 1,
                     },
                     'wind': {
                         "name": 'Heads out',
-                        "id": formats.open_reel_wind.index('Heads out') + 1,
+                        "id": formats.OpenReelReelWind.default_values.index(
+                            'Heads out'
+                        ) + 1,
                     },
                     'reel_speed': {
                         "name": '3 3/4',
-                        "id": formats.open_reel_reel_speed.index('3 3/4') + 1,
+                        "id": formats.OpenReelSpeed.default_values.index(
+                            '3 3/4'
+                        ) + 1,
                     },
-                    'track_configuration':{
+                    'track_configuration': {
                         "name": '1/4 track mono',
-                        "id": formats.open_reel_track_configuration.index('1/4 track mono') + 1,
+                        "id":
+                            formats.OpenReelTrackConfiguration
+                                .default_values
+                                .index('1/4 track mono') + 1,
                     },
                     'duration': '01:23:33',
                     'generation': {
                         "name": 'dub',
-                        "id": formats.open_reel_generation.index('dub') + 1,
+                        "id": formats.OpenReelGeneration.default_values.index(
+                            'dub'
+                        ) + 1,
                     },
                 },
                 'inspection_date': '05-23-2022',
