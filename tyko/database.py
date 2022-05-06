@@ -55,60 +55,23 @@ def _populate_optical_types_table(session):
 
 def _populate_open_reel_enum_tables(session):
     print("Populating open reel tables")
+    enum_table_classes = [
+        formats.OpenReelSubType,
+        formats.OpenReelReelWidth,
+        formats.OpenReelReelDiameter,
+        formats.OpenReelReelThickness,
+        formats.OpenReelBase,
+        formats.OpenReelReelWind,
+        formats.OpenReelSpeed,
+        formats.OpenReelTrackConfiguration,
+        formats.OpenReelGeneration
+    ]
 
-    print("Populating open reel subtypes table")
-    for new_type_name in formats.OpenReelSubType.default_values:
-        new_type = formats.OpenReelSubType()
-        new_type.name = new_type_name
-        session.add(new_type)
-
-    print("Populating open reel reel width table")
-    for new_type_name in formats.OpenReelReelWidth.default_values:
-        new_type = formats.OpenReelReelWidth()
-        new_type.name = new_type_name
-        session.add(new_type)
-
-    print("Populating open reel reel diameter table")
-    for new_type_name in formats.OpenReelReelDiameter.default_values:
-        new_type = formats.OpenReelReelDiameter()
-        new_type.name = new_type_name
-        session.add(new_type)
-
-    print("Populating open reel reel thickness table")
-    for new_type_name in formats.OpenReelReelThickness.default_values:
-        new_type = formats.OpenReelReelThickness()
-        new_type.name = new_type_name
-        session.add(new_type)
-
-    print("Populating open reel base table")
-    for new_type_name in formats.OpenReelBase.default_values:
-        new_type = formats.OpenReelBase()
-        new_type.name = new_type_name
-        session.add(new_type)
-
-    print("Populating open reel wind table")
-    for new_type_name in formats.OpenReelReelWind.default_values:
-        new_type = formats.OpenReelReelWind()
-        new_type.name = new_type_name
-        session.add(new_type)
-
-    print("Populating open reel reel speed table")
-    for new_type_name in formats.OpenReelSpeed.default_values:
-        new_type = formats.OpenReelSpeed()
-        new_type.name = new_type_name
-        session.add(new_type)
-
-    print("Populating open reel track configuration table")
-    for new_type_name in formats.OpenReelTrackConfiguration.default_values:
-        new_type = formats.OpenReelTrackConfiguration()
-        new_type.name = new_type_name
-        session.add(new_type)
-
-    print("Populating open reel generation table")
-    for new_type_name in formats.OpenReelGeneration.default_values:
-        new_type = formats.OpenReelGeneration()
-        new_type.name = new_type_name
-        session.add(new_type)
+    for enum_table_class in enum_table_classes:
+        for new_type_name in enum_table_class.default_values:
+            new_type = enum_table_class()
+            new_type.name = new_type_name
+            session.add(new_type)
 
 
 def create_samples(engine: sqlalchemy.engine.Engine):
