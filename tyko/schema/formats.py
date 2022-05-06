@@ -153,7 +153,6 @@ class OpenReel(AVFormat):
 
     reel_size = db.Column("reel_size", db.Integer)
     track_count = db.Column("track_count", db.Integer)
-    # tape_size = db.Column("tape_size", db.Text)
 
     reel_diameter_id = db.Column(
         db.Integer,
@@ -189,15 +188,14 @@ class OpenReel(AVFormat):
     )
     reel_speed = relationship("OpenReelSpeed")
 
-    # wind = db.Column("wind", db.Text)
-    # track_speed = db.Column("track_speed", db.Text)
-
     track_configuration_id = db.Column(
         db.Integer,
         db.ForeignKey("open_reel_track_configuration.table_id")
     )
     track_configuration = relationship("OpenReelTrackConfiguration")
+
     duration = db.Column("track_duration", db.Text)
+
     generation_id = db.Column(
         db.Integer,
         db.ForeignKey("open_reel_generation.table_id")
@@ -216,7 +214,6 @@ class OpenReel(AVFormat):
                 self.reel_width.serialize() if self.reel_width else None,
             "track_count": self.track_count,
             "reel_size": self.reel_size,
-            # "tape_size": self.tape_size,
             "reel_diameter":
                 self.reel_diameter.serialize() if self.reel_diameter else None,
             "reel_type": self.reel_type,
