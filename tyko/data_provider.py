@@ -1853,15 +1853,13 @@ class OpticalDataConnector(FormatConnector):
 
         new_item.label = format_data.pop('opticalLabel', None)
 
-        date_of_item = format_data.pop('opticalDateOfItem', None)
-        if date_of_item:
+        if date_of_item := format_data.pop('opticalDateOfItem', None):
             new_item.date_of_item = \
                 utils.create_precision_datetime(date_of_item, 3)
 
         new_item.duration = format_data.pop('opticalDuration', None)
 
-        optical_type_id = format_data.pop('opticalTypeId', None)
-        if optical_type_id:
+        if optical_type_id := format_data.pop('opticalTypeId', None):
             new_item.optical_type = \
                 session.query(formats.OpticalType).filter(
                     formats.OpticalType.table_id == int(
@@ -1887,14 +1885,12 @@ class OpenReelDataConnector(FormatConnector):
         new_item.reel_brand = format_data.pop('openReelReelBrand', None)
         new_item.duration = format_data.pop('openReelDuration', None)
 
-        subtype_id = format_data.pop('openReelSubTypeId', None)
-        if subtype_id:
+        if subtype_id := format_data.pop('openReelSubTypeId', None):
             new_item.subtype = session.query(formats.OpenReelSubType).filter(
                 formats.OpenReelSubType.table_id == subtype_id
             ).one()
 
-        reel_width_id = format_data.pop('openReelReelWidthId', None)
-        if reel_width_id:
+        if reel_width_id := format_data.pop('openReelReelWidthId', None):
             new_item.reel_width = \
                 session.query(
                     formats.OpenReelReelWidth
@@ -1902,8 +1898,7 @@ class OpenReelDataConnector(FormatConnector):
                     formats.OpenReelReelWidth.table_id == reel_width_id
                 ).one()
 
-        reel_diameter_id = format_data.pop('openReelReelDiameterId', None)
-        if reel_diameter_id:
+        if reel_diameter_id := format_data.pop('openReelReelDiameterId', None):
             new_item.reel_diameter = \
                 session.query(
                     formats.OpenReelReelDiameter
@@ -1911,8 +1906,9 @@ class OpenReelDataConnector(FormatConnector):
                     formats.OpenReelReelDiameter.table_id == reel_diameter_id
                 ).one()
 
-        reel_thickness_id = format_data.pop('openReelReelThicknessId', None)
-        if reel_thickness_id:
+        if reel_thickness_id := format_data.pop(
+                'openReelReelThicknessId', None
+        ):
             new_item.reel_thickness = \
                 session.query(
                     formats.OpenReelReelThickness
@@ -1920,42 +1916,41 @@ class OpenReelDataConnector(FormatConnector):
                     formats.OpenReelReelThickness.table_id == reel_thickness_id
                 ).one()
 
-        base_id = format_data.pop('openReelBaseId', None)
-        if base_id:
+        if base_id := format_data.pop('openReelBaseId', None):
             new_item.base = session.query(formats.OpenReelBase).filter(
                 formats.OpenReelBase.table_id == base_id
             ).one()
 
-        wind_id = format_data.pop('openReelWindId', None)
-        if wind_id:
+        if wind_id := format_data.pop('openReelWindId', None):
             new_item.wind = session.query(formats.OpenReelReelWind).filter(
                 formats.OpenReelReelWind.table_id == wind_id
             ).one()
 
-        reel_speed_id = format_data.pop('openReelReelSpeedId', None)
-        if reel_speed_id:
+        if reel_speed_id := format_data.pop('openReelReelSpeedId', None):
             new_item.reel_speed = session.query(formats.OpenReelSpeed).filter(
                 formats.OpenReelSpeed.table_id == reel_speed_id
             ).one()
 
-        configuration_id = \
-            format_data.pop('openReelTrackConfigurationId', None)
-
-        if configuration_id:
+        if configuration_id := format_data.pop(
+                'openReelTrackConfigurationId',
+                None
+        ):
             new_item.track_configuration = session.query(
                 formats.OpenReelTrackConfiguration
             ).filter(
                 formats.OpenReelTrackConfiguration.table_id == configuration_id
             ).one()
 
-        generation_id = format_data.pop('openReelGenerationId', None)
-        if generation_id:
+        if generation_id := format_data.pop('openReelGenerationId', None):
             new_item.generation = \
                 session.query(formats.OpenReelGeneration).filter(
                     formats.OpenReelGeneration.table_id == generation_id
                 ).one()
-        open_reel_date_of_reel = format_data.pop('openReelDateOfReel', None)
-        if open_reel_date_of_reel:
+
+        if open_reel_date_of_reel := format_data.pop(
+                'openReelDateOfReel',
+                None
+        ):
             new_item.date_of_reel = \
                 utils.create_precision_datetime(
                     open_reel_date_of_reel,
@@ -1988,20 +1983,18 @@ class VideoCassetteDataConnector(FormatConnector):
 
         new_item.duration = format_data.pop('duration', None)
 
-        if "cassetteTypeId" in format_data:
-            cassette_type = session.query(formats.VideoCassetteType).filter(
-                formats.VideoCassetteType.table_id == format_data.pop(
-                    'cassetteTypeId'
-                )
-            ).one()
-            new_item.cassette_type = cassette_type
+        if cassette_type_id := format_data.pop('cassetteTypeId', None):
+            new_item.cassette_type = \
+                session.query(formats.VideoCassetteType).filter(
+                    formats.VideoCassetteType.table_id == cassette_type_id
+                ).one()
 
-        if 'generationId' in format_data:
+        if gen_id := format_data.pop('generationId', None):
             generation = \
-                session.query(formats.VideoCassetteGenerations).filter(
-                    formats.VideoCassetteGenerations.table_id == int(
-                        format_data.pop('generationId')
-                    )
+                session.query(
+                    formats.VideoCassetteGenerations
+                ).filter(
+                    formats.VideoCassetteGenerations.table_id == int(gen_id)
                 ).one()
             new_item.generation = generation
         return new_item
