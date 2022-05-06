@@ -1,7 +1,7 @@
 <div class="mb-3 row">
     <label for="openReelReelTitle" class="col-sm-2 col-form-label">Title of reel</label>
     <div class="col-sm-10">
-        <input type="text" id="openReelReelTitle" class="form-control" name="openReelReelTitle">
+        <input type="text" id="openReelReelTitle" class="form-control" name="openReelReelTitle" placeholder="item name per finding aid or catalog record">
     </div>
 </div>
 <div class="mb-3 row">
@@ -32,20 +32,17 @@
 <div class="mb-3 row">
     <label for="openReelTrackCount" class="col-sm-2 col-form-label">Track count</label>
     <div class="col-sm-10">
-        <input type="text" id="openReelTrackCount" class="form-control" name="openReelTrackCount">
+        <input type="text" id="openReelTrackCount" class="form-control" name="openReelTrackCount" placeholder="how many tracks are included on the reel">
     </div>
 </div>
 
 <div class="mb-3 row">
-    <label for="openReelReelSize" class="col-sm-2 col-form-label">Reel size (inches)</label>
-    <div class="col-sm-10">
-        <input type="text" id="openReelReelSize" class="form-control" name="openReelReelSize">
+    <div class="col">
+        <label for="openReelReelSize" class="col-form-label">Reel size (inches)</label>
+        <input type="text" id="openReelReelSize" class="form-control" name="openReelReelSize" placeholder="measurement of the size of the reel">
     </div>
-</div>
-
-<div class="mb-3 row">
-    <label for="openReelReelDiameter" class="col-sm-2 col-form-label">Reel diameter (inches)</label>
-    <div class="col-sm-10">
+    <div class="col">
+        <label for="openReelReelDiameter" class="col-form-label">Reel diameter (inches)</label>
         <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_reel_diameter') }}" name="openReelReelDiameterId" id="openReelReelDiameter">
             <option value=""></option>
         </select>
@@ -55,7 +52,7 @@
 <div class="mb-3 row">
     <label for="openReelReelType" class="col-sm-2 col-form-label">Reel type</label>
     <div class="col-sm-10">
-        <input type="text" id="openReelReelSize" class="form-control" name="openReelReelType">
+        <input type="text" id="openReelReelSize" class="form-control" name="openReelReelType" placeholder="the type of reel">
     </div>
 </div>
 
@@ -73,7 +70,7 @@
 <div class="mb-3 row">
     <label for="openReelReelBrand" class="col-sm-2 col-form-label">Reel brand</label>
     <div class="col-sm-10">
-        <input type="text" id="openReelReelBrand" class="form-control" name="openReelReelBrand">
+        <input type="text" id="openReelReelBrand" class="form-control" name="openReelReelBrand" placeholder="the brand of the reel">
     </div>
 </div>
 
@@ -114,7 +111,7 @@
 <div class="mb-3 row">
     <label for="openReelDuration" class="col-sm-2 col-form-label">Duration (HH:MM:SS)</label>
     <div class="col-sm-10">
-        <input type="text" id="openReelDuration" class="form-control" name="openReelDuration">
+        <input type="text" id="openReelDuration" class="form-control" name="openReelDuration" placeholder="how long the content runs">
     </div>
 </div>
 
