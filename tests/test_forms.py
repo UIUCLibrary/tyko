@@ -332,7 +332,7 @@ def dummy_object(app, project):
         ),
         (
             {
-                'name': 'sdfgsdfgsdg',
+                'name': 'CD',
                 'format_id': '8',
                 'opticalTitleOfItem': 'dfgs',
                 'opticalLabel': 'ggg',
@@ -360,7 +360,405 @@ def dummy_object(app, project):
                 'inspection_date': '05-26-2022',
                 'transfer_date': '05-18-2022'
             }
-        )
+        ),
+        (
+            {
+                'name': 'open reel simple',
+                'format_id': '4',
+                'openReelReelTitle': 'The title of the reel',
+                'openReelSubTypeId': formats.open_reel_sub_type.index('Video') + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'title_of_reel': 'The title of the reel',
+                    'format_subtype': {
+                        'name': 'Video',
+                        "id": formats.open_reel_sub_type.index('Video') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+
+        ),
+(
+            {
+                'name': 'open reel width',
+                'format_id': '4',
+                'openReelReelWidthId': formats.open_reel_reel_width.index('1/2') + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'reel_width': {
+                        "name": '1/2',
+                        "id": formats.open_reel_reel_width.index('1/2') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel reel type',
+                'format_id': '4',
+                'openReelReelType': 'plastic',
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'reel_type': 'plastic',
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+
+        ),
+(
+            {
+                'name': 'open reel date of reel',
+                'format_id': '4',
+                'openReelDateOfReel': '05-09-2022',
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'date_of_reel': '05-09-2022',
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel reel size',
+                'format_id': '4',
+                'openReelReelSize': '7',
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'reel_size': 7,
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel diameter',
+                'format_id': '4',
+                'openReelReelDiameter': formats.open_reel_reel_diameter.index('7') + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'reel_diameter': {
+                        "name": '7',
+                        "id": formats.open_reel_reel_diameter.index('7') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel reel thickness',
+                'format_id': '4',
+                'openReelReelThickness': formats.open_reel_reel_thickness.index('1.0') + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'reel_thickness': {
+                        "name": '1.0',
+                        "id": formats.open_reel_reel_thickness.index('1.0') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel reel brand',
+                'format_id': '4',
+                'openReelReelBrand': 'some brand',
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'reel_brand': 'some brand',
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+(
+            {
+                'name': 'open reel base',
+                'format_id': '4',
+                'openReelReelTitle': 'open reel title',
+                'openReelBase': formats.open_reel_base.index('Acetate') + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'base': {
+                        "name": 'Acetate',
+                        "id": formats.open_reel_base.index('Acetate') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel wind',
+                'format_id': '4',
+                'openReelWind': formats.open_reel_wind.index('Heads out') + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'wind': {
+                        "name": 'Heads out',
+                        "id": formats.open_reel_wind.index('Heads out') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel reel speed',
+                'format_id': '4',
+                'openReelReelSpeed': formats.open_reel_reel_speed.index('3 3/4') + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'reel_speed': {
+                        "name": '3 3/4',
+                        "id": formats.open_reel_reel_speed.index('3 3/4') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel track configuration',
+                'format_id': '4',
+                'openReelTrackConfiguration':
+                    formats.open_reel_track_configuration.index(
+                        '1/4 track mono'
+                    ) + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'track_configuration':{
+                        "name": '1/4 track mono',
+                        "id": formats.open_reel_track_configuration.index('1/4 track mono') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel duration',
+                'format_id': '4',
+                'openReelDuration': '01:23:33',
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'duration': '01:23:33',
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel generation',
+                'format_id': '4',
+                'openReelGeneration': formats.open_reel_generation.index('dub') + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'generation': {
+                        "name": 'dub',
+                        "id": formats.open_reel_generation.index('dub') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+        (
+            {
+                'name': 'open reel all metadata',
+                'format_id': '4',
+                'openReelReelTitle': 'open reel title',
+                'openReelSubTypeId': formats.open_reel_sub_type.index('Video') + 1,
+                'openReelReelWidthId': formats.open_reel_reel_width.index('1/2') + 1,
+                'openReelReelType': 'plastic',
+                'openReelDateOfReel': '05-23-2022',
+                'openReelTrackCount': '2',
+                'openReelReelSize': '7',
+                'openReelReelDiameter': formats.open_reel_reel_diameter.index('7') + 1,
+                'openReelReelThickness': formats.open_reel_reel_thickness.index('1.0') + 1,
+                'openReelReelBrand': 'some brand',
+                'openReelBase': formats.open_reel_base.index('Acetate') + 1,
+                'openReelWind': formats.open_reel_wind.index('Heads out') + 1,
+                'openReelReelSpeed': formats.open_reel_reel_speed.index('3 3/4') + 1,
+                'openReelTrackConfiguration':
+                    formats.open_reel_track_configuration.index(
+                        '1/4 track mono'
+                    ) + 1,
+                'openReelDuration': '01:23:33',
+                'openReelGeneration': formats.open_reel_generation.index('dub') + 1,
+                'inspectionDate': '05-23-2022',
+                'transferDate': '05-18-2022'
+            },
+            {
+                'files': [],
+                'format': {
+                    'name': 'open reel'
+                },
+                "format_details": {
+                    'title_of_reel': 'open reel title',
+                    'format_subtype': {
+                        'name': 'Video',
+                        "id": formats.open_reel_sub_type.index('Video') + 1,
+                    },
+                    'reel_width': {
+                        "name": '1/2',
+                        "id": formats.open_reel_reel_width.index('1/2') + 1,
+                    },
+                    'date_of_reel': '05-23-2022',
+                    'track_count': 2,
+                    'reel_size': 7,
+                    'reel_diameter': {
+                        "name": "7",
+                        "id": formats.open_reel_reel_diameter.index('7') + 1,
+                    },
+                    'reel_type': 'plastic',
+                    'reel_thickness': {
+                        "name": '1.0',
+                        "id": formats.open_reel_reel_thickness.index('1.0') + 1,
+                    },
+                    'reel_brand': 'some brand',
+                    'base': {
+                        "name": 'Acetate',
+                        "id": formats.open_reel_base.index('Acetate') + 1,
+                    },
+                    'wind': {
+                        "name": 'Heads out',
+                        "id": formats.open_reel_wind.index('Heads out') + 1,
+                    },
+                    'reel_speed': {
+                        "name": '3 3/4',
+                        "id": formats.open_reel_reel_speed.index('3 3/4') + 1,
+                    },
+                    'track_configuration':{
+                        "name": '1/4 track mono',
+                        "id": formats.open_reel_track_configuration.index('1/4 track mono') + 1,
+                    },
+                    'duration': '01:23:33',
+                    'generation': {
+                        "name": 'dub',
+                        "id": formats.open_reel_generation.index('dub') + 1,
+                    },
+                },
+                'inspection_date': '05-23-2022',
+                'transfer_date': '05-18-2022',
+            }
+        ),
+
+
+
     ], ids=lambda *args: str(args[0].get('name', str(args[0])))
 )
 def test_create_new_video_cassette(

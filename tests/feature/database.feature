@@ -176,9 +176,9 @@ Feature: database
     And the database has open reel record with a <base> base
 
     Examples:
-    | first_name | last_name | file_name    | date_recorded | tape_size | base      |
-    | Henry      | Borchers  | myfile.wav   | 1970/1/1      | 1/4 inch  | acetate   |
-    | John       | Smith     | my2file2.wav | 1998/2/10     | 1/4 inch  | polyester |
+    | first_name | last_name | file_name    | date_recorded | tape_size    | base      |
+    | Henry      | Borchers  | myfile.wav   | 1970/1/1      | 1/2          | Acetate   |
+    | John       | Smith     | my2file2.wav | 1998/2/10     | 1/2          | Polyester |
 
 
   Scenario Outline: Create a vendor

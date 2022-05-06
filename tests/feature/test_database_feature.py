@@ -463,12 +463,18 @@ def test_new_open_reel_project():
                   "to the object"))
 def new_open_reel(dummy_database, create_new_object, date_recorded,
                   tape_size, base, file_name):
+    tape_size_value = dummy_database.query(
+        schema.formats.OpenReelReelWidth
+    ).filter(schema.formats.OpenReelReelWidth.name == tape_size).one()
 
+    base_value = dummy_database.query(
+        schema.formats.OpenReelBase
+    ).filter(schema.formats.OpenReelBase.name == base).one()
     open_reel = schema.OpenReel(
         name=SAMPLE_ITEM_NAME,
-        date_recorded=SAMPLE_DATE,
-        tape_size=tape_size,
-        base=base,
+        date_of_reel=SAMPLE_DATE,
+        reel_width=tape_size_value,
+        base=base_value
 
     )
 
@@ -504,19 +510,30 @@ def database_has_item_record_w_filename(dummy_database, file_name):
 )
 def check_open_reel_tape_size(dummy_database, tape_size):
     open_reel_items = dummy_database.query(schema.OpenReel)
-    open_reel_item = open_reel_items.filter(
-        schema.OpenReel.tape_size == tape_size).one()
 
-    assert open_reel_item.tape_size == tape_size
+    tape_size_value = dummy_database.query(
+        schema.formats.OpenReelReelWidth
+    ).filter(schema.formats.OpenReelReelWidth.name == tape_size).one()
+
+    open_reel_item = open_reel_items.filter(
+        schema.OpenReel.reel_width == tape_size_value
+    ).one()
+
+    assert open_reel_item.reel_width == tape_size_value
 
 
 @then(parsers.parse("the database has open reel record with a {base} base"))
 def check_open_reel_base(dummy_database, base):
     open_reel_items = dummy_database.query(schema.OpenReel)
+    base_value = dummy_database.query(
+        schema.formats.OpenReelBase
+    ).filter(
+        schema.formats.OpenReelBase.name == base
+    ).one()
     open_reel_item = open_reel_items.filter(
-        schema.OpenReel.base == base).one()
+        schema.OpenReel.base == base_value).one()
 
-    assert open_reel_item.base == base
+    assert open_reel_item.base.name == base
 
 
 @scenario("database.feature", "Create a vendor")

@@ -134,40 +134,108 @@ class OpenReel(AVFormat):
     __mapper_args__ = {'polymorphic_identity': 'open_reels'}
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.table_id),
                          primary_key=True)
-    date_recorded = db.Column(
+    date_of_reel = db.Column(
         "date_recorded", db.Date
     )
+    title_of_reel = db.Column("title_of_reel", db.Text)
 
-    track_count = db.Column("track_count", db.Text)
-    tape_size = db.Column("tape_size", db.Text)
-    reel_diam = db.Column("reel_diam", db.Integer)
+    subtype_id = db.Column(
+        db.Integer,
+        db.ForeignKey("open_reel_sub_type.table_id")
+    )
+    subtype = relationship("OpenReelSubType")
+
+    reel_width_id = db.Column(
+        db.Integer,
+        db.ForeignKey("open_reel_reel_width.table_id")
+    )
+    reel_width = relationship("OpenReelReelWidth")
+
+    reel_size = db.Column("reel_size", db.Integer)
+    track_count = db.Column("track_count", db.Integer)
+    # tape_size = db.Column("tape_size", db.Text)
+
+    reel_diameter_id = db.Column(
+        db.Integer,
+        db.ForeignKey("open_reel_reel_diameter.table_id")
+    )
+    reel_diameter = relationship("OpenReelReelDiameter")
+
     reel_type = db.Column("reel_type", db.Text)
-    tape_thickness = db.Column("tape_thickness", db.Integer)
-    tape_brand = db.Column("tape_brand", db.Text)
-    base = db.Column("base", db.Text)
-    wind = db.Column("wind", db.Text)
-    track_speed = db.Column("track_speed", db.Text)
-    track_configuration = db.Column("track_configuration", db.Text)
-    track_duration = db.Column("track_duration", db.Text)
-    generation = db.Column("generation", db.Text)
+
+    reel_thickness_id = db.Column(
+        db.Integer,
+        db.ForeignKey("open_reel_reel_thickness.table_id")
+    )
+    reel_thickness = relationship("OpenReelReelThickness")
+
+    reel_brand = db.Column("tape_brand", db.Text)
+
+    base_id = db.Column(
+        db.Integer,
+        db.ForeignKey("open_reel_base.table_id")
+    )
+    base = relationship("OpenReelBase")
+
+    wind_id = db.Column(
+        db.Integer,
+        db.ForeignKey("open_reel_wind.table_id")
+    )
+    wind = relationship("OpenReelReelWind")
+
+    reel_speed_id = db.Column(
+        db.Integer,
+        db.ForeignKey("open_reel_reel_speed.table_id")
+    )
+    reel_speed = relationship("OpenReelSpeed")
+
+    # wind = db.Column("wind", db.Text)
+    # track_speed = db.Column("track_speed", db.Text)
+
+    track_configuration_id = db.Column(
+        db.Integer,
+        db.ForeignKey("open_reel_track_configuration.table_id")
+    )
+    track_configuration = relationship("OpenReelTrackConfiguration")
+    duration = db.Column("track_duration", db.Text)
+    generation_id = db.Column(
+        db.Integer,
+        db.ForeignKey("open_reel_generation.table_id")
+    )
+    generation = relationship("OpenReelGeneration")
 
     def format_details(self) -> Mapping[str, SerializedData]:
         return {
-            "date_recorded": utils.serialize_precision_datetime(
-                self.date_recorded)
-            if self.date_recorded is not None else None,
+            "title_of_reel": self.title_of_reel,
+            "format_subtype":
+                self.subtype.serialize() if self.subtype else None,
+            "date_of_reel": utils.serialize_precision_datetime(
+                self.date_of_reel)
+            if self.date_of_reel is not None else None,
+            'reel_width':
+                self.reel_width.serialize() if self.reel_width else None,
             "track_count": self.track_count,
-            "tape_size": self.tape_size,
-            "reel_diam": self.reel_diam,
+            "reel_size": self.reel_size,
+            # "tape_size": self.tape_size,
+            "reel_diameter":
+                self.reel_diameter.serialize() if self.reel_diameter else None,
             "reel_type": self.reel_type,
-            "tape_thickness": self.tape_thickness,
-            "tape_brand": self.tape_brand,
-            "base": self.base,
-            "wind": self.wind,
-            "track_speed": self.track_speed,
-            "track_configuration": self.track_configuration,
-            "track_duration": self.track_duration,
-            "generation": self.generation
+            "reel_thickness":
+                self.reel_thickness.serialize()
+                if self.reel_thickness else None,
+            "reel_brand": self.reel_brand,
+            "base": self.base.serialize() if self.base else None,
+            "wind":
+                self.wind.serialize() if self.wind else None,
+            "reel_speed":
+                self.reel_speed.serialize() if self.reel_speed else None,
+            "track_configuration":
+                self.track_configuration.serialize()
+                if self.track_configuration else None,
+            "duration": self.duration,
+            "generation":
+                self.generation.serialize() if self.generation else None,
+
         }
 
 
@@ -518,6 +586,42 @@ class CassetteTapeThickness(AVTables):
         }
 
 
+class OpenReelSubType(EnumTable):
+    __tablename__ = "open_reel_sub_type"
+
+
+class OpenReelReelWidth(EnumTable):
+    __tablename__ = "open_reel_reel_width"
+
+
+class OpenReelReelDiameter(EnumTable):
+    __tablename__ = "open_reel_reel_diameter"
+
+
+class OpenReelReelThickness(EnumTable):
+    __tablename__ = "open_reel_reel_thickness"
+
+
+class OpenReelBase(EnumTable):
+    __tablename__ = "open_reel_base"
+
+
+class OpenReelSpeed(EnumTable):
+    __tablename__ = "open_reel_reel_speed"
+
+
+class OpenReelTrackConfiguration(EnumTable):
+    __tablename__ = "open_reel_track_configuration"
+
+
+class OpenReelGeneration(EnumTable):
+    __tablename__ = "open_reel_generation"
+
+
+class OpenReelReelWind(EnumTable):
+    __tablename__ = "open_reel_wind"
+
+
 item_has_contacts_table = db.Table(
     "item_has_contacts",
     AVTables.metadata,
@@ -552,6 +656,7 @@ format_types = {
     "video cassette": (9, VideoCassette),
 }
 
+# todo: put these in enum table classes
 video_cassette_types = [
     'VHS',
     '3/4″ U-matic',
@@ -576,4 +681,34 @@ video_cassette_generations = [
     'master',
     'commercial',
     'other'
+]
+
+open_reel_sub_type = ["Video", "Audio"]
+
+open_reel_reel_width = ["1/4", "1/2", "1", "2"]
+
+open_reel_reel_diameter = ["5", "7", "10.5"]
+
+open_reel_reel_thickness = ["0.5", "1.0", "1.5"]
+
+open_reel_base = ["Acetate", "Polyester"]
+
+open_reel_wind = ["Heads out", "Tails out"]
+
+open_reel_reel_speed = ["1 7/8", "3 3/4", "7 1/2", "15"]
+
+open_reel_track_configuration = [
+    "full track",
+    "1/4 track mono",
+    "1/4 stereo",
+    "1/2 track mono",
+    "1/2 track stereo"
+]
+
+open_reel_generation = [
+    "source (original)",
+    "dub",
+    "master",
+    "commercial",
+    "other"
 ]
