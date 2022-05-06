@@ -22,22 +22,6 @@ def alembic_table_exists(engine) -> bool:
         return sqlalchemy.inspect(engine).has_table("alembic_version")
 
 
-def _populate_video_cassette_generations_table(session):
-    print("Populating video generations types Table")
-    for generation in formats.VideoCassetteGenerations.default_values:
-        new_type = formats.VideoCassetteGenerations()
-        new_type.name = generation
-        session.add(new_type)
-
-
-def _populate_video_cassette_types_table(session):
-    print("Populating video cassette types Table")
-    for cassette_type in formats.VideoCassetteType.default_values:
-        new_type = formats.VideoCassetteType()
-        new_type.name = cassette_type
-        session.add(new_type)
-
-
 def _create_sample_collection(session):
     print("Adding sample collection")
     new_collection = schema.Collection()
@@ -45,16 +29,7 @@ def _create_sample_collection(session):
     session.add(new_collection)
 
 
-def _populate_optical_types_table(session):
-    print("Populating optical types Table")
-    for new_type_name in formats.OpticalType.default_values:
-        new_type = formats.OpticalType()
-        new_type.name = new_type_name
-        session.add(new_type)
-
-
-def _populate_open_reel_enum_tables(session):
-    print("Populating open reel tables")
+def _populate_enum_tables(session: sqlalchemy.orm.Session):
     enum_table_classes = [
         formats.OpenReelSubType,
         formats.OpenReelReelWidth,
@@ -64,7 +39,10 @@ def _populate_open_reel_enum_tables(session):
         formats.OpenReelReelWind,
         formats.OpenReelSpeed,
         formats.OpenReelTrackConfiguration,
-        formats.OpenReelGeneration
+        formats.OpenReelGeneration,
+        formats.OpticalType,
+        formats.VideoCassetteType,
+        formats.VideoCassetteGenerations
     ]
 
     for enum_table_class in enum_table_classes:
@@ -111,10 +89,7 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
 
     _populate_format_types_table(session)
 
-    _populate_video_cassette_types_table(session)
-    _populate_video_cassette_generations_table(session)
-    _populate_optical_types_table(session)
-    _populate_open_reel_enum_tables(session)
+    _populate_enum_tables(session)
 
     _populate_starting_project_status(
         session, project_status_table=projects.ProjectStatus)
