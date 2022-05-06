@@ -18,6 +18,77 @@ from .views.project_object import ProjectObjectAPI, ObjectApi, \
 from .views import cassette_tape
 
 
+"""
+FORMAT_ENUM_ROUTES:
+For setting formats
+    URI
+    Endpoint
+    view_func
+"""
+FORMAT_ENUM_ROUTES = [
+    (
+        "/api/formats/video_cassette/generations",
+        'video_cassette_generations',
+        "VideoCassetteGenerations"
+    ),
+    (
+        "/api/formats/video_cassette/cassette_type",
+        'video_cassette_cassette_type',
+        "VideoCassetteType"
+    ),
+    (
+        "/api/formats/optical/optical_types",
+        'optical_optical_types',
+        "OpticalType"
+    ),
+    (
+        "/api/formats/open_reel/sub_types",
+        'open_reel_sub_type',
+        "OpenReelSubType"
+    ),
+    (
+        "/api/formats/open_reel/reel_width",
+        'open_reel_reel_width',
+        "OpenReelReelWidth"
+    ),
+    (
+        "/api/formats/open_reel/reel_diameter",
+        'open_reel_reel_diameter',
+        "OpenReelReelDiameter"
+    ),
+    (
+        "/api/formats/open_reel/reel_thickness",
+        'open_reel_reel_thickness',
+        "OpenReelReelThickness"
+    ),
+    (
+        "/api/formats/open_reel/base",
+        'open_reel_base',
+        "OpenReelBase"
+    ),
+    (
+        "/api/formats/open_reel/reel_speed",
+        'open_reel_reel_speed',
+        "OpenReelSpeed"
+    ),
+    (
+        "/api/formats/open_reel/track_configuration",
+        'open_reel_track_configuration',
+        "OpenReelTrackConfiguration"
+    ),
+    (
+        "/api/formats/open_reel/generation",
+        'open_reel_generation',
+        "OpenReelGeneration"
+    ),
+    (
+        "/api/formats/open_reel/wind",
+        'open_reel_wind',
+        "OpenReelReelWind"
+    )
+]
+
+
 @dataclass
 class Route:
     rule: str
@@ -327,32 +398,7 @@ class Routes:
                 methods=['POST']
             )
 
-            self.app.add_url_rule(
-                "/api/formats/video_cassette/generations",
-                endpoint='video_cassette_generations',
-                view_func=lambda: middleware.get_enums(
-                    self.db_engine.db_session_maker,
-                    "VideoCassetteGenerations"
-                )
-            )
-
-            self.app.add_url_rule(
-                "/api/formats/video_cassette/cassette_type",
-                endpoint='video_cassette_cassette_type',
-                view_func=lambda: middleware.get_enums(
-                    self.db_engine.db_session_maker,
-                    "VideoCassetteType"
-                )
-            )
-
-            self.app.add_url_rule(
-                "/api/formats/optical/optical_types",
-                endpoint='optical_optical_types',
-                view_func=lambda: middleware.get_enums(
-                    self.db_engine.db_session_maker,
-                    "OpticalType"
-                )
-            )
+            self.add_enum_routes(self.db_engine.db_session_maker)
 
             for url_rule in self.get_api_routes():
                 self.app.logger.debug(f"Loading rule {url_rule.rule}")
@@ -363,6 +409,17 @@ class Routes:
                     methods=url_rule.methods,
                     defaults=url_rule.defaults
                 )
+
+    def add_enum_routes(self, db_session_maker):
+        for route in FORMAT_ENUM_ROUTES:
+            self.app.add_url_rule(
+                route[0],
+                endpoint=route[1],
+                view_func=lambda class_name=route[2]: middleware.get_enums(
+                    db_session_maker,
+                    class_name
+                )
+            )
 
     def _page_routes(self, data_prov) -> Iterator[Tuple[str, str, Callable]]:
         file_details = frontend.FileDetailsFrontend(data_prov)

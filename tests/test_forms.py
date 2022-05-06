@@ -475,7 +475,7 @@ def dummy_object(app, project):
             {
                 'name': 'open reel diameter',
                 'format_id': '4',
-                'openReelReelDiameter': formats.open_reel_reel_diameter.index('7') + 1,
+                'openReelReelDiameterId': formats.open_reel_reel_diameter.index('7') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -498,7 +498,7 @@ def dummy_object(app, project):
             {
                 'name': 'open reel reel thickness',
                 'format_id': '4',
-                'openReelReelThickness': formats.open_reel_reel_thickness.index('1.0') + 1,
+                'openReelReelThicknessId': formats.open_reel_reel_thickness.index('1.0') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -542,7 +542,7 @@ def dummy_object(app, project):
                 'name': 'open reel base',
                 'format_id': '4',
                 'openReelReelTitle': 'open reel title',
-                'openReelBase': formats.open_reel_base.index('Acetate') + 1,
+                'openReelBaseId': formats.open_reel_base.index('Acetate') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -565,7 +565,7 @@ def dummy_object(app, project):
             {
                 'name': 'open reel wind',
                 'format_id': '4',
-                'openReelWind': formats.open_reel_wind.index('Heads out') + 1,
+                'openReelWindId': formats.open_reel_wind.index('Heads out') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -588,7 +588,7 @@ def dummy_object(app, project):
             {
                 'name': 'open reel reel speed',
                 'format_id': '4',
-                'openReelReelSpeed': formats.open_reel_reel_speed.index('3 3/4') + 1,
+                'openReelReelSpeedId': formats.open_reel_reel_speed.index('3 3/4') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -611,7 +611,7 @@ def dummy_object(app, project):
             {
                 'name': 'open reel track configuration',
                 'format_id': '4',
-                'openReelTrackConfiguration':
+                'openReelTrackConfigurationId':
                     formats.open_reel_track_configuration.index(
                         '1/4 track mono'
                     ) + 1,
@@ -657,7 +657,7 @@ def dummy_object(app, project):
             {
                 'name': 'open reel generation',
                 'format_id': '4',
-                'openReelGeneration': formats.open_reel_generation.index('dub') + 1,
+                'openReelGenerationId': formats.open_reel_generation.index('dub') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },
@@ -687,18 +687,18 @@ def dummy_object(app, project):
                 'openReelDateOfReel': '05-23-2022',
                 'openReelTrackCount': '2',
                 'openReelReelSize': '7',
-                'openReelReelDiameter': formats.open_reel_reel_diameter.index('7') + 1,
-                'openReelReelThickness': formats.open_reel_reel_thickness.index('1.0') + 1,
+                'openReelReelDiameterId': formats.open_reel_reel_diameter.index('7') + 1,
+                'openReelReelThicknessId': formats.open_reel_reel_thickness.index('1.0') + 1,
                 'openReelReelBrand': 'some brand',
-                'openReelBase': formats.open_reel_base.index('Acetate') + 1,
-                'openReelWind': formats.open_reel_wind.index('Heads out') + 1,
-                'openReelReelSpeed': formats.open_reel_reel_speed.index('3 3/4') + 1,
-                'openReelTrackConfiguration':
+                'openReelBaseId': formats.open_reel_base.index('Acetate') + 1,
+                'openReelWindId': formats.open_reel_wind.index('Heads out') + 1,
+                'openReelReelSpeedId': formats.open_reel_reel_speed.index('3 3/4') + 1,
+                'openReelTrackConfigurationId':
                     formats.open_reel_track_configuration.index(
                         '1/4 track mono'
                     ) + 1,
                 'openReelDuration': '01:23:33',
-                'openReelGeneration': formats.open_reel_generation.index('dub') + 1,
+                'openReelGenerationId': formats.open_reel_generation.index('dub') + 1,
                 'inspectionDate': '05-23-2022',
                 'transferDate': '05-18-2022'
             },

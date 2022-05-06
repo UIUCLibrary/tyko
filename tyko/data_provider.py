@@ -1,5 +1,6 @@
 # pylint: disable=redefined-builtin, invalid-name
 import abc
+import functools
 from abc import ABC, ABCMeta
 from datetime import datetime
 from typing import List, Optional, Iterator, Dict, Any
@@ -1826,6 +1827,7 @@ class CassetteTapeThicknessConnector(EnumConnector):
 
 
 def verify_unused_params(func):
+    @functools.wraps(func)
     def wrapper(connector, session, values):
         metadata = values.copy()
         result = func(connector, session, metadata)
@@ -1885,89 +1887,81 @@ class OpenReelDataConnector(FormatConnector):
         new_item.reel_brand = format_data.pop('openReelReelBrand', None)
         new_item.duration = format_data.pop('openReelDuration', None)
 
-        if "openReelSubTypeId" in format_data:
+        subtype_id = format_data.pop('openReelSubTypeId', None)
+        if subtype_id:
             new_item.subtype = session.query(formats.OpenReelSubType).filter(
-                formats.OpenReelSubType.table_id == format_data.pop(
-                    'openReelSubTypeId'
-                )
+                formats.OpenReelSubType.table_id == subtype_id
             ).one()
 
-        if "openReelReelWidthId" in format_data:
+        reel_width_id = format_data.pop('openReelReelWidthId', None)
+        if reel_width_id:
             new_item.reel_width = \
                 session.query(
                     formats.OpenReelReelWidth
                 ).filter(
-                    formats.OpenReelReelWidth.table_id == format_data.pop(
-                        'openReelReelWidthId'
-                    )
+                    formats.OpenReelReelWidth.table_id == reel_width_id
                 ).one()
 
-        if "openReelReelDiameter" in format_data:
+        reel_diameter_id = format_data.pop('openReelReelDiameterId', None)
+        if reel_diameter_id:
             new_item.reel_diameter = \
                 session.query(
                     formats.OpenReelReelDiameter
                 ).filter(
-                    formats.OpenReelReelDiameter.table_id == format_data.pop(
-                        'openReelReelDiameter'
-                    )
+                    formats.OpenReelReelDiameter.table_id == reel_diameter_id
                 ).one()
 
-        if "openReelReelThickness" in format_data:
+        reel_thickness_id = format_data.pop('openReelReelThicknessId', None)
+        if reel_thickness_id:
             new_item.reel_thickness = \
                 session.query(
                     formats.OpenReelReelThickness
                 ).filter(
-                    formats.OpenReelReelThickness.table_id == format_data.pop(
-                        'openReelReelThickness'
-                    )
+                    formats.OpenReelReelThickness.table_id == reel_thickness_id
                 ).one()
 
-        if "openReelBase" in format_data:
+        base_id = format_data.pop('openReelBaseId', None)
+        if base_id:
             new_item.base = session.query(formats.OpenReelBase).filter(
-                formats.OpenReelBase.table_id == format_data.pop(
-                    'openReelBase'
-                )
+                formats.OpenReelBase.table_id == base_id
             ).one()
 
-        if "openReelWind" in format_data:
+        wind_id = format_data.pop('openReelWindId', None)
+        if wind_id:
             new_item.wind = session.query(formats.OpenReelReelWind).filter(
-                formats.OpenReelReelWind.table_id == format_data.pop(
-                    'openReelWind'
-                )
+                formats.OpenReelReelWind.table_id == wind_id
             ).one()
 
-        if "openReelReelSpeed" in format_data:
+        reel_speed_id = format_data.pop('openReelReelSpeedId', None)
+        if reel_speed_id:
             new_item.reel_speed = session.query(formats.OpenReelSpeed).filter(
-                formats.OpenReelSpeed.table_id == format_data.pop(
-                    'openReelReelSpeed'
-                )
+                formats.OpenReelSpeed.table_id == reel_speed_id
             ).one()
 
-        if "openReelTrackConfiguration" in format_data:
+        configuration_id = \
+            format_data.pop('openReelTrackConfigurationId', None)
+
+        if configuration_id:
             new_item.track_configuration = session.query(
                 formats.OpenReelTrackConfiguration
             ).filter(
-                formats.OpenReelTrackConfiguration.table_id == format_data.pop(
-                    'openReelTrackConfiguration'
-                )
+                formats.OpenReelTrackConfiguration.table_id == configuration_id
             ).one()
 
-        if "openReelGeneration" in format_data:
+        generation_id = format_data.pop('openReelGenerationId', None)
+        if generation_id:
             new_item.generation = \
                 session.query(formats.OpenReelGeneration).filter(
-                    formats.OpenReelGeneration.table_id == format_data.pop(
-                        'openReelGeneration'
-                    )
+                    formats.OpenReelGeneration.table_id == generation_id
                 ).one()
-
-        if "openReelDateOfReel" in format_data:
+        open_reel_date_of_reel = format_data.pop('openReelDateOfReel', None)
+        if open_reel_date_of_reel:
             new_item.date_of_reel = \
                 utils.create_precision_datetime(
-                    format_data.pop('openReelDateOfReel'),
+                    open_reel_date_of_reel,
                     3
                 )
         return new_item
-        # return super().create_new_format_item(session, format_data)
 
 
 class VideoCassetteDataConnector(FormatConnector):

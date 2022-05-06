@@ -1,30 +1,22 @@
 <div class="mb-3 row">
     <label for="openReelReelTitle" class="col-sm-2 col-form-label">Title of reel</label>
     <div class="col-sm-10">
-        <input type="text" id="openReelReelTitle" class="form-control" name="openReelReelTitle" required>
+        <input type="text" id="openReelReelTitle" class="form-control" name="openReelReelTitle">
     </div>
 </div>
 <div class="mb-3 row">
     <label for="openReelReelSubType" class="col-sm-2 col-form-label">Reel type</label>
     <div class="col-sm-10">
-        <select class="form-select" name="openReelReelSubType" id="openReelReelSubType" required>
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>Video</option>
-            <option>Audio</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_sub_type') }}" name="openReelSubTypeId" id="openReelReelSubType">
+            <option value=""></option>
         </select>
     </div>
 </div>
 <div class="mb-3 row">
     <label for="openReelReelWidth" class="col-sm-2 col-form-label">Reel width (inches)</label>
     <div class="col-sm-10">
-        <select class="form-select" name="openReelReelWidth" id="openReelReelWidth">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>1/4</option>
-            <option>1/2</option>
-            <option>1</option>
-            <option>2</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_reel_width') }}" name="openReelReelWidthId" id="openReelReelWidth">
+            <option value=""></option>
         </select>
     </div>
 </div>
@@ -33,7 +25,7 @@
     <div class="col-sm-10">
         <div class="input-group">
             <input type="text" id="openReelDateOfReel" class="form-control tyko-date-selector" name="openReelDateOfReel">
-            <button type="button" onclick="tyko.openDateSelect('openReelDateOfReel')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+            <button type="button" onclick="tyko.openDateSelect('openReelDateOfReel', 'mm-dd-yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
         </div>
     </div>
 </div>
@@ -54,12 +46,8 @@
 <div class="mb-3 row">
     <label for="openReelReelDiameter" class="col-sm-2 col-form-label">Reel diameter (inches)</label>
     <div class="col-sm-10">
-        <select class="form-select" name="openReelReelDiameter" id="openReelReelDiameter">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>5</option>
-            <option>7</option>
-            <option>10.5</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_reel_diameter') }}" name="openReelReelDiameterId" id="openReelReelDiameter">
+            <option value=""></option>
         </select>
     </div>
 </div>
@@ -67,7 +55,7 @@
 <div class="mb-3 row">
     <label for="openReelReelType" class="col-sm-2 col-form-label">Reel type</label>
     <div class="col-sm-10">
-        <input type="text" id="openReelReelSize" class="form-control" name="openReelReelSize">
+        <input type="text" id="openReelReelSize" class="form-control" name="openReelReelType">
     </div>
 </div>
 
@@ -75,7 +63,9 @@
 <div class="mb-3 row">
     <label for="openReelReelThickness" class="col-sm-2 col-form-label">Reel thickness (mil)</label>
     <div class="col-sm-10">
-        <input type="text" id="openReelReelThickness" class="form-control" name="openReelReelThickness">
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_reel_thickness') }}" name="openReelReelThicknessId" id="openReelReelThickness">
+            <option value=""></option>
+        </select>
     </div>
 </div>
 
@@ -90,11 +80,8 @@
 <div class="mb-3 row">
     <label for="openReelBase" class="col-sm-2 col-form-label">Base</label>
     <div class="col-sm-10">
-        <select class="form-select" name=openReelBase" id="openReelBase">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>Acetate</option>
-            <option>Polyester</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_base') }}" name="openReelBaseId" id="openReelBase">
+            <option value=""></option>
         </select>
     </div>
 </div>
@@ -102,38 +89,24 @@
 <div class="mb-3 row">
     <label for="openReelWind" class="col-sm-2 col-form-label">Wind</label>
     <div class="col-sm-10">
-        <select class="form-select" name="openReelWind" id="openReelWind" required>
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>Heads out</option>
-            <option>Tails out</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_wind') }}" name="openReelWindId" id="openReelWind">
+            <option value=""></option>
         </select>
     </div>
 </div>
 <div class="mb-3 row">
     <label for="openReelReelSpeed" class="col-sm-2 col-form-label">Reel speed (ips)</label>
     <div class="col-sm-10">
-        <select class="form-select" name="openReelReelSpeed" id="openReelReelSpeed" required>
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>1 7/8</option>
-            <option>3 3/4</option>
-            <option>7 1/2</option>
-            <option>15</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_reel_speed') }}" name="openReelReelSpeedId" id="openReelReelSpeed">
+            <option value=""></option>
         </select>
     </div>
 </div>
 <div class="mb-3 row">
     <label for="openReelTrackConfiguration" class="col-sm-2 col-form-label">Track configuration</label>
     <div class="col-sm-10">
-        <select class="form-select" name="openReelTrackConfiguration" id="openReelTrackConfiguration" required>
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>Full track</option>
-            <option>1/4 track mono</option>
-            <option>1/4 stereo</option>
-            <option>1/2 track mono</option>
-            <option>1/2 track stereo</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_track_configuration') }}" name="openReelTrackConfigurationId" id="openReelTrackConfiguration">
+            <option value=""></option>
         </select>
     </div>
 </div>
@@ -148,14 +121,8 @@
 <div class="mb-3 row">
     <label for="openReelGeneration" class="col-sm-2 col-form-label">Generation</label>
     <div class="col-sm-10">
-        <select class="form-select" name="openReelGeneration" id="openReelGeneration" required>
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>source (original)</option>
-            <option>dub</option>
-            <option>master</option>
-            <option>commercial</option>
-            <option>other</option>
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('open_reel_generation') }}" name="openReelGenerationId" id="openReelGeneration">
+            <option value=""></option>
         </select>
     </div>
 </div>
@@ -164,8 +131,8 @@
     <label for="openReelInspectionDate" class="col-sm-2 col-form-label">Inspection Date (M/D/YYYY)</label>
     <div class="col-sm-10">
         <div class="input-group">
-            <input type="text" id="openReelInspectionDate" class="form-control tyko-date-selector" name="openReelInspectionDate">
-            <button type="button" onclick="tyko.openDateSelect('openReelInspectionDate')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+            <input type="text" id="openReelInspectionDate" class="form-control tyko-date-selector" name="inspectionDate">
+            <button type="button" onclick="tyko.openDateSelect('openReelInspectionDate', 'mm-dd-yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
         </div>
     </div>
 </div>
@@ -174,8 +141,8 @@
     <label for="openReelTransferDate" class="col-sm-2 col-form-label">Transfer Date (M/D/YYYY)</label>
     <div class="col-sm-10">
         <div class="input-group">
-            <input type="text" id="openReelTransferDate" class="form-control tyko-date-selector" name="openReelTransferDate">
-            <button type="button" onclick="tyko.openDateSelect('openReelTransferDate')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+            <input type="text" id="openReelTransferDate" class="form-control tyko-date-selector" name="transferDate">
+            <button type="button" onclick="tyko.openDateSelect('openReelTransferDate', 'mm-dd-yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
         </div>
     </div>
 </div>
