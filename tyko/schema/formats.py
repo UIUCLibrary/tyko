@@ -736,7 +736,7 @@ class GroovedDiscPlaybackSpeed(EnumTable):
 
 class GroovedDiscDiscBase(EnumTable):
     __tablename__ = "grooved_disc_disc_base"
-    default_values = ["glass", "cardboard", "aluminum", "unknown"]
+    default_values = ["Glass", "Cardboard", "Aluminum", "Unknown"]
 
 
 item_has_contacts_table = db.Table(

@@ -85,6 +85,31 @@ FORMAT_ENUM_ROUTES = [
         "/api/formats/open_reel/wind",
         'open_reel_wind',
         "OpenReelReelWind"
+    ),
+    (
+        "/api/formats/grooved_disc/disc_diameter",
+        'grooved_disc_disc_diameter',
+        "GroovedDiscDiscDiameter"
+    ),
+    (
+        "/api/formats/grooved_disc/disc_material",
+        'grooved_disc_disc_material',
+        "GroovedDiscDiscMaterial"
+    ),
+    (
+        "/api/formats/grooved_disc/playback_direction",
+        'grooved_disc_playback_direction',
+        "GroovedDiscPlaybackDirection"
+    ),
+    (
+        "/api/formats/grooved_disc/playback_speed",
+        'grooved_disc_playback_speed',
+        "GroovedDiscPlaybackSpeed"
+    ),
+    (
+        "/api/formats/grooved_disc/disc_base",
+        'grooved_disc_disc_base',
+        "GroovedDiscDiscBase"
     )
 ]
 

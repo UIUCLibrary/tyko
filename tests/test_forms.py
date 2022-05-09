@@ -955,16 +955,16 @@ def dummy_object(app, project):
                 'format_id': '5',
                 'groovedDiscDiscBaseId':
                     formats.GroovedDiscDiscBase.default_values.index(
-                        'glass'
+                        'Glass'
                     ) + 1
             },
             {
                 "files": [],
                 "format_details":{
                     'disc_base': {
-                        "name": 'glass',
+                        "name": 'Glass',
                         "id": formats.GroovedDiscDiscBase.default_values.index(
-                            'glass'
+                            'Glass'
                         ) + 1,
                     }
                 },
@@ -1047,7 +1047,7 @@ def dummy_object(app, project):
                     ) + 1,
                 'groovedDiscDiscBaseId':
                     formats.GroovedDiscDiscBase.default_values.index(
-                        'glass'
+                        'Glass'
                     ) + 1,
                 'groovedDiscDiscDirectionId':
                     formats.GroovedDiscPlaybackDirection.default_values.index(
@@ -1072,9 +1072,9 @@ def dummy_object(app, project):
                     'side_b_duration': '00:12:22',
                     'disc_diameter': {
                         "name": '8',
-                        "id": formats.GroovedDiscDiscDiameter.default_values.index(
-                            '8'
-                        ) + 1,
+                        "id": formats.GroovedDiscDiscDiameter
+                                  .default_values
+                                  .index('8') + 1,
                     },
                     "disc_material": {
                         "name": 'Shellac/78',
@@ -1083,9 +1083,9 @@ def dummy_object(app, project):
                         ) + 1,
                     },
                     'disc_base': {
-                        "name": 'glass',
+                        "name": 'Glass',
                         "id": formats.GroovedDiscDiscBase.default_values.index(
-                            'glass'
+                            'Glass'
                         ) + 1,
                     },
                     'disc_direction': {
