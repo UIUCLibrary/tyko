@@ -553,9 +553,9 @@ class AudioCassette(AVFormat):
 
     # REGEX
     REGEX_DAY_MONTH_YEAR = \
-        re.compile(r"^([0-1]?[0-9])/([0-2][0-9])/([0-9]){4}")
+        re.compile(r"^([0-1]?\d)/([0-2]\d)/(\d){4}")
     REGEX_YEAR_ONLY = re.compile(r"^([1-9]){4}$")
-    REGEX_MONTH_YEAR = re.compile(r"^([0-1]?[0-9])/([0-9]){4}$")
+    REGEX_MONTH_YEAR = re.compile(r"^([0-1]?\d)/(\d){4}$")
 
     @classmethod
     def serialize_date(cls, date: Optional[datetime.date],
