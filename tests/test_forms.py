@@ -911,18 +911,20 @@ def dummy_object(app, project):
             {
                 'name': 'groove disc Diameter',
                 'format_id': '5',
-                'groovedDiscDiscDiameterId': formats.GroovedDiscDiscDiameter.default_values.index(
-                            '8'
-                        ) + 1,
+                'groovedDiscDiscDiameterId':
+                    formats.GroovedDiscDiscDiameter
+                        .default_values.index('8') + 1,
             },
             {
                 "files": [],
                 "format_details":{
                     'disc_diameter': {
                         "name": '8',
-                        "id": formats.GroovedDiscDiscDiameter.default_values.index(
-                            '8'
-                        ) + 1,
+                        "id":
+                            formats
+                                .GroovedDiscDiscDiameter
+                                .default_values
+                                .index('8') + 1,
                     }
                 },
             }
@@ -942,9 +944,10 @@ def dummy_object(app, project):
                 "format_details": {
                     "disc_material": {
                         "name": 'Shellac/78',
-                        "id": formats.GroovedDiscDiscMaterial.default_values.index(
-                            'Shellac/78'
-                        ) + 1,
+                        "id":
+                            formats.GroovedDiscDiscMaterial
+                                .default_values
+                                .index('Shellac/78') + 1,
                     }
                 },
             }
@@ -985,9 +988,11 @@ def dummy_object(app, project):
                 "format_details":{
                     'disc_direction': {
                         "name": 'In to Out',
-                        "id": formats.GroovedDiscPlaybackDirection.default_values.index(
-                            'In to Out',
-                        ) + 1
+                        "id":
+                            formats
+                                .GroovedDiscPlaybackDirection
+                                .default_values
+                                .index('In to Out') + 1
                     }
                 },
             }
@@ -1007,9 +1012,10 @@ def dummy_object(app, project):
                     'playback_speed': {
                         "name": '45',
                         "id":
-                            formats.GroovedDiscPlaybackSpeed.default_values.index(
-                                '45',
-                            ) + 1
+                            formats
+                                .GroovedDiscPlaybackSpeed
+                                .default_values
+                                .index('45') + 1
                     }
                 },
             }
@@ -1072,15 +1078,19 @@ def dummy_object(app, project):
                     'side_b_duration': '00:12:22',
                     'disc_diameter': {
                         "name": '8',
-                        "id": formats.GroovedDiscDiscDiameter
-                                  .default_values
-                                  .index('8') + 1,
+                        "id":
+                            formats
+                                .GroovedDiscDiscDiameter
+                                .default_values
+                                .index('8') + 1,
                     },
                     "disc_material": {
                         "name": 'Shellac/78',
-                        "id": formats.GroovedDiscDiscMaterial.default_values.index(
-                            'Shellac/78'
-                        ) + 1,
+                        "id":
+                            formats
+                                .GroovedDiscDiscMaterial
+                                .default_values
+                                .index('Shellac/78') + 1,
                     },
                     'disc_base': {
                         "name": 'Glass',
@@ -1090,16 +1100,18 @@ def dummy_object(app, project):
                     },
                     'disc_direction': {
                         "name": 'In to Out',
-                        "id": formats.GroovedDiscPlaybackDirection.default_values.index(
-                            'In to Out',
-                        ) + 1
+                        "id":
+                            formats.GroovedDiscPlaybackDirection
+                                .default_values
+                                .index('In to Out') + 1
                     },
                     'playback_speed': {
                         "name": '45',
                         "id":
-                            formats.GroovedDiscPlaybackSpeed.default_values.index(
-                                '45',
-                            ) + 1
+                            formats
+                                .GroovedDiscPlaybackSpeed
+                                .default_values
+                                .index('45') + 1
                     },
                 },
                 'inspection_date': '5/18/2022',
