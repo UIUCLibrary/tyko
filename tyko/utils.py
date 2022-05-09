@@ -38,11 +38,6 @@ def create_precision_datetime(date: str, precision: int = 3):
     return datetime.strptime(date, formatter)
 
 
-def create_precision_datetime_with_slash(date: str, precision: int = 3):
-
-    return datetime.strptime(date, "%m/%d/%Y")
-
-
 def serialize_precision_datetime(
         date: Union[date, Column[Date]],
         precision=3
@@ -51,9 +46,3 @@ def serialize_precision_datetime(
     if formatter is None:
         raise AttributeError("Invalid precision type")
     return date.strftime(formatter)
-
-
-# def serialize_precision_datetime_with_slash(
-#         date: Union[date, Column[Date]],
-# ) -> str:
-#     return date.strftime("%-m/%-d/%Y")

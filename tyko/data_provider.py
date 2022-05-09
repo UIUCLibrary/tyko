@@ -1010,7 +1010,7 @@ class ItemDataConnector(AbsNotesConnector):
                     )
             if inspection_date:
                 new_item.inspection_date = \
-                    utils.create_precision_datetime_with_slash(
+                    utils.create_precision_datetime(
                         inspection_date
                     )
             for instance_file in kwargs.get("files", []):
@@ -1856,7 +1856,7 @@ class OpticalDataConnector(FormatConnector):
 
         if date_of_item := format_data.pop('opticalDateOfItem', None):
             new_item.date_of_item = \
-                utils.create_precision_datetime_with_slash(date_of_item)
+                utils.create_precision_datetime(date_of_item)
 
         new_item.duration = format_data.pop('opticalDuration', None)
 
@@ -1892,7 +1892,7 @@ class GroovedDiscDataConnector(FormatConnector):
                 None
         ):
             new_item.date_of_disc = \
-                utils.create_precision_datetime_with_slash(date_of_disc)
+                utils.create_precision_datetime(date_of_disc)
 
         new_item.side_a_duration = \
             format_data.pop('groovedDiscSideADuration', None)
@@ -2046,7 +2046,7 @@ class OpenReelDataConnector(FormatConnector):
                 None
         ):
             new_item.date_of_reel = \
-                utils.create_precision_datetime_with_slash(
+                utils.create_precision_datetime(
                     open_reel_date_of_reel
                 )
         return new_item
@@ -2069,7 +2069,7 @@ class VideoCassetteDataConnector(FormatConnector):
 
         if "dateOfCassette" in format_data:
             new_item.date_of_cassette = \
-                utils.create_precision_datetime_with_slash(
+                utils.create_precision_datetime(
                     format_data.pop('dateOfCassette'),
                 )
 
