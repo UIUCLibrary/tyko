@@ -625,6 +625,8 @@ class ObjectDataConnector(AbsNotesConnector):
                     OpticalDataConnector,
                 formats.format_types['open reel'][0]:
                     OpenReelDataConnector,
+                formats.format_types['grooved disc'][0]:
+                    GroovedDiscDataConnector,
             }
             connector = connectors.get(
                 int(data['format_id']),
@@ -1008,9 +1010,8 @@ class ItemDataConnector(AbsNotesConnector):
                     )
             if inspection_date:
                 new_item.inspection_date = \
-                    utils.create_precision_datetime(
-                        inspection_date,
-                        3
+                    utils.create_precision_datetime_with_slash(
+                        inspection_date
                     )
             for instance_file in kwargs.get("files", []):
                 new_file = InstantiationFile(file_name=instance_file['name'])
@@ -1855,7 +1856,7 @@ class OpticalDataConnector(FormatConnector):
 
         if date_of_item := format_data.pop('opticalDateOfItem', None):
             new_item.date_of_item = \
-                utils.create_precision_datetime(date_of_item, 3)
+                utils.create_precision_datetime_with_slash(date_of_item)
 
         new_item.duration = format_data.pop('opticalDuration', None)
 
@@ -1866,6 +1867,99 @@ class OpticalDataConnector(FormatConnector):
                         optical_type_id
                     )
                 ).one()
+        return new_item
+
+
+class GroovedDiscDataConnector(FormatConnector):
+    @verify_unused_params
+    def create_new_format_item(self, session, format_data):
+        new_item = formats.GroovedDisc(
+            name=format_data.pop('name'),
+            format_type=self.get_format_type(
+                session, int(format_data.pop("format_id"))
+            )
+        )
+        new_item.title_of_album = \
+            format_data.pop('groovedDiscTitleOfAlbum', None)
+
+        new_item.title_of_disc = \
+            format_data.pop('groovedDiscTitleOfDisc', None)
+
+        new_item.side_a_label = format_data.pop('groovedDiscSideALabel', None)
+        new_item.side_b_label = format_data.pop('groovedDiscSideBLabel', None)
+        if date_of_disc := format_data.pop(
+                'groovedDiscDateOfDisc',
+                None
+        ):
+            new_item.date_of_disc = \
+                utils.create_precision_datetime_with_slash(date_of_disc)
+
+        new_item.side_a_duration = \
+            format_data.pop('groovedDiscSideADuration', None)
+
+        new_item.side_b_duration = \
+            format_data.pop('groovedDiscSideBDuration', None)
+
+        if diameter_id := format_data.pop('groovedDiscDiscDiameterId', None):
+            try:
+                new_item.disc_diameter = \
+                    session.query(
+                        formats.GroovedDiscDiscDiameter
+                    ).filter(
+                        formats
+                        .GroovedDiscDiscDiameter
+                        .table_id == int(diameter_id)
+                    ).one()
+            except sqlalchemy.exc.NoResultFound as e:
+                raise KeyError(f"No enum found for id: {diameter_id}") from e
+
+        if disc_material_id := format_data.pop(
+                'groovedDiscDiscMaterialId',
+                None
+        ):
+            new_item.disc_material = \
+                session.query(
+                    formats.GroovedDiscDiscMaterial
+                ).filter(
+                    formats
+                    .GroovedDiscDiscMaterial
+                    .table_id == int(disc_material_id)
+                ).one()
+
+        if disc_base_id := format_data.pop('groovedDiscDiscBaseId', None):
+            new_item.disc_base = \
+                session.query(
+                    formats.GroovedDiscDiscBase
+                ).filter(
+                    formats.GroovedDiscDiscBase.table_id == int(disc_base_id)
+                ).one()
+
+        if disc_direction_id := format_data.pop(
+                'groovedDiscDiscDirectionId',
+                None
+        ):
+            new_item.playback_direction = \
+                session.query(
+                    formats.GroovedDiscPlaybackDirection
+                ).filter(
+                    formats
+                    .GroovedDiscPlaybackDirection
+                    .table_id == int(disc_direction_id)
+                ).one()
+
+        if disc_speed_id := format_data.pop(
+                'groovedDiscPlaybackSpeedId',
+                None
+        ):
+            new_item.playback_speed = \
+                session.query(
+                    formats.GroovedDiscPlaybackSpeed
+                ).filter(
+                    formats
+                    .GroovedDiscPlaybackSpeed
+                    .table_id == int(disc_speed_id)
+                ).one()
+
         return new_item
 
 
@@ -1952,9 +2046,8 @@ class OpenReelDataConnector(FormatConnector):
                 None
         ):
             new_item.date_of_reel = \
-                utils.create_precision_datetime(
-                    open_reel_date_of_reel,
-                    3
+                utils.create_precision_datetime_with_slash(
+                    open_reel_date_of_reel
                 )
         return new_item
 
@@ -1976,9 +2069,8 @@ class VideoCassetteDataConnector(FormatConnector):
 
         if "dateOfCassette" in format_data:
             new_item.date_of_cassette = \
-                utils.create_precision_datetime(
+                utils.create_precision_datetime_with_slash(
                     format_data.pop('dateOfCassette'),
-                    3
                 )
 
         new_item.duration = format_data.pop('duration', None)

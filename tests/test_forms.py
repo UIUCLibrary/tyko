@@ -81,7 +81,7 @@ def dummy_object(app, project):
                 "format_id": format_types['video cassette'][0],
                 'titleOfCassette': 'Title',
                 'label':'This is a label',
-                'dateOfCassette': '12-03-2003',
+                'dateOfCassette': '12/3/2003',
             },
             {
                 'files': [],
@@ -91,7 +91,7 @@ def dummy_object(app, project):
                 "format_details": {
                     'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'date_of_cassette': '12-03-2003',
+                    'date_of_cassette': '12/3/2003',
                 }
             }
         ),
@@ -102,7 +102,7 @@ def dummy_object(app, project):
                 "format_id": format_types['video cassette'][0],
                 'titleOfCassette': 'Title',
                 'label':'This is a label',
-                'dateOfCassette': '12-03-2003',
+                'dateOfCassette': '12/3/2003',
                 'duration': '00:39:21',
             },
             {
@@ -113,7 +113,7 @@ def dummy_object(app, project):
                 "format_details": {
                     'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'date_of_cassette': '12-03-2003',
+                    'date_of_cassette': '12/3/2003',
                     'duration': '00:39:21',
                 }
             }
@@ -124,9 +124,9 @@ def dummy_object(app, project):
                 "format_id": format_types['video cassette'][0],
                 'titleOfCassette': 'Title',
                 'label':'This is a label',
-                'dateOfCassette': '12-03-2003',
+                'dateOfCassette': '12/3/2003',
                 'duration': '00:39:21',
-                'inspectionDate': '12-03-2003',
+                'inspectionDate': '12/3/2003',
             },
             {
                 'files': [],
@@ -136,10 +136,10 @@ def dummy_object(app, project):
                 "format_details": {
                     'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'date_of_cassette': '12-03-2003',
+                    'date_of_cassette': '12/3/2003',
                     'duration': '00:39:21',
                 },
-                'inspection_date': '12-03-2003',
+                'inspection_date': '12/3/2003',
             }
         ),
         (
@@ -148,10 +148,10 @@ def dummy_object(app, project):
                 "format_id": format_types['video cassette'][0],
                 'titleOfCassette': 'Title',
                 'label':'This is a label',
-                'dateOfCassette': '12-03-2003',
+                'dateOfCassette': '12/3/2003',
                 'duration': '00:39:21',
-                'inspectionDate': '12-03-2003',
-                'transferDate':'12-03-2003',
+                'inspectionDate': '12/3/2003',
+                'transferDate':'12/3/2003',
             },
             {
                 'files': [],
@@ -161,11 +161,11 @@ def dummy_object(app, project):
                 "format_details": {
                     'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'date_of_cassette': '12-03-2003',
+                    'date_of_cassette': '12/3/2003',
                     'duration': '00:39:21',
                 },
-                'inspection_date': '12-03-2003',
-                'transfer_date': '12-03-2003',
+                'inspection_date': '12/3/2003',
+                'transfer_date': '12/3/2003',
             }
         ),
         (
@@ -174,15 +174,15 @@ def dummy_object(app, project):
                 "format_id": format_types['video cassette'][0],
                 'titleOfCassette': 'Title',
                 'label':'This is a label',
-                'dateOfCassette': '12-03-2003',
+                'dateOfCassette': '12/3/2003',
                 'cassetteTypeId':
                     formats.VideoCassetteType.default_values.index(
                         'Betamax'
                     ) + 1,
                     # + 1 because the database indexes start at 1 not 0
                 'duration': '00:39:21',
-                'inspectionDate': '12-03-2003',
-                'transferDate':'12-03-2003',
+                'inspectionDate': '12/3/2003',
+                'transferDate':'12/3/2003',
             },
             {
                 'files': [],
@@ -192,7 +192,7 @@ def dummy_object(app, project):
                 "format_details": {
                     'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'date_of_cassette': '12-03-2003',
+                    'date_of_cassette': '12/3/2003',
                     'duration': '00:39:21',
                     'cassette_type': {
                         "name": 'Betamax',
@@ -201,8 +201,8 @@ def dummy_object(app, project):
                         ) + 1,
                     },
                 },
-                'inspection_date': '12-03-2003',
-                'transfer_date': '12-03-2003',
+                'inspection_date': '12/3/2003',
+                'transfer_date': '12/3/2003',
             }
         ),
         (
@@ -211,10 +211,10 @@ def dummy_object(app, project):
                 "format_id": format_types['video cassette'][0],
                 'titleOfCassette': 'Title',
                 'label':'This is a label',
-                'dateOfCassette': '12-03-2003',
+                'dateOfCassette': '12/3/2003',
                 'duration': '00:39:21',
-                'inspectionDate': '12-03-2003',
-                'transferDate':'12-03-2003',
+                'inspectionDate': '12/3/2003',
+                'transferDate':'12/3/2003',
                 'generationId':
                     formats.VideoCassetteGenerations.default_values.index(
                         'source (original)'
@@ -228,7 +228,7 @@ def dummy_object(app, project):
                 "format_details": {
                     'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'date_of_cassette': '12-03-2003',
+                    'date_of_cassette': '12/3/2003',
                     'duration': '00:39:21',
                     'generation': {
                         'id':
@@ -238,8 +238,8 @@ def dummy_object(app, project):
                         'name': 'source (original)',
                     }
                 },
-                'inspection_date': '12-03-2003',
-                'transfer_date': '12-03-2003',
+                'inspection_date': '12/3/2003',
+                'transfer_date': '12/3/2003',
             }
         ),
         (
@@ -252,10 +252,10 @@ def dummy_object(app, project):
                         'Betamax'
                     ) + 1,
                 'label':'This is a label',
-                'dateOfCassette': '12-03-2003',
+                'dateOfCassette': '12/3/2003',
                 'duration': '00:39:21',
-                'inspectionDate': '12-03-2003',
-                'transferDate':'12-03-2003',
+                'inspectionDate': '12/3/2003',
+                'transferDate':'12/3/2003',
                 'generationId':
                     formats.VideoCassetteGenerations.default_values.index(
                         'source (original)'
@@ -269,7 +269,7 @@ def dummy_object(app, project):
                 "format_details": {
                     'title_of_cassette': 'Title',
                     'label': 'This is a label',
-                    'date_of_cassette': '12-03-2003',
+                    'date_of_cassette': '12/3/2003',
                     'duration': '00:39:21',
                     'generation': {
                         'id':
@@ -285,8 +285,8 @@ def dummy_object(app, project):
                         ) + 1,
                     }
                 },
-                'inspection_date': '12-03-2003',
-                'transfer_date': '12-03-2003',
+                'inspection_date': '12/3/2003',
+                'transfer_date': '12/3/2003',
             }
         ),
         (
@@ -350,12 +350,12 @@ def dummy_object(app, project):
                 'format_id': '8',
                 'opticalTitleOfItem': 'dfgs',
                 'opticalLabel': 'ggg',
-                'opticalDateOfItem': '05-23-2022',
+                'opticalDateOfItem': '5/23/2022',
                 'opticalTypeId':
                     formats.OpticalType.default_values.index('CD') + 1,
                 'opticalDuration': '01:55:01',
-                'inspectionDate': '05-26-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/26/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -365,7 +365,7 @@ def dummy_object(app, project):
                 "format_details": {
                     'title_of_item': 'dfgs',
                     'label': 'ggg',
-                    'date_of_item': '05-23-2022',
+                    'date_of_item': '5/23/2022',
                     'type': {
                         "name": 'CD',
                         "id":
@@ -373,8 +373,8 @@ def dummy_object(app, project):
                     },
                     'duration': '01:55:01',
                 },
-                'inspection_date': '05-26-2022',
-                'transfer_date': '05-18-2022'
+                'inspection_date': '5/26/2022',
+                'transfer_date': '5/18/2022'
             }
         ),
         (
@@ -384,8 +384,8 @@ def dummy_object(app, project):
                 'openReelReelTitle': 'The title of the reel',
                 'openReelSubTypeId':
                     formats.OpenReelSubType.default_values.index('Video') + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -401,8 +401,8 @@ def dummy_object(app, project):
                         ) + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
 
         ),
@@ -412,8 +412,8 @@ def dummy_object(app, project):
                 'format_id': '4',
                 'openReelReelWidthId':
                     formats.OpenReelReelWidth.default_values.index('1/2') + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -428,8 +428,8 @@ def dummy_object(app, project):
                         ) + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -437,8 +437,8 @@ def dummy_object(app, project):
                 'name': 'open reel reel type',
                 'format_id': '4',
                 'openReelReelType': 'plastic',
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -448,8 +448,8 @@ def dummy_object(app, project):
                 "format_details": {
                     'reel_type': 'plastic',
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
 
         ),
@@ -457,9 +457,9 @@ def dummy_object(app, project):
             {
                 'name': 'open reel date of reel',
                 'format_id': '4',
-                'openReelDateOfReel': '05-09-2022',
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'openReelDateOfReel': '5/9/2022',
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -467,10 +467,10 @@ def dummy_object(app, project):
                     'name': 'open reel'
                 },
                 "format_details": {
-                    'date_of_reel': '05-09-2022',
+                    'date_of_reel': '5/9/2022',
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -478,8 +478,8 @@ def dummy_object(app, project):
                 'name': 'open reel reel size',
                 'format_id': '4',
                 'openReelReelSize': '7',
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -489,8 +489,8 @@ def dummy_object(app, project):
                 "format_details": {
                     'reel_size': 7,
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -499,8 +499,8 @@ def dummy_object(app, project):
                 'format_id': '4',
                 'openReelReelDiameterId':
                     formats.OpenReelReelDiameter.default_values.index('7') + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -516,8 +516,8 @@ def dummy_object(app, project):
                             ) + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -528,8 +528,8 @@ def dummy_object(app, project):
                     formats.OpenReelReelThickness.default_values.index(
                         '1.0'
                     ) + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -545,8 +545,8 @@ def dummy_object(app, project):
                             ) + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -554,8 +554,8 @@ def dummy_object(app, project):
                 'name': 'open reel reel brand',
                 'format_id': '4',
                 'openReelReelBrand': 'some brand',
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -565,8 +565,8 @@ def dummy_object(app, project):
                 "format_details": {
                     'reel_brand': 'some brand',
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -576,8 +576,8 @@ def dummy_object(app, project):
                 'openReelReelTitle': 'open reel title',
                 'openReelBaseId':
                     formats.OpenReelBase.default_values.index('Acetate') + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -592,8 +592,8 @@ def dummy_object(app, project):
                         ) + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -604,8 +604,8 @@ def dummy_object(app, project):
                     formats.OpenReelReelWind.default_values.index(
                         'Heads out'
                     ) + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -620,8 +620,8 @@ def dummy_object(app, project):
                         ) + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -630,8 +630,8 @@ def dummy_object(app, project):
                 'format_id': '4',
                 'openReelReelSpeedId':
                     formats.OpenReelSpeed.default_values.index('3 3/4') + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -646,8 +646,8 @@ def dummy_object(app, project):
                         ) + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -658,8 +658,8 @@ def dummy_object(app, project):
                     formats.OpenReelTrackConfiguration.default_values.index(
                         '1/4 track mono'
                     ) + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -675,8 +675,8 @@ def dummy_object(app, project):
                                 .index('1/4 track mono') + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -684,8 +684,8 @@ def dummy_object(app, project):
                 'name': 'open reel duration',
                 'format_id': '4',
                 'openReelDuration': '01:23:33',
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -695,8 +695,8 @@ def dummy_object(app, project):
                 "format_details": {
                     'duration': '01:23:33',
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -705,8 +705,8 @@ def dummy_object(app, project):
                 'format_id': '4',
                 'openReelGenerationId':
                     formats.OpenReelGeneration.default_values.index('dub') + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -721,8 +721,8 @@ def dummy_object(app, project):
                         ) + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
         (
@@ -735,7 +735,7 @@ def dummy_object(app, project):
                 'openReelReelWidthId':
                     formats.OpenReelReelWidth.default_values.index('1/2') + 1,
                 'openReelReelType': 'plastic',
-                'openReelDateOfReel': '05-23-2022',
+                'openReelDateOfReel': '5/23/2022',
                 'openReelTrackCount': '2',
                 'openReelReelSize': '7',
                 'openReelReelDiameterId':
@@ -760,8 +760,8 @@ def dummy_object(app, project):
                 'openReelDuration': '01:23:33',
                 'openReelGenerationId':
                     formats.OpenReelGeneration.default_values.index('dub') + 1,
-                'inspectionDate': '05-23-2022',
-                'transferDate': '05-18-2022'
+                'inspectionDate': '5/23/2022',
+                'transferDate': '5/18/2022'
             },
             {
                 'files': [],
@@ -782,7 +782,7 @@ def dummy_object(app, project):
                             '1/2'
                         ) + 1,
                     },
-                    'date_of_reel': '05-23-2022',
+                    'date_of_reel': '5/23/2022',
                     'track_count': 2,
                     'reel_size': 7,
                     'reel_diameter': {
@@ -834,10 +834,279 @@ def dummy_object(app, project):
                         ) + 1,
                     },
                 },
-                'inspection_date': '05-23-2022',
-                'transfer_date': '05-18-2022',
+                'inspection_date': '5/23/2022',
+                'transfer_date': '5/18/2022',
             }
         ),
+        (
+            {
+                'name': 'groove disc title of album',
+                'format_id': '5',
+                'groovedDiscTitleOfAlbum': 'title of album',
+            },
+            {
+                "files": [],
+                "format_details":{
+                    'title_of_album': 'title of album',
+                }
+            }
+        ),
+        (
+                {
+                    'name': 'groove disc title of disc',
+                    'format_id': '5',
+                    'groovedDiscTitleOfDisc': 'title of disc',
+                },
+                {
+                    "files": [],
+                    "format_details": {
+                        'title_of_disc': 'title of disc',
+                    }
+                }
+        ),
+        (
+            {
+                'name': 'groove disc side labels',
+                'format_id': '5',
+                'groovedDiscSideALabel': 'side a',
+                'groovedDiscSideBLabel': 'side b',
+            },
+            {
+                "files": [],
+                "format_details":{
+                    'side_a_label': 'side a',
+                    'side_b_label': 'side b',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'groove disc Date Of Disc',
+                'format_id': '5',
+                'groovedDiscDateOfDisc': '5/16/2022',
+            },
+            {
+                "files": [],
+                "format_details":{
+                    'date_of_disc': '5/16/2022',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'groove disc Side Duration',
+                'format_id': '5',
+                'groovedDiscSideADuration': '00:12:21',
+                'groovedDiscSideBDuration': '00:12:22',
+            },
+            {
+                "files": [],
+                "format_details":{
+                    'side_a_duration': '00:12:21',
+                    'side_b_duration': '00:12:22',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'groove disc Diameter',
+                'format_id': '5',
+                'groovedDiscDiscDiameterId': formats.GroovedDiscDiscDiameter.default_values.index(
+                            '8'
+                        ) + 1,
+            },
+            {
+                "files": [],
+                "format_details":{
+                    'disc_diameter': {
+                        "name": '8',
+                        "id": formats.GroovedDiscDiscDiameter.default_values.index(
+                            '8'
+                        ) + 1,
+                    }
+                },
+            }
+        ),
+        (
+            {
+                'name': 'groove disc Material',
+                'format_id': '5',
+                'groovedDiscTitleOfAlbum': 'title of album',
+                'groovedDiscDiscMaterialId':
+                    formats.GroovedDiscDiscMaterial.default_values.index(
+                        'Shellac/78'
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    "disc_material": {
+                        "name": 'Shellac/78',
+                        "id": formats.GroovedDiscDiscMaterial.default_values.index(
+                            'Shellac/78'
+                        ) + 1,
+                    }
+                },
+            }
+        ),
+        (
+            {
+                'name': 'groove disc Base',
+                'format_id': '5',
+                'groovedDiscDiscBaseId':
+                    formats.GroovedDiscDiscBase.default_values.index(
+                        'glass'
+                    ) + 1
+            },
+            {
+                "files": [],
+                "format_details":{
+                    'disc_base': {
+                        "name": 'glass',
+                        "id": formats.GroovedDiscDiscBase.default_values.index(
+                            'glass'
+                        ) + 1,
+                    }
+                },
+            }
+        ),
+        (
+            {
+                'name': 'groove disc direction',
+                'format_id': '5',
+                'groovedDiscDiscDirectionId':
+                    formats.GroovedDiscPlaybackDirection.default_values.index(
+                        'In to Out',
+                    ) + 1,
+
+            },
+            {
+                "files": [],
+                "format_details":{
+                    'disc_direction': {
+                        "name": 'In to Out',
+                        "id": formats.GroovedDiscPlaybackDirection.default_values.index(
+                            'In to Out',
+                        ) + 1
+                    }
+                },
+            }
+        ),
+        (
+            {
+                'name': 'groove disc speed',
+                'format_id': '5',
+                'groovedDiscPlaybackSpeedId':
+                    formats.GroovedDiscPlaybackSpeed.default_values.index(
+                        '45',
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details":{
+                    'playback_speed': {
+                        "name": '45',
+                        "id":
+                            formats.GroovedDiscPlaybackSpeed.default_values.index(
+                                '45',
+                            ) + 1
+                    }
+                },
+            }
+        ),
+        (
+            {
+                'name': 'groove inspectionDate',
+                'format_id': '5',
+                'inspectionDate': '5/18/2022',
+            },
+            {
+                "files": [],
+                'inspection_date': '5/18/2022',
+
+            }
+        ),
+        (
+            {
+                'name': 'groove disc all metadata',
+                'format_id': '5',
+                'groovedDiscTitleOfAlbum': 'title of album',
+                'groovedDiscTitleOfDisc': 'title of disc',
+                'groovedDiscSideALabel': 'side a',
+                'groovedDiscSideBLabel': 'side b',
+                'groovedDiscDateOfDisc': '5/16/2022',
+                'groovedDiscSideADuration': '00:12:21',
+                'groovedDiscSideBDuration': '00:12:22',
+                'groovedDiscDiscDiameterId':
+                    formats.GroovedDiscDiscDiameter.default_values.index(
+                        '8'
+                    ) + 1,
+                'groovedDiscDiscMaterialId':
+                    formats.GroovedDiscDiscMaterial.default_values.index(
+                        'Shellac/78'
+                    ) + 1,
+                'groovedDiscDiscBaseId':
+                    formats.GroovedDiscDiscBase.default_values.index(
+                        'glass'
+                    ) + 1,
+                'groovedDiscDiscDirectionId':
+                    formats.GroovedDiscPlaybackDirection.default_values.index(
+                        'In to Out',
+                    ) + 1,
+                'groovedDiscPlaybackSpeedId':
+                    formats.GroovedDiscPlaybackSpeed.default_values.index(
+                        '45',
+                    ) + 1,
+                'inspectionDate': '5/18/2022',
+                'transferDate': '5/19/2022'
+            },
+            {
+                "files": [],
+                "format_details":{
+                    'title_of_album': 'title of album',
+                    'title_of_disc': 'title of disc',
+                    'side_a_label': 'side a',
+                    'side_b_label': 'side b',
+                    'date_of_disc': '5/16/2022',
+                    'side_a_duration': '00:12:21',
+                    'side_b_duration': '00:12:22',
+                    'disc_diameter': {
+                        "name": '8',
+                        "id": formats.GroovedDiscDiscDiameter.default_values.index(
+                            '8'
+                        ) + 1,
+                    },
+                    "disc_material": {
+                        "name": 'Shellac/78',
+                        "id": formats.GroovedDiscDiscMaterial.default_values.index(
+                            'Shellac/78'
+                        ) + 1,
+                    },
+                    'disc_base': {
+                        "name": 'glass',
+                        "id": formats.GroovedDiscDiscBase.default_values.index(
+                            'glass'
+                        ) + 1,
+                    },
+                    'disc_direction': {
+                        "name": 'In to Out',
+                        "id": formats.GroovedDiscPlaybackDirection.default_values.index(
+                            'In to Out',
+                        ) + 1
+                    },
+                    'playback_speed': {
+                        "name": '45',
+                        "id":
+                            formats.GroovedDiscPlaybackSpeed.default_values.index(
+                                '45',
+                            ) + 1
+                    },
+                },
+                'inspection_date': '5/18/2022',
+                'transfer_date': '5/19/2022',
+            }
+        ),
+
 
 
 

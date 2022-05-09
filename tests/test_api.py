@@ -965,14 +965,11 @@ def test_create_and_delete_file_annotation(server_with_object_item_file):
 
 
 dates = [
-    "1993",
-    "11-1950",
-    "11-26-1993",
-    "11-26-1993",
-    "11-06-1993",
-    "11-06-1993",
-    "01-06-1993",
-    "01-06-1993"
+    # "1993",
+    # "11/1950",
+    # "11/26/1993",
+    "11/6/1993",
+    "1/6/1993"
 ]
 
 
@@ -996,7 +993,7 @@ def test_create_add_and_remove_cassette(date, server_with_enums):
                 "format_type_id":
                     data['cassette_tape_formats']['compact cassette']['id'],
                 "date_recorded": date,
-                "inspection_date": "12-10-2019",
+                "inspection_date": "12/10/2019",
                 "tape_thickness_id": data['tape_thicknesses'][0]['id'],
                 'tape_type_id': data["cassette_tape_tape_types"][0]['id']
             }
@@ -1018,7 +1015,7 @@ def test_create_add_and_remove_cassette(date, server_with_enums):
     assert cassette_type['name'] == "compact cassette"
 
     assert format_details['date_recorded'] == date
-    assert new_item_get_data['inspection_date'] == "12-10-2019"
+    assert new_item_get_data['inspection_date'] == "12/10/2019"
 
     assert format_details['tape_thickness']['id'] == \
            data['tape_thicknesses'][0]['id']
@@ -1049,7 +1046,7 @@ def test_create_and_remove_cassette_with_notes(server_with_enums):
             "format_details": {
                 "format_type_id":
                     data['cassette_tape_formats']['compact cassette']['id'],
-                "date_recorded": "11-26-1993",
+                "date_recorded": "11/26/1993",
             }
         }),
         content_type='application/json'

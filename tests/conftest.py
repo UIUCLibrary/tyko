@@ -251,8 +251,8 @@ def server_with_cassette(server_with_enums):
             "format_details": {
                 "format_type_id":
                     data['cassette_tape_formats']['compact cassette']['id'],
-                "date_recorded": "11-26-1993",
-                "inspection_date": "12-10-2019",
+                "date_recorded": "11/26/1993",
+                "inspection_date": "12/10/2019",
                 "tape_thickness_id": data['tape_thicknesses'][0]['id'],
                 'tape_type_id': data["cassette_tape_tape_types"][0]['id']
 

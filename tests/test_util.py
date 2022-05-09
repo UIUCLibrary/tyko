@@ -3,10 +3,10 @@ import tyko.utils
 
 good_test_data = [
     ("1993", 1),
-    ("11-1950", 2),
-    ("11-26-1993", 3),
-    ("11-06-1993", 3),
-    ("01-06-1993", 3),
+    ("11/1950", 2),
+    ("11/26/1993", 3),
+    ("11/6/1993", 3),
+    ("1/6/1993", 3),
 ]
 @pytest.mark.parametrize("date, expected", good_test_data)
 def test_date_identify_precision(date, expected):

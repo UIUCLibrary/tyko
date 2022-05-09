@@ -291,26 +291,71 @@ class GroovedDisc(AVFormat, ABC):
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.FK_TABLE_ID),
                          primary_key=True)
 
-    # This is a year
-    date_recorded = db.Column("date_recorded", db.Integer)
-    side = db.Column("side", db.Text)
-    duration = db.Column("duration", db.Text)
-    diameter = db.Column("diameter", db.Integer)
-    disc_material = db.Column("disc_material", db.Text)
-    base = db.Column("base", db.Text)
-    playback_direction = db.Column("playback_direction", db.Text)
-    playback_speed = db.Column("playback_speed", db.Text)
+    title_of_album = db.Column("title_of_album", db.Text)
+    title_of_disc = db.Column("title_of_disc", db.Text)
+
+    side_a_label = db.Column("side_a_label", db.Text)
+    side_b_label = db.Column("side_b_label", db.Text)
+
+    date_of_disc = db.Column("date_of_disc", db.Date)
+
+    side_a_duration = db.Column("side_a_duration", db.Text)
+    side_b_duration = db.Column("side_b_duration", db.Text)
+
+    # duration = db.Column("duration", db.Text)
+
+    disc_diameter_id = db.Column(
+        db.Integer,
+        db.ForeignKey("grooved_disc_disc_diameter.table_id")
+    )
+    disc_diameter = relationship("GroovedDiscDiscDiameter")
+
+    disc_material_id = db.Column(
+        db.Integer,
+        db.ForeignKey("grooved_disc_disc_material.table_id")
+    )
+    disc_material = relationship("GroovedDiscDiscMaterial")
+
+    disc_base_id = db.Column(
+        db.Integer,
+        db.ForeignKey("grooved_disc_disc_base.table_id")
+    )
+    disc_base = relationship("GroovedDiscDiscBase")
+
+    playback_direction_id = db.Column(
+        db.Integer,
+        db.ForeignKey("grooved_disc_playback_direction.table_id")
+    )
+    playback_direction = relationship("GroovedDiscPlaybackDirection")
+
+    playback_speed_id = db.Column(
+        db.Integer,
+        db.ForeignKey("grooved_disc_playback_speed.table_id")
+    )
+    playback_speed = relationship("GroovedDiscPlaybackSpeed")
 
     def format_details(self) -> Mapping[str, SerializedData]:
         return {
-            "date_recorded": self.date_recorded,
-            "side": self.side,
-            "duration": self.duration,
-            "diameter": self.diameter,
-            "disc_material": self.disc_material,
-            "base": self.base,
-            "playback_direction": self.playback_direction,
-            "playback_speed": self.playback_speed
+            "title_of_album": self.title_of_album,
+            "title_of_disc": self.title_of_disc,
+            "side_a_label": self.side_a_label,
+            "side_b_label": self.side_b_label,
+            "date_of_disc": utils.serialize_precision_datetime(
+                self.date_of_disc) if self.date_of_disc else None,
+            "side_a_duration": self.side_a_duration,
+            "side_b_duration": self.side_b_duration,
+            "disc_diameter":
+                self.disc_diameter.serialize() if self.disc_diameter else None,
+            "disc_material":
+                self.disc_material.serialize() if self.disc_material else None,
+            "disc_base":
+                self.disc_base.serialize() if self.disc_base else None,
+            "disc_direction":
+                self.playback_direction.serialize()
+                if self.playback_direction else None,
+            "playback_speed":
+                self.playback_speed.serialize()
+                if self.playback_speed else None
         }
 
 
@@ -507,9 +552,10 @@ class AudioCassette(AVFormat):
                                          db.Integer, default=3)
 
     # REGEX
-    REGEX_DAY_MONTH_YEAR = re.compile(r"^([0-1][0-9])-([0-2][0-9])-([0-9]){4}")
+    REGEX_DAY_MONTH_YEAR = \
+        re.compile(r"^([0-1]?[0-9])/([0-2][0-9])/([0-9]){4}")
     REGEX_YEAR_ONLY = re.compile(r"^([1-9]){4}$")
-    REGEX_MONTH_YEAR = re.compile(r"^([0-1][0-9])-([0-9]){4}$")
+    REGEX_MONTH_YEAR = re.compile(r"^([0-1]?[0-9])/([0-9]){4}$")
 
     @classmethod
     def serialize_date(cls, date: Optional[datetime.date],
@@ -521,10 +567,10 @@ class AudioCassette(AVFormat):
 
         if isinstance(date, datetime.date):
             if precision == 3:
-                return date.strftime("%m-%d-%Y")
+                return date.strftime("%m/%d/%Y")
 
             if precision == 2:
-                return date.strftime("%m-%Y")
+                return date.strftime("%m/%Y")
 
             if precision == 1:
                 return date.strftime("%Y")
@@ -538,10 +584,10 @@ class AudioCassette(AVFormat):
                       DeprecationWarning)
 
         if cls.REGEX_DAY_MONTH_YEAR.match(date_string):
-            return datetime.datetime.strptime(date_string, "%m-%d-%Y"), 3
+            return datetime.datetime.strptime(date_string, "%m/%d/%Y"), 3
 
         if cls.REGEX_MONTH_YEAR.match(date_string):
-            return datetime.datetime.strptime(date_string, "%m-%Y"), 2
+            return datetime.datetime.strptime(date_string, "%m/%Y"), 2
 
         if cls.REGEX_YEAR_ONLY.match(date_string):
             return datetime.datetime.strptime(date_string, "%Y"), 1
@@ -663,6 +709,36 @@ class OpenReelGeneration(EnumTable):
 class OpenReelReelWind(EnumTable):
     __tablename__ = "open_reel_wind"
     default_values = ["Heads out", "Tails out"]
+
+
+class GroovedDiscDiscDiameter(EnumTable):
+    __tablename__ = "grooved_disc_disc_diameter"
+    default_values = ["7", "8", "10", "12", "16"]
+
+
+class GroovedDiscDiscMaterial(EnumTable):
+    __tablename__ = "grooved_disc_disc_material"
+    default_values = [
+        "Shellac/78",
+        "Lacquer",
+        "Vinyl",
+        "Edison Diamond"
+    ]
+
+
+class GroovedDiscPlaybackDirection(EnumTable):
+    __tablename__ = "grooved_disc_playback_direction"
+    default_values = ["In to Out", "Out to In"]
+
+
+class GroovedDiscPlaybackSpeed(EnumTable):
+    __tablename__ = "grooved_disc_playback_speed"
+    default_values = ["33 1/3", "45", "78"]
+
+
+class GroovedDiscDiscBase(EnumTable):
+    __tablename__ = "grooved_disc_disc_base"
+    default_values = ["glass", "cardboard", "aluminum", "unknown"]
 
 
 item_has_contacts_table = db.Table(

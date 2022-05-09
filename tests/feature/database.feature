@@ -288,6 +288,6 @@ Scenario Outline: Create a new media project with audio cassettes
 
     Examples:
     | object_title           | item_title         | date_recorded | audio_type       | tape_type | tape_thickness | inspection_date |
-    | John Doe Oral history  | The beginning part | 11-26-1999    | compact cassette | I         | "0.5"          | 12-10-2019      |
-    | Brass Band Recording   | The recording      | 01-1997       | ADAT             | NA        | "0.5"          | 12-12-2019      |
-    | Famous Amazing Speech  | The Speech         | 1997          | DAT              | NA        | NA             | 12-11-2019      |
+    | John Doe Oral history  | The beginning part | 11/26/1999    | compact cassette | I         | "0.5"          | 12/10/2019      |
+    | Brass Band Recording   | The recording      | 1/1997        | ADAT             | NA        | "0.5"          | 12/12/2019      |
+    | Famous Amazing Speech  | The Speech         | 1997          | DAT              | NA        | NA             | 12/11/2019      |

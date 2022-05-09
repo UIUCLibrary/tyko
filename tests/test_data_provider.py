@@ -41,7 +41,7 @@ class TestOpticalDataConnector:
                 {
                     'name': 'some name',
                     'format_id': 8,
-                    'opticalDateOfItem': '5-23-2022',
+                    'opticalDateOfItem': '5/23/2022',
                 }
             ),
 

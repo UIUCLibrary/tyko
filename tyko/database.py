@@ -42,7 +42,13 @@ def _populate_enum_tables(session: sqlalchemy.orm.Session):
         formats.OpenReelGeneration,
         formats.OpticalType,
         formats.VideoCassetteType,
-        formats.VideoCassetteGenerations
+        formats.VideoCassetteGenerations,
+        formats.GroovedDiscDiscDiameter,
+        formats.GroovedDiscDiscMaterial,
+        formats.GroovedDiscPlaybackDirection,
+        formats.GroovedDiscDiscBase,
+        formats.GroovedDiscPlaybackSpeed,
+
     ]
 
     for enum_table_class in enum_table_classes:

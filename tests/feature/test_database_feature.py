@@ -740,7 +740,7 @@ def media_type_can_be_serialize(dummy_database, media_type):
 
 @given("a new GroovedDisc item is created")
 def new_grooved_disc(dummy_database):
-    new_disc = schema.GroovedDisc(name="side A", side="A")
+    new_disc = schema.GroovedDisc(name="my grooved disc")
     dummy_database.add(new_disc)
     dummy_database.commit()
 
@@ -931,7 +931,7 @@ def new_audio_item(dummy_database, new_audio_object, item_title, date_recorded,
         recording_date_precision=recording_date_precision,
         cassette_type=schema.CassetteType(name=audio_type),
         tape_thickness=schema.CassetteTapeThickness(value=tape_thickness),
-        inspection_date=datetime.strptime(inspection_date, "%m-%d-%Y")
+        inspection_date=datetime.strptime(inspection_date, "%m/%d/%Y")
     )
 
     if tape_type.strip() != "":
