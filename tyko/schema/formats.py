@@ -302,8 +302,6 @@ class GroovedDisc(AVFormat, ABC):
     side_a_duration = db.Column("side_a_duration", db.Text)
     side_b_duration = db.Column("side_b_duration", db.Text)
 
-    # duration = db.Column("duration", db.Text)
-
     disc_diameter_id = db.Column(
         db.Integer,
         db.ForeignKey("grooved_disc_disc_diameter.table_id")
