@@ -752,7 +752,7 @@ def test_database_film():
 
 @given("a new Film item is created")
 def new_film(dummy_database):
-    new_film = schema.Film(name="reel 1", sound="optical")
+    new_film = schema.Film(name="reel 1")
     dummy_database.add(new_film)
     dummy_database.commit()
 
