@@ -245,38 +245,102 @@ class Film(AVFormat, ABC):
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.FK_TABLE_ID),
                          primary_key=True)
 
+    title_of_film = db.Column("film_title", db.Text)
+    film_shrinkage = db.Column("film_shrinkage", db.Integer)
     date_of_film = db.Column("date_of_film", db.Date)
     can_label = db.Column("can_label", db.Text)
     leader_label = db.Column("leader_label", db.Text)
     length = db.Column("length", db.Integer)
     duration = db.Column("duration", db.Text)
-    format_gauge = db.Column("format_gauge", db.Integer)
-    base = db.Column("base", db.Text)
+    # format_gauge = db.Column("format_gauge", db.Integer)
+
+    film_base_id = db.Column(
+        db.Integer,
+        db.ForeignKey("film_film_base.table_id")
+    )
+    film_base = relationship("FilmFilmBase")
+
+    soundtrack_id = db.Column(
+        db.Integer,
+        db.ForeignKey("film_soundtrack.table_id")
+    )
+    soundtrack = relationship("FilmSoundtrack")
+
     edge_code_date = db.Column("edge_code_date", db.Date)
-    sound = db.Column("sound", db.Text)
-    color = db.Column("color", db.Text)
-    image_type = db.Column("image_type", db.Text)
+
+    color_id = db.Column(
+        db.Integer,
+        db.ForeignKey("film_color.table_id")
+    )
+    color = relationship("FilmColor")
+
+    image_type_id = db.Column(
+        db.Integer,
+        db.ForeignKey("film_image_type.table_id")
+    )
+    image_type = relationship("FilmImageType")
+
+    wind_id = db.Column(
+        db.Integer,
+        db.ForeignKey("film_wind.table_id")
+    )
+    wind = relationship("FilmWind")
+
+    emulsion_id = db.Column(
+        db.Integer,
+        db.ForeignKey("film_emulsion.table_id")
+    )
+    emulsion = relationship("FilmEmulsion")
+
+    film_speed_id = db.Column(
+        db.Integer,
+        db.ForeignKey("film_film_speed.table_id")
+    )
+
+    film_speed = relationship("FilmFilmSpeed")
+
+    film_gauge_id = db.Column(
+        db.Integer,
+        db.ForeignKey("film_film_gauge.table_id")
+    )
+
+    film_gauge = relationship("FilmFilmGauge")
+
+    ad_test = db.Column("ad_test", db.Boolean)
     ad_test_date = db.Column("ad_test_date", db.Date)
-    ad_test_level = db.Column("ad_test_level", db.Integer)
+    ad_test_level = db.Column("ad_test_level", db.Text)
 
     def format_details(self) -> Mapping[str, SerializedData]:
         return {
+            "film_title": self.title_of_film,
             "date_of_film":
                 utils.serialize_precision_datetime(self.date_of_film)
                 if self.date_of_film is not None else None,
             "can_label": self.can_label,
             "leader_label": self.leader_label,
-            "length": self.length,
+            "film_length": self.length,
             "duration": self.duration,
-            "format_gauge": self.format_gauge,
-            "base": self.base,
+            # "format_gauge": self.format_gauge,
+            "film_base":
+                self.film_base.serialize() if self.film_base else None,
             "edge_code_date":
                 utils.serialize_precision_datetime(
-                    self.edge_code_date)
+                    self.edge_code_date, 1)
                 if self.edge_code_date is not None else None,
-            "sound": self.sound,
-            "color": self.color,
-            "image_type": self.image_type,
+            "soundtrack":
+                self.soundtrack.serialize() if self.soundtrack else None,
+            "color": self.color.serialize() if self.color else None,
+            "film_gauge":
+                self.film_gauge.serialize() if self.film_gauge else None,
+            "film_speed":
+                self.film_speed.serialize() if self.film_speed else None,
+            "film_image_type":
+                self.image_type.serialize() if self.image_type else None,
+            "wind": self.wind.serialize() if self.wind else None,
+            "film_emulsion":
+                self.emulsion.serialize() if self.emulsion else None,
+            "film_shrinkage": self.film_shrinkage,
+            'ad_strip_test': self.ad_test,
             "ad_test_date":
                 utils.serialize_precision_datetime(
                     self.ad_test_date)
@@ -737,6 +801,46 @@ class GroovedDiscPlaybackSpeed(EnumTable):
 class GroovedDiscDiscBase(EnumTable):
     __tablename__ = "grooved_disc_disc_base"
     default_values = ["Glass", "Cardboard", "Aluminum", "Unknown"]
+
+
+class FilmFilmSpeed(EnumTable):
+    __tablename__ = "film_film_speed"
+    default_values = ["16", "18", "24", "Unknown"]
+
+
+class FilmFilmGauge(EnumTable):
+    __tablename__ = "film_film_gauge"
+    default_values = ["8", "Super8", "16", "35"]
+
+
+class FilmFilmBase(EnumTable):
+    __tablename__ = "film_film_base"
+    default_values = ["Acetate", "Nitrate", "Polyester"]
+
+
+class FilmSoundtrack(EnumTable):
+    __tablename__ = "film_soundtrack"
+    default_values = ["Optical", "Magnetic", "Silent"]
+
+
+class FilmColor(EnumTable):
+    __tablename__ = "film_color"
+    default_values = ["Color", "Black & White", "Color/Black & White"]
+
+
+class FilmImageType(EnumTable):
+    __tablename__ = "film_image_type"
+    default_values = ["Positive", "Negative", "Reversal"]
+
+
+class FilmWind(EnumTable):
+    __tablename__ = "film_wind"
+    default_values = ["A", "B"]
+
+
+class FilmEmulsion(EnumTable):
+    __tablename__ = "film_emulsion"
+    default_values = ["In", "Out"]
 
 
 item_has_contacts_table = db.Table(

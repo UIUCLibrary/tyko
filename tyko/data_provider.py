@@ -627,6 +627,8 @@ class ObjectDataConnector(AbsNotesConnector):
                     OpenReelDataConnector,
                 formats.format_types['grooved disc'][0]:
                     GroovedDiscDataConnector,
+                formats.format_types['film'][0]:
+                    FilmDataConnector,
             }
             connector = connectors.get(
                 int(data['format_id']),
@@ -1867,6 +1869,84 @@ class OpticalDataConnector(FormatConnector):
                         optical_type_id
                     )
                 ).one()
+        return new_item
+
+
+class FilmDataConnector(FormatConnector):
+    @verify_unused_params
+    def create_new_format_item(self, session, format_data):
+        new_item = formats.Film(
+            name=format_data.pop('name'),
+            format_type=self.get_format_type(
+                session, int(format_data.pop("format_id"))
+            )
+        )
+        new_item.title_of_film = format_data.pop('filmTitle', None)
+        new_item.film_shrinkage = format_data.pop('filmShrinkage', None)
+        new_item.can_label = format_data.pop('filmCanLabel', None)
+        new_item.leader_label = format_data.pop('filmLeaderLabel', None)
+        new_item.length = format_data.pop('filmLength', None)
+        new_item.duration = format_data.pop('filmDuration', None)
+        new_item.ad_test_level = format_data.pop('filmADStripTestLevel', None)
+
+        if film_ad_strip_test := format_data.pop('filmADStripTest', None):
+            new_item.ad_test = bool(film_ad_strip_test)
+
+        if film_edge_code_date := format_data.pop('filmEdgeCodeDate', None):
+            new_item.edge_code_date = \
+                utils.create_precision_datetime(film_edge_code_date, 1)
+
+        if film_date := format_data.pop('filmDate', None):
+            new_item.date_of_film = \
+                utils.create_precision_datetime(film_date, 3)
+
+        if film_ad_strip_test_date := format_data.pop(
+                'filmADStripTestDate',
+                None
+        ):
+            new_item.ad_test_date = \
+                utils.create_precision_datetime(film_ad_strip_test_date, 3)
+
+        if base_id := format_data.pop('filmBaseId', None):
+            new_item.film_base = session.query(formats.FilmFilmBase).filter(
+                formats.FilmFilmBase.table_id == base_id
+            ).one()
+
+        if soundtrack_id := format_data.pop('filmSoundtrackId', None):
+            new_item.soundtrack = session.query(formats.FilmSoundtrack).filter(
+                formats.FilmSoundtrack.table_id == soundtrack_id
+            ).one()
+
+        if color_id := format_data.pop('filmColorId', None):
+            new_item.color = session.query(formats.FilmColor).filter(
+                formats.FilmColor.table_id == color_id
+            ).one()
+
+        if image_type_id := format_data.pop('filmImageTypeId', None):
+            new_item.image_type = session.query(formats.FilmImageType).filter(
+                formats.FilmImageType.table_id == image_type_id
+            ).one()
+
+        if wind_id := format_data.pop('filmWindId', None):
+            new_item.wind = session.query(formats.FilmWind).filter(
+                formats.FilmWind.table_id == wind_id
+            ).one()
+
+        if film_emulsion_id := format_data.pop('filmEmulsionId', None):
+            new_item.emulsion = session.query(formats.FilmEmulsion).filter(
+                formats.FilmEmulsion.table_id == film_emulsion_id
+            ).one()
+
+        if film_speed_id := format_data.pop('filmSpeedId', None):
+            new_item.film_speed = session.query(formats.FilmFilmSpeed).filter(
+                formats.FilmFilmSpeed.table_id == film_speed_id
+            ).one()
+
+        if film_gauge_id := format_data.pop('filmGaugeId', None):
+            new_item.film_gauge = session.query(formats.FilmFilmGauge).filter(
+                formats.FilmFilmGauge.table_id == film_gauge_id
+            ).one()
+
         return new_item
 
 

@@ -48,6 +48,14 @@ def _populate_enum_tables(session: sqlalchemy.orm.Session):
         formats.GroovedDiscPlaybackDirection,
         formats.GroovedDiscDiscBase,
         formats.GroovedDiscPlaybackSpeed,
+        formats.FilmFilmSpeed,
+        formats.FilmFilmGauge,
+        formats.FilmFilmBase,
+        formats.FilmSoundtrack,
+        formats.FilmColor,
+        formats.FilmImageType,
+        formats.FilmWind,
+        formats.FilmEmulsion
 
     ]
 

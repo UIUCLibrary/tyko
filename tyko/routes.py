@@ -910,11 +910,12 @@ def page_formats(middleware_source):
 
 
 def list_routes(app):
-    results = []
-    for rt in app.url_map.iter_rules():
-        results.append({
+    results = [
+        {
             "endpoint": rt.endpoint,
             "methods": list(rt.methods),
             "route": str(rt)
-        })
+        } for rt in app.url_map.iter_rules()
+    ]
+
     return jsonify(results)

@@ -40,6 +40,7 @@ def dummy_object(app, project):
         ).get_json()
 
 
+
 @pytest.mark.parametrize(
     "post_data, expected_data",
     [
@@ -1118,10 +1119,456 @@ def dummy_object(app, project):
                 'transfer_date': '5/19/2022',
             }
         ),
-
-
-
-
+        (
+            {
+                'name': 'film simple',
+                'format_id': '6',
+                'filmTitle': 'Title of film',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'film_title': 'Title of film',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film date of film',
+                'format_id': '6',
+                'filmDate': '5/24/2022',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'date_of_film': '5/24/2022',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film Can label',
+                'format_id': '6',
+                'filmCanLabel': 'Can label',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'can_label': 'Can label',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film leader label',
+                'format_id': '6',
+                'filmLeaderLabel': 'Leader Label',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'leader_label': 'Leader Label',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film length',
+                'format_id': '6',
+                'filmLength': 100,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'film_length': 100,
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film duration',
+                'format_id': '6',
+                'filmDuration': '00:12:21',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'duration': '00:12:21',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film film base',
+                'format_id': '6',
+                'filmBaseId':
+                    formats.FilmFilmBase.default_values.index(
+                        'Acetate'
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'film_base': {
+                        "name": 'Acetate',
+                        "id":
+                            formats
+                                .FilmFilmBase
+                                .default_values
+                                .index('Acetate') + 1
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film edge code',
+                'format_id': '6',
+                'filmEdgeCodeDate': '1967',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'edge_code_date': '1967',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film soundtrack',
+                'format_id': '6',
+                'filmSoundtrackId':
+                    formats.FilmSoundtrack.default_values.index(
+                        'Magnetic'
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'soundtrack': {
+                        "name": 'Magnetic',
+                        "id":
+                            formats
+                                .FilmSoundtrack
+                                .default_values
+                                .index('Magnetic') + 1
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film colors',
+                'format_id': '6',
+                'filmColorId':
+                    formats.FilmColor.default_values.index(
+                        'Color'
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'color': {
+                        "name": 'Color',
+                        "id":
+                            formats
+                                .FilmColor
+                                .default_values
+                                .index('Color') + 1
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film image type',
+                'format_id': '6',
+                'filmImageTypeId':
+                    formats.FilmImageType.default_values.index(
+                        'Positive'
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'film_image_type': {
+                        "name": 'Positive',
+                        "id":
+                            formats
+                                .FilmImageType
+                                .default_values
+                                .index('Positive') + 1
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film wind',
+                'format_id': '6',
+                'filmWindId':
+                    formats.FilmWind.default_values.index(
+                        'A'
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'wind': {
+                        "name": 'A',
+                        "id":
+                            formats
+                                .FilmWind
+                                .default_values
+                                .index('A') + 1
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film emulsion',
+                'format_id': '6',
+                'filmEmulsionId':
+                    formats.FilmEmulsion.default_values.index('In') + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'film_emulsion': {
+                        "name": 'In',
+                        "id":
+                            formats
+                                .FilmEmulsion
+                                .default_values
+                                .index('In') + 1
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film ADStripTest',
+                'format_id': '6',
+                'filmADStripTest': True,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'ad_strip_test': True,
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film AD Strip Test Date',
+                'format_id': '6',
+                'filmADStripTestDate': '11/5/2022',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'ad_test_date': '11/5/2022',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film AD strip test level',
+                'format_id': '6',
+                'filmADStripTestLevel': '2',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'ad_test_level': '2',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film shrinkage',
+                'format_id': '6',
+                'filmShrinkage': '32',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'film_shrinkage': 32
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film film speed',
+                'format_id': '6',
+                'filmSpeedId': formats.FilmFilmSpeed.default_values.index(
+                        '24'
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'film_speed': {
+                        "name": '24',
+                        "id":
+                            formats
+                                .FilmFilmSpeed
+                                .default_values
+                                .index('24') + 1
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film gauge',
+                'format_id': '6',
+                'filmGaugeId':
+                    formats.FilmFilmGauge.default_values.index('16') + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'film_gauge': {
+                        "name": '16',
+                        "id":
+                            formats
+                                .FilmFilmGauge
+                                .default_values
+                                .index('16') + 1
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'film all metadata',
+                'format_id': '6',
+                'filmTitle': 'Title of film',
+                'filmDate': '5/24/2022',
+                'filmCanLabel': 'Can label',
+                'filmLeaderLabel': 'Leader Label',
+                'filmLength': 100,
+                'filmSpeedId': formats.FilmFilmSpeed.default_values.index(
+                        '24'
+                    ) + 1,
+                'filmDuration': '00:12:21',
+                'filmBaseId':
+                    formats.FilmFilmBase.default_values.index(
+                        'Acetate'
+                    ) + 1,
+                'filmEdgeCodeDate': '1967',
+                'filmSoundtrackId':
+                    formats.FilmSoundtrack.default_values.index(
+                        'Magnetic'
+                    ) + 1,
+                'filmColorId':
+                    formats.FilmColor.default_values.index(
+                        'Color'
+                    ) + 1,
+                'filmImageTypeId':
+                    formats.FilmImageType.default_values.index(
+                        'Positive'
+                    ) + 1,
+                'filmWindId':
+                    formats.FilmWind.default_values.index(
+                        'A'
+                    ) + 1,
+                'filmEmulsionId':
+                    formats.FilmEmulsion.default_values.index('In') + 1,
+                'filmGaugeId':
+                    formats.FilmFilmGauge.default_values.index('16') + 1,
+                'filmADStripTest': True,
+                'filmADStripTestDate': '11/5/2022',
+                'filmADStripTestLevel': '2',
+                'filmShrinkage': '32',
+                'inspectionDate': '5/18/2022',
+                'transferDate': '5/19/2022'
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'film_title': 'Title of film',
+                    'date_of_film': '5/24/2022',
+                    'can_label': 'Can label',
+                    'leader_label': 'Leader Label',
+                    'film_base': {
+                        "name": 'Acetate',
+                        "id":
+                            formats
+                                .FilmFilmBase
+                                .default_values
+                                .index('Acetate') + 1
+                    },
+                    'film_speed': {
+                        "name": '24',
+                        "id":
+                            formats
+                                .FilmFilmSpeed
+                                .default_values
+                                .index('24') + 1
+                    },
+                    'edge_code_date': '1967',
+                    'soundtrack': {
+                        "name": 'Magnetic',
+                        "id":
+                            formats
+                                .FilmSoundtrack
+                                .default_values
+                                .index('Magnetic') + 1
+                    },
+                    'color': {
+                        "name": 'Color',
+                        "id":
+                            formats
+                                .FilmColor
+                                .default_values
+                                .index('Color') + 1
+                    },
+                    'film_image_type': {
+                        "name": 'Positive',
+                        "id":
+                            formats
+                                .FilmImageType
+                                .default_values
+                                .index('Positive') + 1
+                    },
+                    'wind': {
+                        "name": 'A',
+                        "id":
+                            formats
+                                .FilmWind
+                                .default_values
+                                .index('A') + 1
+                    },
+                    'film_emulsion': {
+                        "name": 'In',
+                        "id":
+                            formats
+                                .FilmEmulsion
+                                .default_values
+                                .index('In') + 1
+                    },
+                    'film_gauge': {
+                        "name": '16',
+                        "id":
+                            formats
+                                .FilmFilmGauge
+                                .default_values
+                                .index('16') + 1
+                    },
+                    'film_length': 100,
+                    'duration': '00:12:21',
+                    'ad_strip_test': True,
+                    'ad_test_date': '11/5/2022',
+                    'ad_test_level': '2',
+                    'film_shrinkage': 32
+                },
+                'inspection_date': '5/18/2022',
+                'transfer_date': '5/19/2022',
+            }
+        )
     ], ids=lambda *args: str(args[0].get('name', str(args[0])))
 )
 def test_create_new_video_cassette(
