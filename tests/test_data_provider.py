@@ -3,7 +3,6 @@ from unittest.mock import Mock
 from sqlalchemy.orm.session import Session
 
 import tyko.data_provider.formats
-from tyko import data_provider
 import pytest
 
 

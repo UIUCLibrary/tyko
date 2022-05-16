@@ -252,7 +252,6 @@ class Film(AVFormat, ABC):
     leader_label = db.Column("leader_label", db.Text)
     length = db.Column("length", db.Integer)
     duration = db.Column("duration", db.Text)
-    # format_gauge = db.Column("format_gauge", db.Integer)
 
     film_base_id = db.Column(
         db.Integer,

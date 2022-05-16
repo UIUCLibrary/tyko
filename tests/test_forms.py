@@ -28,7 +28,7 @@ def namer(*args, **kwargs):
 @pytest.fixture()
 def dummy_object(app, project):
     with app.test_client() as server:
-        create_project_page = server.get("/project/create/")
+        server.get("/project/create/")
         project_id = project['id']
 
         return server.post(

@@ -2,13 +2,17 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
 
 import tyko
-from tyko import data_provider, schema
+from tyko import schema
 from tyko.run import is_correct_db_version
 import tyko.database
 import sqlalchemy
 import pytest
 import json
 from flask import Flask
+
+TEMPLATE_FOLDER = "../tyko/templates"
+
+SQLITE_IN_MEMORY = "sqlite:///:memory:"
 
 static_page_routes = [
     "/",
@@ -33,14 +37,12 @@ api_routes = [
 
 ]
 
-# TEMP_DATABASE = "sqlite:///:memory:"
-
 
 @pytest.mark.parametrize("route", static_page_routes)
 def test_static_pages(route):
-    app = Flask(__name__, template_folder="../tyko/templates")
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
     app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     app = tyko.create_app(app=app, verify_db=False)
@@ -53,9 +55,9 @@ def test_static_pages(route):
 
 @pytest.mark.parametrize("route", dynamic_page_routes)
 def test_dynamic_pages(route):
-    app = Flask(__name__, template_folder="../tyko/templates")
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
     app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
@@ -67,9 +69,9 @@ def test_dynamic_pages(route):
 
 @pytest.fixture(scope="module")
 def test_app():
-    app = Flask(__name__, template_folder="../tyko/templates")
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
     app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
@@ -93,9 +95,9 @@ def test_api_formats(test_app):
 
 @pytest.mark.parametrize("route", api_routes)
 def test_api_routes(route):
-    app = Flask(__name__, template_folder="../tyko/templates")
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
     app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
@@ -103,6 +105,7 @@ def test_api_routes(route):
     with app.test_client() as server:
         resp = server.get(route)
         assert resp.status == "200 OK"
+
 
 def test_create(test_app):
     resp = test_app.post(
@@ -162,28 +165,32 @@ test_data_read = [
 @pytest.mark.parametrize("data_type,data_value", test_data_read)
 def test_create_and_read2(data_type, data_value):
 
-    app = Flask(__name__, template_folder="../tyko/templates")
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
     app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     tyko.create_app(app, verify_db=False)
     tyko.database.init_database(db.engine)
     with app.test_client() as server:
-        route ="/api/{}/".format(data_type)
+        route = f"/api/{data_type}/"
         create_resp = server.post(
             route,
             data=json.dumps(data_value),
             content_type='application/json'
         )
 
-        assert create_resp.status == "200 OK", "Failed to create a new entity with {}".format(route)
+        assert \
+            create_resp.status == "200 OK", \
+            f"Failed to create a new entity with {route}"
 
         new_id = json.loads(create_resp.data)["id"]
         assert new_id is not None
 
-        read_res = server.get("/api/{}/{}".format(data_type, new_id))
-        assert read_res.status_code == 200 , "{} failed with status {}".format(route, read_res.status_code)
+        read_res = server.get(f"/api/{data_type}/{new_id}")
+        assert \
+            read_res.status_code == 200, \
+            f"{route} failed with status {read_res.status_code}"
 
         read_resp_data = json.loads(read_res.data)
         data_object = read_resp_data[data_type]
@@ -197,7 +204,7 @@ def test_create_and_read2(data_type, data_value):
 def test_empty_database_error():
     # Creating a server without a validate database should raise a DataError
     # exception
-    db = sqlalchemy.create_engine("sqlite:///:memory:")
+    db = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
 
     with pytest.raises(tyko.exceptions.DataError):
         empty_data_provider = tyko.data_provider.data_provider.DataProvider(db)
@@ -205,8 +212,8 @@ def test_empty_database_error():
 
 
 def test_get_object_pbcore():
-    app = Flask(__name__, template_folder="../tyko/templates")
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -229,40 +236,42 @@ def test_get_object_pbcore():
         new_id = json.loads(create_resp.data)["id"]
         assert new_id is not None
 
-        pbcore_req_res = server.get("/api/object/{}-pbcore.xml".format(new_id))
-        assert pbcore_req_res.status == "200 OK", "Failed create a PBCore record for id {}".format(new_id)
+        pbcore_req_res = server.get(f"/api/object/{new_id}-pbcore.xml")
+        assert \
+            pbcore_req_res.status == "200 OK", \
+            f"Failed create a PBCore record for id {new_id}"
 
 
 def test_project_status_by_name_invalid():
-    engine = sqlalchemy.create_engine("sqlite:///:memory:")
+    engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = tyko.data_provider.data_provider.ProjectDataConnector(dummy_session)
+    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
 
     with pytest.raises(tyko.exceptions.DataError):
-        status = \
-            project_provider.get_project_status_by_name(
-                "invalid status", create_if_not_exists=False)
+        project_provider.get_project_status_by_name(
+            "invalid status", create_if_not_exists=False)
 
 
 def test_project_status_by_name_invalid_multiple_with_same_name():
-    engine = sqlalchemy.create_engine("sqlite:///:memory:")
+    engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = tyko.data_provider.data_provider.ProjectDataConnector(dummy_session)
+    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
     session = dummy_session()
     session.add(schema.projects.ProjectStatus(name="double"))
     session.add(schema.projects.ProjectStatus(name="double"))
     session.commit()
 
     with pytest.raises(tyko.exceptions.DataError):
-        status = \
-            project_provider.get_project_status_by_name(
-                "double", create_if_not_exists=False)
+        project_provider.get_project_status_by_name(
+            "double",
+            create_if_not_exists=False
+        )
 
 
 def test_project_status_by_name_valid():
-    engine = sqlalchemy.create_engine("sqlite:///:memory:")
+    engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
     project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
@@ -273,7 +282,7 @@ def test_project_status_by_name_valid():
 
 
 def test_project_status_by_name_new_create():
-    engine = sqlalchemy.create_engine("sqlite:///:memory:")
+    engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
     project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
@@ -286,13 +295,14 @@ def test_project_status_by_name_new_create():
 class TestProjectDataConnector:
     @pytest.fixture()
     def dummy_session(self):
-        engine = sqlalchemy.create_engine("sqlite:///:memory:")
+        engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
         tyko.database.init_database(engine)
         return sessionmaker(bind=engine)
 
     def test_get_note(self, dummy_session):
 
-        project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
+        project_provider = \
+            tyko.data_provider.ProjectDataConnector(dummy_session)
 
         project_id = project_provider.create(title="dummy")
 
@@ -312,7 +322,7 @@ class TestProjectDataConnector:
 class TestItemDataConnector:
     @pytest.fixture()
     def dummy_session(self):
-        engine = sqlalchemy.create_engine("sqlite:///:memory:")
+        engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
         tyko.database.init_database(engine)
         return sessionmaker(bind=engine)
 
@@ -366,7 +376,7 @@ class TestItemDataConnector:
 class TestObjectDataConnector:
     @pytest.fixture()
     def dummy_session(self):
-        engine = sqlalchemy.create_engine("sqlite:///:memory:")
+        engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
         tyko.database.init_database(engine)
         return sessionmaker(bind=engine)
 
@@ -391,7 +401,7 @@ class TestObjectDataConnector:
 
 
 def test_project_default_status():
-    engine = sqlalchemy.create_engine("sqlite:///:memory:")
+    engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
     project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
@@ -400,8 +410,8 @@ def test_project_default_status():
 
 
 def test_db_version_test_valid():
-    app = Flask(__name__, template_folder="../tyko/templates")
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db = SQLAlchemy(app)
@@ -419,8 +429,8 @@ def test_db_version_test_valid():
 
 
 def test_is_correct_db_version_no_table():
-    app = Flask(__name__, template_folder="../tyko/templates")
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db = SQLAlchemy(app)
@@ -429,8 +439,8 @@ def test_is_correct_db_version_no_table():
 
 
 def test_db_version_test_different():
-    app = Flask(__name__, template_folder="../tyko/templates")
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
     version_table = sqlalchemy.Table(
@@ -447,11 +457,11 @@ def test_db_version_test_different():
 
 
 def test_db_version_test_no_data():
-    app = Flask(__name__, template_folder="../tyko/templates")
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app = Flask(__name__, template_folder=TEMPLATE_FOLDER)
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
-    version_table = sqlalchemy.Table(
+    sqlalchemy.Table(
         "alembic_version", db.metadata,
         sqlalchemy.Column("version_num",
                           sqlalchemy.String(length=32),

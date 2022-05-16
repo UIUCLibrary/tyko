@@ -91,7 +91,7 @@ def test_pbcore_valid_id(tmpdir):
         assert sample_object_response.status_code == 200
         sample_object_response = sample_object_response.get_json()['object']
 
-        sample_item = server.post(
+        server.post(
             flask.url_for(
                 "object_item",
                 project_id=sample_project['id'],

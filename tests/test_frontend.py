@@ -1,7 +1,4 @@
 import json
-import sys
-
-from pyexpat import ExpatError
 
 from flask import Flask, url_for
 from flask_sqlalchemy import SQLAlchemy
@@ -106,6 +103,7 @@ def test_view_web_more(app):
 
         more_page_resp = server.get("/more")
         assert more_page_resp.status_code == 200
+
 
 def test_view_web_file(app):
     with app.test_client() as server:
@@ -243,7 +241,9 @@ def test_breadcrumb_builder_len(breadcrumb_builder_with_project):
 
 
 def test_breadcrumb_builder_get_key(breadcrumb_builder_with_project):
-    assert breadcrumb_builder_with_project["Project"] == "http://127.0.0.1:5000/project/1"
+    assert \
+        breadcrumb_builder_with_project["Project"] == \
+        "http://127.0.0.1:5000/project/1"
 
 
 def test_breadcrumb_builder_iter(breadcrumb_builder_with_project):
@@ -263,14 +263,18 @@ def test_breadcrumb_builder_del(breadcrumb_builder_with_project):
     assert len(breadcrumb_builder_with_project) == 0
 
 
-def test_breadcrumb_builder_build_throws_on_false_level(breadcrumb_builder_with_project):
+def test_breadcrumb_builder_build_throws_on_false_level(
+        breadcrumb_builder_with_project
+):
     with pytest.raises(ValueError):
-        result = breadcrumb_builder_with_project.build("invalid")
+        breadcrumb_builder_with_project.build("invalid")
 
 
-def test_breadcrumb_builder_set_throws_on_bad_level(breadcrumb_builder_with_project):
+def test_breadcrumb_builder_set_throws_on_bad_level(
+        breadcrumb_builder_with_project
+):
     with pytest.raises(ValueError):
-        result = breadcrumb_builder_with_project["invalid"] = "spam"
+        breadcrumb_builder_with_project["invalid"] = "spam"
 
 
 def test_create_project_page(app):

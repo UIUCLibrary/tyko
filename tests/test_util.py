@@ -8,17 +8,20 @@ good_test_data = [
     ("11/6/1993", 3),
     ("1/6/1993", 3),
 ]
+
+
 @pytest.mark.parametrize("date, expected", good_test_data)
 def test_date_identify_precision(date, expected):
     assert tyko.utils.identify_precision(date) == expected
+
 
 bad_test_data = [
     "11-46-1993",
     "31-6-1993"
 ]
 
+
 @pytest.mark.parametrize("date", bad_test_data)
 def test_date_identify_bad_precision(date):
     with pytest.raises(AttributeError):
         assert tyko.utils.identify_precision(date)
-
