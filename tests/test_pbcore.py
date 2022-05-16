@@ -10,9 +10,10 @@ from flask_sqlalchemy import SQLAlchemy
 from lxml import etree
 
 import tyko
+import tyko.data_provider.data_provider
 import tyko.exceptions
 import tyko.database
-from tyko import pbcore, data_provider, schema
+from tyko import pbcore
 from tyko.schema.formats import format_types
 
 PBCORE_XSD_URL = "https://raw.githubusercontent.com/PBCore-AV-Metadata/PBCore_2.1/master/pbcore-2.1.xsd"
@@ -31,13 +32,15 @@ xsd = etree.XML(PBCORE_XSD)
 PBCORE_SCHEMA = etree.XMLSchema(xsd)
 
 
-
 def test_pbcore_fail_invalid_id():
     db = sqlalchemy.create_engine("sqlite:///:memory:")
-    empty_data_provider = data_provider.DataProvider(db)
+    empty_data_provider = tyko.data_provider.data_provider.DataProvider(db)
 
     with pytest.raises(tyko.exceptions.DataError):
-        pbcore.create_pbcore_from_object(object_id=1, data_provider=empty_data_provider)
+        pbcore.create_pbcore_from_object(
+            object_id=1,
+            data_provider=empty_data_provider
+        )
 
 
 def test_pbcore_valid_id(tmpdir):
@@ -73,7 +76,10 @@ def test_pbcore_valid_id(tmpdir):
         ).get_json()
 
         sample_object_response = server.post(
-            flask.url_for("project_add_object", project_id=sample_project['id']),
+            flask.url_for(
+                "project_add_object",
+                project_id=sample_project['id']
+            ),
             data=json.dumps(
                 {
                     "name": "My dummy object",
@@ -101,8 +107,14 @@ def test_pbcore_valid_id(tmpdir):
         ).get_json()
 
         pbcore_xml = server.get(
-            flask.url_for("object_pbcore", id=sample_object_response['object_id'])
+            flask.url_for(
+                "object_pbcore",
+                id=sample_object_response['object_id']
+            )
+
         ).get_data()
         doc = etree.fromstring(pbcore_xml)
         print(str(etree.tostring(doc, pretty_print=True), encoding="utf-8"))
-        assert PBCORE_SCHEMA.validate(doc) is True, PBCORE_SCHEMA.error_log.filter_from_errors().last_error.message
+        assert \
+            PBCORE_SCHEMA.validate(doc) is True, \
+            PBCORE_SCHEMA.error_log.filter_from_errors().last_error.message

@@ -6,16 +6,20 @@ from flask import Flask, make_response, Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import OperationalError
 
-from .database import init_database
+from .database import init_database, create_samples
 from .exceptions import DataError, NoTable
-from .data_provider import DataProvider, get_schema_version
 from .schema import ALEMBIC_VERSION
-from .routes import Routes
+import tyko
+import tyko.data_provider
+import tyko.routes
 
 
 def is_correct_db_version(app, database) -> bool:
     try:
-        version = get_schema_version(db_engine=database.get_engine())
+        version = tyko.data_provider.get_schema_version(
+            db_engine=database.get_engine()
+        )
+
         if version is None:
             app.logger.error("No version information found")
             return False
@@ -50,7 +54,7 @@ def create_app(
     engine = database.get_engine()
 
     app.logger.info("Loading database connection")
-    data_provider = DataProvider(engine)
+    tyko_data_provider = tyko.data_provider.DataProvider(engine)
 
     app.logger.info("Checking database schema version")
     if verify_db is True and not is_correct_db_version(app, database):
@@ -60,7 +64,7 @@ def create_app(
         app.add_url_rule("/", "unable_to_load", page_failed_on_startup)
         return app
 
-    app_routes = Routes(data_provider, app)
+    app_routes = tyko.routes.Routes(tyko_data_provider, app)
     app.logger.info("Initializing API routes")
     app_routes.init_api_routes()
     app.logger.info("Initializing Website routes")
@@ -80,9 +84,11 @@ def main() -> None:
         my_app.config.from_object("tyko.config.Config")
         my_app.config.from_envvar("TYKO_SETTINGS", True)
         database = SQLAlchemy(my_app)
-        data_provider = DataProvider(database.engine)
+        data_provider = tyko.data_provider.DataProvider(database.engine)
         my_app.logger.info("Initializing Database")  # pylint: disable=E1101
         init_database(data_provider.db_engine)
+        if "--create-samples" in sys.argv:
+            create_samples(data_provider.db_engine)
         sys.exit(0)
     my_app = create_app()
     if my_app is not None:

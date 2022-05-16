@@ -11,7 +11,7 @@ from typing import List, Dict, Any, Iterator
 import flask
 from flask import jsonify, make_response, abort, request, url_for
 
-from . import data_provider as dp
+import tyko.data_provider
 from . import pbcore
 from .exceptions import DataError
 from .views import files
@@ -64,7 +64,7 @@ class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
 class Middleware:
     """Middleware to connect to database."""
 
-    def __init__(self, data_provider: dp.DataProvider) -> None:
+    def __init__(self, data_provider: tyko.data_provider.DataProvider) -> None:
         self.data_provider = data_provider
 
     def get_formats(self, serialize=True):
@@ -89,11 +89,13 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
         'originals_return_date'
     ]
 
-    def __init__(self, data_provider: dp.DataProvider) -> None:
+    def __init__(self, data_provider: tyko.data_provider.DataProvider) -> None:
         super().__init__(data_provider)
 
         self._data_connector = \
-            dp.ObjectDataConnector(data_provider.db_session_maker)
+            tyko.data_provider.ObjectDataConnector(
+                data_provider.db_session_maker
+            )
 
     def get(self, serialize=False, **kwargs) -> flask.Response:
         if "id" in kwargs:
@@ -282,7 +284,9 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
         super().__init__(data_provider)
 
         self._data_connector = \
-            dp.CollectionDataConnector(data_provider.db_session_maker)
+            tyko.data_provider.CollectionDataConnector(
+                data_provider.db_session_maker
+            )
 
     def get(self, serialize=False, **kwargs):
         if "id" in kwargs:
@@ -388,7 +392,9 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         super().__init__(data_provider)
 
         self._data_connector = \
-            dp.ProjectDataConnector(data_provider.db_session_maker)
+            tyko.data_provider.ProjectDataConnector(
+                data_provider.db_session_maker
+            )
 
     def get(self, serialize=False, **kwargs):
         if "id" in kwargs:
@@ -680,7 +686,9 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
         super().__init__(data_provider)
 
         self._data_connector = \
-            dp.ItemDataConnector(data_provider.db_session_maker)
+            tyko.data_provider.ItemDataConnector(
+                data_provider.db_session_maker
+            )
 
     def get(self, serialize=False, **kwargs):
         if "id" in kwargs:
@@ -850,7 +858,9 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         super().__init__(data_provider)
 
         self._data_connector = \
-            dp.NotesDataConnector(data_provider.db_session_maker)
+            tyko.data_provider.NotesDataConnector(
+                data_provider.db_session_maker
+            )
 
     @staticmethod
     def resolve_parents(source: dict) -> dict:
@@ -965,7 +975,7 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
 def get_enums(session_maker, enum_type: str):
     session = session_maker()
     try:
-        results = dp.enum_getter(session, enum_type)
+        results = tyko.data_provider.enum_getter(session, enum_type)
     finally:
         session.close()
     return jsonify(results)

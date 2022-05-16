@@ -1,9 +1,12 @@
+from __future__ import annotations
 import functools
 import flask.wrappers
 from flask import views, request, url_for, jsonify, make_response
+import typing
 
-from tyko import data_provider
-from tyko.data_provider import DataProvider
+import tyko.data_provider
+if typing.TYPE_CHECKING:
+    from tyko.data_provider import DataProvider
 
 NO_JSON_DATA_LOCATED_MESSAGE = 'No JSON data Located'
 
@@ -26,7 +29,7 @@ class ItemFilesAPI(views.MethodView):
     def __init__(self, provider: DataProvider) -> None:
         self._data_provider = provider
         self._data_connector = \
-            data_provider.FilesDataConnector(provider.db_session_maker)
+            tyko.data_provider.FilesDataConnector(provider.db_session_maker)
 
     def get_by_id(self, file_id):
         return self._data_connector.get(int(file_id), serialize=True)
@@ -39,7 +42,7 @@ class ItemFilesAPI(views.MethodView):
         return self.get_all(item_id)
 
     def get_all(self, item_id: int) -> flask.Response:
-        items_dp = data_provider.ItemDataConnector(
+        items_dp = tyko.data_provider.ItemDataConnector(
             self._data_provider.db_session_maker)
         item = items_dp.get(item_id, serialize=True)
         return jsonify({
@@ -101,9 +104,9 @@ class ItemFilesAPI(views.MethodView):
                            ) -> bool:
         """Check if there is a matching file that matches all the ids"""
 
-        project_connector = data_provider.ProjectDataConnector(
+        project_connector = tyko.data_provider.ProjectDataConnector(
             self._data_provider.db_session_maker)
-        item_connector = data_provider.ItemDataConnector(
+        item_connector = tyko.data_provider.ItemDataConnector(
             self._data_provider.db_session_maker)
 
         project = project_connector.get(project_id, serialize=True)
@@ -125,7 +128,9 @@ class FileNotesAPI(views.MethodView):
     def __init__(self, provider: DataProvider) -> None:
         self._data_provider = provider
         self._data_connector = \
-            data_provider.FileNotesDataConnector(provider.db_session_maker)
+            tyko.data_provider.FileNotesDataConnector(
+                provider.db_session_maker
+            )
 
     def get(self, file_id: int) -> flask.Response:
         note_id = request.args.get("id")
@@ -142,7 +147,7 @@ class FileNotesAPI(views.MethodView):
 
     def get_all(self, file_id: int) -> flask.Response:
         data_connector = \
-            data_provider.FilesDataConnector(
+            tyko.data_provider.FilesDataConnector(
                 self._data_provider.db_session_maker)
 
         notes = data_connector.get(file_id, serialize=True)
@@ -192,7 +197,7 @@ class FileNotesAPI(views.MethodView):
         return self._data_connector.update(note_id, changed_data)
 
     def _file_has_matching_note(self, file_id: int, note_id: int) -> bool:
-        provider = data_provider.FilesDataConnector(
+        provider = tyko.data_provider.FilesDataConnector(
             self._data_provider.db_session_maker)
 
         matching_file = provider.get(file_id, serialize=True)
@@ -208,7 +213,7 @@ class FileNotesAPI(views.MethodView):
                 f"File {file_id} has no note with id {note_id}")
 
         note_data_connector = \
-            data_provider.FileNotesDataConnector(
+            tyko.data_provider.FileNotesDataConnector(
                 self._data_provider.db_session_maker)
         file_record = note_data_connector.delete(note_id)
         if file_record is True:
@@ -225,7 +230,7 @@ class FileAnnotationsAPI(views.MethodView):
             def wrapper(self, file_id, *args, **kwargs):
                 annotation_id = request.args.get('id')
                 if annotation_id:
-                    connector = data_provider.FileAnnotationsConnector(
+                    connector = tyko.data_provider.FileAnnotationsConnector(
                         self._data_provider.db_session_maker)  # noqa: E501 pylint: disable=W0212
                     annotation = connector.get(annotation_id, serialize=True)
                     if annotation['file_id'] != file_id:
@@ -239,7 +244,7 @@ class FileAnnotationsAPI(views.MethodView):
         self._data_provider = provider
 
     def get(self, file_id: int) -> flask.Response:
-        file_connector = data_provider.FilesDataConnector(
+        file_connector = tyko.data_provider.FilesDataConnector(
             self._data_provider.db_session_maker)
         res = file_connector.get(file_id, serialize=True)
 
@@ -255,7 +260,7 @@ class FileAnnotationsAPI(views.MethodView):
             raise ValueError(NO_JSON_DATA_LOCATED_MESSAGE)
 
         annotation_connector = \
-            data_provider.FileAnnotationsConnector(
+            tyko.data_provider.FileAnnotationsConnector(
                 self._data_provider.db_session_maker)
         new_annotation_id = annotation_connector.create(
             file_id=file_id,
@@ -276,7 +281,7 @@ class FileAnnotationsAPI(views.MethodView):
     @Decorators.validate
     def delete(self, file_id: int) -> flask.Response:  # pylint: disable=W0613
         annotation_id = request.args['id']
-        connector = data_provider.FileAnnotationsConnector(
+        connector = tyko.data_provider.FileAnnotationsConnector(
             self._data_provider.db_session_maker)
 
         successfully_deleted = connector.delete(annotation_id)
@@ -296,7 +301,7 @@ class FileAnnotationsAPI(views.MethodView):
             'content': json_request.get('content'),
             'type_id': int(json_request.get('type_id')),
         }
-        connector = data_provider.FileAnnotationsConnector(
+        connector = tyko.data_provider.FileAnnotationsConnector(
             self._data_provider.db_session_maker)
         return connector.update(annotation_id, changed_data)
 
@@ -306,7 +311,7 @@ class FileAnnotationTypesAPI(views.MethodView):
         self._data_provider = provider
 
     def get(self) -> flask.Response:
-        connector = data_provider.FileAnnotationsConnector(
+        connector = tyko.data_provider.FileAnnotationsConnector(
             self._data_provider.db_session_maker)
         all_types = connector.get(serialize=True)
         return jsonify({
@@ -316,7 +321,7 @@ class FileAnnotationTypesAPI(views.MethodView):
 
     def delete(self) -> flask.Response:
         annotation_id = request.args["id"]
-        connector = data_provider.FileAnnotationTypeConnector(
+        connector = tyko.data_provider.FileAnnotationTypeConnector(
             self._data_provider.db_session_maker)
         successful = connector.delete(annotation_id)
         if successful is True:
@@ -330,7 +335,7 @@ class FileAnnotationTypesAPI(views.MethodView):
             raise ValueError('No JSON data Located')
 
         annotation_connector = \
-            data_provider.FileAnnotationTypeConnector(
+            tyko.data_provider.FileAnnotationTypeConnector(
                 self._data_provider.db_session_maker)
 
         new_annotation_type = \

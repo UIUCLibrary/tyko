@@ -995,8 +995,7 @@ def test_create_add_and_remove_cassette(date, server_with_enums):
                 "date_recorded": date,
                 "inspection_date": "12/10/2019",
                 "tape_thickness_id": data['tape_thicknesses'][0]['id'],
-                'tape_type_id': data["cassette_tape_tape_types"][0]['id']
-            }
+                'tape_type_id': data["cassette_tape_tape_types"][0]['id']}
         }),
         content_type='application/json'
     )
@@ -1046,8 +1045,7 @@ def test_create_and_remove_cassette_with_notes(server_with_enums):
             "format_details": {
                 "format_type_id":
                     data['cassette_tape_formats']['compact cassette']['id'],
-                "date_recorded": "11/26/1993",
-            }
+                "date_recorded": "11/26/1993"}
         }),
         content_type='application/json'
     )
@@ -1204,4 +1202,3 @@ def test_api_video_cassette_generation(app):
         server.get('/')
         response = server.get(url_for('video_cassette_generations'))
         assert {'id': 2, 'name': 'dub'} in response.get_json()
-

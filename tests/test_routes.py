@@ -3,12 +3,14 @@ from unittest.mock import Mock, MagicMock
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
+import tyko.data_provider.data_provider
 import tyko.routes
 import tyko.database
 import tyko.views.project_object
 from tyko import data_provider
 
-from tyko.data_provider import DataProvider
+from tyko.data_provider.data_provider import DataProvider
+
 
 def test_get_api():
     testing_app = Flask(__name__, template_folder="../tyko/templates")
@@ -54,7 +56,7 @@ class TestProjectObjectAPI:
 class TestNewItem:
     def test_add_item_called(self):
         app = Flask(__name__, template_folder="../tyko/templates")
-        data_connector = Mock(spec=data_provider.ObjectDataConnector)
+        data_connector = Mock(spec=tyko.data_provider.data_provider.ObjectDataConnector)
 
         user_view = \
             tyko.routes.NewItem.as_view("api", data_connector=data_connector)
@@ -76,7 +78,7 @@ class TestNewItem:
 class TestObjectItemNewNotes:
     def test_add_item_called(self):
         app = Flask(__name__, template_folder="../tyko/templates")
-        data_connector = Mock(spec=data_provider.ItemDataConnector)
+        data_connector = Mock(spec=tyko.data_provider.data_provider.ItemDataConnector)
 
         user_view = \
             tyko.routes.ObjectItemNewNotes.as_view(
@@ -102,7 +104,7 @@ class TestObjectItemNewNotes:
 class TestProjectNewNote:
     def test_add_item_called(self):
         app = Flask(__name__, template_folder="../tyko/templates")
-        data_connector = Mock(spec=data_provider.ProjectDataConnector)
+        data_connector = Mock(spec=tyko.data_provider.data_provider.ProjectDataConnector)
 
         user_view = \
             tyko.routes.ProjectNewNote.as_view(
@@ -127,7 +129,7 @@ class TestProjectNewNote:
 class TestObjectUpdateNotes:
     def test_update_note_called(self):
         app = Flask(__name__, template_folder="../tyko/templates")
-        data_connector = Mock(spec=data_provider.ObjectDataConnector)
+        data_connector = Mock(spec=tyko.data_provider.data_provider.ObjectDataConnector)
 
         user_view = \
             tyko.routes.ObjectUpdateNotes.as_view(
@@ -153,7 +155,7 @@ class TestObjectUpdateNotes:
 class TestProjectNoteUpdate:
     def test_update_note_called(self):
         app = Flask(__name__, template_folder="../tyko/templates")
-        data_connector = Mock(spec=data_provider.ProjectDataConnector)
+        data_connector = Mock(spec=tyko.data_provider.data_provider.ProjectDataConnector)
 
         user_view = \
             tyko.routes.ProjectNoteUpdate.as_view(
@@ -179,7 +181,7 @@ class TestProjectNoteUpdate:
 class TestObjectItemNewFile:
     def test_add_file_called(self):
         app = Flask(__name__, template_folder="../tyko/templates")
-        data_connector = Mock(spec=data_provider.ItemDataConnector)
+        data_connector = Mock(spec=tyko.data_provider.data_provider.ItemDataConnector)
 
         user_view = \
             tyko.routes.ObjectItemNewFile.as_view(
@@ -205,7 +207,7 @@ class TestObjectItemNewFile:
 class TestProjectNewObject:
     def test_add_object_called(self):
         app = Flask(__name__, template_folder="../tyko/templates")
-        data_connector = Mock(spec=data_provider.ProjectDataConnector)
+        data_connector = Mock(spec=tyko.data_provider.data_provider.ProjectDataConnector)
 
         user_view = \
             tyko.routes.ProjectNewObject.as_view(
@@ -229,7 +231,7 @@ class TestProjectNewObject:
 class TestObjectNewNotes:
     def test_add_note_called(self):
         app = Flask(__name__, template_folder="../tyko/templates")
-        data_connector = Mock(spec=data_provider.ProjectDataConnector)
+        data_connector = Mock(spec=tyko.data_provider.data_provider.ProjectDataConnector)
 
         user_view = \
             tyko.routes.ObjectNewNotes.as_view(
@@ -254,7 +256,7 @@ class TestObjectNewNotes:
 class TestObjectItemNotes:
     def test_update_note_called(self):
         app = Flask(__name__, template_folder="../tyko/templates")
-        data_connector = Mock(spec=data_provider.ItemDataConnector)
+        data_connector = Mock(spec=tyko.data_provider.data_provider.ItemDataConnector)
 
         user_view = \
             tyko.routes.ObjectItemNotes.as_view(

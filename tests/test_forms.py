@@ -20,8 +20,10 @@ def project(app):
             content_type='application/json'
         ).get_json()
 
+
 def namer(*args, **kwargs):
     return str(args[0])
+
 
 @pytest.fixture()
 def dummy_object(app, project):
@@ -38,7 +40,6 @@ def dummy_object(app, project):
             ),
             content_type='application/json'
         ).get_json()
-
 
 
 @pytest.mark.parametrize(

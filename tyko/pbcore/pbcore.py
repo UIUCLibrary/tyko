@@ -1,7 +1,13 @@
+from __future__ import annotations
 from importlib.resources import read_text
 from jinja2 import Template
-from tyko.data_provider import DataProvider, ObjectDataConnector, \
-    FilesDataConnector, ProjectDataConnector
+import typing
+
+from tyko.data_provider import ProjectDataConnector, \
+    ObjectDataConnector, FilesDataConnector
+
+if typing.TYPE_CHECKING:
+    from tyko.data_provider import DataProvider
 
 
 def resolve_project_data(project_connector, unresolved_object: dict):

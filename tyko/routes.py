@@ -1,22 +1,34 @@
 # pylint: disable=invalid-name, not-an-iterable
+from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, List, Iterator, Tuple, Callable, Optional, Union
+from typing import \
+    Any, \
+    List, \
+    Iterator, \
+    Tuple, \
+    Callable, \
+    Optional, \
+    Union, \
+    TYPE_CHECKING
+
 from flask import jsonify, render_template, views, request
 
 import tyko.views.files
 from . import middleware
-from .data_provider import DataProvider, ItemDataConnector, \
-    ObjectDataConnector, \
-    ProjectDataConnector
+from tyko.data_provider import \
+    ItemDataConnector, \
+    ProjectDataConnector, \
+    ObjectDataConnector
+
 from . import frontend
-from .views.object_item import ObjectItemNotesAPI, ObjectItemAPI
-from .views.object_item import ItemAPI
+from .views.object_item import ObjectItemNotesAPI, ObjectItemAPI, ItemAPI
 from .views.project import ProjectNotesAPI, ProjectAPI
 from .views.project_object import ProjectObjectAPI, ObjectApi, \
     ProjectObjectNotesAPI
 from .views import cassette_tape
-
+if TYPE_CHECKING:
+    from tyko.data_provider import DataProvider
 
 """
 FORMAT_ENUM_ROUTES:

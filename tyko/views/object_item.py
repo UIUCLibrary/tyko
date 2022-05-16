@@ -54,8 +54,8 @@ class ObjectItemAPI(views.MethodView):
         format_type = self._provider.get_formats(
             request_data["format_id"], serialize=True)[0]
         connectors = {
-            "audio cassette": data_provider.AudioCassetteDataConnector,
-            'cassette tape': data_provider.AudioCassetteDataConnector,
+            "audio cassette": data_provider.formats.AudioCassetteDataConnector,
+            'cassette tape': data_provider.formats.AudioCassetteDataConnector,
 
         }
         connector_class = connectors.get(format_type['name'])
@@ -70,7 +70,8 @@ class ObjectItemAPI(views.MethodView):
         else:
             data_connector = \
                 data_provider.ObjectDataConnector(
-                    self._provider.db_session_maker)
+                    self._provider.db_session_maker
+                )
 
             new_item = data_connector.add_item(
                 object_id=object_id,
@@ -127,7 +128,9 @@ class ObjectItemAPI(views.MethodView):
         item_id = request.args.get("item_id")
         data = request.get_json()
         connector = data_provider.ItemDataConnector(
-            self._provider.db_session_maker)
+            self._provider.db_session_maker
+        )
+
         replacement_item = connector.update(int(item_id), data)
         return replacement_item
 
@@ -222,7 +225,8 @@ class ItemAPI(views.MethodView):
     def get(self, item_id):
         item = self._data_connector.get(item_id, True)
         object_provider = data_provider.ObjectDataConnector(
-            self._data_provider.db_session_maker)
+            self._data_provider.db_session_maker
+        )
 
         if 'parent_object_id' in item and item['parent_object_id'] is not None:
             parent_project = \

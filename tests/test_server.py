@@ -2,13 +2,10 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
 
 import tyko
-import tyko.schema.formats
-import tyko.schema.projects
-from tyko import routes, data_provider, schema
+from tyko import data_provider, schema
 from tyko.run import is_correct_db_version
 import tyko.database
 import sqlalchemy
-from tyko.database import init_database
 import pytest
 import json
 from flask import Flask
@@ -85,7 +82,7 @@ def test_api_formats(test_app):
     assert resp.status == "200 OK"
     tmp_data = json.loads(resp.data)
 
-    for k, v in tyko.schema.formats.format_types.items():
+    for k, v in schema.formats.format_types.items():
         for entry in tmp_data:
             if entry["name"] == k:
                 assert entry["id"] == v[0]
@@ -203,7 +200,7 @@ def test_empty_database_error():
     db = sqlalchemy.create_engine("sqlite:///:memory:")
 
     with pytest.raises(tyko.exceptions.DataError):
-        empty_data_provider = data_provider.DataProvider(db)
+        empty_data_provider = tyko.data_provider.data_provider.DataProvider(db)
         empty_data_provider.get_formats()
 
 
@@ -240,7 +237,7 @@ def test_project_status_by_name_invalid():
     engine = sqlalchemy.create_engine("sqlite:///:memory:")
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = data_provider.ProjectDataConnector(dummy_session)
+    project_provider = tyko.data_provider.data_provider.ProjectDataConnector(dummy_session)
 
     with pytest.raises(tyko.exceptions.DataError):
         status = \
@@ -252,10 +249,10 @@ def test_project_status_by_name_invalid_multiple_with_same_name():
     engine = sqlalchemy.create_engine("sqlite:///:memory:")
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = data_provider.ProjectDataConnector(dummy_session)
+    project_provider = tyko.data_provider.data_provider.ProjectDataConnector(dummy_session)
     session = dummy_session()
-    session.add(tyko.schema.projects.ProjectStatus(name="double"))
-    session.add(tyko.schema.projects.ProjectStatus(name="double"))
+    session.add(schema.projects.ProjectStatus(name="double"))
+    session.add(schema.projects.ProjectStatus(name="double"))
     session.commit()
 
     with pytest.raises(tyko.exceptions.DataError):
@@ -268,7 +265,7 @@ def test_project_status_by_name_valid():
     engine = sqlalchemy.create_engine("sqlite:///:memory:")
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = data_provider.ProjectDataConnector(dummy_session)
+    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
 
     status = project_provider.get_project_status_by_name(
                 "In progress", create_if_not_exists=False)
@@ -279,7 +276,7 @@ def test_project_status_by_name_new_create():
     engine = sqlalchemy.create_engine("sqlite:///:memory:")
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = data_provider.ProjectDataConnector(dummy_session)
+    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
 
     status = project_provider.get_project_status_by_name(
                 "new status", create_if_not_exists=True)
@@ -295,7 +292,7 @@ class TestProjectDataConnector:
 
     def test_get_note(self, dummy_session):
 
-        project_provider = data_provider.ProjectDataConnector(dummy_session)
+        project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
 
         project_id = project_provider.create(title="dummy")
 
@@ -322,7 +319,7 @@ class TestItemDataConnector:
     @pytest.fixture()
     def item_provider(self, dummy_session):
 
-        return data_provider.ItemDataConnector(dummy_session)
+        return tyko.data_provider.ItemDataConnector(dummy_session)
 
     def test_get_note(self, item_provider):
         new_item_data = item_provider.create(name="dummy", format_id=1)
@@ -346,10 +343,12 @@ class TestItemDataConnector:
             item_provider.get_note(new_item_data['item_id'], note_id=2)
 
     def test_add_file(self, item_provider, dummy_session):
-        project_provider = data_provider.ProjectDataConnector(dummy_session)
+        project_provider = \
+            tyko.data_provider.ProjectDataConnector(dummy_session)
+
         project_provider.create(title="dummyProject")
         new_item_data = item_provider.create(name="dummy", format_id=1)
-        object_provider = data_provider.ObjectDataConnector(dummy_session)
+        object_provider = tyko.data_provider.ObjectDataConnector(dummy_session)
         object_id = object_provider.create(name="dummyobject")
         project_id = project_provider.create(title="dummy")
 
@@ -373,7 +372,7 @@ class TestObjectDataConnector:
 
     def test_get_note(self, dummy_session):
 
-        object_provider = data_provider.ObjectDataConnector(dummy_session)
+        object_provider = tyko.data_provider.ObjectDataConnector(dummy_session)
 
         object_id = object_provider.create(name="dummy")
 
@@ -395,7 +394,7 @@ def test_project_default_status():
     engine = sqlalchemy.create_engine("sqlite:///:memory:")
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = data_provider.ProjectDataConnector(dummy_session)
+    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
     statuses = project_provider.get_all_project_status()
     assert len(statuses) == 3
 

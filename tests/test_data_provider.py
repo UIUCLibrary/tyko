@@ -1,6 +1,8 @@
 from datetime import datetime
 from unittest.mock import Mock
 from sqlalchemy.orm.session import Session
+
+import tyko.data_provider.formats
 from tyko import data_provider
 import pytest
 
@@ -49,7 +51,7 @@ class TestOpticalDataConnector:
     )
     def test_data(self, output_key, expected_value, data):
         new_item = \
-            data_provider.OpticalDataConnector(
+            tyko.data_provider.formats.OpticalDataConnector(
                 Mock()
             ).create_new_format_item(Mock(spec=Session), data)
         assert getattr(new_item, output_key) == expected_value
