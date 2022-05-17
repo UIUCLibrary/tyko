@@ -944,11 +944,11 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
             if not self.field_can_edit(k):
                 return make_response(
                     "Cannot update note field: {}".format(k), 400)
+        if note_text := json_request.get("text"):
+            new_object["text"] = note_text
 
-        if "text" in json_request:
-            new_object["text"] = json_request.get("text")
-        if 'note_type_id' in json_request:
-            new_object['note_type_id'] = int(json_request['note_type_id'])
+        if note_text_id := json_request.get("note_type_id"):
+            new_object['note_type_id'] = int(note_text_id)
 
         updated_note = \
             self._data_connector.update(
