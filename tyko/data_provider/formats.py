@@ -1,16 +1,17 @@
 import functools
+import typing
 
 import sqlalchemy
-import typing
 
 from sqlalchemy import orm
 
-from . import data_provider
 from tyko import utils
 from tyko.schema import \
     formats, \
     AudioCassette, \
     CassetteTapeThickness
+
+from . import data_provider
 
 
 class FormatConnector(data_provider.ItemDataConnector):

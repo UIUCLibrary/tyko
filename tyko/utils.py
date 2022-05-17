@@ -3,7 +3,6 @@ import datetime
 import typing
 
 from sqlalchemy import Column, Date
-from typing import Union
 
 DATE_FORMATS_IN = {
     1: "%Y",
@@ -44,7 +43,7 @@ def create_precision_datetime(
 
 
 def serialize_precision_datetime(
-        date: Union[datetime.date, Column[Date]],
+        date: typing.Union[datetime.date, Column[Date]],
         precision: int = 3
 ) -> str:
     formatter = DATE_FORMATS_OUT.get(precision)

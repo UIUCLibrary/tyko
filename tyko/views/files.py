@@ -1,8 +1,8 @@
 from __future__ import annotations
 import functools
+import typing
 import flask.wrappers
 from flask import views, request, url_for, jsonify, make_response
-import typing
 
 import tyko.data_provider
 if typing.TYPE_CHECKING:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from importlib.resources import read_text
-from jinja2 import Template
 import typing
+from jinja2 import Template
 
 from tyko.data_provider import ProjectDataConnector, \
     ObjectDataConnector, FilesDataConnector

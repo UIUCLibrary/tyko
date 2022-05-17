@@ -6,12 +6,13 @@ from flask import Flask, make_response, Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import OperationalError
 
-from .database import init_database, create_samples
-from .exceptions import DataError, NoTable
-from .schema import ALEMBIC_VERSION
 import tyko
 import tyko.data_provider
 import tyko.routes
+
+from .database import init_database, create_samples
+from .exceptions import DataError, NoTable
+from .schema import ALEMBIC_VERSION
 
 
 def is_correct_db_version(app, database) -> bool:

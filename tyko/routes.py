@@ -18,13 +18,12 @@ import flask
 from flask import jsonify, render_template, views, request
 
 import tyko.views.files
-from . import middleware
 from tyko.data_provider import \
     ItemDataConnector, \
     ProjectDataConnector, \
     ObjectDataConnector
 
-from . import frontend
+from . import frontend, middleware
 from .views.object_item import ObjectItemNotesAPI, ObjectItemAPI, ItemAPI
 from .views.project import ProjectNotesAPI, ProjectAPI
 from .views.project_object import ProjectObjectAPI, ObjectApi, \
