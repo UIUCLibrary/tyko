@@ -48,8 +48,7 @@ class ObjectItemAPI(views.MethodView):
             }
         except KeyError as e:
             traceback.print_exc(file=sys.stderr)
-            return make_response(
-                "missing required value {}".format(e), 400)
+            return make_response(f"missing required value {e}", 400)
 
         format_type = self._provider.get_formats(
             request_data["format_id"], serialize=True)[0]
@@ -209,8 +208,7 @@ class ItemAPI(views.MethodView):
             new_item = self.create_changed_data(json_request)
 
         except ValueError as reason:
-            return make_response(
-                "Cannot update item. Reason: {}".format(reason), 400)
+            return make_response(f"Cannot update item. Reason: {reason}", 400)
 
         replacement_item = self._data_connector.update(
             item_id, changed_data=new_item

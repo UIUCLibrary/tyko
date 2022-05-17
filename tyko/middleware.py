@@ -170,8 +170,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
         try:
             new_object = self.create_changed_data(json_request)
         except ValueError as reason:
-            return make_response(
-                "Cannot update object field: {}".format(reason), 400)
+            return make_response(f"Cannot update object field: {reason}", 400)
 
         updated_object = \
             self._data_connector.update(
@@ -358,7 +357,9 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
             new_collection = self.create_changed_data(json_request)
         except ValueError as reason:
             return make_response(
-                "Cannot update collection: Reason {}".format(reason), 400)
+                f"Cannot update collection: Reason {reason}",
+                400
+            )
 
         updated_collection = \
             self._data_connector.update(
@@ -942,8 +943,7 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         json_request = request.get_json()
         for k, _ in json_request.items():
             if not self.field_can_edit(k):
-                return make_response(
-                    "Cannot update note field: {}".format(k), 400)
+                return make_response(f"Cannot update note field: {k}", 400)
         if note_text := json_request.get("text"):
             new_object["text"] = note_text
 

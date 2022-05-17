@@ -175,8 +175,9 @@ class FrontendEntity(AbsFrontend):
 
     def display_details(self, entity_id, *args, **kwargs):  # noqa: E501 pylint: disable=unused-argument
         return make_response(
-            "{}.display_details not implemented".format(
-                self.__class__.__name__), 404)
+            f"{self.__class__.__name__}.display_details not implemented",
+            404
+        )
 
     def list(self):
         return make_response(

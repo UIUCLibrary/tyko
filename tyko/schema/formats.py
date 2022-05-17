@@ -633,7 +633,7 @@ class AudioCassette(AVFormat):
             if precision == 1:
                 return date.strftime("%Y")
 
-        raise AttributeError("Unable to serialize date {}".format(date))
+        raise AttributeError(f"Unable to serialize date {date}")
 
     @classmethod
     def encode_date(cls, date_string: str) -> Tuple[datetime.datetime, int]:
@@ -650,7 +650,7 @@ class AudioCassette(AVFormat):
         if cls.REGEX_YEAR_ONLY.match(date_string):
             return datetime.datetime.strptime(date_string, "%Y"), 1
 
-        raise AttributeError("Unknown date format: {}".format(date_string))
+        raise AttributeError(f"Unknown date format: {date_string}")
 
     def format_details(self) -> Mapping[str, SerializedData]:
 

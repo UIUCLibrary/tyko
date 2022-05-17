@@ -20,8 +20,7 @@ def alembic_table_exists(engine) -> bool:
     if packaging.version.parse(sqlalchemy.__version__) < \
             packaging.version.parse("1.4"):
         return engine.dialect.has_table(engine, "alembic_version")
-    else:
-        return sqlalchemy.inspect(engine).has_table("alembic_version")
+    return sqlalchemy.inspect(engine).has_table("alembic_version")
 
 
 def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
@@ -225,7 +224,7 @@ def validate_tables(engine: sqlalchemy.engine.Engine) -> bool:
 
     for table in db.inspect(engine).get_table_names():
         if table not in expected_table_names:
-            print("Unexpected table found: {}".format(table))
+            print(f"Unexpected table found: {table}")
             valid = False
         else:
             expected_table_names.remove(table)

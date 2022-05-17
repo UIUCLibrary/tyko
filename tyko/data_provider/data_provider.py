@@ -651,8 +651,7 @@ class ProjectDataConnector(AbsNotesConnector):
             project = self._get_project(session, project_id)
 
             if len(project.notes) == 0:
-                raise DataError(
-                    "Project with ID: {} has no notes".format(project_id))
+                raise DataError(f"Project with ID: {project_id} has no notes")
 
             # Find note that matches the note ID
             for note in project.notes:
@@ -728,8 +727,8 @@ class ProjectDataConnector(AbsNotesConnector):
 
         if len(projects) > 1:
             raise DataError(
-                message="Found multiple projects with ID: {}".format(
-                    project_id))
+                message=f"Found multiple projects with ID: {project_id}"
+            )
 
         return projects[0]
 
@@ -1069,14 +1068,13 @@ class ObjectDataConnector(AbsNotesConnector):
                 CollectionObject.id == object_id).all()
 
         if len(matching_objects) == 0:
-            raise DataError(
-                message="No object found with ID: {}".format(
-                    object_id))
+            raise DataError(message=f"No object found with ID: {object_id}")
 
         if len(matching_objects) > 1:
             raise DataError(
-                message="Found multiple objects with ID: {}".format(
-                    object_id))
+                message=f"Found multiple objects with ID: {object_id}"
+            )
+
         return matching_objects[0]
 
     @classmethod
@@ -1660,7 +1658,8 @@ class CassetteTypeConnector(EnumConnector):
         try:
             if self.entry_already_exists(name, session) is True:
                 raise ValueError(
-                    "Already a value stored for {}".format(self.enum_table))
+                    f"Already a value stored for {self.enum_table}"
+                )
             new_cassette_type = self.enum_table(name=name)
             session.add(new_cassette_type)
             session.flush()
