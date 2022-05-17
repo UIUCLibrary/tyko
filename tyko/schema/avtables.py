@@ -29,5 +29,9 @@ class AVTables(declarative_base(metaclass=DeclarativeABCMeta)):
         return {}
 
     @classmethod
-    def serialize_date(cls, date: Union[Column[Date], datetime.date], precision: int = 3):
+    def serialize_date(
+            cls,
+            date: Union[Column[Date], datetime.date],
+            precision: int = 3
+    ):
         return date.isoformat() if isinstance(date, datetime.date) else None

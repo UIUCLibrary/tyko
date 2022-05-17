@@ -5,7 +5,7 @@ import typing
 import warnings
 from abc import ABC
 
-from typing import Optional, Tuple, TYPE_CHECKING, Mapping, Union, Type
+from typing import Tuple, TYPE_CHECKING, Mapping, Union, Type
 import re
 import sqlalchemy as db
 from sqlalchemy.orm import relationship

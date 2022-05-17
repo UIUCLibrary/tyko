@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, Tuple, Any, Type, List, TypedDict, Union, Mapping, cast
+from typing import Tuple, Any, Type, List, TypedDict, Union, Mapping, cast
 
 import sqlalchemy as db
 import sqlalchemy.orm

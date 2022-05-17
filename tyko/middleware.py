@@ -982,7 +982,10 @@ class NotestMiddlwareEntity(AbsMiddlwareEntity):
         }
 
 
-def get_enums(session_maker: orm.sessionmaker, enum_type: str) -> flask.Response:
+def get_enums(
+        session_maker: orm.sessionmaker,
+        enum_type: str
+) -> flask.Response:
     session: orm.Session = session_maker()
     try:
         results = tyko.data_provider.enum_getter(session, enum_type)
