@@ -46,9 +46,9 @@ class ObjectItemAPI(views.MethodView):
                 "files": request_data.get("files", [])
 
             }
-        except KeyError as e:
+        except KeyError as error:
             traceback.print_exc(file=sys.stderr)
-            return make_response(f"missing required value {e}", 400)
+            return make_response(f"missing required value {error}", 400)
 
         format_type = self._provider.get_formats(
             request_data["format_id"], serialize=True)[0]

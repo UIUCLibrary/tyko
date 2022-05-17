@@ -181,7 +181,9 @@ class FrontendEntity(AbsFrontend):
 
     def list(self):
         return make_response(
-            "{}.list not implemented".format(self.__class__.__name__), 404)
+            f"{self.__class__.__name__}.list not implemented",
+            404
+        )
 
     def render_page(self, template, **context):
         new_context = self.build_header_context(

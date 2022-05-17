@@ -1239,9 +1239,9 @@ class FilesDataConnector(AbsDataProviderConnector):
             item = session.query(AVFormat)\
                 .filter(AVFormat.table_id == item_id).one()
 
-            for f in item.files:
-                if f.file_id == file_id:
-                    item.files.remove(f)
+            for file in item.files:
+                if file.file_id == file_id:
+                    item.files.remove(file)
                     return True
             raise ValueError(f"Item {item_id} does not have a file with an"
                              f" id of {file_id}")
