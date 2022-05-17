@@ -1230,7 +1230,7 @@ def dummy_object(app, project):
             {
                 "files": [],
                 "format_details": {
-                    'edge_code_date': '1967',
+                    'edge_code_date': 1967,
                 },
             }
         ),
@@ -1510,7 +1510,7 @@ def dummy_object(app, project):
                                 .default_values
                                 .index('24') + 1
                     },
-                    'edge_code_date': '1967',
+                    'edge_code_date': 1967,
                     'soundtrack': {
                         "name": 'Magnetic',
                         "id":

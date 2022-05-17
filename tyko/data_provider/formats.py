@@ -204,6 +204,9 @@ class FilmDataConnector(FormatConnector):
         new_item.duration = format_data.pop('filmDuration', None)
         new_item.ad_test_level = format_data.pop('filmADStripTestLevel', None)
 
+        if film_edge_code_date := format_data.pop('filmEdgeCodeDate', None):
+            new_item.edge_code_date = int(film_edge_code_date)
+
         self._add_date_values(new_item, format_data)
 
         self._add_enum_values(new_item, format_data, session)
@@ -213,43 +216,41 @@ class FilmDataConnector(FormatConnector):
     def _add_enum_values(self, item, format_data, session):
         if base_id := format_data.pop('filmBaseId', None):
             item.film_base = session.query(formats.FilmFilmBase).filter(
-                formats.FilmFilmBase.table_id == base_id
+                formats.FilmFilmBase.table_id == int(base_id)
             ).one()
         if soundtrack_id := format_data.pop('filmSoundtrackId', None):
             item.soundtrack = session.query(formats.FilmSoundtrack).filter(
-                formats.FilmSoundtrack.table_id == soundtrack_id
+                formats.FilmSoundtrack.table_id == int(soundtrack_id)
             ).one()
         if color_id := format_data.pop('filmColorId', None):
             item.color = session.query(formats.FilmColor).filter(
-                formats.FilmColor.table_id == color_id
+                formats.FilmColor.table_id == int(color_id)
             ).one()
         if image_type_id := format_data.pop('filmImageTypeId', None):
             item.image_type = session.query(formats.FilmImageType).filter(
-                formats.FilmImageType.table_id == image_type_id
+                formats.FilmImageType.table_id == int(image_type_id)
             ).one()
         if wind_id := format_data.pop('filmWindId', None):
             item.wind = session.query(formats.FilmWind).filter(
-                formats.FilmWind.table_id == wind_id
+                formats.FilmWind.table_id == int(wind_id)
             ).one()
         if film_emulsion_id := format_data.pop('filmEmulsionId', None):
             item.emulsion = session.query(formats.FilmEmulsion).filter(
-                formats.FilmEmulsion.table_id == film_emulsion_id
+                formats.FilmEmulsion.table_id == int(film_emulsion_id)
             ).one()
         if film_speed_id := format_data.pop('filmSpeedId', None):
             item.film_speed = session.query(formats.FilmFilmSpeed).filter(
-                formats.FilmFilmSpeed.table_id == film_speed_id
+                formats.FilmFilmSpeed.table_id == int(film_speed_id)
             ).one()
         if film_gauge_id := format_data.pop('filmGaugeId', None):
             item.film_gauge = session.query(formats.FilmFilmGauge).filter(
-                formats.FilmFilmGauge.table_id == film_gauge_id
+                formats.FilmFilmGauge.table_id == int(film_gauge_id)
             ).one()
 
     def _add_date_values(self, item, format_data) -> None:
         if film_ad_strip_test := format_data.pop('filmADStripTest', None):
             item.ad_test = bool(film_ad_strip_test)
-        if film_edge_code_date := format_data.pop('filmEdgeCodeDate', None):
-            item.edge_code_date = \
-                utils.create_precision_datetime(film_edge_code_date, 1)
+
         if film_date := format_data.pop('filmDate', None):
             item.date_of_film = \
                 utils.create_precision_datetime(film_date, 3)

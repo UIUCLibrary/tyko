@@ -56,6 +56,10 @@ function loadTableFiles(element){
 }
 
 function loadDynamicEnums(element){
+    if(!element.dataset.enumUrl){
+      console.warn(`${element.id} element does not have a data-enum-url property`)
+      return
+    }
     fetch(element.dataset.enumUrl).then(response => response.json()).then(newData => {
         for( let data of newData){
           const newOption = document.createElement('option')

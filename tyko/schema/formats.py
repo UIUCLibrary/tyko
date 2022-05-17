@@ -265,7 +265,7 @@ class Film(AVFormat, ABC):
     )
     soundtrack = relationship("FilmSoundtrack")
 
-    edge_code_date = db.Column("edge_code_date", db.Date)
+    edge_code_date = db.Column("edge_code_date", db.Integer)
 
     color_id = db.Column(
         db.Integer,
@@ -311,7 +311,7 @@ class Film(AVFormat, ABC):
 
     def format_details(self) -> Mapping[str, SerializedData]:
         return {
-            "film_title": self.title_of_film,
+                "film_title": self.title_of_film,
             "date_of_film":
                 utils.serialize_precision_datetime(self.date_of_film)
                 if self.date_of_film is not None else None,
@@ -322,10 +322,7 @@ class Film(AVFormat, ABC):
             # "format_gauge": self.format_gauge,
             "film_base":
                 self.film_base.serialize() if self.film_base else None,
-            "edge_code_date":
-                utils.serialize_precision_datetime(
-                    self.edge_code_date, 1)
-                if self.edge_code_date is not None else None,
+            "edge_code_date": self.edge_code_date,
             "soundtrack":
                 self.soundtrack.serialize() if self.soundtrack else None,
             "color": self.color.serialize() if self.color else None,

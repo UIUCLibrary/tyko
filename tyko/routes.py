@@ -122,7 +122,47 @@ FORMAT_ENUM_ROUTES = [
         "/api/formats/grooved_disc/disc_base",
         'grooved_disc_disc_base',
         "GroovedDiscDiscBase"
-    )
+    ),
+    (
+        "/api/formats/film/film_speed",
+        'film_film_speed',
+        "FilmFilmSpeed"
+    ),
+    (
+        "/api/formats/film/film_gauge",
+        'film_film_gauge',
+        "FilmFilmGauge"
+    ),
+    (
+        "/api/formats/film/film_base",
+        'film_film_base',
+        "FilmFilmBase"
+    ),
+    (
+        "/api/formats/film/film_emulsion",
+        'film_emulsion',
+        "FilmEmulsion"
+    ),
+    (
+        "/api/formats/film/soundtrack",
+        'film_soundtrack',
+        "FilmSoundtrack"
+    ),
+    (
+        "/api/formats/film/color",
+        'film_color',
+        "FilmColor"
+    ),
+    (
+        "/api/formats/film/image_type",
+        'film_image_type',
+        "FilmImageType"
+    ),
+    (
+        "/api/formats/film/wind",
+        'film_wind',
+        "FilmWind"
+    ),
 ]
 
 

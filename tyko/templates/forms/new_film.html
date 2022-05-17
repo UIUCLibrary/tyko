@@ -9,10 +9,15 @@
     </div>
 </div>
 <div class="mb-3 row">
-    <label for="filmDate" class="col-sm-2 col-form-label">The date of film content (date of recording)</label>
+    <label for="filmDate" class="col-sm-2 col-form-label">Date of Film</label>
     <div class="col-sm-10">
         <div class="input-group">
-            <input type="text" id="filmDate" class="form-control tyko-date-selector" name="filmDate">
+            <input type="text"
+                   id="filmDate"
+                   class="form-control tyko-date-selector"
+                   name="filmDate"
+                   placeholder="The date of film content (date of recording)"
+            >
             <button type="button"
                     onclick="tyko.openDateSelect('filmDate', 'm/d/yyyy')"
                     class="btn btn-outline-secondary">
@@ -34,7 +39,9 @@
 </div>
 
 <div class="mb-3 row">
-    <label for="filmLeaderLabel" class="col-sm-2 col-form-label">Leader label</label>
+    <label for="filmLeaderLabel" class="col-sm-2 col-form-label">
+        Leader label
+    </label>
     <div class="col-sm-10">
         <input id="filmLeaderLabel"
                type="text"
@@ -47,121 +54,113 @@
 <div class="mb-3 row">
     <label for="filmLength" class="col-sm-2 col-form-label">Length (ft)</label>
     <div class="col-sm-10">
-        <input type="number" min="0" id="filmLength" class="form-control" name="filmLength" placeholder="length of the film">
+        <input type="number"
+               min="0"
+               id="filmLength"
+               class="form-control"
+               name="filmLength"
+               placeholder="length of the film">
     </div>
 </div>
 
 <div class="mb-3 row">
     <label for="filmDuration" class="col-sm-2 col-form-label">Duration (HH:MM:SS)</label>
     <div class="col-sm-10">
-        <input type="text" id="filmDuration" class="form-control" name="filmDuration" placeholder="how long the content runs">
+        <input type="text"
+               id="filmDuration"
+               class="form-control"
+               name="filmDuration"
+               placeholder="how long the content runs">
     </div>
 </div>
 
 <div class="mb-3 row">
     <label for="filmSpeed" class="col-sm-2 col-form-label">Speed (fps)</label>
     <div class="col-sm-10">
-        <select class="form-select" name="filmSpeed" id="filmSpeed">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>16</option>
-            <option>18</option>
-            <option>24</option>
-            <option>unknown</option>
-        </select>
-    </div>
-</div>
-
-<div class="mb-3 row">
-    <label for="filmGauge" class="col-sm-2 col-form-label">Gauge (mm)</label>
-    <div class="col-sm-10">
-        <select class="form-select" name="filmGauge" id="filmGauge">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>8</option>
-            <option>Super8</option>
-            <option>16</option>
-            <option>35</option>
-        </select>
-    </div>
-</div>
-
-<div class="mb-3 row">
-    <label for="filmBase" class="col-sm-2 col-form-label">Base</label>
-    <div class="col-sm-10">
-        <select class="form-select" name="filmBase" id="filmBase">
-            {#todo: populate dynamically#}
+        <select class="form-select tyko tyko-enum-dynamic"
+                data-enum-url="{{ url_for('film_film_speed') }}"
+                name="filmSpeedId"
+                id="filmSpeed">
             <option value=""></option>
-            <option id="1">Acetate</option>
-            <option id="2">Nitrate</option>
-            <option id="3">Polyester</option>
         </select>
     </div>
 </div>
+
+<div class="row mb-3 g-3">
+
+    <div class="form-group col-sm offset-sm-2">
+        <label for="filmBase" class="col-form-label">Base</label>
+        <select class="form-select tyko tyko-enum-dynamic"
+                data-enum-url="{{ url_for('film_film_base') }}"
+                name="filmBaseId"
+                id="filmBase">
+            <option value=""></option>
+        </select>
+    </div>
+    <div class="form-group col-sm">
+        <label for="filmImageType" class="col-form-label">Image Type</label>
+        <select class="form-select tyko tyko-enum-dynamic"
+                data-enum-url="{{ url_for('film_image_type') }}"
+                name="filmImageTypeId"
+                id="filmImageType">
+            <option value=""></option>
+        </select>
+    </div>
+    <div class="form-group col-sm">
+        <label for="filmSoundtrack" class="col-form-label">Soundtrack</label>
+        <select class="form-select tyko tyko-enum-dynamic"
+                data-enum-url="{{ url_for('film_soundtrack') }}"
+                name="filmSoundtrackId"
+                id="filmSoundtrack">
+            <option value=""></option>
+        </select>
+    </div>
+    <div class="form-group col-sm">
+        <label for="filmColor" class="col-form-label">Color</label>
+        <select class="form-select tyko tyko-enum-dynamic"
+                data-enum-url="{{ url_for('film_color') }}"
+                name="filmColorId"
+                id="filmColor">
+            <option value=""></option>
+        </select>
+    </div>
+
+</div>
+
 <div class="mb-3 row">
-    <label for="filmEdgeCodeDate" class="col-sm-2 col-form-label">Edge code date</label>
+    <label for="filmEdgeCodeDate" class="col-sm-2 col-form-label">
+        Edge code date
+    </label>
     <div class="col-sm-10">
         <div class="input-group">
-            <input type="text" id="filmEdgeCodeDate" class="form-control tyko-date-selector" name="filmEdgeCodeDate">
+            <input type="text"
+                   id="filmEdgeCodeDate"
+                   class="form-control tyko-date-selector"
+                   name="filmEdgeCodeDate">
         </div>
     </div>
 </div>
-<div class="mb-3 row">
-    <label for="filmSoundtrack" class="col-sm-2 col-form-label">Soundtrack</label>
-    <div class="col-sm-10">
-        <select class="form-select" name="filmSoundtrack" id="filmSoundtrack"d>
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>Optical</option>
-            <option>Magnetic</option>
-            <option>Silent</option>
+
+<div class="row mb-3 g-3">
+    <label class="col-sm-2 col-form-label">Film Wind</label>
+    <div class="form-group col-sm">
+        <label for="filmWind" class="col-form-label">Wind</label>
+
+        <select class="form-select tyko tyko-enum-dynamic"
+                data-enum-url="{{ url_for('film_wind') }}"
+                name="filmWindId"
+                id="filmWind">
+            <option value=""></option>
         </select>
     </div>
-</div>
-<div class="mb-3 row">
-    <label for="filmColor" class="col-sm-2 col-form-label">Color</label>
-    <div class="col-sm-10">
-        <select class="form-select" name="filmColor" id="filmColor">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>Color</option>
-            <option>Black & White</option>
-            <option>Color/Black & White</option>
-        </select>
-    </div>
-</div>
-<div class="mb-3 row">
-    <label for="filmImageType" class="col-sm-2 col-form-label">Image Type</label>
-    <div class="col-sm-10">
-        <select class="form-select" name="filmImageType" id="filmImageType">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>Positive</option>
-            <option>Negative</option>
-            <option>Reversal</option>
-        </select>
-    </div>
-</div>
-<div class="mb-3 row">
-    <label for="filmWind" class="col-sm-2 col-form-label">Wind</label>
-    <div class="col-sm-10">
-        <select class="form-select" name="filmWind" id="filmWind" >
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>A</option>
-            <option>B</option>
-        </select>
-    </div>
-</div>
-<div class="mb-3 row">
-    <label for="filmEmulsion" class="col-sm-2 col-form-label">Emulsion</label>
-    <div class="col-sm-10">
-        <select class="form-select" name="filmEmulsion" id="filmEmulsion">
-            {#todo: populate dynamically#}
-            <option></option>
-            <option>In</option>
-            <option>Out</option>
-        </select>
+    <div class="form-group col-sm">
+        <label for="filmEmulsion" class="col-form-label">Emulsion</label>
+            <select class="form-select tyko tyko-enum-dynamic"
+                    data-enum-url="{{ url_for('film_emulsion') }}"
+                    name="filmEmulsionId"
+                    id="filmEmulsion">
+                <option value=""></option>
+            </select>
     </div>
 </div>
 
@@ -171,31 +170,39 @@
         <div class="row">
             <div class="col-sm-10">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="filmADStripTest">
+                    <input type="checkbox" class="form-check-input" id="filmADStripTest" onclick="enableSubOption(this, ['filmADStripTestLevel', 'filmADStripTestDateBrowseButton', 'filmADStripTestDate'])">
                 </div>
             </div>
         </div>
         <div class="row g-3">
-        {#        todo: make below active only if the top is true #}
-            <div class="form-group col-sm-7">
-                <label for="filmADStripTestDate" class="col-form-label">A-D Strip Test Date</label>
+            <div class="form-group col-sm">
+                <label for="filmADStripTestDate" class="col-form-label disabled">A-D Strip Test Date</label>
                 <div class="input-group">
                     <input type="text" id="filmADStripTestDate" class="form-control tyko-date-selector" name="filmADStripTestDate" disabled>
-                    <button type="button" onclick="tyko.openDateSelect('filmADStripTestDate', 'm/d/yyyy')" class="btn btn-outline-secondary" disabled> <em class="bi bi-calendar-event"></em></button>
+                    <button type="button" id="filmADStripTestDateBrowseButton" onclick="tyko.openDateSelect('filmADStripTestDate', 'm/d/yyyy')" class="btn btn-outline-secondary" disabled> <em class="bi bi-calendar-event"></em></button>
                 </div>
             </div>
             <div class="form-group col-sm">
                 <label for="filmADStripTestLevel" class="col-form-label" disabled>A-D Strip Level</label>
-                <select class="form-select" name="filmADStripTestLevel" id="filmADStripTestLevel" disabled>
-                    {#todo: populate dynamically#}
-                    <option></option>
-                    <option>0</option>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
+                <select class="form-select"
+                        name="filmADStripTestLevel"
+                        id="filmADStripTestLevel" disabled>
+                    <option value=""></option>
+                    <option value="1">0</option>
+                    <option value="2">1</option>
+                    <option value="3">2</option>
+                    <option value="4">3</option>
+                    <option value="5">4</option>
                 </select>
             </div>
+            <script>
+              function enableSubOption(checkboxElement, ids=[]){
+                for (const idValue of ids) {
+                  const element = document.getElementById(idValue)
+                  element.disabled = !checkboxElement.checked;
+                }
+              }
+            </script>
         </div>
     </div>
 </div>
@@ -204,5 +211,36 @@
     <label for="filmShrinkage" class="col-sm-2 col-form-label">Shrinkage (%)</label>
     <div class="col-sm-10">
         <input type="number" min="0" max="100" id="filmShrinkage" class="form-control" name="filmShrinkage">
+    </div>
+</div>
+
+
+<div class="mb-3 row">
+    <label for="inspectionDate" class="col-sm-2 col-form-label">
+        Inspection Date (M/D/YYYY)
+    </label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text"
+                   id="inspectionDate"
+                   class="form-control tyko-date-selector"
+                   name="inspectionDate"
+                   placeholder="date of condition inspection">
+            <button type="button" onclick="tyko.openDateSelect('inspectionDate', 'm/d/yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="transferDate" class="col-sm-2 col-form-label">Transfer Date (M/D/YYYY)</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text"
+                   id="transferDate"
+                   class="form-control tyko-date-selector"
+                   name="transferDate"
+                   placeholder="date of digitization">
+            <button type="button" onclick="tyko.openDateSelect('transferDate', 'm/d/yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
     </div>
 </div>
