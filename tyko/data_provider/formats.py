@@ -319,8 +319,10 @@ class GroovedDiscDataConnector(FormatConnector):
                         .GroovedDiscDiscDiameter
                         .table_id == int(diameter_id)
                     ).one()
-            except sqlalchemy.exc.NoResultFound as e:
-                raise KeyError(f"No enum found for id: {diameter_id}") from e
+            except sqlalchemy.exc.NoResultFound as error:
+                raise KeyError(
+                    f"No enum found for id: {diameter_id}"
+                ) from error
 
         if disc_material_id := format_data.pop(
                 'groovedDiscDiscMaterialId',
