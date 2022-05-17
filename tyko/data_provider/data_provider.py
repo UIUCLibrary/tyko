@@ -319,9 +319,7 @@ class ItemDataConnector(AbsNotesConnector):
             item = self._get_item(item_id, session)
 
             if len(item.notes) == 0:
-                raise DataError(
-                    "Item with ID: {} has no notes".format(item_id)
-                )
+                raise DataError(f"Item with ID: {item_id} has no notes")
 
             # Find note that matches the note ID
             for note in item.notes:
@@ -330,8 +328,8 @@ class ItemDataConnector(AbsNotesConnector):
                     break
             else:
                 raise DataError(
-                    message="Item id {} contains no note with an"
-                            " id {}".format(item_id, note_id),
+                    message=f"Item id {item_id} contains no note with an"
+                            f" id {note_id}",
                     status_code=404
                 )
 
@@ -660,8 +658,8 @@ class ProjectDataConnector(AbsNotesConnector):
                     break
             else:
                 raise DataError(
-                    message="Project id {} contains no note with an"
-                            " id {}".format(project_id, note_id),
+                    message=f"Project id {project_id} contains no note with an"
+                            f" id {note_id}",
                     status_code=404
                 )
 
@@ -703,8 +701,8 @@ class ProjectDataConnector(AbsNotesConnector):
                         .filter(Project.id == project_id) \
                         .one().serialize()
             raise DataError(
-                message="Project id {} contains no object with an"
-                        " id {}".format(project_id, object_id),
+                message=f"Project id {project_id} contains no object with an"
+                        f" id {object_id}",
                 status_code=404
             )
         finally:
@@ -721,7 +719,7 @@ class ProjectDataConnector(AbsNotesConnector):
         if len(projects) == 0:
             raise DataError(
                 message="Unable to locate project "
-                        "with ID: {}".format(project_id),
+                        f"with ID: {project_id}",
                 status_code=404
             )
 
@@ -909,21 +907,21 @@ class ObjectDataConnector(AbsNotesConnector):
 
             if len(objects) == 0:
                 raise DataError(
-                    message="Unable to locate collection object "
-                            "with ID: {}".format(object_id),
+                    message=f"Unable to locate collection object with "
+                            f"ID: {object_id}",
                     status_code=404
                 )
 
             if len(objects) > 1:
                 raise DataError(
-                    message="Found multiple objects with ID: {}".format(
-                        object_id))
+                    message=f"Found multiple objects with ID: {object_id}"
+                )
 
             collection_object = objects[0]
 
             if len(collection_object.notes) == 0:
                 raise DataError(
-                    "Object with ID: {} has no notes".format(object_id))
+                    f"Object with ID: {object_id} has no notes")
 
             # Find note that matches the note ID
             for note in collection_object.notes:
@@ -932,8 +930,8 @@ class ObjectDataConnector(AbsNotesConnector):
                     break
             else:
                 raise DataError(
-                    message="Collection id {} contains no note with an"
-                            " id {}".format(object_id, note_id),
+                    message=f"Collection id {object_id} contains no note "
+                            f"with an id {note_id}",
                     status_code=404
                 )
 
@@ -1051,14 +1049,11 @@ class ObjectDataConnector(AbsNotesConnector):
                 AVFormat.table_id == item_id).all()
 
         if len(matching_items) == 0:
-            raise DataError(
-                message="No items found with ID: {}".format(
-                    item_id))
+            raise DataError(message=f"No items found with ID: {item_id}")
 
         if len(matching_items) > 1:
-            raise DataError(
-                message="Found multiple items with ID: {}".format(
-                    item_id))
+            raise DataError(message=f"Found multiple items with ID: {item_id}")
+
         return matching_items[0]
 
     @staticmethod

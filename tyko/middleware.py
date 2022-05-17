@@ -531,8 +531,8 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         try:
             new_project = self.create_changed_data(json_request)
         except ValueError as reason:
-            return make_response(
-                "Cannot update project. Reason: {}".format(reason), 400)
+            return \
+                make_response(f"Cannot update project. Reason: {reason}", 400)
 
         updated_project = \
             self._data_connector.update(
@@ -647,7 +647,7 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             return make_response("Invalid data", 400)
         except KeyError as e:
             traceback.print_exc(file=sys.stderr)
-            return make_response("Missing required data: {}".format(e), 400)
+            return make_response(f"Missing required data: {e}", 400)
 
     def remove_object(self, project_id: int, object_id: int) -> flask.Response:
         try:
@@ -766,8 +766,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             new_item = self.create_changed_data(json_request)
 
         except ValueError as reason:
-            return make_response(
-                "Cannot update item. Reason: {}".format(reason), 400)
+            return make_response(f"Cannot update item. Reason: {reason}", 400)
 
         replacement_item = self._data_connector.update(
             id, changed_data=new_item
