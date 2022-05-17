@@ -1,6 +1,7 @@
 import functools
 
 import sqlalchemy
+import typing
 from . import data_provider
 from tyko import utils
 from tyko.schema import \
@@ -173,7 +174,10 @@ class OpticalDataConnector(FormatConnector):
 
         if date_of_item := format_data.pop('opticalDateOfItem', None):
             new_item.date_of_item = \
-                utils.create_precision_datetime(date_of_item)
+                typing.cast(
+                    sqlalchemy.Column[sqlalchemy.Date],
+                    utils.create_precision_datetime(date_of_item)
+                )
 
         new_item.duration = format_data.pop('opticalDuration', None)
 

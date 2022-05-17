@@ -10,8 +10,11 @@ from typing import \
     Callable, \
     Optional, \
     Union, \
+    Iterable, \
+    TypedDict, \
     TYPE_CHECKING
 
+import flask
 from flask import jsonify, render_template, views, request
 
 import tyko.views.files
@@ -30,6 +33,7 @@ from .views import cassette_tape
 if TYPE_CHECKING:
     from tyko.data_provider import DataProvider
     from sqlalchemy import orm
+    from werkzeug.routing import Rule
 
 """
 FORMAT_ENUM_ROUTES:
@@ -202,13 +206,13 @@ class NotesAPI(views.MethodView):
                  notes_middleware: middleware.NotestMiddlwareEntity) -> None:
         self._middleware = notes_middleware
 
-    def delete(self, note_id: int):
+    def delete(self, note_id: int) -> flask.Response:
         return self._middleware.delete(id=note_id)
 
-    def get(self, note_id: int):
+    def get(self, note_id: int) -> flask.Response:
         return self._middleware.get(id=note_id)
 
-    def put(self, note_id: int):
+    def put(self, note_id: int) -> flask.Response:
         return self._middleware.update(id=note_id)
 
 
@@ -218,13 +222,13 @@ class CollectionsAPI(views.MethodView):
 
         self._collection = collection
 
-    def get(self, collection_id: int):
+    def get(self, collection_id: int) -> flask.Response:
         return self._collection.get(id=collection_id)
 
-    def put(self, collection_id: int):
+    def put(self, collection_id: int) -> flask.Response:
         return self._collection.update(id=collection_id)
 
-    def delete(self, collection_id: int):
+    def delete(self, collection_id: int) -> flask.Response:
         return self._collection.delete(id=collection_id)
 
 
@@ -232,7 +236,7 @@ class NewItem(views.MethodView):
     def __init__(self, data_connector: ObjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, project_id, object_id):
+    def post(self, project_id, object_id) -> flask.Response:
         data = request.form
         return jsonify(self._data_connector.add_item(object_id, data))
 
@@ -241,7 +245,7 @@ class ObjectItemNewNotes(views.MethodView):
     def __init__(self, data_connector: ItemDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         item_id = kwargs['item_id']
         data = request.form
         return jsonify(
@@ -257,7 +261,7 @@ class ObjectUpdateNotes(views.MethodView):
     def __init__(self, data_connector: ObjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         data = request.form
 
         changed_data = {}
@@ -280,7 +284,7 @@ class ProjectNoteUpdate(views.MethodView):
     def __init__(self, data_connector: ProjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         project_id = kwargs['project_id']
         data = request.form
 
@@ -304,7 +308,7 @@ class ProjectNewNote(views.MethodView):
     def __init__(self, data_connector: ProjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         project_id = kwargs['project_id']
         data = request.form
         note_type_id = int(data['note_type_id'])
@@ -318,7 +322,7 @@ class ProjectNewObject(views.MethodView):
     def __init__(self, data_connector: ProjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         project_id = kwargs['project_id']
         data = request.form
         print(data)
@@ -329,7 +333,7 @@ class ObjectNewNotes(views.MethodView):
     def __init__(self, data_connector: ObjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         data = request.form
         note_type_id = int(data['note_type_id'])
         object_id = kwargs['object_id']
@@ -346,7 +350,7 @@ class ObjectItemNewFile(views.MethodView):
     def __init__(self, data_connector: ItemDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, project_id, object_id, item_id):
+    def post(self, project_id, object_id, item_id) -> flask.Response:
         data = request.form
         return jsonify(self._data_connector.add_file(
             project_id,
@@ -361,7 +365,7 @@ class ObjectItemNotes(views.MethodView):
     def __init__(self, data_connector: ItemDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         data = request.form
         note_id = int(data['noteId'])
         item_id = kwargs['item_id']
@@ -953,7 +957,7 @@ class Routes:
         )
 
 
-def page_formats(middleware_source):
+def page_formats(middleware_source: middleware.Middleware) -> str:
     formats = middleware_source.get_formats(serialize=False)
     return render_template(
         "formats.html",
@@ -962,13 +966,21 @@ def page_formats(middleware_source):
     )
 
 
-def list_routes(app):
-    results = [
+def list_routes(app: flask.app.Flask) -> flask.Response:
+    result_type = TypedDict(
+        'result_type', {
+            'endpoint': str,
+            'methods': List[str],
+            'route': str
+        }
+    )
+    rules: Iterable[Rule] = app.url_map.iter_rules()
+    results: List[result_type] = [
         {
             "endpoint": rt.endpoint,
             "methods": list(rt.methods),
             "route": str(rt)
-        } for rt in app.url_map.iter_rules()
+        } for rt in rules
     ]
 
     return jsonify(results)

@@ -663,7 +663,11 @@ class AudioCassette(AVFormat):
             "date_recorded":
                 utils.serialize_precision_datetime(
                     self.recording_date,
-                    self.recording_date_precision)
+                    typing.cast(
+                        int,
+                        self.recording_date_precision
+                    )
+                )
                 if self.recording_date is not None
                 else None,
         }

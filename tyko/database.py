@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, Tuple, Any, Type, List, TypedDict, Union, Mapping
+from typing import Dict, Tuple, Any, Type, List, TypedDict, Union, Mapping, cast
 
 import sqlalchemy as db
 import sqlalchemy.orm
@@ -27,7 +27,11 @@ def alembic_table_exists(engine) -> bool:
 def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
     print("Adding sample collection")
     new_collection = schema.Collection()
-    new_collection.collection_name = "sample collection"
+    new_collection.collection_name = \
+        cast(
+            db.Column[db.Text],
+            "sample collection"
+        )
     session.add(new_collection)
 
 

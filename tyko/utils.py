@@ -1,5 +1,7 @@
 import re
 import datetime
+import typing
+
 from sqlalchemy import Column, Date
 from typing import Union
 
@@ -23,14 +25,17 @@ DATE_PRECISIONS_REGEX = {
 }
 
 
-def identify_precision(data) -> int:
+def identify_precision(data: str) -> int:
     for precision, matcher in DATE_PRECISIONS_REGEX.items():
         if matcher.match(data):
             return precision
     raise AttributeError(f"Unable to identify format for string {data}")
 
 
-def create_precision_datetime(date: str, precision: int = 3):
+def create_precision_datetime(
+        date: str,
+        precision: int = 3
+) -> datetime.datetime:
 
     formatter = DATE_FORMATS_IN.get(precision)
     if formatter is None:
@@ -40,9 +45,9 @@ def create_precision_datetime(date: str, precision: int = 3):
 
 def serialize_precision_datetime(
         date: Union[datetime.date, Column[Date]],
-        precision=3
+        precision: int = 3
 ) -> str:
     formatter = DATE_FORMATS_OUT.get(precision)
     if formatter is None:
         raise AttributeError("Invalid precision type")
-    return date.strftime(formatter)
+    return typing.cast(datetime.date, date).strftime(formatter)
