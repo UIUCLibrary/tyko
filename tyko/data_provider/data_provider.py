@@ -199,9 +199,10 @@ class ItemDataConnector(AbsNotesConnector):
             strip_empty_strings(format_data)
             transfer_date = format_data.pop('transferDate', None)
             inspection_date = format_data.pop('inspectionDate', None)
+            parent_object_id = format_data.pop('object_id', None)
 
             new_item = self.create_new_format_item(session, format_data)
-
+            new_item.object_id = parent_object_id
             if transfer_date:
                 new_item.transfer_date = \
                     utils.create_precision_datetime(
@@ -1003,6 +1004,8 @@ class ObjectDataConnector(AbsNotesConnector):
                     tyko.data_provider.formats.GroovedDiscDataConnector,
                 schema.formats.format_types['film'][0]:
                     tyko.data_provider.formats.FilmDataConnector,
+                schema.formats.format_types['audio cassette'][0]:
+                    tyko.data_provider.formats.AudioCassetteDataConnector,
             }
             connector = connectors.get(
                 int(data['format_id']),

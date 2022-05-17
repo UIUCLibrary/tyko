@@ -588,24 +588,28 @@ class AudioCassette(AVFormat):
 
     table_id = db.Column(db.Integer, db.ForeignKey(AVFormat.table_id),
                          primary_key=True)
-
     cassette_format_type_id = db.Column(
         db.Integer,
         db.ForeignKey("cassette_types.table_id")
     )
+    title_of_cassette = db.Column(db.Text)
+    side_a_label = db.Column(db.Text)
+    side_a_duration = db.Column(db.Text)
 
-    cassette_type = relationship("CassetteType")
+    side_b_label = db.Column(db.Text)
+    side_b_duration = db.Column(db.Text)
+    generation_id = db.Column(
+        db.Integer,
+        db.ForeignKey("audio_cassette_generation.table_id")
+    )
+    generation = relationship('AudioCassetteGeneration')
 
-    tape_type_id = db.Column(db.Integer,
-                             db.ForeignKey("cassette_tape_types.table_id"))
+    tape_subtype_id = db.Column(
+        db.Integer,
+        db.ForeignKey("audio_cassette_subtype.table_id")
+    )
 
-    tape_type = relationship("CassetteTapeType")
-
-    tape_thickness_id = \
-        db.Column(db.Integer,
-                  db.ForeignKey("cassette_tape_thickness.table_id"))
-
-    tape_thickness = relationship("CassetteTapeThickness")
+    tape_subtype = relationship("AudioCassetteSubtype")
 
     recording_date = db.Column("recording_date", db.Date)
     recording_date_precision = db.Column("recording_date_precision",
@@ -659,31 +663,25 @@ class AudioCassette(AVFormat):
 
     def format_details(self) -> Mapping[str, SerializedData]:
 
-        serialized_data = {
-            "date_recorded":
+        return {
+            "cassette_title": self.title_of_cassette,
+            "side_a_label": self.side_a_label,
+            "side_a_duration": self.side_a_duration,
+            "side_b_label": self.side_b_label,
+            "side_b_duration": self.side_b_duration,
+            "generation":
+                self.generation.serialize() if self.generation else None,
+            "cassette_type":
+                self.tape_subtype.serialize() if self.tape_subtype else None,
+            "date_of_cassette":
                 utils.serialize_precision_datetime(
                     self.recording_date,
                     typing.cast(
                         int,
                         self.recording_date_precision
                     )
-                )
-                if self.recording_date is not None
-                else None,
+                ) if self.recording_date is not None else None,
         }
-        if self.cassette_type is not None:
-            serialized_data["cassette_type"] = self.cassette_type.serialize()
-        if self.tape_type is not None:
-            serialized_data["tape_type"] = self.tape_type.serialize()
-        else:
-            serialized_data["tape_type"] = None
-
-        if self.tape_thickness is not None:
-            serialized_data["tape_thickness"] = self.tape_thickness.serialize()
-        else:
-            serialized_data["tape_thickness"] = None
-
-        return serialized_data
 
 
 class CollectionItem(AVFormat):
@@ -846,6 +844,32 @@ class FilmWind(EnumTable):
 class FilmEmulsion(EnumTable):
     __tablename__ = "film_emulsion"
     default_values = ["In", "Out"]
+
+
+class AudioCassetteSubtype(EnumTable):
+    __tablename__ = "audio_cassette_subtype"
+    default_values = [
+        "Compact cassette I",
+        "Compact cassette type II",
+        "Compact cassette type III",
+        "Compact cassette IV",
+        "DAT",
+        "ADAT",
+        "Microcassette",
+        "Continuous loop cartridge",
+        "Other"
+    ]
+
+
+class AudioCassetteGeneration(EnumTable):
+    __tablename__ = "audio_cassette_generation"
+    default_values = [
+        "Source (original)",
+        "Dub",
+        "Master",
+        "Commercial",
+        "Other"
+    ]
 
 
 item_has_contacts_table = db.Table(

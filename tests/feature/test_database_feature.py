@@ -929,8 +929,8 @@ def new_audio_item(dummy_database, new_audio_object, item_title, date_recorded,
         object=new_audio_object["object"],
         recording_date=recording_date,
         recording_date_precision=recording_date_precision,
-        cassette_type=schema.CassetteType(name=audio_type),
-        tape_thickness=schema.CassetteTapeThickness(value=tape_thickness),
+        # cassette_type=schema.CassetteType(name=audio_type),
+        # tape_thickness=schema.CassetteTapeThickness(value=tape_thickness),
         inspection_date=datetime.strptime(inspection_date, "%m/%d/%Y")
     )
 
@@ -975,7 +975,7 @@ def audio_cassette_has_a_title(
         .one().items[0]
     cassette_data = cassette.serialize()
     assert cassette_data['name'] == item_title
-    assert cassette_data['format_details']['date_recorded'] == date_recorded
+    assert cassette_data['format_details']['date_of_cassette'] == date_recorded
 
 
 @then(

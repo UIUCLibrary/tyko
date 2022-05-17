@@ -1569,10 +1569,162 @@ def dummy_object(app, project):
                 'inspection_date': '5/18/2022',
                 'transfer_date': '5/19/2022',
             }
+        ),
+        (
+            {
+                'name': 'audio cassette title',
+                'format_id': '7',
+                'cassetteTitle': 'title of cassette',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'cassette_title': 'title of cassette',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'audio cassette date of cassette',
+                'format_id': '7',
+                'dateOfCassette': '5/19/2022',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'date_of_cassette': '5/19/2022',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'audio cassette labels',
+                'format_id': '7',
+                'cassetteSideALabel': 'Label side A',
+                'cassetteSideBLabel': 'Label side B',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'side_a_label': 'Label side A',
+                    'side_b_label': 'Label side B',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'audio cassette duration',
+                'format_id': '7',
+                'cassetteSideADuration': '00:11:23',
+                'cassetteSideBDuration': '00:31:23',
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'side_a_duration': '00:11:23',
+                    'side_b_duration': '00:31:23',
+                },
+            }
+        ),
+        (
+            {
+                'name': 'audio cassette generation',
+                'format_id': '7',
+                'generationId':
+                    formats.AudioCassetteGeneration.default_values.index(
+                        'Dub'
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'generation': {
+                        "name": 'Dub',
+                        "id":
+                            formats
+                                .AudioCassetteGeneration
+                                .default_values
+                                .index('Dub') + 1
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'audio cassette subtype',
+                'format_id': '7',
+                'cassetteTypeId':
+                    formats.AudioCassetteSubtype.default_values.index(
+                        'DAT'
+                    ) + 1,
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'cassette_type': {
+                        "name": "DAT",
+                        "id":
+                            formats.AudioCassetteSubtype.default_values.index(
+                                'DAT'
+                            ) + 1,
+                    },
+                },
+            }
+        ),
+        (
+            {
+                'name': 'audio cassette all metadata',
+                'format_id': '7',
+                'cassetteTitle': 'title of cassette',
+                'dateOfCassette': '5/19/2022',
+                'cassetteTypeId':
+                    formats.AudioCassetteSubtype.default_values.index(
+                        'DAT'
+                    ) + 1,
+                'generationId':
+                    formats.AudioCassetteGeneration.default_values.index(
+                        'Dub'
+                    ) + 1,
+                'cassetteSideALabel': 'Label side A',
+                'cassetteSideADuration': '00:11:23',
+                'cassetteSideBLabel': 'Label side B',
+                'cassetteSideBDuration': '00:31:23',
+                'inspectionDate': '5/19/2022',
+                'transferDate': '5/13/2022'
+            },
+            {
+                "files": [],
+                "format_details": {
+                    'cassette_title': 'title of cassette',
+                    'date_of_cassette': '5/19/2022',
+                    'cassette_type': {
+                        "name": "DAT",
+                        "id":
+                            formats.AudioCassetteSubtype.default_values.index(
+                                'DAT'
+                            ) + 1,
+                    },
+
+                    'generation': {
+                        "name": 'Dub',
+                        "id":
+                            formats
+                                .AudioCassetteGeneration
+                                .default_values
+                                .index('Dub') + 1
+                    },
+                    'side_a_label': 'Label side A',
+                    'side_a_duration': '00:11:23',
+                    'side_b_label': 'Label side B',
+                    'side_b_duration': '00:31:23',
+                },
+                'inspection_date': '5/19/2022',
+                'transfer_date': '5/13/2022'
+            }
         )
     ], ids=lambda *args: str(args[0].get('name', str(args[0])))
 )
-def test_create_new_video_cassette(
+def test_create_new_item(
         app,
         project,
         dummy_object,

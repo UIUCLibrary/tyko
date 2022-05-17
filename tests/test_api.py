@@ -992,10 +992,11 @@ def test_create_add_and_remove_cassette(date, server_with_enums):
             "format_details": {
                 "format_type_id":
                     data['cassette_tape_formats']['compact cassette']['id'],
-                "date_recorded": date,
-                "inspection_date": "12/10/2019",
-                "tape_thickness_id": data['tape_thicknesses'][0]['id'],
-                'tape_type_id': data["cassette_tape_tape_types"][0]['id']}
+                "date_of_cassette": date,
+            },
+            "inspection_date": "12/10/2019",
+                # "tape_thickness_id": data['tape_thicknesses'][0]['id'],
+                # 'tape_type_id': data["cassette_tape_tape_types"][0]['id']
         }),
         content_type='application/json'
     )
@@ -1010,17 +1011,17 @@ def test_create_add_and_remove_cassette(date, server_with_enums):
     assert "cassette_type" in new_item_get_data['format_details']
 
     format_details = new_item_get_data['format_details']
-    cassette_type = format_details['cassette_type']
-    assert cassette_type['name'] == "compact cassette"
+    # cassette_type = format_details['cassette_type']
+    # assert cassette_type['name'] == "compact cassette"
 
-    assert format_details['date_recorded'] == date
+    assert format_details['date_of_cassette'] == date
     assert new_item_get_data['inspection_date'] == "12/10/2019"
 
-    assert format_details['tape_thickness']['id'] == \
-           data['tape_thicknesses'][0]['id']
-
-    assert format_details['tape_type']['id'] == \
-           data["cassette_tape_tape_types"][0]['id']
+    # assert format_details['tape_thickness']['id'] == \
+    #        data['tape_thicknesses'][0]['id']
+    #
+    # assert format_details['tape_type']['id'] == \
+    #        data["cassette_tape_tape_types"][0]['id']
 
     delete_resp = server.delete(new_item_data['routes']['api'])
 
@@ -1086,10 +1087,10 @@ def test_create_and_remove_cassette_with_notes(server_with_enums):
 
 
 cassette_data = [
-    ("date_recorded", lambda x: x["date_recorded"], "1993"),
-    ("format_type_id", lambda x: x['cassette_type']["id"], 2),
-    ("tape_thickness_id", lambda x: x['tape_thickness']["id"], 2),
-    ("tape_type_id", lambda x: x['tape_type']["id"], 2),
+    ("date_of_cassette", lambda x: x["date_of_cassette"], "11/26/1993"),
+    # ("format_type_id", lambda x: x['cassette_type']["id"], 2),
+    # ("tape_thickness_id", lambda x: x['tape_thickness']["id"], 2),
+    # ("tape_type_id", lambda x: x['tape_type']["id"], 2),
 ]
 
 

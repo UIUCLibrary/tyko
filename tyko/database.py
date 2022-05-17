@@ -61,7 +61,9 @@ def _populate_enum_tables(session: sqlalchemy.orm.Session) -> None:
         formats.FilmColor,
         formats.FilmImageType,
         formats.FilmWind,
-        formats.FilmEmulsion
+        formats.FilmEmulsion,
+        formats.AudioCassetteSubtype,
+        formats.AudioCassetteGeneration
 
     ]
 

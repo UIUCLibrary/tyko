@@ -2,13 +2,14 @@ import functools
 
 import sqlalchemy
 import typing
+
+from sqlalchemy import orm
+
 from . import data_provider
 from tyko import utils
 from tyko.schema import \
     formats, \
     AudioCassette, \
-    CollectionObject, \
-    CassetteType, \
     CassetteTapeThickness
 
 
@@ -19,47 +20,69 @@ class FormatConnector(data_provider.ItemDataConnector):
             .filter(formats.FormatTypes.id == format_id).one()
 
 
+def verify_unused_params(func):
+    @functools.wraps(func)
+    def wrapper(connector, session, values):
+        metadata = values.copy()
+        result = func(connector, session, metadata)
+        if metadata:
+            raise KeyError(f"Invalid data types: {list(metadata.keys())}")
+
+        return result
+
+    return wrapper
+
+
 class AudioCassetteDataConnector(FormatConnector):
-
-    def create_new_format_item(self, session, format_data):
-
-        format_type = self.get_format_type(
-            session, int(format_data["format_id"])
-        )
-
+    @verify_unused_params
+    def create_new_format_item(self, session: orm.session, format_data):
         new_cassette = AudioCassette(
-            name=format_data['name'],
-            format_type=format_type
+            name=format_data.pop('name'),
+            format_type=self.get_format_type(
+                session,
+                int(format_data.pop("format_id"))
+            )
         )
-        format_details = format_data['format_details']
-        self._add_optional_args(new_cassette, **format_details)
+        api_data = format_data.pop('format_details', {})
+        new_cassette.title_of_cassette = format_data.pop('cassetteTitle', None)
+        if new_cassette.title_of_cassette is None:
+            api_data.pop('cassette_title', None)
+
+        new_cassette.side_a_label = format_data.pop('cassetteSideALabel', None)
+        new_cassette.side_b_label = format_data.pop('cassetteSideBLabel', None)
+        new_cassette.side_a_duration = \
+            format_data.pop('cassetteSideADuration', None)
+
+        new_cassette.side_b_duration = \
+            format_data.pop('cassetteSideBDuration', None)
+
+        if cassette_type_id := format_data.pop(
+                'cassetteTypeId',
+                None
+        ):
+            new_cassette.tape_subtype = \
+                session.query(formats.AudioCassetteSubtype).filter(
+                    formats.AudioCassetteSubtype.table_id == cassette_type_id
+                ).one()
+
+        if gen_id := format_data.pop('generationId', None):
+            generation = \
+                session.query(
+                    formats.AudioCassetteGeneration
+                ).filter(
+                    formats.AudioCassetteGeneration.table_id == int(gen_id)
+                ).one()
+            new_cassette.generation = generation
+
+        if date_of_cassette := format_data.pop('dateOfCassette', None):
+            new_cassette.recording_date = \
+                utils.create_precision_datetime(date_of_cassette, 3)
+        if new_cassette.recording_date is None:
+            if date_of_cassette := api_data.pop('date_of_cassette', None):
+                new_cassette.recording_date = \
+                    utils.create_precision_datetime(date_of_cassette, 3)
+
         return new_cassette
-
-    def create(self, *args, **kwargs):
-        new_base_item = super().create(*args, **kwargs)
-        session = self.session_maker()
-        try:
-            format_details = kwargs.get('format_details', {})
-            base_object = session.query(CollectionObject)\
-                .filter(CollectionObject.id == kwargs['object_id'])\
-                .one()
-
-            new_cassette = self.create_new_format_item(session, new_base_item)
-            format_type_id = format_details.get('format_type_id')
-            if format_type_id is not None and str(format_type_id) != "":
-                new_cassette.cassette_type = session.query(CassetteType)\
-                    .filter(CassetteType.table_id == int(format_type_id))\
-                    .one()
-
-            self._add_optional_args(new_cassette, **format_details)
-
-            base_object.items.append(new_cassette)
-            session.add(new_cassette)
-            session.commit()
-            i = new_cassette.serialize()
-            return i
-        finally:
-            session.close()
 
     @staticmethod
     def _add_optional_args(new_cassette, **params):
@@ -143,19 +166,6 @@ class CassetteTapeThicknessConnector(data_provider.EnumConnector):
             return matching_enum.serialize()
         finally:
             session.close()
-
-
-def verify_unused_params(func):
-    @functools.wraps(func)
-    def wrapper(connector, session, values):
-        metadata = values.copy()
-        result = func(connector, session, metadata)
-        if metadata:
-            raise KeyError(f"Invalid data types: {list(metadata.keys())}")
-
-        return result
-
-    return wrapper
 
 
 class OpticalDataConnector(FormatConnector):

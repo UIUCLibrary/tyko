@@ -38,60 +38,100 @@
 {#    </script>#}
 
 {#<div id="cassetteOnlyData">#}
+
 <div class="mb-3 row">
     <label for="cassetteTitle" class="col-sm-2 col-form-label">Title of cassette</label>
     <div class="col-sm-10">
         <input type="text" id="cassetteTitle" class="form-control" name="cassetteTitle" required>
     </div>
 </div>
-<div class="mb-3 row">
-    <label for="cassetteSideALabel" class="col-sm-2 col-form-label">Side A label</label>
-    <div class="col-sm-10">
-        <input type="text" id="cassetteSideALabel" class="form-control" name="cassetteSideALabel">
-    </div>
-</div>
-<div class="mb-3 row">
-    <label for="cassetteSideBLabel" class="col-sm-2 col-form-label">Side B label</label>
-    <div class="col-sm-10">
-        <input type="text" id="cassetteSideBLabel" class="form-control" name="cassetteSideBLabel">
-    </div>
-</div>
+
 <div class="mb-3 row">
     <label for="dateOfCassette" class="col-sm-2 col-form-label">Date of cassette</label>
     <div class="col-sm-10">
         <div class="input-group">
             <input type="text" id="dateOfCassette" class="form-control tyko-date-selector" name="dateOfCassette">
-            <button type="button" onclick="tyko.openDateSelect('dateOfCassette')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+            <button type="button" onclick="tyko.openDateSelect('dateOfCassette', 'm/d/yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
         </div>
     </div>
 </div>
 <div class="mb-3 row">
-    <label for="cassetteSideADuration" class="col-sm-2 col-form-label">Side A Duration</label>
+    <label for="cassetteType" class="col-sm-2 col-form-label">Cassette Type</label>
     <div class="col-sm-10">
-        <input type="text" id="cassetteSideADuration" class="form-control" name="cassetteSideADuration">
-    </div>
-</div>
-<div class="mb-3 row">
-    <label for="cassetteSideBDuration" class="col-sm-2 col-form-label">Side B Duration</label>
-    <div class="col-sm-10">
-        <input type="text" id="cassetteSideBDuration" class="form-control" name="cassetteSideBDuration">
+{#        todo set this dynamically#}
+        <select class="form-select" name="cassetteTypeId" id="cassetteType">
+            <option value=""></option>
+            <option value="1">Compact cassette I</option>
+            <option value="2">Compact cassette type II</option>
+            <option value="3">Compact cassette type III</option>
+            <option value="4">Compact cassette IV</option>
+            <option value="5">DAT</option>
+            <option value="6">ADAT</option>
+            <option value="7">Microcassette</option>
+            <option value="8">Continuous loop cartridge</option>
+            <option value="9">Other</option>
+
+        </select>
     </div>
 </div>
 <div class="mb-3 row">
     <label for="generation" class="col-sm-2 col-form-label">Generation</label>
     <div class="col-sm-10">
-{#            todo set this based on the generations data#}
-        <select class="form-control" name="generation" id="generation" required>
+{#            todo set this dynamically#}
+        <select class="form-select" name="generation" id="generation" required>
             <option>sdfsadf</option>
         </select>
     </div>
 </div>
+<div class="row mb-3 g-3">
+    <label class="col-sm-2 col-form-label">Side A</label>
+    <div class="form-group col-sm">
+        <label for="cassetteSideALabel" class="form-label">Label</label>
+        <input type="text" id="cassetteSideALabel" class="form-control" name="cassetteSideALabel">
+    </div>
+    <div class="form-group col-sm">
+        <label for="cassetteSideADuration" class=" form-label">Duration</label>
+        <input type="text" id="cassetteSideADuration" class="form-control" name="cassetteSideADuration">
+    </div>
+</div>
+<div class="row mb-3 g-3">
+    <label class="col-sm-2 col-form-label">Side B</label>
+    <div class="form-group col-sm">
+        <label for="cassetteSideBLabel" class="form-label">Label</label>
+        <input type="text" id="cassetteSideBLabel" class="form-control" name="cassetteSideBLabel">
+    </div>
+    <div class="form-group col-sm">
+        <label for="cassetteSideBDuration" class=" form-label">Duration</label>
+        <input type="text" id="cassetteSideBDuration" class="form-control" name="cassetteSideBDuration">
+    </div>
+</div>
+
 <div class="mb-3 row">
-    <label for="dateOfTransfer" class="col-sm-2 col-form-label">Transfer Date</label>
+    <label for="inspectionDate" class="col-sm-2 col-form-label">
+        Inspection Date
+    </label>
     <div class="col-sm-10">
         <div class="input-group">
-            <input type="text" id="dateOfTransfer" class="form-control tyko-date-selector" name="dateOfTransfer">
-            <button type="button" onclick="tyko.openDateSelect('dateOfTransfer')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+            <input type="text"
+                   id="inspectionDate"
+                   class="form-control tyko-date-selector"
+                   name="inspectionDate"
+                   placeholder="date of condition inspection">
+            <button type="button" onclick="tyko.openDateSelect('inspectionDate', 'm/d/yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
+        </div>
+    </div>
+</div>
+
+<div class="mb-3 row">
+    <label for="transferDate" class="col-sm-2 col-form-label">Transfer Date</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text"
+                   id="transferDate"
+                   class="form-control tyko-date-selector"
+                   name="transferDate"
+                   placeholder="date of digitization">
+            <button type="button" onclick="tyko.openDateSelect('transferDate', 'm/d/yyyy')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
         </div>
     </div>
 </div>

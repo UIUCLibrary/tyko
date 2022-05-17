@@ -211,7 +211,8 @@ def test_view_web_item(app):
                         }
                     ],
                     "medusa_uuid": "03de08f0-dada-0136-5326-0050569601ca-4",
-                    "format_id": format_types['audio cassette'][0]
+                    "format_id": format_types['audio cassette'][0],
+                    "format_details": {}
                 }
             ),
             content_type='application/json'
