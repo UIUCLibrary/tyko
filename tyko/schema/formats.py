@@ -311,15 +311,15 @@ class Film(AVFormat, ABC):
 
     def format_details(self) -> Mapping[str, SerializedData]:
         return {
-                "film_title": self.title_of_film,
+            "film_title": self.title_of_film,
             "date_of_film":
-                utils.serialize_precision_datetime(self.date_of_film)
-                if self.date_of_film is not None else None,
+                utils.serialize_precision_datetime(
+                    self.date_of_film
+                ) if self.date_of_film is not None else None,
             "can_label": self.can_label,
             "leader_label": self.leader_label,
             "film_length": self.length,
             "duration": self.duration,
-            # "format_gauge": self.format_gauge,
             "film_base":
                 self.film_base.serialize() if self.film_base else None,
             "edge_code_date": self.edge_code_date,
