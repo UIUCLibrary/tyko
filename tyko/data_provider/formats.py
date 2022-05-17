@@ -35,7 +35,7 @@ def verify_unused_params(func):
 
 class AudioCassetteDataConnector(FormatConnector):
     @verify_unused_params
-    def create_new_format_item(self, session: orm.session, format_data):
+    def create_new_format_item(self, session: orm.Session, format_data):
         new_cassette = AudioCassette(
             name=format_data.pop('name'),
             format_type=self.get_format_type(
@@ -75,8 +75,10 @@ class AudioCassetteDataConnector(FormatConnector):
             new_cassette.generation = generation
 
         if date_of_cassette := format_data.pop('dateOfCassette', None):
-            new_cassette.recording_date = \
+            new_cassette.recording_date = typing.cast(
+                sqlalchemy.Column[sqlalchemy.Date],
                 utils.create_precision_datetime(date_of_cassette, 3)
+            )
         if new_cassette.recording_date is None:
             if date_of_cassette := api_data.pop('date_of_cassette', None):
                 new_cassette.recording_date = \

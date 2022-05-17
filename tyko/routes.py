@@ -252,7 +252,7 @@ class ObjectItemNewNotes(views.MethodView):
             self._data_connector.add_note(
                 item_id=item_id,
                 note_text=data['text'],
-                note_type_id=data['note_type_id']
+                note_type_id=int(data['note_type_id'])
             )
         )
 
