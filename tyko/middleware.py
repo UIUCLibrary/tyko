@@ -1,5 +1,5 @@
 # pylint: disable=redefined-builtin, invalid-name
-
+from __future__ import annotations
 import abc
 import hashlib
 import json
@@ -18,7 +18,7 @@ from .views import files
 
 CACHE_HEADER = "private, max-age=0"
 
-if typing.TypedDict:
+if typing.TYPE_CHECKING:
     from sqlalchemy import orm
 
 

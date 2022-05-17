@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, Tuple, Any, Type, List
+from typing import Dict, Tuple, Any, Type, List, TypedDict, Union, Mapping
 
 import sqlalchemy as db
 import sqlalchemy.orm
@@ -10,11 +10,13 @@ from tyko import schema
 from .schema import formats
 from .schema import notes
 from .schema import projects
-import packaging.version
+
+
+TykoEnumData = TypedDict('TykoEnumData', {'name': str, 'id': int})
 
 
 def alembic_table_exists(engine) -> bool:
-
+    import packaging.version
     if packaging.version.parse(sqlalchemy.__version__) < \
             packaging.version.parse("1.4"):
         return engine.dialect.has_table(engine, "alembic_version")
@@ -22,14 +24,14 @@ def alembic_table_exists(engine) -> bool:
         return sqlalchemy.inspect(engine).has_table("alembic_version")
 
 
-def _create_sample_collection(session):
+def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
     print("Adding sample collection")
     new_collection = schema.Collection()
     new_collection.collection_name = "sample collection"
     session.add(new_collection)
 
 
-def _populate_enum_tables(session: sqlalchemy.orm.Session):
+def _populate_enum_tables(session: sqlalchemy.orm.Session) -> None:
     enum_table_classes: List[Type[formats.EnumTable]] = [
         formats.OpenReelSubType,
         formats.OpenReelReelWidth,
@@ -66,7 +68,7 @@ def _populate_enum_tables(session: sqlalchemy.orm.Session):
             session.add(new_type)
 
 
-def create_samples(engine: sqlalchemy.engine.Engine):
+def create_samples(engine: sqlalchemy.engine.Engine) -> None:
     session_maker = sessionmaker(bind=engine)
     session: sqlalchemy.orm.Session = session_maker()
     _create_sample_collection(session)
@@ -118,7 +120,7 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
         raise IOError("Table data has changed")
 
 
-def _populate_note_type_table(session):
+def _populate_note_type_table(session: sqlalchemy.orm.Session) -> None:
     print("Populating NoteTypes Table")
     for note_type, note_metadata in notes.note_types.items():
         note_id = note_metadata[0]
@@ -128,7 +130,7 @@ def _populate_note_type_table(session):
 
 
 def _populate_starting_project_status(
-        session,
+        session: sqlalchemy.orm.Session,
         project_status_table: Type[projects.ProjectStatus]) -> None:
 
     print(f"Populating {project_status_table.__tablename__} Table")
@@ -138,7 +140,7 @@ def _populate_starting_project_status(
         session.add(new_status)
 
 
-def _populate_format_types_table(session):
+def _populate_format_types_table(session: sqlalchemy.orm.Session) -> None:
     print("Populating project_status_type Table")
     for format_type, format_metadata in formats.format_types.items():
         format_id = format_metadata[0]
@@ -148,18 +150,23 @@ def _populate_format_types_table(session):
         session.add(new_format_type)
 
 
-def validate_enumerated_tables(engine):
+def validate_enumerated_tables(engine: sqlalchemy.engine.Engine) -> bool:
     session = sessionmaker(bind=engine)()
     valid = True
 
     if not validate_enumerate_table_data(
-            engine, formats.FormatTypes,
-            formats.format_types):
+            engine,
+            formats.FormatTypes,
+            formats.format_types
+    ):
 
         valid = False
 
     if not validate_enumerate_table_data(
-            engine, notes.NoteTypes, notes.note_types):
+            engine,
+            notes.NoteTypes,
+            notes.note_types
+    ):
 
         valid = False
 
@@ -167,10 +174,17 @@ def validate_enumerated_tables(engine):
     return valid
 
 
-def validate_enumerate_table_data(engine,
-                                  sql_table_type: Type[
-                                      tyko.schema.avtables.AVTables],
-                                  expected_table: Dict[str, Tuple[int, Any]]
+def validate_enumerate_table_data(
+        engine: sqlalchemy.engine.Engine,
+        sql_table_type: Type[tyko.schema.avtables.AVTables],
+        expected_table: Mapping[
+            str,
+            Union[
+                Tuple[int, Any],
+                Tuple[int, Type[tyko.schema.formats.AVFormat]],
+                Tuple[int]
+            ]
+        ]
                                   ) -> bool:
 
     session = sessionmaker(bind=engine)()
@@ -195,7 +209,7 @@ def validate_enumerate_table_data(engine,
     return valid
 
 
-def validate_tables(engine):
+def validate_tables(engine: sqlalchemy.engine.Engine) -> bool:
 
     expected_table_names = []
     for k in tyko.schema.avtables.AVTables.metadata.tables.keys():

@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, date
+import datetime
 from sqlalchemy import Column, Date
 from typing import Union
 
@@ -35,11 +35,11 @@ def create_precision_datetime(date: str, precision: int = 3):
     formatter = DATE_FORMATS_IN.get(precision)
     if formatter is None:
         raise AttributeError("Invalid precision type")
-    return datetime.strptime(date, formatter)
+    return datetime.datetime.strptime(date, formatter)
 
 
 def serialize_precision_datetime(
-        date: Union[date, Column[Date]],
+        date: Union[datetime.date, Column[Date]],
         precision=3
 ) -> str:
     formatter = DATE_FORMATS_OUT.get(precision)

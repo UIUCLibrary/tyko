@@ -1,10 +1,11 @@
+from __future__ import annotations
 import abc
 import datetime
 import typing
 import warnings
 from abc import ABC
 
-from typing import Optional, Tuple, TYPE_CHECKING, Mapping
+from typing import Optional, Tuple, TYPE_CHECKING, Mapping, Union, Type
 import re
 import sqlalchemy as db
 from sqlalchemy.orm import relationship
@@ -15,7 +16,8 @@ if TYPE_CHECKING:
     from tyko.schema.objects import CollectionObject  # noqa: F401
     from tyko.schema.treatment import Treatment  # noqa: F401
     from tyko.schema.instantiation import InstantiationFile  # noqa: F401
-    from tyko.schema.notes import Note  # noqa: F401
+    from tyko.schema.notes import Note  # noqa:
+    from sqlalchemy import Column, Date
 
 item_has_notes_table = db.Table(
     "item_has_notes",
@@ -616,8 +618,11 @@ class AudioCassette(AVFormat):
     REGEX_MONTH_YEAR = re.compile(r"^([0-1]?\d)/(\d){4}$")
 
     @classmethod
-    def serialize_date(cls, date: Optional[datetime.date],
-                       precision=3) -> str:
+    def serialize_date(
+            cls,
+            date: Union[Column[Date], datetime.date],
+            precision: int = 3
+    ) -> str:
         warnings.warn(
             "Use utils.serialize_precision_datetime instead",
             DeprecationWarning
@@ -861,7 +866,13 @@ item_has_contacts_table = db.Table(
 # =============================================================================
 
 
-format_types = {
+format_types: Mapping[
+    str,
+    Union[
+        Tuple[int],
+        Tuple[int, Type[AVFormat]]
+    ]
+] = {
     "audio video": (1, AudioVideo),
     "audio": (2,),
     "video": (3,),

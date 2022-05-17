@@ -1,4 +1,4 @@
-from typing import Dict, Mapping
+from typing import Dict, Mapping, Tuple
 
 import sqlalchemy as db
 from sqlalchemy.orm import relationship
@@ -55,7 +55,7 @@ class NoteTypes(AVTables):
 
 
 # =============================================================================
-note_types = {
+note_types: Dict[str, Tuple[int]] = {
     "Inspection": (1, ),
     "Playback": (2, ),
     "Project": (3, ),
