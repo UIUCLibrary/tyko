@@ -556,30 +556,21 @@ class VideoCassette(AVFormat, ABC):
     generation = relationship('VideoCassetteGenerations')
 
     def format_details(self) -> Mapping[str, SerializedData]:
-        details = {
+
+        return {
             'title_of_cassette': self.title_of_cassette,
+            'generation':
+                self.generation.serialize() if self.generation else None,
+            'cassette_type':
+                self.cassette_type.serialize() if self.cassette_type else None,
+            'duration': self.duration,
+            'label': self.label,
+            'date_of_cassette':
+                utils.serialize_precision_datetime(
+                    self.date_of_cassette,
+                    3
+                ) if self.date_of_cassette else None,
         }
-
-        if self.generation is not None:
-            details['generation'] = self.generation.serialize()
-
-        if self.label is not None:
-            details['label'] = self.label
-
-        if self.duration is not None:
-            details['duration'] = self.duration
-
-        if self.cassette_type is not None:
-            details['cassette_type'] = self.cassette_type
-
-        if self.date_of_cassette is not None:
-            details['date_of_cassette'] = \
-                utils.serialize_precision_datetime(self.date_of_cassette, 3)
-
-        if self.cassette_type is not None:
-            details['cassette_type'] = self.cassette_type.serialize()
-
-        return details
 
 
 class AudioCassette(AVFormat):
