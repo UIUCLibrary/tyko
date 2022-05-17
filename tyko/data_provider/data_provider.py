@@ -1,7 +1,7 @@
 import abc
 from abc import ABC, ABCMeta
 from datetime import datetime
-from typing import Iterator, List, Dict, Any, Optional
+from typing import Iterator, List, Dict, Any, Optional, Union, TypedDict
 
 import sqlalchemy
 from sqlalchemy import true, orm
@@ -17,6 +17,8 @@ from tyko.schema import NoteTypes, Note, formats, CollectionItem, \
 from tyko.schema.formats import AVFormat
 
 DATE_FORMAT = '%Y-%m-%d'
+
+TykoEnumData = TypedDict('TykoEnumData', {'name': str, 'id': int})
 
 
 class AbsDataProviderConnector(metaclass=abc.ABCMeta):
@@ -1689,9 +1691,11 @@ class CassetteTapeTypeConnector(EnumConnector):
             session.close()
 
 
-def enum_getter(session, enum_name):
-    data_type = getattr(schema.formats, enum_name)
+def enum_getter(session: orm.Session, enum_name: str) -> List[TykoEnumData]:
+    data_type: schema.formats.EnumTable = getattr(schema.formats, enum_name)
     return [
-        {"id": item.table_id, "name": item.name}
-        for item in session.query(data_type).all()
+        {
+            "id": item.table_id,
+            "name": item.name
+        } for item in session.query(data_type).all()
     ]

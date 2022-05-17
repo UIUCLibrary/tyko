@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, Tuple, Any, Type
+from typing import Dict, Tuple, Any, Type, List
 
 import sqlalchemy as db
 import sqlalchemy.orm
@@ -30,7 +30,7 @@ def _create_sample_collection(session):
 
 
 def _populate_enum_tables(session: sqlalchemy.orm.Session):
-    enum_table_classes = [
+    enum_table_classes: List[Type[formats.EnumTable]] = [
         formats.OpenReelSubType,
         formats.OpenReelReelWidth,
         formats.OpenReelReelDiameter,

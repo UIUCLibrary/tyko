@@ -29,6 +29,7 @@ from .views.project_object import ProjectObjectAPI, ObjectApi, \
 from .views import cassette_tape
 if TYPE_CHECKING:
     from tyko.data_provider import DataProvider
+    from sqlalchemy import orm
 
 """
 FORMAT_ENUM_ROUTES:
@@ -487,7 +488,7 @@ class Routes:
                     defaults=url_rule.defaults
                 )
 
-    def add_enum_routes(self, db_session_maker):
+    def add_enum_routes(self, db_session_maker: orm.sessionmaker) -> None:
         for route in FORMAT_ENUM_ROUTES:
             self.app.add_url_rule(
                 route[0],
