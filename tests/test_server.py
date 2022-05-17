@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import sessionmaker
 
 import tyko
-from tyko import schema
+from tyko import schema, data_provider
 from tyko.run import is_correct_db_version
 import tyko.database
 import sqlalchemy
@@ -246,7 +246,7 @@ def test_project_status_by_name_invalid():
     engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
+    project_provider = data_provider.ProjectDataConnector(dummy_session)
 
     with pytest.raises(tyko.exceptions.DataError):
         project_provider.get_project_status_by_name(
@@ -257,7 +257,7 @@ def test_project_status_by_name_invalid_multiple_with_same_name():
     engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
+    project_provider = data_provider.ProjectDataConnector(dummy_session)
     session = dummy_session()
     session.add(schema.projects.ProjectStatus(name="double"))
     session.add(schema.projects.ProjectStatus(name="double"))
@@ -274,7 +274,7 @@ def test_project_status_by_name_valid():
     engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
+    project_provider = data_provider.ProjectDataConnector(dummy_session)
 
     status = project_provider.get_project_status_by_name(
                 "In progress", create_if_not_exists=False)
@@ -285,7 +285,7 @@ def test_project_status_by_name_new_create():
     engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
+    project_provider = data_provider.ProjectDataConnector(dummy_session)
 
     status = project_provider.get_project_status_by_name(
                 "new status", create_if_not_exists=True)
@@ -302,7 +302,7 @@ class TestProjectDataConnector:
     def test_get_note(self, dummy_session):
 
         project_provider = \
-            tyko.data_provider.ProjectDataConnector(dummy_session)
+            data_provider.ProjectDataConnector(dummy_session)
 
         project_id = project_provider.create(title="dummy")
 
@@ -329,7 +329,7 @@ class TestItemDataConnector:
     @pytest.fixture()
     def item_provider(self, dummy_session):
 
-        return tyko.data_provider.ItemDataConnector(dummy_session)
+        return data_provider.ItemDataConnector(dummy_session)
 
     def test_get_note(self, item_provider):
         new_item_data = item_provider.create(name="dummy", format_id=1)
@@ -354,11 +354,11 @@ class TestItemDataConnector:
 
     def test_add_file(self, item_provider, dummy_session):
         project_provider = \
-            tyko.data_provider.ProjectDataConnector(dummy_session)
+            data_provider.ProjectDataConnector(dummy_session)
 
         project_provider.create(title="dummyProject")
         new_item_data = item_provider.create(name="dummy", format_id=1)
-        object_provider = tyko.data_provider.ObjectDataConnector(dummy_session)
+        object_provider = data_provider.ObjectDataConnector(dummy_session)
         object_id = object_provider.create(name="dummyobject")
         project_id = project_provider.create(title="dummy")
 
@@ -382,7 +382,7 @@ class TestObjectDataConnector:
 
     def test_get_note(self, dummy_session):
 
-        object_provider = tyko.data_provider.ObjectDataConnector(dummy_session)
+        object_provider = data_provider.ObjectDataConnector(dummy_session)
 
         object_id = object_provider.create(name="dummy")
 
@@ -404,7 +404,7 @@ def test_project_default_status():
     engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
     tyko.database.init_database(engine)
     dummy_session = sessionmaker(bind=engine)
-    project_provider = tyko.data_provider.ProjectDataConnector(dummy_session)
+    project_provider = data_provider.ProjectDataConnector(dummy_session)
     statuses = project_provider.get_all_project_status()
     assert len(statuses) == 3
 
