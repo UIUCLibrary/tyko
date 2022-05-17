@@ -1,7 +1,7 @@
 import abc
 from abc import ABC, ABCMeta
 from datetime import datetime
-from typing import Iterator, List, Dict, Any, Optional, Union, TypedDict
+from typing import Iterator, List, Dict, Any, Optional, TypedDict, Mapping
 
 import sqlalchemy
 from sqlalchemy import true, orm
@@ -23,7 +23,7 @@ TykoEnumData = TypedDict('TykoEnumData', {'name': str, 'id': int})
 
 class AbsDataProviderConnector(metaclass=abc.ABCMeta):
 
-    def __init__(self, session_maker) -> None:
+    def __init__(self, session_maker: orm.sessionmaker) -> None:
         self.session_maker = session_maker
 
     @abc.abstractmethod
@@ -45,7 +45,7 @@ class AbsDataProviderConnector(metaclass=abc.ABCMeta):
 
 class AbsNotesConnector(AbsDataProviderConnector, ABC):  # noqa: E501 pylint: disable=abstract-method
     @staticmethod
-    def get_note_type(session, note_type_id):
+    def get_note_type(session: orm.Session, note_type_id: int) -> NoteTypes:
         note_types = session.query(NoteTypes) \
             .filter(NoteTypes.id == note_type_id) \
             .all()
@@ -55,7 +55,12 @@ class AbsNotesConnector(AbsDataProviderConnector, ABC):  # noqa: E501 pylint: di
         return note_types[0]
 
     @classmethod
-    def new_note(cls, session, text: str, note_type_id: int):
+    def new_note(
+            cls,
+            session: orm.Session,
+            text: str,
+            note_type_id: int
+    ) -> Note:
         new_note = Note(
             text=text,
             note_type=cls.get_note_type(session, note_type_id)
@@ -74,20 +79,21 @@ def strip_empty_strings(data):
 class ItemDataConnector(AbsNotesConnector):
 
     @staticmethod
-    def _get_all(session):
-        res = list(session.query(schema.formats.Film).all()) + \
-              list(session.query(schema.formats.AudioCassette).all()) + \
-              list(session.query(schema.formats.AudioVideo).all()) + \
-              list(session.query(schema.formats.GroovedDisc).all()) + \
-              list(session.query(schema.formats.OpenReel).all()) + \
-              list(session.query(schema.formats.CollectionItem).all())
+    def _get_all(session: orm.Session) -> List[schema.formats.AVFormat]:
+        res: List[schema.formats.AVFormat] = \
+            list(session.query(schema.formats.Film).all()) + \
+            list(session.query(schema.formats.AudioCassette).all()) + \
+            list(session.query(schema.formats.AudioVideo).all()) + \
+            list(session.query(schema.formats.GroovedDisc).all()) + \
+            list(session.query(schema.formats.OpenReel).all()) + \
+            list(session.query(schema.formats.CollectionItem).all())
         if len(res) == 0:
             res = list(session.query(formats.AVFormat)
                        .all())
         return res
 
     @staticmethod
-    def _iterall(session) -> Iterator[schema.formats.AVFormat]:
+    def _iterall(session: orm.Session) -> Iterator[schema.formats.AVFormat]:
         yield from session.query(schema.formats.Film).all()
         yield from session.query(schema.formats.AudioCassette).all()
         yield from session.query(schema.formats.AudioVideo).all()
@@ -97,7 +103,10 @@ class ItemDataConnector(AbsNotesConnector):
         yield from session.query(schema.formats.VideoCassette).all()
 
     @staticmethod
-    def _get_one(session, table_id: int):
+    def _get_one(
+            session: orm.Session,
+            table_id: int
+    ) -> List[schema.formats.AVFormat]:
 
         res = list(session.query(schema.formats.Film)
                    .filter(schema.formats.AVFormat.table_id == table_id)
@@ -127,7 +136,7 @@ class ItemDataConnector(AbsNotesConnector):
         return res
 
     @staticmethod
-    def _serialize(items):
+    def _serialize(items: List[formats.CollectionItem]):
         serialized_all_collection_item = []
         for collection_item in items:
             serialized_all_collection_item.append(
@@ -167,7 +176,11 @@ class ItemDataConnector(AbsNotesConnector):
         finally:
             session.close()
 
-    def create_new_format_item(self, session, format_data):
+    def create_new_format_item(
+            self,
+            session: orm.Session,
+            format_data: Mapping[str, str]
+    ) -> CollectionItem:
         format_id = int(format_data["format_id"])
 
         format_type = session.query(schema.formats.FormatTypes) \
@@ -698,7 +711,10 @@ class ProjectDataConnector(AbsNotesConnector):
             session.close()
 
     @staticmethod
-    def _get_project(session, project_id):
+    def _get_project(
+            session: orm.Session,
+            project_id: int
+    ) -> Project:
         projects = session.query(Project).filter(
             Project.id == project_id).all()
 

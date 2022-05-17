@@ -6,7 +6,7 @@ import json
 import sys
 import traceback
 import typing
-from typing import List, Dict, Any, Iterator
+from typing import List, Dict, Any, Iterator, Mapping
 
 import flask
 from flask import jsonify, make_response, abort, request, url_for
@@ -20,6 +20,7 @@ CACHE_HEADER = "private, max-age=0"
 
 if typing.TYPE_CHECKING:
     from sqlalchemy import orm
+    from tyko import schema
 
 
 class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
@@ -70,7 +71,13 @@ class Middleware:
     def __init__(self, data_provider: tyko.data_provider.DataProvider) -> None:
         self.data_provider = data_provider
 
-    def get_formats(self, serialize=True):
+    def get_formats(
+            self,
+            serialize: bool = True
+    ) -> typing.Union[
+        flask.Response,
+        List[Mapping[str, schema.formats.SerializedData]]
+    ]:
         formats = self.data_provider.get_formats(serialize=serialize)
         if serialize:
             result = jsonify(formats)
@@ -78,7 +85,7 @@ class Middleware:
             result = formats
         return result
 
-    def get_formats_by_id(self, id):
+    def get_formats_by_id(self, id: int) -> flask.Response:
         formats = self.data_provider.get_formats(id=id, serialize=True)
         return jsonify(formats)
 

@@ -10,7 +10,10 @@ if typing.TYPE_CHECKING:
     from tyko.data_provider import DataProvider
 
 
-def resolve_project_data(project_connector, unresolved_object: dict):
+def resolve_project_data(
+        project_connector: ProjectDataConnector,
+        unresolved_object: dict
+):
     project_id = unresolved_object.get("parent_project_id")
     if project_id is None:
         return None
@@ -35,15 +38,13 @@ def create_pbcore_from_object(object_id: int,
     for item in resulting_object.get("items", []):
         item['files'] = resolve_files(file_connector, item)
 
-    xml = template.render(
+    return template.render(
         obj=resulting_object,
         identifier_source="University of Illinois at Urbana-Champaign"
     )
 
-    return xml
 
-
-def resolve_files(file_connector, item):
+def resolve_files(file_connector: FilesDataConnector, item):
     # The files comibg back aren't complete, get the rest of the metadata
     # before passing it on to the PBCore template
     resolved_files = []
