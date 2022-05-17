@@ -1,6 +1,5 @@
 # pylint: disable=redefined-builtin, invalid-name
 
-from . import formats
 from tyko.data_provider.data_provider import \
     AbsDataProviderConnector, \
     AbsNotesConnector, \
@@ -16,6 +15,7 @@ from tyko.data_provider.data_provider import \
     get_schema_version,\
     NotesDataConnector, \
     enum_getter
+from . import formats
 
 __all__ = [
     "formats",
