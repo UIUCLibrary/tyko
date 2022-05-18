@@ -1,29 +1,33 @@
+# syntax = docker/dockerfile:1.2
+
 FROM python:3.10-alpine as builder
-RUN apk add --no-cache \
-    gcc \
-    build-base \
-    musl-dev \
-    linux-headers \
-    mariadb-client \
-    mariadb-dev \
-    libressl-dev \
-    libxml2-dev \
-    libxslt-dev \
-    npm
+
+RUN --mount=type=cache,id=apk-cache,target=/var/cache/apk \
+    apk add \
+        gcc \
+        build-base \
+        musl-dev \
+        linux-headers \
+        mariadb-client \
+        mariadb-dev \
+        libressl-dev \
+        libxml2-dev \
+        libxslt-dev \
+        npm
 
 
-RUN python -m pip install pip --upgrade
-RUN pip install gunicorn mysqlclient lxml flask sqlalchemy build
 WORKDIR /build
-RUN pip wheel --wheel-dir /build/wheels gunicorn mysqlclient
 COPY ["requirements.txt", "setup.py", "setup.cfg", "webpack.config.js", "pyproject.toml","MANIFEST.in", "package.json", "package-lock.json", "/build/"]
-RUN pip wheel --wheel-dir /build/wheels -r /build/requirements.txt
+RUN --mount=type=cache,id=custom-pip,target=/root/.cache/pip python -m pip install pip --upgrade &&\
+    pip install gunicorn mysqlclient lxml flask sqlalchemy build && \
+    pip wheel --wheel-dir /build/wheels gunicorn mysqlclient -r /build/requirements.txt
+
 COPY tyko/ /build/tyko/
 RUN python -m build --wheel
 
 FROM python:3.10-alpine as app
-RUN apk update \
-    && apk add --no-cache \
+RUN --mount=type=cache,id=apk-cache,target=/var/cache/apk  \
+    apk add \
         mariadb-client \
         mariadb-connector-c \
         curl
