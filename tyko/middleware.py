@@ -573,18 +573,18 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
             self._data_connector.get_note(
                 project_id=project_id,
                 note_id=note_id,
-                serialize=True
             )
         )
 
     def update_note(self, project_id: int, note_id: int) -> flask.Response:
 
-        data = request.get_json()
-        note_id_value = int(note_id)
         updated_project = \
-            self._data_connector.update_note(project_id=project_id,
-                                             note_id=note_id_value,
-                                             changed_data=data)
+            self._data_connector.update_note(
+                project_id=project_id,
+                note_id=note_id,
+                changed_data=request.get_json()
+            )
+
         if not updated_project:
             return make_response("", 204)
 

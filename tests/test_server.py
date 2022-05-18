@@ -314,7 +314,6 @@ class TestProjectDataConnector:
 
         note_retrieved = project_provider.get_note(
             project_id, note_created['note_id'],
-            serialize=False
         )
         assert note_retrieved == note_created
 

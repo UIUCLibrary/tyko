@@ -730,7 +730,7 @@ class ProjectDataConnector(AbsNotesConnector):
 
         return projects[0]
 
-    def get_note(self, project_id, note_id, serialize):
+    def get_note(self, project_id, note_id):
         session = self.session_maker()
         try:
             project = self.get(id=project_id, serialize=True)
