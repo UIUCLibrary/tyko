@@ -69,4 +69,4 @@ HEALTHCHECK --start-period=5s CMD curl --fail http://localhost:9182/ || exit 1
 #TODO: create a way to run alembic upgrade head from startup
 #CMD alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
 #CMD alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
-CMD python -m tyko init-db --create-samples && alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
+CMD python -m tyko init-db && alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
