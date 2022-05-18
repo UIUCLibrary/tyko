@@ -366,7 +366,8 @@ class CollectionMiddlewareEntity(AbsMiddlewareEntity):
                         "page_collection_details",
                         collection_id=new_collection_id
                     )
-        })
+            }
+        )
 
 
 class ProjectMiddlewareEntity(AbsMiddlewareEntity):
