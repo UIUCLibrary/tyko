@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.2
-
-FROM python:3.10-alpine as builder
+ARG BASE_IMAGE=python:3.10-alpine
+FROM ${BASE_IMAGE} as builder
 
 RUN --mount=type=cache,id=apk-cache,target=/var/cache/apk \
     apk add \
@@ -25,7 +25,7 @@ RUN --mount=type=cache,id=custom-pip,target=/root/.cache/pip python -m pip insta
 COPY tyko/ /build/tyko/
 RUN python -m build --wheel
 
-FROM python:3.10-alpine as app
+FROM ${BASE_IMAGE} as app
 RUN --mount=type=cache,id=apk-cache,target=/var/cache/apk  \
     apk add \
         mariadb-client \
@@ -69,4 +69,4 @@ HEALTHCHECK --start-period=5s CMD curl --fail http://localhost:9182/ || exit 1
 #TODO: create a way to run alembic upgrade head from startup
 #CMD alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
 #CMD alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
-CMD python -m tyko init-db && alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
+CMD python -m tyko init-db --create-samples && alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
