@@ -591,7 +591,7 @@ pipeline {
                     }
                     steps{
                         script{
-                            docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile")
+                            docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .")
                         }
                     }
                     post{
