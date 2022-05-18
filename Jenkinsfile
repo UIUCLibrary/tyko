@@ -660,9 +660,9 @@ pipeline {
                         configFileProvider([configFile(fileId: 'docker_props', variable: 'CONFIG_FILE')]) {
                             script{
                                 def deploySettings = readProperties(file: CONFIG_FILE)
-                                echo "deploySettings = ${deploySettings}"
-//                                                 docker.withServer(CONFIG.docker.server.apiUrl, "DOCKER_TYKO"){
-                                docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .")
+                                docker.withServer(deploySettings['docker_url'], "DOCKER_TYKO"){
+                                    docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .")
+                                }
                             }
                         }
                     }
