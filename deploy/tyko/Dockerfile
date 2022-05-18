@@ -1,4 +1,4 @@
-FROM python:3.7-alpine as builder
+FROM python:3.10-alpine as builder
 RUN apk add --no-cache \
     gcc \
     build-base \
@@ -13,26 +13,27 @@ RUN apk add --no-cache \
 
 
 RUN python -m pip install pip --upgrade
-RUN pip install gunicorn mysqlclient lxml flask sqlalchemy
+RUN pip install gunicorn mysqlclient lxml flask sqlalchemy build
 WORKDIR /build
 RUN pip wheel --wheel-dir /build/wheels gunicorn mysqlclient
-COPY ["requirements.txt", "setup.py", "setup.cfg", "webpack.config.js", "MANIFEST.in", "package.json", "package-lock.json", "/build/"]
+COPY ["requirements.txt", "setup.py", "setup.cfg", "webpack.config.js", "pyproject.toml","MANIFEST.in", "package.json", "package-lock.json", "/build/"]
 RUN pip wheel --wheel-dir /build/wheels -r /build/requirements.txt
 COPY tyko/ /build/tyko/
-RUN python setup.py bdist_wheel
+RUN python -m build --wheel
 
-FROM python:3.7-alpine as app
+FROM python:3.10-alpine as app
+RUN apk update \
+    && apk add --no-cache \
+        mariadb-client \
+        mariadb-connector-c \
+        curl
 
 COPY requirements.txt ./requirements.txt
 COPY --from=builder /build/wheels/*.whl ./wheel/
 COPY --from=builder /build/dist/*.whl ./dist/
 
-RUN apk update \
-    && apk add --no-cache \
-        mariadb-client \
-        mariadb-connector-c \
-        curl \
-    && pip install --no-index --find-links=./wheel dist/tyko-*.whl gunicorn mysqlclient -r requirements.txt
+
+RUN pip install --no-index --find-links=./wheel dist/tyko-*.whl gunicorn mysqlclient -r requirements.txt
 
 
 WORKDIR /app
@@ -62,5 +63,6 @@ ADD deploy/tyko/gunicorn.conf.py gunicorn.conf.py
 HEALTHCHECK --start-period=5s CMD curl --fail http://localhost:9182/ || exit 1
 #CMD alembic upgrade head
 #TODO: create a way to run alembic upgrade head from startup
-CMD alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
-#CMD python -m tyko init-db && alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
+#CMD alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
+#CMD alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
+CMD python -m tyko init-db && alembic upgrade head && gunicorn -c gunicorn.conf.py "tyko.run:create_app()"
