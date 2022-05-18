@@ -82,8 +82,7 @@ class Middleware:
         return jsonify(formats) if serialize else formats
 
     def get_formats_by_id(self, id: int) -> flask.Response:
-        formats = self.data_provider.get_formats(id=id, serialize=True)
-        return jsonify(formats)
+        return jsonify(self.data_provider.get_formats(id=id, serialize=True))
 
 
 class ObjectMiddlewareEntity(AbsMiddlewareEntity):
@@ -114,12 +113,9 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
                 "objects": objects,
                 "total": len(objects)
             }
-            response = make_response(jsonify(data), 200)
+            return make_response(jsonify(data), 200)
 
-            return response
-
-        result = objects
-        return result
+        return objects
 
     def object_by_id(self, id: int) -> flask.Response:
 
@@ -374,11 +370,15 @@ class CollectionMiddlewareEntity(AbsMiddlewareEntity):
                 department=department,
                 record_series=record_series)
 
-        return jsonify({
-            "id": new_collection_id,
-            "url": url_for("collection", collection_id=new_collection_id),
-            "frontend_url": url_for("page_collection_details",
-                                    collection_id=new_collection_id)
+        return jsonify(
+            {
+                "id": new_collection_id,
+                "url": url_for("collection", collection_id=new_collection_id),
+                "frontend_url":
+                    url_for(
+                        "page_collection_details",
+                        collection_id=new_collection_id
+                    )
         })
 
 
@@ -410,6 +410,7 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
         offset = request.args.get("offset")
         projects = self._data_connector.get(serialize=serialize)
         total_projects = len(projects)
+
         if limit:
             offset_value = int(offset)
             limit_value = int(limit)
@@ -420,23 +421,21 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
                 "projects": projects,
                 "total": total_projects
             }
-            json_data = json.dumps(data)
             response = make_response(jsonify(data), 200)
 
             hash_value = \
-                hashlib.sha256(bytes(json_data, encoding="utf-8")).hexdigest()
+                hashlib.sha256(
+                    bytes(json.dumps(data), encoding="utf-8")
+                ).hexdigest()
 
             response.headers["ETag"] = str(hash_value)
             response.headers["Cache-Control"] = CACHE_HEADER
             return response
 
-        result = projects
-        return result
+        return projects
 
     def get_project_by_id(self, id: int):
-        current_project = self._data_connector.get(id, serialize=True)
-
-        if current_project:
+        if current_project := self._data_connector.get(id, serialize=True):
             serialized_project_notes = self.serialize_project_notes(
                 current_project.get("notes", []),
                 project_id=id
@@ -446,19 +445,26 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
 
             for obj in current_project['objects']:
                 obj['routes'] = {
-                    "frontend": url_for("page_project_object_details",
-                                        project_id=id,
-                                        object_id=obj['object_id']),
-                    "api":  url_for("project_object",
-                                    project_id=id,
-                                    object_id=obj['object_id'])
+                    "frontend":
+                        url_for(
+                            "page_project_object_details",
+                            project_id=id,
+                            object_id=obj['object_id']
+                        ),
+                    "api":
+                        url_for(
+                            "project_object",
+                            project_id=id,
+                            object_id=obj['object_id']
+                        )
                 }
 
-                obj['notes'] = self.serialize_object_notes(
-                    obj['notes'],
-                    project_id=id,
-                    object_id=obj['object_id'],
-                )
+                obj['notes'] = \
+                    self.serialize_object_notes(
+                        obj['notes'],
+                        project_id=id,
+                        object_id=obj['object_id'],
+                    )
             return current_project
 
         return abort(404)
@@ -479,12 +485,13 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
             note_id = note['note_id']
             serialize_note = note_mw.get(id=note_id, resolve_parents=False)
             serialize_note["route"] = {
-                'api': url_for(
-                    "object_notes",
-                    note_id=note_id,
-                    object_id=object_id,
-                    project_id=project_id
-                )
+                'api':
+                    url_for(
+                        "object_notes",
+                        note_id=note_id,
+                        object_id=object_id,
+                        project_id=project_id
+                    )
             }
             serialize_notes.append(
                 serialize_note
