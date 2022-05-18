@@ -643,7 +643,8 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
 
         return new_data
 
-    def serialize_project_notes(self, notes, project_id: int):
+    @staticmethod
+    def serialize_project_notes(notes, project_id: int):
         serialized_notes = []
         for note in notes.copy():
             note["route"] = {
