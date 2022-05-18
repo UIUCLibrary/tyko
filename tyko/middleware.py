@@ -391,7 +391,7 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
         })
 
 
-class ProjectMiddlwareEntity(AbsMiddlwareEntity):
+class ProjectMiddlewareEntity(AbsMiddlwareEntity):
     WRITABLE_FIELDS = [
         "title",
         "project_code",
@@ -593,10 +593,11 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         )
 
     def remove_note(self, project_id: int, note_id: int) -> flask.Response:
-        updated_project = self._data_connector.remove_note(
-            project_id=project_id,
-            note_id=note_id
-        )
+        updated_project = \
+            self._data_connector.remove_note(
+                project_id=project_id,
+                note_id=note_id
+            )
 
         return make_response(
             jsonify({
@@ -634,13 +635,10 @@ class ProjectMiddlwareEntity(AbsMiddlwareEntity):
         try:
 
             new_data = self.get_new_data(request.get_json())
-            new_object = self._data_connector.add_object(project_id,
-                                                         data=new_data)
-            return jsonify(
-                {
-                    "object": new_object
-                }
-            )
+            new_object = \
+                self._data_connector.add_object(project_id, data=new_data)
+
+            return jsonify({"object": new_object})
 
         except AttributeError:
             traceback.print_exc(file=sys.stderr)
@@ -729,11 +727,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
         current_item = self._data_connector.get(id, serialize=True)
 
         if current_item:
-            return jsonify(
-                {
-                    "item": current_item
-                }
-            )
+            return jsonify({"item": current_item})
 
         return abort(404)
 
@@ -768,16 +762,12 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
         except ValueError as reason:
             return make_response(f"Cannot update item. Reason: {reason}", 400)
 
-        replacement_item = self._data_connector.update(
-            id, changed_data=new_item
-        )
+        replacement_item = \
+            self._data_connector.update(id, changed_data=new_item)
+
         if not replacement_item:
             return make_response("", 204)
-        return jsonify(
-            {
-                "item": replacement_item
-            }
-        )
+        return jsonify({"item": replacement_item})
 
     def add_file(
             self,
@@ -785,9 +775,9 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             object_id: int,
             item_id: int
     ) -> flask.Response:
-        return files.ItemFilesAPI(self._data_provider).post(project_id,
-                                                            object_id,
-                                                            item_id)
+        return files.ItemFilesAPI(
+            self._data_provider
+        ).post(project_id, object_id, item_id)
 
     def add_note(self, item_id: int) -> flask.Response:
         data = request.get_json()
@@ -799,11 +789,8 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
                     item_id=item_id,
                     note_type_id=note_type_id,
                     note_text=note_text)
-            return jsonify(
-                {
-                    "item": update_item
-                }
-            )
+            return jsonify({"item": update_item})
+
         except AttributeError:
             traceback.print_exc(file=sys.stderr)
             return make_response("Invalid data", 400)
@@ -832,12 +819,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
             note_id=note_id
         )
 
-        return make_response(
-            jsonify({
-                "item": updated_item
-            }),
-            202
-        )
+        return make_response(jsonify({"item": updated_item}), 202)
 
     def update_note(self, item_id: int, note_id: int) -> flask.Response:
         data = request.get_json()

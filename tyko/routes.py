@@ -597,7 +597,7 @@ class Routes:
                 self.app.add_url_rule(rule, endpoint, func)
 
     def get_api_project_routes(self) -> Iterator[UrlRule]:
-        project = middleware.ProjectMiddlwareEntity(self.db_engine)
+        project = middleware.ProjectMiddlewareEntity(self.db_engine)
         yield UrlRule(
             rule="/api/project/",
             endpoint="add_project",

@@ -4,7 +4,7 @@ from tyko import middleware
 
 
 class ProjectObjectAPI(views.MethodView):
-    def __init__(self, project: middleware.ProjectMiddlwareEntity) -> None:
+    def __init__(self, project: middleware.ProjectMiddlewareEntity) -> None:
         self._project = project
 
     def get(self, project_id, object_id):

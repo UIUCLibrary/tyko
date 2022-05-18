@@ -5,7 +5,7 @@ from unittest.mock import Mock
 class TestProjectMiddlewareEntity:
     def test_serialize_notes(self, monkeypatch):
         data_provider = Mock(name="data provider")
-        mw = middleware.ProjectMiddlwareEntity(data_provider)
+        mw = middleware.ProjectMiddlewareEntity(data_provider)
         notes = [{"note_id": 1}]
         note_detail = {
                 "note_id": 1,

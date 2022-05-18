@@ -27,7 +27,7 @@ class ObjectItemAPI(views.MethodView):
         self._provider = provider
 
     def post(self, project_id, object_id):  # noqa: E501  pylint: disable=W0613,C0301
-        current_project = middleware.ProjectMiddlwareEntity(
+        current_project = middleware.ProjectMiddlewareEntity(
             self._provider).get_project_by_id(project_id)
         # make sure that the project has that object
         for child_object in current_project['objects']:
