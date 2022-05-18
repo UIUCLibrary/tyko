@@ -502,7 +502,7 @@ pipeline {
                 stage("Tox") {
                     when {
                         equals expected: true, actual: params.TEST_RUN_TOX
-                        beforeInput true
+                        beforeAgent true
                     }
                     agent {
                         dockerfile {
