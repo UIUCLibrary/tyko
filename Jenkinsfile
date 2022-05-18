@@ -591,7 +591,7 @@ pipeline {
                     steps{
                         script{
                             docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .").withRun{ e->
-                                echo "I got ${e.id}"
+                                sh "docker inspect ${e.id}"
                             }
                         }
                     }
