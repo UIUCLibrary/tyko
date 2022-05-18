@@ -89,6 +89,7 @@ pipeline {
             )
         booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
         booleanParam(name: 'DEPLOY_DOCS', defaultValue: false, description: 'Update online documentation')
+        booleanParam(name: "DEPLOY_PREVIEW_SERVER", defaultValue: false, description: 'Deploy to preview server')
         booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
     }
     stages {
@@ -641,6 +642,33 @@ pipeline {
                                         [pattern: 'dist/', type: 'INCLUDE'],
                                         ]
                                 )
+                        }
+                    }
+                }
+                stage('Deploy to Preview Server'){
+                    agent {
+                        label 'linux && docker && x86'
+                    }
+                    environment {
+                        DOCKER_IMAGE_TEMP_NAME = UUID.randomUUID().toString()
+                    }
+                    when{
+                        equals expected: true, actual: params.DEPLOY_PREVIEW_SERVER
+                        beforeInput true
+                    }
+                    steps{
+                        script{
+//                             configFileProvider([configFile(fileId: 'getmarc_deployapi', variable: 'CONFIG_FILE')]) {
+//                                                 def CONFIG = readJSON(file: CONFIG_FILE).deploy
+//                                                 docker.withServer(CONFIG.docker.server.apiUrl, "DOCKER_TYKO"){
+                            docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .").withRun{ e->
+                                sh "docker inspect ${e.id}"
+                            }
+                        }
+                    }
+                    post{
+                        cleanup{
+                            sh(returnStatus: true, script:"docker image rm ${env.DOCKER_IMAGE_TEMP_NAME}")
                         }
                     }
                 }
