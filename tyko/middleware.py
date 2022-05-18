@@ -119,9 +119,7 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
 
     def object_by_id(self, id: int) -> flask.Response:
 
-        current_object = self._data_connector.get(id, serialize=True)
-
-        if current_object:
+        if current_object := self._data_connector.get(id, serialize=True):
             for item in current_object['items']:
                 item['routes'] = {
                     "api": url_for(
@@ -137,16 +135,17 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
                         project_id=current_object['parent_project_id']
                     )
                 }
-            return jsonify({
-                "object": current_object
-            })
+            return jsonify({"object": current_object})
 
         return abort(404)
 
     def pbcore(self, id: int) -> flask.Response:
-        xml = pbcore.create_pbcore_from_object(
-            object_id=id,
-            data_provider=self._data_provider)
+        xml = \
+            pbcore.create_pbcore_from_object(
+                object_id=id,
+                data_provider=self._data_provider
+            )
+
         response = make_response(xml, 200)
         response.headers["Content-type"] = "text/xml"
         return response
@@ -171,9 +170,7 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
         if not updated_object:
             return make_response("", 204)
 
-        return jsonify(
-            {"object": updated_object}
-        )
+        return jsonify({"object": updated_object})
 
     @classmethod
     def create_changed_data(cls, json_request) -> Dict[str, Any]:
@@ -190,6 +187,7 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
         if 'originals_return_date' in json_request:
             new_object['originals_return_date'] = json_request[
                 'originals_return_date']
+
         return new_object
 
     def create(self, data=None):
@@ -217,11 +215,8 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
                     object_id=object_id,
                     note_type_id=note_type_id,
                     note_text=note_text)
-            return jsonify(
-                {
-                    "object": update_object
-                }
-            )
+            return jsonify({"object": update_object})
+
         except AttributeError:
             traceback.print_exc(file=sys.stderr)
             return make_response("Invalid note data", 400)
@@ -252,12 +247,7 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
             object_id=object_id,
             item_id=item_id
         )
-        return make_response(
-            jsonify({
-                "object": updated_object
-            }),
-            202
-        )
+        return make_response(jsonify({"object": updated_object}), 202)
 
     def get_note(self, object_id: int, note_id: int) -> flask.Response:
         return jsonify(
@@ -306,12 +296,10 @@ class CollectionMiddlewareEntity(AbsMiddlewareEntity):
             response.headers["Cache-Control"] = CACHE_HEADER
             return response
 
-        result = collections
-        return result
+        return collections
 
     def collection_by_id(self, id):
-        current_collection = self._data_connector.get(id, serialize=True)
-        if current_collection:
+        if current_collection := self._data_connector.get(id, serialize=True):
             return jsonify({
                 "collection": current_collection
             })
@@ -335,6 +323,7 @@ class CollectionMiddlewareEntity(AbsMiddlewareEntity):
 
         if "record_series" in json_request:
             new_collection["record_series"] = json_request["record_series"]
+
         return new_collection
 
     def update(self, id: int) -> flask.Response:
@@ -355,9 +344,7 @@ class CollectionMiddlewareEntity(AbsMiddlewareEntity):
         if not updated_collection:
             return make_response("", 204)
 
-        return jsonify(
-            {"collection": updated_collection}
-        )
+        return jsonify({"collection": updated_collection})
 
     def create(self) -> flask.Response:
         data = request.get_json()
@@ -493,9 +480,7 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
                         project_id=project_id
                     )
             }
-            serialize_notes.append(
-                serialize_note
-            )
+            serialize_notes.append(serialize_note)
 
         return serialize_notes
 
@@ -521,6 +506,7 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
 
         if "title" in request.json:
             new_project["title"] = json_request.get("title")
+
         return new_project
 
     def update(self, id: int) -> flask.Response:
@@ -539,9 +525,7 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
         if not updated_project:
             return make_response("", 204)
 
-        return jsonify(
-            {"project": updated_project}
-        )
+        return jsonify({"project": updated_project})
 
     def create(self) -> flask.Response:
         data = request.get_json()
@@ -597,12 +581,7 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
                 note_id=note_id
             )
 
-        return make_response(
-            jsonify({
-                "project": updated_project
-            }),
-            202
-        )
+        return make_response(jsonify({"project": updated_project}), 202)
 
     def add_note(self, project_id: int) -> flask.Response:
 
@@ -650,12 +629,8 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
             updated_project = self._data_connector.remove_object(
                 project_id=project_id, object_id=object_id)
 
-            return make_response(
-                jsonify({
-                    "project": updated_project
-                }),
-                202
-            )
+            return make_response(jsonify({"project": updated_project}), 202)
+
         except DataError as e:
             return make_response(e.message, e.status_code)
 
@@ -718,13 +693,10 @@ class ItemMiddlewareEntity(AbsMiddlewareEntity):
             response.headers["Cache-Control"] = CACHE_HEADER
             return response
 
-        result = items
-        return result
+        return items
 
     def item_by_id(self, id: int) -> flask.Response:
-        current_item = self._data_connector.get(id, serialize=True)
-
-        if current_item:
+        if current_item := self._data_connector.get(id, serialize=True):
             return jsonify({"item": current_item})
 
         return abort(404)
@@ -787,6 +759,7 @@ class ItemMiddlewareEntity(AbsMiddlewareEntity):
                     item_id=item_id,
                     note_type_id=note_type_id,
                     note_text=note_text)
+
             return jsonify({"item": update_item})
 
         except AttributeError:
@@ -828,14 +801,14 @@ class ItemMiddlewareEntity(AbsMiddlewareEntity):
         if not updated_object:
             return make_response("", 204)
 
-        return jsonify(
-            {"item": updated_object}
-        )
+        return jsonify({"item": updated_object})
 
     def get_note(self, item_id: int, note_id: int) -> flask.Response:
-        note = self._data_connector.get_note(item_id=item_id,
-                                             note_id=note_id)
-        return jsonify(note)
+        return jsonify(
+            self._data_connector.get_note(
+                item_id=item_id,
+                note_id=note_id)
+        )
 
 
 class NotestMiddlewareEntity(AbsMiddlewareEntity):
@@ -882,9 +855,7 @@ class NotestMiddlewareEntity(AbsMiddlewareEntity):
             del note_data['parent_object_ids']
             del note_data['parent_item_ids']
 
-            return jsonify({
-                "note": note_data
-            })
+            return jsonify({"note": note_data})
 
         notes = self._data_connector.get(serialize=serialize)
         if serialize:
@@ -936,9 +907,7 @@ class NotestMiddlewareEntity(AbsMiddlewareEntity):
         if not updated_note:
             return make_response("", 204)
 
-        return jsonify(
-            {"note": updated_note}
-        )
+        return jsonify({"note": updated_note})
 
     def create(self) -> flask.Response:
         data = request.get_json()
@@ -955,10 +924,7 @@ class NotestMiddlewareEntity(AbsMiddlewareEntity):
         )
 
     def list_types(self):
-        types = self._data_connector.list_types()
-        return {
-            "types": types
-        }
+        return {"types": self._data_connector.list_types()}
 
 
 def get_enums(

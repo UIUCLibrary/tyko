@@ -132,10 +132,7 @@ class CassetteTapeThicknessConnector(data_provider.EnumConnector):
             if serialize is False:
                 return cassette_types
 
-            enum_types = []
-            for i in cassette_types:
-                enum_types.append(i.serialize())
-
+            enum_types = [i.serialize() for i in cassette_types]
             if id is not None:
                 return enum_types[0]
             return enum_types

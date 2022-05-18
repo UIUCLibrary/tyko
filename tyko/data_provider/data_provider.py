@@ -137,12 +137,9 @@ class ItemDataConnector(AbsNotesConnector):
 
     @staticmethod
     def _serialize(items: List[formats.CollectionItem]):
-        serialized_all_collection_item = []
-        for collection_item in items:
-            serialized_all_collection_item.append(
-                collection_item.serialize(true))
-
-        return serialized_all_collection_item
+        return [
+            collection_item.serialize(true) for collection_item in items
+        ]
 
     def get(self, id=None, serialize=False):
         session = self.session_maker()
@@ -181,16 +178,14 @@ class ItemDataConnector(AbsNotesConnector):
             session: orm.Session,
             format_data: Mapping[str, str]
     ) -> CollectionItem:
-        format_id = int(format_data["format_id"])
 
-        format_type = session.query(schema.formats.FormatTypes) \
-            .filter(schema.formats.FormatTypes.id == format_id).one()
+        format_type = \
+            session.query(schema.formats.FormatTypes).filter(
+                schema.formats.FormatTypes.id == int(format_data["format_id"])
+            ).one()
 
-        new_item = CollectionItem(
-            name=format_data['name'],
-            format_type=format_type
-        )
-        return new_item
+        return \
+            CollectionItem(name=format_data['name'], format_type=format_type)
 
     def create(self, *args, **kwargs):
         session = self.session_maker()
@@ -397,10 +392,8 @@ class ItemDataConnector(AbsNotesConnector):
             generation: str
     ) -> InstantiationFile:
 
-        new_file = InstantiationFile(
-            file_name=file_name,
-            generation=generation
-        )
+        new_file = \
+            InstantiationFile(file_name=file_name, generation=generation)
 
         session.add(new_file)
         return new_file
@@ -499,13 +492,12 @@ class ProjectDataConnector(AbsNotesConnector):
                 )
 
             if len(names) == 0:
-                if create_if_not_exists is True:
+                if create_if_not_exists:
                     new_project_status = ProjectStatus(name=name)
                     session.add(new_project_status)
                     return new_project_status
 
-                if create_if_not_exists is False:
-                    raise DataError("No valid project status")
+                raise DataError("No valid project status")
 
             return names[0]
         finally:
@@ -594,9 +586,7 @@ class ProjectDataConnector(AbsNotesConnector):
 
     def update(self, id, changed_data):
         updated_project = None
-        project = self.get_project(id)
-
-        if project:
+        if project := self.get_project(id):
             if "title" in changed_data:
                 project.title = changed_data['title']
 
@@ -815,45 +805,43 @@ class ObjectDataConnector(AbsNotesConnector):
 
     def update(self, id, changed_data):
         collection_object = self.get(id, serialize=False)
-
+        if not collection_object:
+            return
         session = self.session_maker()
         try:
-            if collection_object:
+            if "name" in changed_data:
+                collection_object.name = changed_data['name']
 
-                if "name" in changed_data:
-                    collection_object.name = changed_data['name']
+            if "barcode" in changed_data:
+                collection_object.barcode = changed_data['barcode']
 
-                if "barcode" in changed_data:
-                    collection_object.barcode = changed_data['barcode']
-
-                if "collection_id" in changed_data:
-                    collection = session.query(Collection)\
-                        .filter(Collection.id ==
-                                changed_data['collection_id'])\
-                        .one()
-
-                    collection_object.collection = collection
-
-                if 'originals_rec_date' in changed_data:
-                    collection_object.originals_rec_date = \
-                        datetime.strptime(
-                            changed_data['originals_rec_date'],
-                            DATE_FORMAT
-                        )
-                if 'originals_return_date' in changed_data:
-                    collection_object.originals_return_date = \
-                        datetime.strptime(
-                            changed_data['originals_return_date'],
-                            DATE_FORMAT
-                        )
-
-                session.add(collection_object)
-                session.commit()
-
-                updated_object = session.query(CollectionObject)\
-                    .filter(CollectionObject.id == id)\
+            if "collection_id" in changed_data:
+                collection = session.query(Collection)\
+                    .filter(Collection.id == changed_data['collection_id'])\
                     .one()
-                return updated_object.serialize()
+
+                collection_object.collection = collection
+
+            if 'originals_rec_date' in changed_data:
+                collection_object.originals_rec_date = \
+                    datetime.strptime(
+                        changed_data['originals_rec_date'],
+                        DATE_FORMAT
+                    )
+            if 'originals_return_date' in changed_data:
+                collection_object.originals_return_date = \
+                    datetime.strptime(
+                        changed_data['originals_return_date'],
+                        DATE_FORMAT
+                    )
+
+            session.add(collection_object)
+            session.commit()
+
+            updated_object = session.query(CollectionObject)\
+                .filter(CollectionObject.id == id)\
+                .one()
+            return updated_object.serialize()
 
         finally:
             session.close()
@@ -1119,13 +1107,9 @@ class FileNotesDataConnector(AbsDataProviderConnector):
                         CollectionObject.project is not None).all()
 
             if serialize:
-                serialized_notes = []
-                for notes in all_notes:
-                    serialized_notes.append(
-                        notes.serialize(True)
-                    )
-
-                all_notes = serialized_notes
+                all_notes = [
+                    notes.serialize(True) for notes in all_notes
+                ]
             if id is not None:
                 return all_notes[0]
 
@@ -1180,8 +1164,7 @@ class FilesDataConnector(AbsDataProviderConnector):
                 .filter(InstantiationFile.file_id == id).one()
 
             if serialize is True:
-                res = matching_file.serialize(recurse=True)
-                return res
+                return matching_file.serialize(recurse=True)
 
             return matching_file
         finally:
@@ -1262,10 +1245,9 @@ class CollectionDataConnector(AbsDataProviderConnector):
                 session.query(Collection).all()
 
         if serialize:
-            serialized_collections = []
-            for collection in all_collections:
-                serialized_collections.append(collection.serialize())
-            all_collections = serialized_collections
+            all_collections = [
+                collection.serialize() for collection in all_collections
+            ]
 
         session.close()
 
@@ -1296,9 +1278,7 @@ class CollectionDataConnector(AbsDataProviderConnector):
 
     def update(self, id, changed_data):
         updated_collection = None
-        collection = self.get(id, serialize=False)
-
-        if collection:
+        if collection := self.get(id, serialize=False):
             if "collection_name" in changed_data:
                 collection.collection_name = changed_data["collection_name"]
 
@@ -1398,9 +1378,7 @@ class NotesDataConnector(AbsDataProviderConnector):
 
     def update(self, id, changed_data):
         updated_note = None
-        note = self.get(id, serialize=False)
-
-        if note:
+        if note := self.get(id, serialize=False):
             session = self.session_maker()
             if "text" in changed_data:
                 note.text = changed_data['text']
@@ -1631,10 +1609,7 @@ class CassetteTypeConnector(EnumConnector):
         if serialize is False:
             return cassette_types
 
-        enum_types = []
-        for i in cassette_types:
-            enum_types.append(i.serialize())
-        return enum_types
+        return [i.serialize() for i in cassette_types]
 
     def get(self, id=None, serialize=False):
         session = self.session_maker()
@@ -1683,10 +1658,7 @@ class CassetteTapeTypeConnector(EnumConnector):
             if serialize is False:
                 return cassette_types
 
-            enum_types = []
-            for i in cassette_types:
-                enum_types.append(i.serialize())
-
+            enum_types = [i.serialize() for i in cassette_types]
             if id is not None:
                 return enum_types[0]
             return enum_types
