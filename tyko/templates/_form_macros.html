@@ -22,7 +22,7 @@
     {% call form_row() %}
         <label for="{{input_id}}" class="col-sm-2 col-form-label"> {{display_text}}</label>
         <div class="col-sm-10">
-                <select id="inputProjectStatus" name="{{ api_data_name }}" class="form-control" {% if required %}required{% endif %}>
+                <select id="inputProjectStatus" name="{{ api_data_name }}" class="form-select" {% if required %}required{% endif %}>
                 {% for option in options %}
                     {{option}}
                 <option value="{{ option.value }}">{{option.text}}</option>
