@@ -81,6 +81,7 @@ pipeline {
         timeout(time: 1, unit: 'DAYS')
     }
     parameters {
+        booleanParam(name: 'RUN_CHECKS', defaultValue: false, description: 'Run checks on code')
         booleanParam(
                 name: 'USE_SONARQUBE',
                 defaultValue: defaultParamValues.USE_SONARQUBE,
@@ -157,6 +158,10 @@ pipeline {
         stage('Code Quality') {
             stages{
                 stage('Testing'){
+                    when{
+                        equals expected: true, actual: params.RUN_CHECKS
+                        beforeAgent true
+                    }
                     agent {
                       dockerfile {
                         filename 'CI/docker/jenkins/Dockerfile'
