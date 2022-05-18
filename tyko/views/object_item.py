@@ -8,7 +8,7 @@ from tyko import middleware, data_provider
 
 
 class ObjectItemNotesAPI(views.MethodView):
-    def __init__(self, item: middleware.ItemMiddlwareEntity) -> None:
+    def __init__(self, item: middleware.ItemMiddlewareEntity) -> None:
         self._item = item
 
     def put(self, project_id, object_id, item_id, note_id):  # noqa: E501 pylint: disable=W0613,C0301
@@ -27,7 +27,7 @@ class ObjectItemAPI(views.MethodView):
         self._provider = provider
 
     def post(self, project_id, object_id):  # noqa: E501  pylint: disable=W0613,C0301
-        current_project = middleware.ProjectMiddlwareEntity(
+        current_project = middleware.ProjectMiddlewareEntity(
             self._provider).get_project_by_id(project_id)
         # make sure that the project has that object
         for child_object in current_project['objects']:
@@ -46,16 +46,15 @@ class ObjectItemAPI(views.MethodView):
                 "files": request_data.get("files", [])
 
             }
-        except KeyError as e:
+        except KeyError as error:
             traceback.print_exc(file=sys.stderr)
-            return make_response(
-                "missing required value {}".format(e), 400)
+            return make_response(f"missing required value {error}", 400)
 
         format_type = self._provider.get_formats(
             request_data["format_id"], serialize=True)[0]
         connectors = {
-            "audio cassette": data_provider.AudioCassetteDataConnector,
-            'cassette tape': data_provider.AudioCassetteDataConnector,
+            "audio cassette": data_provider.formats.AudioCassetteDataConnector,
+            'cassette tape': data_provider.formats.AudioCassetteDataConnector,
 
         }
         connector_class = connectors.get(format_type['name'])
@@ -64,13 +63,15 @@ class ObjectItemAPI(views.MethodView):
             new_data = {
                 "name": request_data['name'],
                 "format_id": int(request_data['format_id']),
-                "format_details": request_data.get('format_details')
+                "format_details": request_data.get('format_details', {}),
+                'inspectionDate': request_data.get('inspection_date')
             }
             new_item = connector.create(**new_data, object_id=object_id)
         else:
             data_connector = \
                 data_provider.ObjectDataConnector(
-                    self._provider.db_session_maker)
+                    self._provider.db_session_maker
+                )
 
             new_item = data_connector.add_item(
                 object_id=object_id,
@@ -127,7 +128,9 @@ class ObjectItemAPI(views.MethodView):
         item_id = request.args.get("item_id")
         data = request.get_json()
         connector = data_provider.ItemDataConnector(
-            self._provider.db_session_maker)
+            self._provider.db_session_maker
+        )
+
         replacement_item = connector.update(int(item_id), data)
         return replacement_item
 
@@ -145,7 +148,7 @@ class ObjectItemAPI(views.MethodView):
 
     def delete(self, project_id, object_id):  # noqa: E501  pylint: disable=W0613,C0301
         item_id = int(request.args.get("item_id"))
-        parent_object = middleware.ObjectMiddlwareEntity(self._provider)
+        parent_object = middleware.ObjectMiddlewareEntity(self._provider)
         return parent_object.remove_item(object_id=object_id, item_id=item_id)
 
     def _add_routes_to_files(self, files, item_id, object_id, project_id):
@@ -205,8 +208,7 @@ class ItemAPI(views.MethodView):
             new_item = self.create_changed_data(json_request)
 
         except ValueError as reason:
-            return make_response(
-                "Cannot update item. Reason: {}".format(reason), 400)
+            return make_response(f"Cannot update item. Reason: {reason}", 400)
 
         replacement_item = self._data_connector.update(
             item_id, changed_data=new_item
@@ -222,7 +224,8 @@ class ItemAPI(views.MethodView):
     def get(self, item_id):
         item = self._data_connector.get(item_id, True)
         object_provider = data_provider.ObjectDataConnector(
-            self._data_provider.db_session_maker)
+            self._data_provider.db_session_maker
+        )
 
         if 'parent_object_id' in item and item['parent_object_id'] is not None:
             parent_project = \

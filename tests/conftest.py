@@ -155,8 +155,9 @@ def server_with_object_and_item():
             }),
             content_type='application/json'
         )
-        new_object_id = json.loads(post_new_object_project_resp.data)['object'][
-            "object_id"]
+        new_object_id = json.loads(
+            post_new_object_project_resp.data
+        )['object']["object_id"]
 
         assert post_new_object_project_resp.status_code == 200
         new_item_url = url_for("object_item",
@@ -247,16 +248,13 @@ def server_with_cassette(server_with_enums):
         data=json.dumps({
             "name": "dummy",
             "format_id":
-                data['format_types']['audio cassette']["format_types_id"],
+                data['format_types']['audio cassette']["id"],
             "format_details": {
                 "format_type_id":
                     data['cassette_tape_formats']['compact cassette']['id'],
-                "date_recorded": "11-26-1993",
-                "inspection_date": "12-10-2019",
-                "tape_thickness_id": data['tape_thicknesses'][0]['id'],
-                'tape_type_id': data["cassette_tape_tape_types"][0]['id']
-
-            }
+                "date_of_cassette": "11/26/1993",
+            },
+            "inspection_date": "12/10/2019",
         }),
         content_type='application/json'
     )
@@ -315,7 +313,7 @@ def server_with_enums(server_with_object):
     }
     data["cassette_tape_formats"] = cassette_tape_formats
 
-    # ========================== cassette_tape_tape_types ======================
+    # ========================= cassette_tape_tape_types ======================
 
     tape_tape_type_api_url = url_for("cassette_tape_tape_types")
     for value in ["I", "II", "IV"]:

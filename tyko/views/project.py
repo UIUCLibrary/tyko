@@ -5,7 +5,7 @@ from tyko import middleware
 
 class ProjectNotesAPI(views.MethodView):
 
-    def __init__(self, project: middleware.ProjectMiddlwareEntity) -> None:
+    def __init__(self, project: middleware.ProjectMiddlewareEntity) -> None:
         super().__init__()
         self._project = project
 
@@ -20,7 +20,7 @@ class ProjectNotesAPI(views.MethodView):
 
 
 class ProjectsAPI(views.MethodView):
-    def __init__(self, project: middleware.ProjectMiddlwareEntity) -> None:
+    def __init__(self, project: middleware.ProjectMiddlewareEntity) -> None:
         self._project = project
 
     def get(self):
@@ -28,7 +28,7 @@ class ProjectsAPI(views.MethodView):
 
 
 class ProjectAPI(views.MethodView):
-    def __init__(self, project: middleware.ProjectMiddlwareEntity) -> None:
+    def __init__(self, project: middleware.ProjectMiddlewareEntity) -> None:
         self._project = project
 
     def put(self, project_id: int):

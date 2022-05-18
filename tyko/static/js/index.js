@@ -15,11 +15,11 @@ window.$ = $
  * Add a date selection helper
  * @param {String} elementId - ID for the input element
  */
-export function openDateSelect(elementId){
+export function openDateSelect(elementId, format='yyyy-mm-dd'){
     const element = document.getElementById(elementId)
     const datepicker = new Datepicker(element, {
         buttonClass: 'btn',
-        format: 'yyyy-mm-dd'
+        format: format
     });
     datepicker.show()
     element.addEventListener("focusout", () =>{
@@ -55,12 +55,31 @@ function loadTableFiles(element){
     })
 }
 
+function loadDynamicEnums(element){
+    if(!element.dataset.enumUrl){
+      console.warn(`${element.id} element does not have a data-enum-url property`)
+      return
+    }
+    fetch(element.dataset.enumUrl).then(response => response.json()).then(newData => {
+        for( let data of newData){
+          const newOption = document.createElement('option')
+          newOption.setAttribute('value', data.id)
+          newOption.innerText = data.name
+          element.appendChild(newOption)
+        }
+
+    })
+}
+
 function loadTykoTypes(){
     for(const element of document.getElementsByClassName('tyko')){
       if(element.classList.contains('tyko-editor')){
         tyko.configureTykoEditorTags(element);
       }
 
+      if(element.classList.contains('tyko-enum-dynamic')){
+          loadDynamicEnums(element)
+      }
       if(element.classList.contains('tyko-table-files')){
           loadTableFiles(element)
       }

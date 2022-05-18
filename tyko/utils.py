@@ -1,40 +1,52 @@
 import re
-from datetime import datetime, date
+import datetime
+import typing
+
 from sqlalchemy import Column, Date
-from typing import Union
 
-DATE_FORMATS = {
+DATE_FORMATS_IN = {
     1: "%Y",
-    2: "%m-%Y",
-    3: "%m-%d-%Y",
+    2: "%m/%Y",
+    3: "%m/%d/%Y",
 }
+
+DATE_FORMATS_OUT = {
+    1: "%Y",
+    2: "%-m/%Y",
+    3: "%-m/%-d/%Y",
+}
+
+
 DATE_PRECISIONS_REGEX = {
-    1: re.compile(r'^([0-9]{4})$'),
-    2: re.compile(r'^([0-1][0-9])-([0-9]{4})$'),
-    3: re.compile(r'^([0-1][0-9])-([0-3][0-9])-([0-9]{4})$')
+    1: re.compile(r'^(\d{4})$'),
+    2: re.compile(r'^([0-1]?\d)/(\d{4})$'),
+    3: re.compile(r'^([0-1]?\d)/([0-3]?\d)/(\d{4})$')
 }
 
 
-def identify_precision(data) -> int:
+def identify_precision(data: str) -> int:
     for precision, matcher in DATE_PRECISIONS_REGEX.items():
         if matcher.match(data):
             return precision
     raise AttributeError(f"Unable to identify format for string {data}")
 
 
-def create_precision_datetime(date: str, precision: int = 3):
+def create_precision_datetime(
+        date: str,
+        precision: int = 3
+) -> datetime.datetime:
 
-    formatter = DATE_FORMATS.get(precision)
+    formatter = DATE_FORMATS_IN.get(precision)
     if formatter is None:
         raise AttributeError("Invalid precision type")
-    return datetime.strptime(date, formatter)
+    return datetime.datetime.strptime(date, formatter)
 
 
 def serialize_precision_datetime(
-        date: Union[date, Column[Date]],
-        precision=3
+        date: typing.Union[datetime.date, Column[Date]],
+        precision: int = 3
 ) -> str:
-    formatter = DATE_FORMATS.get(precision)
+    formatter = DATE_FORMATS_OUT.get(precision)
     if formatter is None:
         raise AttributeError("Invalid precision type")
-    return date.strftime(formatter)
+    return typing.cast(datetime.date, date).strftime(formatter)

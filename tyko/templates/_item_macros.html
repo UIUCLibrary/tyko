@@ -13,14 +13,14 @@
             <select class="form-select" class="form-control" name="format_id" id="itemFormatSelection" required>
                 <option value="" disabled selected>Select a Format</option>
                 {%- for format in formats%}
-                    <option value="{{format.format_types_id}}">{{ format.name }}</option>
+                    <option value="{{format.id}}">{{ format.name }}</option>
                 {%- endfor %}
             </select>
             <script type="module">
                 const FORMATS = {
                 {%- for format in formats%}
                   "{{ format.name }}": {
-                    "format_id": "{{ format.format_types_id }}"
+                    "format_id": "{{ format.id }}"
                   },
                 {%- endfor %}
                 };

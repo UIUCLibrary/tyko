@@ -1,19 +1,24 @@
 # pylint: disable=invalid-name
-
+from __future__ import annotations
 import abc
 import collections.abc
 import typing
 from abc import ABC
 from typing import Tuple, Set, Optional, Callable, List, Iterator, \
-    NamedTuple, Dict
+    NamedTuple, Dict, TYPE_CHECKING
+
 from dataclasses import dataclass
 
 from flask import current_app as app
 from flask import make_response, render_template, url_for
 
 import pkg_resources
-from . import data_provider
+
+from tyko import data_provider
 from .views.object_item import ObjectItemAPI
+
+if TYPE_CHECKING:
+    from tyko.data_provider import DataProvider
 
 
 @dataclass
@@ -161,7 +166,7 @@ class FrontendEntity(AbsFrontend):
         ("Collections", "page_collections"),
     }
 
-    def __init__(self, provider: data_provider.DataProvider) -> None:
+    def __init__(self, provider: DataProvider) -> None:
         self._data_provider = provider
 
         FrontendEntity._entities.add(
@@ -170,12 +175,15 @@ class FrontendEntity(AbsFrontend):
 
     def display_details(self, entity_id, *args, **kwargs):  # noqa: E501 pylint: disable=unused-argument
         return make_response(
-            "{}.display_details not implemented".format(
-                self.__class__.__name__), 404)
+            f"{self.__class__.__name__}.display_details not implemented",
+            404
+        )
 
     def list(self):
         return make_response(
-            "{}.list not implemented".format(self.__class__.__name__), 404)
+            f"{self.__class__.__name__}.list not implemented",
+            404
+        )
 
     def render_page(self, template, **context):
         new_context = self.build_header_context(
@@ -228,7 +236,7 @@ class ProjectComponentDetailFrontend(FrontendEntity, ABC):  # noqa: E501 pylint:
 
 class ProjectFrontend(ProjectComponentDetailFrontend):
 
-    def __init__(self, provider: data_provider.DataProvider) -> None:
+    def __init__(self, provider: DataProvider) -> None:
         super().__init__(provider)
 
         self._data_connector = \
@@ -317,7 +325,7 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
 
 
 class ItemFrontend(ProjectComponentDetailFrontend):
-    def __init__(self, provider: data_provider.DataProvider) -> None:
+    def __init__(self, provider: DataProvider) -> None:
         super().__init__(provider)
 
         self._data_connector = \
@@ -404,7 +412,7 @@ class ItemFrontend(ProjectComponentDetailFrontend):
 
 
 class ObjectFrontend(ProjectComponentDetailFrontend):
-    def __init__(self, provider: data_provider.DataProvider) -> None:
+    def __init__(self, provider: DataProvider) -> None:
         super().__init__(provider)
         self._data_provider = provider
         self._data_connector = \
@@ -555,11 +563,13 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
 
 
 class CollectionFrontend(FrontendEntity):
-    def __init__(self, provider: data_provider.DataProvider) -> None:
+    def __init__(self, provider: DataProvider) -> None:
         super().__init__(provider)
 
         self._data_connector = \
-            data_provider.CollectionDataConnector(provider.db_session_maker)
+            data_provider.CollectionDataConnector(
+                provider.db_session_maker
+            )
 
     def list(self):
         return self.render_page(template="collections.html",
@@ -598,10 +608,11 @@ class NewCollectionForm(AbsFrontend):
 
 
 class FileDetailsFrontend:
-    def __init__(self, provider: data_provider.DataProvider) -> None:
+    def __init__(self, provider: DataProvider) -> None:
         self._data_provider = data_provider
-        self._data_connector = \
-            data_provider.FilesDataConnector(provider.db_session_maker)
+        self._data_connector = data_provider.FilesDataConnector(
+            provider.db_session_maker
+        )
 
     @staticmethod
     def build_breadcrumbs(active_level, project_url=None, object_url=None,

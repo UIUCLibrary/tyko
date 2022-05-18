@@ -117,6 +117,7 @@
                     </td>
                 </tr>
             {% if "parent_project_id" in object %}
+
                 {% call newEntityModal('newItemModal', title="New Item", submitUrl=url_for("object_new_item", project_id=object['parent_project_id'], object_id=object['object_id']), formId="newEdityForm") %}
                     <div class="mb-3 row">
                         <label for="itemNameInput" class="col-sm-2 col-form-label">Name</label>
@@ -130,12 +131,54 @@
                             <select class="form-select" class="form-control" name="format_id" id="itemFormatSelection" required>
                                 <option disabled selected value="">Select a Format</option>
                                 {%- for format in formats %}
-                                <option value="{{format.format_types_id}}">{{ format.name }}</option>
+                                <option value="{{format.id}}">{{ format.name }}</option>
                                 {%- endfor %}
                             </select>
                         </div>
                     </div>
+                    <div id="dynamicSelection"></div>
                 {% endcall %}
+                <div style="display: none;">
+                    <div id="cassetteOnlyData">
+                        {% include 'forms/new_audio_cassette.html' %}
+                    </div>
+                    <div id="filmOnlyData">
+                        {% include 'forms/new_film.html' %}
+                    </div>
+                    <div id="openReelOnlyData">
+                        {% include 'forms/new_open_reel.html' %}
+                    </div>
+                    <div id="groovedDiscOnlyData">
+                        {% include 'forms/new_grooved_disc.html' %}
+                    </div>
+                    <div id="opticalOnlyData">
+                        {% include 'forms/new_optical.html' %}
+                    </div>
+                    <div id="videoCassetteOnlyData">
+                        {% include 'forms/new_video_cassette.html' %}
+                    </div>
+                </div>
+                <script>
+                  const formatSelection = document.getElementById('itemFormatSelection')
+                  formatSelection.onchange = function (){
+                    const dynamicSelection = document.getElementById('dynamicSelection')
+                    const options = {
+                      "audio cassette": "cassetteOnlyData",
+                      "film": "filmOnlyData",
+                      "open reel": "openReelOnlyData",
+                      "grooved disc": "groovedDiscOnlyData",
+                      "optical": "opticalOnlyData",
+                      "video cassette": "videoCassetteOnlyData"
+                    }
+                    const newItem = options[formatSelection.options[formatSelection.selectedIndex].text] ?? ""
+                    if(newItem) {
+                      dynamicSelection.innerHTML = document.getElementById(newItem).innerHTML;
+                    } else {
+                        dynamicSelection.innerText = '';
+
+                    }
+                  }
+                </script>
 {#                {{ newItemModal("newItemModal") }}#}
 
 {#                {{ new_item_modal("newItemtModal", formats, url_for("object_item", object_id=object['object_id'], project_id=object['parent_project_id'])) }}#}

@@ -406,10 +406,10 @@ def add_new_item_to_object(dummy_database, create_new_object, media_type,
 
     # media_table_type = media_type_info[1](item=new_item)
 
-    getattr(
-        create_new_object,
-        media_table_type.__tablename__
-    ).append(media_table_type)
+    # getattr(
+    #     create_new_object,
+    #     media_table_type.__tablename__
+    create_new_object.items.append(media_table_type)
 
     # create_new_object.items.append(media_table_type)
     dummy_database.add(create_new_object)
@@ -463,12 +463,18 @@ def test_new_open_reel_project():
                   "to the object"))
 def new_open_reel(dummy_database, create_new_object, date_recorded,
                   tape_size, base, file_name):
+    tape_size_value = dummy_database.query(
+        schema.formats.OpenReelReelWidth
+    ).filter(schema.formats.OpenReelReelWidth.name == tape_size).one()
 
+    base_value = dummy_database.query(
+        schema.formats.OpenReelBase
+    ).filter(schema.formats.OpenReelBase.name == base).one()
     open_reel = schema.OpenReel(
         name=SAMPLE_ITEM_NAME,
-        date_recorded=SAMPLE_DATE,
-        tape_size=tape_size,
-        base=base,
+        date_of_reel=SAMPLE_DATE,
+        reel_width=tape_size_value,
+        base=base_value
 
     )
 
@@ -504,19 +510,30 @@ def database_has_item_record_w_filename(dummy_database, file_name):
 )
 def check_open_reel_tape_size(dummy_database, tape_size):
     open_reel_items = dummy_database.query(schema.OpenReel)
-    open_reel_item = open_reel_items.filter(
-        schema.OpenReel.tape_size == tape_size).one()
 
-    assert open_reel_item.tape_size == tape_size
+    tape_size_value = dummy_database.query(
+        schema.formats.OpenReelReelWidth
+    ).filter(schema.formats.OpenReelReelWidth.name == tape_size).one()
+
+    open_reel_item = open_reel_items.filter(
+        schema.OpenReel.reel_width == tape_size_value
+    ).one()
+
+    assert open_reel_item.reel_width == tape_size_value
 
 
 @then(parsers.parse("the database has open reel record with a {base} base"))
 def check_open_reel_base(dummy_database, base):
     open_reel_items = dummy_database.query(schema.OpenReel)
+    base_value = dummy_database.query(
+        schema.formats.OpenReelBase
+    ).filter(
+        schema.formats.OpenReelBase.name == base
+    ).one()
     open_reel_item = open_reel_items.filter(
-        schema.OpenReel.base == base).one()
+        schema.OpenReel.base == base_value).one()
 
-    assert open_reel_item.base == base
+    assert open_reel_item.base.name == base
 
 
 @scenario("database.feature", "Create a vendor")
@@ -723,7 +740,7 @@ def media_type_can_be_serialize(dummy_database, media_type):
 
 @given("a new GroovedDisc item is created")
 def new_grooved_disc(dummy_database):
-    new_disc = schema.GroovedDisc(name="side A", side="A")
+    new_disc = schema.GroovedDisc(name="my grooved disc")
     dummy_database.add(new_disc)
     dummy_database.commit()
 
@@ -735,7 +752,7 @@ def test_database_film():
 
 @given("a new Film item is created")
 def new_film(dummy_database):
-    new_film = schema.Film(name="reel 1", sound="optical")
+    new_film = schema.Film(name="reel 1")
     dummy_database.add(new_film)
     dummy_database.commit()
 
@@ -912,9 +929,9 @@ def new_audio_item(dummy_database, new_audio_object, item_title, date_recorded,
         object=new_audio_object["object"],
         recording_date=recording_date,
         recording_date_precision=recording_date_precision,
-        cassette_type=schema.CassetteType(name=audio_type),
-        tape_thickness=schema.CassetteTapeThickness(value=tape_thickness),
-        inspection_date=datetime.strptime(inspection_date, "%m-%d-%Y")
+        # cassette_type=schema.CassetteType(name=audio_type),
+        # tape_thickness=schema.CassetteTapeThickness(value=tape_thickness),
+        inspection_date=datetime.strptime(inspection_date, "%m/%d/%Y")
     )
 
     if tape_type.strip() != "":
@@ -934,7 +951,11 @@ def object_has_audio_cassette(dummy_database, object_title):
     found_object = dummy_database.query(schema.CollectionObject)\
         .filter(schema.CollectionObject.name == object_title).one()
     assert found_object.name == object_title
-    assert len(found_object.audio_cassettes) == 1
+    cassettes = []
+    for item in found_object.items:
+        if isinstance(item, schema.AudioCassette):
+            cassettes.append(item)
+    assert len(cassettes) == 1
 
 
 @then(
@@ -951,10 +972,10 @@ def audio_cassette_has_a_title(
 ):
     cassette = dummy_database.query(schema.CollectionObject) \
         .filter(schema.CollectionObject.name == object_title) \
-        .one().audio_cassettes[0]
+        .one().items[0]
     cassette_data = cassette.serialize()
     assert cassette_data['name'] == item_title
-    assert cassette_data['format_details']['date_recorded'] == date_recorded
+    assert cassette_data['format_details']['date_of_cassette'] == date_recorded
 
 
 @then(
@@ -973,7 +994,7 @@ def audio_cassette_has_a_tape_thickness(
 
     cassette = dummy_database.query(schema.CollectionObject) \
         .filter(schema.CollectionObject.name == object_title) \
-        .one().audio_cassettes[0]
+        .one().items[0]
     cassette_date = cassette.serialize()
     assert cassette_date['name'] == item_title
 
@@ -998,7 +1019,8 @@ def audio_cassette_inspection_date(
 ):
     cassette = dummy_database.query(schema.CollectionObject) \
         .filter(schema.CollectionObject.name == object_title) \
-        .one().audio_cassettes[0]
+        .one().items[0]
+    assert isinstance(cassette, schema.AudioCassette)
     cassette_date = cassette.serialize()
     assert \
-        cassette_date['format_details']['inspection_date'] == inspection_date
+        cassette_date['inspection_date'] == inspection_date

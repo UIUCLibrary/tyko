@@ -1,21 +1,183 @@
 # pylint: disable=invalid-name, not-an-iterable
+from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, List, Iterator, Tuple, Callable, Optional, Union
+from typing import \
+    Any, \
+    List, \
+    Iterator, \
+    Tuple, \
+    Callable, \
+    Optional, \
+    Union, \
+    Iterable, \
+    TypedDict, \
+    TYPE_CHECKING
+
+import flask
 from flask import jsonify, render_template, views, request
 
 import tyko.views.files
-from . import middleware
-from .data_provider import DataProvider, ItemDataConnector, \
-    ObjectDataConnector, \
-    ProjectDataConnector
-from . import frontend
-from .views.object_item import ObjectItemNotesAPI, ObjectItemAPI
-from .views.object_item import ItemAPI
+from tyko.data_provider import \
+    ItemDataConnector, \
+    ProjectDataConnector, \
+    ObjectDataConnector
+
+from . import frontend, middleware
+from .views.object_item import ObjectItemNotesAPI, ObjectItemAPI, ItemAPI
 from .views.project import ProjectNotesAPI, ProjectAPI
 from .views.project_object import ProjectObjectAPI, ObjectApi, \
     ProjectObjectNotesAPI
 from .views import cassette_tape
+if TYPE_CHECKING:
+    from tyko.data_provider import DataProvider
+    from sqlalchemy import orm
+    from werkzeug.routing import Rule
+
+"""
+FORMAT_ENUM_ROUTES:
+For setting formats
+    URI
+    Endpoint
+    view_func
+"""
+FORMAT_ENUM_ROUTES = [
+    (
+        "/api/formats/video_cassette/generations",
+        'video_cassette_generations',
+        "VideoCassetteGenerations"
+    ),
+    (
+        "/api/formats/video_cassette/cassette_type",
+        'video_cassette_cassette_type',
+        "VideoCassetteType"
+    ),
+    (
+        "/api/formats/optical/optical_types",
+        'optical_optical_types',
+        "OpticalType"
+    ),
+    (
+        "/api/formats/open_reel/sub_types",
+        'open_reel_sub_type',
+        "OpenReelSubType"
+    ),
+    (
+        "/api/formats/open_reel/reel_width",
+        'open_reel_reel_width',
+        "OpenReelReelWidth"
+    ),
+    (
+        "/api/formats/open_reel/reel_diameter",
+        'open_reel_reel_diameter',
+        "OpenReelReelDiameter"
+    ),
+    (
+        "/api/formats/open_reel/reel_thickness",
+        'open_reel_reel_thickness',
+        "OpenReelReelThickness"
+    ),
+    (
+        "/api/formats/open_reel/base",
+        'open_reel_base',
+        "OpenReelBase"
+    ),
+    (
+        "/api/formats/open_reel/reel_speed",
+        'open_reel_reel_speed',
+        "OpenReelSpeed"
+    ),
+    (
+        "/api/formats/open_reel/track_configuration",
+        'open_reel_track_configuration',
+        "OpenReelTrackConfiguration"
+    ),
+    (
+        "/api/formats/open_reel/generation",
+        'open_reel_generation',
+        "OpenReelGeneration"
+    ),
+    (
+        "/api/formats/open_reel/wind",
+        'open_reel_wind',
+        "OpenReelReelWind"
+    ),
+    (
+        "/api/formats/grooved_disc/disc_diameter",
+        'grooved_disc_disc_diameter',
+        "GroovedDiscDiscDiameter"
+    ),
+    (
+        "/api/formats/grooved_disc/disc_material",
+        'grooved_disc_disc_material',
+        "GroovedDiscDiscMaterial"
+    ),
+    (
+        "/api/formats/grooved_disc/playback_direction",
+        'grooved_disc_playback_direction',
+        "GroovedDiscPlaybackDirection"
+    ),
+    (
+        "/api/formats/grooved_disc/playback_speed",
+        'grooved_disc_playback_speed',
+        "GroovedDiscPlaybackSpeed"
+    ),
+    (
+        "/api/formats/grooved_disc/disc_base",
+        'grooved_disc_disc_base',
+        "GroovedDiscDiscBase"
+    ),
+    (
+        "/api/formats/film/film_speed",
+        'film_film_speed',
+        "FilmFilmSpeed"
+    ),
+    (
+        "/api/formats/film/film_gauge",
+        'film_film_gauge',
+        "FilmFilmGauge"
+    ),
+    (
+        "/api/formats/film/film_base",
+        'film_film_base',
+        "FilmFilmBase"
+    ),
+    (
+        "/api/formats/film/film_emulsion",
+        'film_emulsion',
+        "FilmEmulsion"
+    ),
+    (
+        "/api/formats/film/soundtrack",
+        'film_soundtrack',
+        "FilmSoundtrack"
+    ),
+    (
+        "/api/formats/film/color",
+        'film_color',
+        "FilmColor"
+    ),
+    (
+        "/api/formats/film/image_type",
+        'film_image_type',
+        "FilmImageType"
+    ),
+    (
+        "/api/formats/film/wind",
+        'film_wind',
+        "FilmWind"
+    ),
+    (
+        "/api/formats/audio_cassette/subtype",
+        'audio_cassette_subtype',
+        "AudioCassetteSubtype"
+    ),
+    (
+        "/api/formats/audio_cassette/generation",
+        'audio_cassette_generation',
+        "AudioCassetteGeneration"
+    ),
+]
 
 
 @dataclass
@@ -50,32 +212,32 @@ class UrlRule:
 
 class NotesAPI(views.MethodView):
     def __init__(self,
-                 notes_middleware: middleware.NotestMiddlwareEntity) -> None:
+                 notes_middleware: middleware.NotestMiddlewareEntity) -> None:
         self._middleware = notes_middleware
 
-    def delete(self, note_id: int):
+    def delete(self, note_id: int) -> flask.Response:
         return self._middleware.delete(id=note_id)
 
-    def get(self, note_id: int):
+    def get(self, note_id: int) -> flask.Response:
         return self._middleware.get(id=note_id)
 
-    def put(self, note_id: int):
+    def put(self, note_id: int) -> flask.Response:
         return self._middleware.update(id=note_id)
 
 
 class CollectionsAPI(views.MethodView):
     def __init__(self,
-                 collection: middleware.CollectionMiddlwareEntity) -> None:
+                 collection: middleware.CollectionMiddlewareEntity) -> None:
 
         self._collection = collection
 
-    def get(self, collection_id: int):
+    def get(self, collection_id: int) -> flask.Response:
         return self._collection.get(id=collection_id)
 
-    def put(self, collection_id: int):
+    def put(self, collection_id: int) -> flask.Response:
         return self._collection.update(id=collection_id)
 
-    def delete(self, collection_id: int):
+    def delete(self, collection_id: int) -> flask.Response:
         return self._collection.delete(id=collection_id)
 
 
@@ -83,7 +245,7 @@ class NewItem(views.MethodView):
     def __init__(self, data_connector: ObjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, project_id, object_id):
+    def post(self, project_id, object_id) -> flask.Response:
         data = request.form
         return jsonify(self._data_connector.add_item(object_id, data))
 
@@ -92,14 +254,14 @@ class ObjectItemNewNotes(views.MethodView):
     def __init__(self, data_connector: ItemDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         item_id = kwargs['item_id']
         data = request.form
         return jsonify(
             self._data_connector.add_note(
                 item_id=item_id,
                 note_text=data['text'],
-                note_type_id=data['note_type_id']
+                note_type_id=int(data['note_type_id'])
             )
         )
 
@@ -108,7 +270,7 @@ class ObjectUpdateNotes(views.MethodView):
     def __init__(self, data_connector: ObjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         data = request.form
 
         changed_data = {}
@@ -131,7 +293,7 @@ class ProjectNoteUpdate(views.MethodView):
     def __init__(self, data_connector: ProjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         project_id = kwargs['project_id']
         data = request.form
 
@@ -155,7 +317,7 @@ class ProjectNewNote(views.MethodView):
     def __init__(self, data_connector: ProjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         project_id = kwargs['project_id']
         data = request.form
         note_type_id = int(data['note_type_id'])
@@ -169,7 +331,7 @@ class ProjectNewObject(views.MethodView):
     def __init__(self, data_connector: ProjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         project_id = kwargs['project_id']
         data = request.form
         print(data)
@@ -180,7 +342,7 @@ class ObjectNewNotes(views.MethodView):
     def __init__(self, data_connector: ObjectDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         data = request.form
         note_type_id = int(data['note_type_id'])
         object_id = kwargs['object_id']
@@ -197,7 +359,7 @@ class ObjectItemNewFile(views.MethodView):
     def __init__(self, data_connector: ItemDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, project_id, object_id, item_id):
+    def post(self, project_id, object_id, item_id) -> flask.Response:
         data = request.form
         return jsonify(self._data_connector.add_file(
             project_id,
@@ -212,7 +374,7 @@ class ObjectItemNotes(views.MethodView):
     def __init__(self, data_connector: ItemDataConnector) -> None:
         self._data_connector = data_connector
 
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs) -> flask.Response:
         data = request.form
         note_id = int(data['noteId'])
         item_id = kwargs['item_id']
@@ -327,6 +489,8 @@ class Routes:
                 methods=['POST']
             )
 
+            self.add_enum_routes(self.db_engine.db_session_maker)
+
             for url_rule in self.get_api_routes():
                 self.app.logger.debug(f"Loading rule {url_rule.rule}")
                 self.app.add_url_rule(
@@ -336,6 +500,17 @@ class Routes:
                     methods=url_rule.methods,
                     defaults=url_rule.defaults
                 )
+
+    def add_enum_routes(self, db_session_maker: orm.sessionmaker) -> None:
+        for route in FORMAT_ENUM_ROUTES:
+            self.app.add_url_rule(
+                route[0],
+                endpoint=route[1],
+                view_func=lambda class_name=route[2]: middleware.get_enums(
+                    db_session_maker,
+                    class_name
+                )
+            )
 
     def _page_routes(self, data_prov) -> Iterator[Tuple[str, str, Callable]]:
         file_details = frontend.FileDetailsFrontend(data_prov)
@@ -432,7 +607,7 @@ class Routes:
                 self.app.add_url_rule(rule, endpoint, func)
 
     def get_api_project_routes(self) -> Iterator[UrlRule]:
-        project = middleware.ProjectMiddlwareEntity(self.db_engine)
+        project = middleware.ProjectMiddlewareEntity(self.db_engine)
         yield UrlRule(
             rule="/api/project/",
             endpoint="add_project",
@@ -484,7 +659,7 @@ class Routes:
         )
 
     def get_api_object_routes(self) -> Iterator[UrlRule]:
-        project_object = middleware.ObjectMiddlwareEntity(self.db_engine)
+        project_object = middleware.ObjectMiddlewareEntity(self.db_engine)
 
         yield UrlRule(
             rule="/api/object/<int:object_id>",
@@ -533,7 +708,7 @@ class Routes:
 
     def get_api_item_routes(self) -> Iterator[UrlRule]:
 
-        item = middleware.ItemMiddlwareEntity(self.db_engine)
+        item = middleware.ItemMiddlewareEntity(self.db_engine)
         yield UrlRule(
             "/api/project/<int:project_id>/object/<int:object_id>/item",
             view_func=ObjectItemAPI.as_view(
@@ -662,7 +837,7 @@ class Routes:
         )
 
     def get_api_notes_routes(self) -> Iterator[UrlRule]:
-        notes = middleware.NotestMiddlwareEntity(self.db_engine)
+        notes = middleware.NotestMiddlewareEntity(self.db_engine)
         yield UrlRule(
             "/api/note/<int:note_id>",
             view_func=NotesAPI.as_view(
@@ -690,7 +865,7 @@ class Routes:
         )
 
     def get_api_collection_routes(self) -> Iterator[UrlRule]:
-        collection = middleware.CollectionMiddlwareEntity(self.db_engine)
+        collection = middleware.CollectionMiddlewareEntity(self.db_engine)
         yield UrlRule(
             "/api/collection/<int:collection_id>",
             view_func=CollectionsAPI.as_view(
@@ -791,7 +966,7 @@ class Routes:
         )
 
 
-def page_formats(middleware_source):
+def page_formats(middleware_source: middleware.Middleware) -> str:
     formats = middleware_source.get_formats(serialize=False)
     return render_template(
         "formats.html",
@@ -800,12 +975,21 @@ def page_formats(middleware_source):
     )
 
 
-def list_routes(app):
-    results = []
-    for rt in app.url_map.iter_rules():
-        results.append({
+def list_routes(app: flask.app.Flask) -> flask.Response:
+    result_type = TypedDict(
+        'result_type', {
+            'endpoint': str,
+            'methods': List[str],
+            'route': str
+        }
+    )
+    rules: Iterable[Rule] = app.url_map.iter_rules()
+    results: List[result_type] = [
+        {
             "endpoint": rt.endpoint,
             "methods": list(rt.methods),
             "route": str(rt)
-        })
+        } for rt in rules
+    ]
+
     return jsonify(results)

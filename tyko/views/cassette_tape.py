@@ -1,9 +1,12 @@
 import abc
 from flask import views, request, jsonify, make_response
-from tyko.data_provider import CassetteTypeConnector, \
-    CassetteTapeTypeConnector, \
-    CassetteTapeThicknessConnector, \
-    AbsDataProviderConnector
+from tyko.data_provider import AbsDataProviderConnector
+
+from tyko.data_provider.data_provider import \
+    CassetteTypeConnector, \
+    CassetteTapeTypeConnector
+
+from tyko.data_provider.formats import CassetteTapeThicknessConnector
 
 
 class AbsEnumView(views.MethodView):
