@@ -20,7 +20,8 @@ def alembic_table_exists(engine) -> bool:
     if packaging.version.parse(sqlalchemy.__version__) < \
             packaging.version.parse("1.4"):
         return engine.dialect.has_table(engine, "alembic_version")
-    return sqlalchemy.inspect(engine).has_table("alembic_version")
+    else:
+        return sqlalchemy.inspect(engine).has_table("alembic_version")
 
 
 def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
