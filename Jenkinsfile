@@ -81,7 +81,7 @@ pipeline {
         timeout(time: 1, unit: 'DAYS')
     }
     parameters {
-        booleanParam(name: 'RUN_CHECKS', defaultValue: false, description: 'Run checks on code')
+        booleanParam(name: 'RUN_CHECKS', defaultValue: true, description: 'Run checks on code')
         booleanParam(
                 name: 'USE_SONARQUBE',
                 defaultValue: defaultParamValues.USE_SONARQUBE,
