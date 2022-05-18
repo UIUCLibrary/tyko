@@ -649,27 +649,28 @@ pipeline {
                     agent {
                         label 'linux && docker && x86'
                     }
-                    environment {
-                        DOCKER_IMAGE_TEMP_NAME = UUID.randomUUID().toString()
+                    input {
+                        message 'Deploy to Preview server?'
+                        parameters {
+                            string defaultValue: 'tyko:preview', name: 'DOCKER_IMAGE_NAME'
+                            string defaultValue: 'tyko_preview', name: 'CONTAINER_NAME'
+                            string defaultValue: '9182', name: 'PORT'
+                        }
                     }
+
                     when{
                         equals expected: true, actual: params.DEPLOY_PREVIEW_SERVER
+                        beforeAgent true
                         beforeInput true
                     }
                     steps{
                         configFileProvider([configFile(fileId: 'docker_props', variable: 'CONFIG_FILE')]) {
                             script{
-                                def deploySettings = readProperties(file: CONFIG_FILE)
-                                def dockerImage = docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .")
-                                docker.withServer(deploySettings['docker_url'], "DOCKER_TYKO"){
-                                    dockerImage.run('-p 8081:9182')
+                                docker.withServer(readProperties(file: CONFIG_FILE)['docker_url'], "DOCKER_TYKO"){
+                                    def dockerImage = docker.build(DOCKER_IMAGE_NAME, "-f deploy/tyko/Dockerfile .")
+                                    dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${PORT}")
                                 }
                             }
-                        }
-                    }
-                    post{
-                        cleanup{
-                            sh(returnStatus: true, script:"docker image rm ${env.DOCKER_IMAGE_TEMP_NAME}")
                         }
                     }
                 }
