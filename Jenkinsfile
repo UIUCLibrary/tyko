@@ -584,10 +584,7 @@ pipeline {
                 }
                 stage('Build Docker Image'){
                     agent {
-                        dockerfile {
-                            filename 'CI/docker/jenkins/Dockerfile'
-                            label "linux && docker && x86"
-                        }
+                        label 'linux && docker && x86'
                     }
                     environment {
                         DOCKER_IMAGE_TEMP_NAME = UUID.randomUUID().toString()
