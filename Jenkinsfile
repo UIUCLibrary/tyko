@@ -541,36 +541,40 @@ pipeline {
                 }
             }
         }
-        stage("Creating Python Packages"){
-            agent {
-                dockerfile {
-                    filename 'CI/docker/jenkins/Dockerfile'
-                    label "linux && docker && x86"
-                }
-            }
-            steps{
-                timeout(10){
-                    sh(script: "python3 -m build")
-                }
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
-                    stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz", name: 'PYTHON_PACKAGES'
-                }
-                unstable {
-                    archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
-                    stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz,", name: 'PYTHON_PACKAGES'
-                }
+        stage('Packaging'){
+            parallel{
+                stage("Creating Python Packages"){
+                    agent {
+                        dockerfile {
+                            filename 'CI/docker/jenkins/Dockerfile'
+                            label "linux && docker && x86"
+                        }
+                    }
+                    steps{
+                        timeout(10){
+                            sh(script: "python3 -m build")
+                        }
+                    }
+                    post {
+                        success {
+                            archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
+                            stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz", name: 'PYTHON_PACKAGES'
+                        }
+                        unstable {
+                            archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
+                            stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz,", name: 'PYTHON_PACKAGES'
+                        }
 
-                cleanup{
-                    cleanWs(
-                        deleteDirs: true,
-                        patterns: [
-                            [pattern: 'dist/', type: 'INCLUDE'],
-                            [pattern: '**/__pycache__/', type: 'INCLUDE'],
-                        ]
-                    )
+                        cleanup{
+                            cleanWs(
+                                deleteDirs: true,
+                                patterns: [
+                                    [pattern: 'dist/', type: 'INCLUDE'],
+                                    [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                                ]
+                            )
+                        }
+                    }
                 }
             }
         }
