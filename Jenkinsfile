@@ -588,8 +588,18 @@ pipeline {
                             label "linux && docker && x86"
                         }
                     }
+                    environment {
+                        DOCKER_IMAGE_TEMP_NAME = UUID.randomUUID().toString()
+                    }
                     steps{
-                        echo "here"
+                        script{
+                            docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile")
+                        }
+                    }
+                    post{
+                        cleanup{
+                            sh(returnStatus: true, script:"docker image rm ${env.DOCKER_IMAGE_TEMP_NAME}")
+                        }
                     }
                 }
             }
