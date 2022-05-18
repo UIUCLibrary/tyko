@@ -117,7 +117,8 @@ setup(
         "MarkupSafe<2",
         "Flask-SQLAlchemy",
         "lxml",
-        "Jinja2<3.0,>2.0"
+        "Jinja2<3.0,>2.0",
+        "packaging"
         ],
     python_requires='>3.7',
     entry_points={

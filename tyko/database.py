@@ -20,7 +20,8 @@ def alembic_table_exists(engine) -> bool:
     if packaging.version.parse(sqlalchemy.__version__) < \
             packaging.version.parse("1.4"):
         return engine.dialect.has_table(engine, "alembic_version")
-    return sqlalchemy.inspect(engine).has_table("alembic_version")
+    else:
+        return sqlalchemy.inspect(engine).has_table("alembic_version")
 
 
 def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
@@ -215,16 +216,25 @@ def validate_enumerate_table_data(
 
 
 def validate_tables(engine: sqlalchemy.engine.Engine) -> bool:
+    tables_to_discard = [
+        "alembic_version"
+    ]
 
-    expected_table_names = []
-    for k in tyko.schema.avtables.AVTables.metadata.tables.keys():
-        expected_table_names.append(k)
-
+    expected_table_names = {
+        table_name for table_name in
+        tyko.schema.avtables.AVTables.metadata.tables.keys()
+        if table_name not in tables_to_discard
+    }
     valid = True
 
-    for table in db.inspect(engine).get_table_names():
+    existing_tables = {
+        table_name for table_name in
+        db.inspect(engine).get_table_names()
+        if table_name not in tables_to_discard
+    }
+    for table in existing_tables:
         if table not in expected_table_names:
-            print(f"Unexpected table found: {table}")
+            print(f"Unexpected table found: {table}", file=sys.stderr)
             valid = False
         else:
             expected_table_names.remove(table)
