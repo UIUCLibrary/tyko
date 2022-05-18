@@ -660,9 +660,12 @@ pipeline {
                         configFileProvider([configFile(fileId: 'docker_props', variable: 'CONFIG_FILE')]) {
                             script{
                                 def deploySettings = readProperties(file: CONFIG_FILE)
-                                def dockerImage = docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .")
                                 docker.withServer(deploySettings['docker_url'], "DOCKER_TYKO"){
-                                    dockerImage.run('-p 8081:9182')
+                                    docker.image('python').inside{
+                                        sh 'echo "I am here"'
+                                    }
+//                                     def dockerImage = docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .")
+//                                     dockerImage.run('-p 8081:9182')
                                 }
                             }
                         }
