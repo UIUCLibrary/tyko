@@ -815,46 +815,45 @@ class ObjectDataConnector(AbsNotesConnector):
 
     def update(self, id, changed_data):
         collection_object = self.get(id, serialize=False)
-        if collection_object:
-            return None
 
         session = self.session_maker()
         try:
+            if collection_object:
 
-            if "name" in changed_data:
-                collection_object.name = changed_data['name']
+                if "name" in changed_data:
+                    collection_object.name = changed_data['name']
 
-            if "barcode" in changed_data:
-                collection_object.barcode = changed_data['barcode']
+                if "barcode" in changed_data:
+                    collection_object.barcode = changed_data['barcode']
 
-            if "collection_id" in changed_data:
-                collection = session.query(Collection)\
-                    .filter(Collection.id ==
-                            changed_data['collection_id'])\
+                if "collection_id" in changed_data:
+                    collection = session.query(Collection)\
+                        .filter(Collection.id ==
+                                changed_data['collection_id'])\
+                        .one()
+
+                    collection_object.collection = collection
+
+                if 'originals_rec_date' in changed_data:
+                    collection_object.originals_rec_date = \
+                        datetime.strptime(
+                            changed_data['originals_rec_date'],
+                            DATE_FORMAT
+                        )
+                if 'originals_return_date' in changed_data:
+                    collection_object.originals_return_date = \
+                        datetime.strptime(
+                            changed_data['originals_return_date'],
+                            DATE_FORMAT
+                        )
+
+                session.add(collection_object)
+                session.commit()
+
+                updated_object = session.query(CollectionObject)\
+                    .filter(CollectionObject.id == id)\
                     .one()
-
-                collection_object.collection = collection
-
-            if 'originals_rec_date' in changed_data:
-                collection_object.originals_rec_date = \
-                    datetime.strptime(
-                        changed_data['originals_rec_date'],
-                        DATE_FORMAT
-                    )
-            if 'originals_return_date' in changed_data:
-                collection_object.originals_return_date = \
-                    datetime.strptime(
-                        changed_data['originals_return_date'],
-                        DATE_FORMAT
-                    )
-
-            session.add(collection_object)
-            session.commit()
-
-            updated_object = session.query(CollectionObject)\
-                .filter(CollectionObject.id == id)\
-                .one()
-            return updated_object.serialize()
+                return updated_object.serialize()
 
         finally:
             session.close()
