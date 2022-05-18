@@ -452,7 +452,6 @@ pipeline {
                             }
                             when{
                                 equals expected: true, actual: params.USE_SONARQUBE
-                                beforeAgent true
                                 beforeOptions true
                             }
                             steps{
