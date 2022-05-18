@@ -657,12 +657,12 @@ pipeline {
                         beforeInput true
                     }
                     steps{
-                        script{
-//                             configFileProvider([configFile(fileId: 'getmarc_deployapi', variable: 'CONFIG_FILE')]) {
-//                                                 def CONFIG = readJSON(file: CONFIG_FILE).deploy
+                        configFileProvider([configFile(fileId: 'docker_props', variable: 'CONFIG_FILE')]) {
+                            script{
+                                def deploySettings = readProperties(file: CONFIG_FILE)
+                                echo "deploySettings = ${deploySettings}"
 //                                                 docker.withServer(CONFIG.docker.server.apiUrl, "DOCKER_TYKO"){
-                            docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .").withRun{ e->
-                                sh "docker inspect ${e.id}"
+                                docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .")
                             }
                         }
                     }
