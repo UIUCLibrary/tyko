@@ -100,7 +100,7 @@ pipeline {
               }
             }
             stages{
-                stage('Backing Docs'){
+                stage('Making Docs'){
                     parallel{
                         stage('Javascript Docs'){
                             steps{
