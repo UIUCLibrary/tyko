@@ -576,6 +576,17 @@ pipeline {
                         }
                     }
                 }
+                stage('Build Docker Image'){
+                    agent {
+                        dockerfile {
+                            filename 'CI/docker/jenkins/Dockerfile'
+                            label "linux && docker && x86"
+                        }
+                    }
+                    steps{
+                        echo "here"
+                    }
+                }
             }
         }
         stage("Deploy"){
