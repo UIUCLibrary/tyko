@@ -13,7 +13,7 @@ class TestProjectMiddlewareEntity:
                 "note_type_id": 1,
                 "text": "dummy"
             }
-        notes_middleware = Mock(spec=middleware.NotestMiddlwareEntity)
+        notes_middleware = Mock(spec=middleware.NotestMiddlewareEntity)
         notes_middleware.get = Mock(return_value=note_detail)
 
         monkeypatch.setattr(
@@ -31,7 +31,7 @@ class TestProjectMiddlewareEntity:
 class TestNotestMiddlewareEntity:
     def test_get_notes_remove_parent_info(self):
         data_provider = Mock()
-        mw = middleware.NotestMiddlwareEntity(data_provider)
+        mw = middleware.NotestMiddlewareEntity(data_provider)
         mw._data_connector.get = Mock(
             return_value={
                 "parent_project_ids": [],

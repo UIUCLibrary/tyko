@@ -23,7 +23,7 @@ if typing.TYPE_CHECKING:
     from tyko import schema
 
 
-class AbsMiddlwareEntity(metaclass=abc.ABCMeta):
+class AbsMiddlewareEntity(metaclass=abc.ABCMeta):
     WRITABLE_FIELDS: List[str] = []
 
     @classmethod
@@ -79,18 +79,14 @@ class Middleware:
         List[Mapping[str, schema.formats.SerializedData]]
     ]:
         formats = self.data_provider.get_formats(serialize=serialize)
-        if serialize:
-            result = jsonify(formats)
-        else:
-            result = formats
-        return result
+        return jsonify(formats) if serialize else formats
 
     def get_formats_by_id(self, id: int) -> flask.Response:
         formats = self.data_provider.get_formats(id=id, serialize=True)
         return jsonify(formats)
 
 
-class ObjectMiddlwareEntity(AbsMiddlwareEntity):
+class ObjectMiddlewareEntity(AbsMiddlewareEntity):
     WRITABLE_FIELDS = [
         "name",
         "barcode",
@@ -240,12 +236,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
             note_id=note_id
         )
 
-        return make_response(
-            jsonify({
-                "object": updated_object
-            }),
-            202
-        )
+        return make_response(jsonify({"object": updated_object}), 202)
 
     def update_note(self, object_id: int, note_id: int) -> flask.Response:
         data = request.get_json()
@@ -282,7 +273,7 @@ class ObjectMiddlwareEntity(AbsMiddlwareEntity):
         )
 
 
-class CollectionMiddlwareEntity(AbsMiddlwareEntity):
+class CollectionMiddlewareEntity(AbsMiddlewareEntity):
     WRITABLE_FIELDS = [
         "collection_name",
         "record_series",
@@ -391,7 +382,7 @@ class CollectionMiddlwareEntity(AbsMiddlwareEntity):
         })
 
 
-class ProjectMiddlewareEntity(AbsMiddlwareEntity):
+class ProjectMiddlewareEntity(AbsMiddlewareEntity):
     WRITABLE_FIELDS = [
         "title",
         "project_code",
@@ -477,12 +468,12 @@ class ProjectMiddlewareEntity(AbsMiddlwareEntity):
             notes: Iterator[Dict[str, Any]],
             project_id,
             object_id,
-            notes_middleware: typing.Optional[AbsMiddlwareEntity] = None
+            notes_middleware: typing.Optional[AbsMiddlewareEntity] = None
     ):
         serialize_notes = []
 
         note_mw = \
-            notes_middleware or NotestMiddlwareEntity(self._data_provider)
+            notes_middleware or NotestMiddlewareEntity(self._data_provider)
 
         for note in notes:
             note_id = note['note_id']
@@ -683,7 +674,7 @@ class ProjectMiddlewareEntity(AbsMiddlwareEntity):
         return serialized_notes
 
 
-class ItemMiddlwareEntity(AbsMiddlwareEntity):
+class ItemMiddlewareEntity(AbsMiddlewareEntity):
     WRITABLE_FIELDS = [
         "name",
         "medusa_uuid",
@@ -840,7 +831,7 @@ class ItemMiddlwareEntity(AbsMiddlwareEntity):
         return jsonify(note)
 
 
-class NotestMiddlwareEntity(AbsMiddlwareEntity):
+class NotestMiddlewareEntity(AbsMiddlewareEntity):
     WRITABLE_FIELDS = [
         "text",
         "note_type_id"

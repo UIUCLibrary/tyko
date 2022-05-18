@@ -8,7 +8,7 @@ from tyko import middleware, data_provider
 
 
 class ObjectItemNotesAPI(views.MethodView):
-    def __init__(self, item: middleware.ItemMiddlwareEntity) -> None:
+    def __init__(self, item: middleware.ItemMiddlewareEntity) -> None:
         self._item = item
 
     def put(self, project_id, object_id, item_id, note_id):  # noqa: E501 pylint: disable=W0613,C0301
@@ -148,7 +148,7 @@ class ObjectItemAPI(views.MethodView):
 
     def delete(self, project_id, object_id):  # noqa: E501  pylint: disable=W0613,C0301
         item_id = int(request.args.get("item_id"))
-        parent_object = middleware.ObjectMiddlwareEntity(self._provider)
+        parent_object = middleware.ObjectMiddlewareEntity(self._provider)
         return parent_object.remove_item(object_id=object_id, item_id=item_id)
 
     def _add_routes_to_files(self, files, item_id, object_id, project_id):

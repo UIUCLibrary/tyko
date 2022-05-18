@@ -202,7 +202,7 @@ class UrlRule:
 
 class NotesAPI(views.MethodView):
     def __init__(self,
-                 notes_middleware: middleware.NotestMiddlwareEntity) -> None:
+                 notes_middleware: middleware.NotestMiddlewareEntity) -> None:
         self._middleware = notes_middleware
 
     def delete(self, note_id: int) -> flask.Response:
@@ -217,7 +217,7 @@ class NotesAPI(views.MethodView):
 
 class CollectionsAPI(views.MethodView):
     def __init__(self,
-                 collection: middleware.CollectionMiddlwareEntity) -> None:
+                 collection: middleware.CollectionMiddlewareEntity) -> None:
 
         self._collection = collection
 
@@ -649,7 +649,7 @@ class Routes:
         )
 
     def get_api_object_routes(self) -> Iterator[UrlRule]:
-        project_object = middleware.ObjectMiddlwareEntity(self.db_engine)
+        project_object = middleware.ObjectMiddlewareEntity(self.db_engine)
 
         yield UrlRule(
             rule="/api/object/<int:object_id>",
@@ -698,7 +698,7 @@ class Routes:
 
     def get_api_item_routes(self) -> Iterator[UrlRule]:
 
-        item = middleware.ItemMiddlwareEntity(self.db_engine)
+        item = middleware.ItemMiddlewareEntity(self.db_engine)
         yield UrlRule(
             "/api/project/<int:project_id>/object/<int:object_id>/item",
             view_func=ObjectItemAPI.as_view(
@@ -827,7 +827,7 @@ class Routes:
         )
 
     def get_api_notes_routes(self) -> Iterator[UrlRule]:
-        notes = middleware.NotestMiddlwareEntity(self.db_engine)
+        notes = middleware.NotestMiddlewareEntity(self.db_engine)
         yield UrlRule(
             "/api/note/<int:note_id>",
             view_func=NotesAPI.as_view(
@@ -855,7 +855,7 @@ class Routes:
         )
 
     def get_api_collection_routes(self) -> Iterator[UrlRule]:
-        collection = middleware.CollectionMiddlwareEntity(self.db_engine)
+        collection = middleware.CollectionMiddlewareEntity(self.db_engine)
         yield UrlRule(
             "/api/collection/<int:collection_id>",
             view_func=CollectionsAPI.as_view(

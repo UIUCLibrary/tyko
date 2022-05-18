@@ -55,7 +55,7 @@ class ProjectObjectAPI(views.MethodView):
 
 class ObjectApi(views.MethodView):
     def __init__(self,
-                 object_middleware: middleware.ObjectMiddlwareEntity) -> None:
+                 object_middleware: middleware.ObjectMiddlewareEntity) -> None:
 
         self._object_middleware = object_middleware
 
@@ -72,7 +72,7 @@ class ObjectApi(views.MethodView):
 class ProjectObjectNotesAPI(views.MethodView):
 
     def __init__(self,
-                 project_object: middleware.ObjectMiddlwareEntity) -> None:
+                 project_object: middleware.ObjectMiddlewareEntity) -> None:
 
         self._project_object = project_object
 
