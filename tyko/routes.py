@@ -167,6 +167,16 @@ FORMAT_ENUM_ROUTES = [
         'film_wind',
         "FilmWind"
     ),
+    (
+        "/api/formats/audio_cassette/subtype",
+        'audio_cassette_subtype',
+        "AudioCassetteSubtype"
+    ),
+    (
+        "/api/formats/audio_cassette/generation",
+        'audio_cassette_generation',
+        "AudioCassetteGeneration"
+    ),
 ]
 
 
