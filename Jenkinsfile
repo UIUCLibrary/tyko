@@ -81,6 +81,7 @@ pipeline {
         timeout(time: 1, unit: 'DAYS')
     }
     parameters {
+        booleanParam(name: 'RUN_CHECKS', defaultValue: true, description: 'Run checks on code')
         booleanParam(
                 name: 'USE_SONARQUBE',
                 defaultValue: defaultParamValues.USE_SONARQUBE,
@@ -99,7 +100,7 @@ pipeline {
               }
             }
             stages{
-                stage('Backing Docs'){
+                stage('Making Docs'){
                     parallel{
                         stage('Javascript Docs'){
                             steps{
@@ -157,6 +158,10 @@ pipeline {
         stage('Code Quality') {
             stages{
                 stage('Testing'){
+                    when{
+                        equals expected: true, actual: params.RUN_CHECKS
+                        beforeAgent true
+                    }
                     agent {
                       dockerfile {
                         filename 'CI/docker/jenkins/Dockerfile'
@@ -447,7 +452,6 @@ pipeline {
                             }
                             when{
                                 equals expected: true, actual: params.USE_SONARQUBE
-                                beforeAgent true
                                 beforeOptions true
                             }
                             steps{
@@ -497,6 +501,7 @@ pipeline {
                 stage("Tox") {
                     when {
                         equals expected: true, actual: params.TEST_RUN_TOX
+                        beforeAgent true
                     }
                     agent {
                         dockerfile {
@@ -541,36 +546,60 @@ pipeline {
                 }
             }
         }
-        stage("Creating Python Packages"){
-            agent {
-                dockerfile {
-                    filename 'CI/docker/jenkins/Dockerfile'
-                    label "linux && docker && x86"
-                }
-            }
-            steps{
-                timeout(10){
-                    sh(script: "python3 -m build")
-                }
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
-                    stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz", name: 'PYTHON_PACKAGES'
-                }
-                unstable {
-                    archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
-                    stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz,", name: 'PYTHON_PACKAGES'
-                }
+        stage('Packaging'){
+            parallel{
+                stage("Creating Python Packages"){
+                    agent {
+                        dockerfile {
+                            filename 'CI/docker/jenkins/Dockerfile'
+                            label "linux && docker && x86"
+                        }
+                    }
+                    steps{
+                        timeout(10){
+                            sh(script: "python3 -m build")
+                        }
+                    }
+                    post {
+                        success {
+                            archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
+                            stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz", name: 'PYTHON_PACKAGES'
+                        }
+                        unstable {
+                            archiveArtifacts artifacts: "dist/*.whl,dist/*.zip,dist/*.tar.gz", fingerprint: true
+                            stash includes: "dist/*.whl,dist/*.zip,dist/*.tar.gz,", name: 'PYTHON_PACKAGES'
+                        }
 
-                cleanup{
-                    cleanWs(
-                        deleteDirs: true,
-                        patterns: [
-                            [pattern: 'dist/', type: 'INCLUDE'],
-                            [pattern: '**/__pycache__/', type: 'INCLUDE'],
-                        ]
-                    )
+                        cleanup{
+                            cleanWs(
+                                deleteDirs: true,
+                                patterns: [
+                                    [pattern: 'dist/', type: 'INCLUDE'],
+                                    [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                                ]
+                            )
+                        }
+                    }
+                }
+                stage('Build Docker Image'){
+                    agent {
+                        label 'linux && docker && x86'
+                    }
+                    environment {
+                        DOCKER_IMAGE_TEMP_NAME = UUID.randomUUID().toString()
+                    }
+                    steps{
+                        script{
+                            docker.build(env.DOCKER_IMAGE_TEMP_NAME, "-f deploy/tyko/Dockerfile .").withRun{ e->
+                                sh "docker inspect ${e.id}"
+                            }
+                        }
+                    }
+                    post{
+                        cleanup{
+                            sh(returnStatus: true, script:"docker image rm ${env.DOCKER_IMAGE_TEMP_NAME}")
+                        }
+                    }
                 }
             }
         }
