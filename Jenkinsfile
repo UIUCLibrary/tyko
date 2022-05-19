@@ -682,6 +682,7 @@ pipeline {
                     post{
                         failure{
                             script{
+                                def configProperties = readProperties(file: CONFIG_FILE)
                                 configFileProvider([configFile(fileId: 'preview_server_props', variable: 'CONFIG_FILE')]) {
                                     docker.withServer(configProperties['docker_url'], configProperties['docker_jenkins_certs']){
                                         sh(script: 'docker ps')
