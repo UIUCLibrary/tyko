@@ -666,8 +666,9 @@ pipeline {
                     steps{
                         configFileProvider([configFile(fileId: 'preview_server_props', variable: 'CONFIG_FILE')]) {
                             script{
+                                def configProperties = readProperties(file: CONFIG_FILE)
                                 def dockerImage = docker.build(DOCKER_IMAGE_NAME, "-f deploy/tyko/Dockerfile .")
-                                docker.withServer(readProperties(file: CONFIG_FILE)['docker_url'], 'avdatabase.library.illinois.edu'){
+                                docker.withServer(configProperties['docker_url'], configProperties['docker_jenkins_certs']){
                                     sh 'docker ps'
 //                                     dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${PORT}")
                                 }
