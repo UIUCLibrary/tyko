@@ -469,6 +469,7 @@ pipeline {
                                         credentialsId: 'sonarcloud-token',
                                         projectVersion: props.Version
                                     )
+                                    milestone label: 'sonarcloud'
 //                                     load('ci/jenkins/scripts/sonarqube.groovy').sonarcloudSubmit('reports/sonar-report.json', 'sonarcloud-token')
                                 }
                             }
@@ -604,9 +605,9 @@ pipeline {
                 }
             }
         }
-        stage("Deploy"){
+        stage('Deploy'){
             options{
-                lock("tyko-deploy")
+                lock('tyko-deploy')
             }
             parallel{
                 stage('Deploy Online Documentation') {
@@ -747,7 +748,6 @@ pipeline {
                             }
                         }
                         stage("Deploying New Production Server"){
-
                             steps{
                                 unstash 'PYTHON_PACKAGES'
                                 unstash 'SERVER_DEPLOY_FILES'
@@ -782,6 +782,13 @@ pipeline {
                                 }
                             }
                         }
+                    }
+                }
+            }
+            post{
+                always{
+                    script{
+                        milestone label: 'deploy'
                     }
                 }
             }
