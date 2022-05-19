@@ -654,7 +654,6 @@ pipeline {
                         parameters {
                             string defaultValue: 'tyko:preview', name: 'DOCKER_IMAGE_NAME'
                             string defaultValue: 'tyko_preview', name: 'CONTAINER_NAME'
-                            string defaultValue: '9182', name: 'PORT'
                         }
                     }
 
@@ -667,14 +666,14 @@ pipeline {
                         configFileProvider([configFile(fileId: 'preview_server_props', variable: 'CONFIG_FILE')]) {
                             script{
                                 def configProperties = readProperties(file: CONFIG_FILE)
-                                def dockerImage = docker.build(DOCKER_IMAGE_NAME, "-f deploy/tyko/Dockerfile .")
+                                def dockerImage = docker.build(DOCKER_IMAGE_NAME, '-f deploy/tyko/Dockerfile .')
                                 docker.withServer(configProperties['docker_url'], configProperties['docker_jenkins_certs']){
                                     sh(returnStatus: true,
                                        script: """docker stop ${CONTAINER_NAME}
                                                   docker rm ${CONTAINER_NAME}
                                                   """
                                        )
-                                    dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${PORT}")
+                                    dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${configProperties['exposed_port']}")
                                 }
                             }
                         }
