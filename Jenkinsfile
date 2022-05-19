@@ -669,8 +669,8 @@ pipeline {
                                 def configProperties = readProperties(file: CONFIG_FILE)
                                 def dockerImage = docker.build(DOCKER_IMAGE_NAME, "-f deploy/tyko/Dockerfile .")
                                 docker.withServer(configProperties['docker_url'], configProperties['docker_jenkins_certs']){
-                                    sh 'docker ps'
-//                                     dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${PORT}")
+                                    sh(returnStatus: true, script: "docker stop ${CONTAINER_NAME}")
+                                    dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${PORT}")
                                 }
                             }
                         }
