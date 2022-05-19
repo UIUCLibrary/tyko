@@ -666,8 +666,8 @@ pipeline {
                     steps{
                         configFileProvider([configFile(fileId: 'docker_props', variable: 'CONFIG_FILE')]) {
                             script{
-                                def dockerImage = docker.build(DOCKER_IMAGE_NAME, "-f deploy/tyko/Dockerfile .")
-                                docker.withServer(readProperties(file: CONFIG_FILE)['docker_url'], "DOCKER_TYKO"){
+                                docker.withServer(readProperties(file: CONFIG_FILE)['docker_url'], 'avdatabase.library.illinois.edu'){
+                                    def dockerImage = docker.build(DOCKER_IMAGE_NAME, "-f deploy/tyko/Dockerfile .")
                                     dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${PORT}")
                                 }
                             }
