@@ -664,11 +664,12 @@ pipeline {
                         beforeInput true
                     }
                     steps{
-                        configFileProvider([configFile(fileId: 'docker_props', variable: 'CONFIG_FILE')]) {
+                        configFileProvider([configFile(fileId: 'preview_server_props', variable: 'CONFIG_FILE')]) {
                             script{
                                 def dockerImage = docker.build(DOCKER_IMAGE_NAME, "-f deploy/tyko/Dockerfile .")
                                 docker.withServer(readProperties(file: CONFIG_FILE)['docker_url'], 'avdatabase.library.illinois.edu'){
-                                    dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${PORT}")
+                                    sh 'docker ps'
+//                                     dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${PORT}")
                                 }
                             }
                         }
