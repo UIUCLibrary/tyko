@@ -678,6 +678,18 @@ pipeline {
                             }
                         }
                     }
+                    post{
+                        failure{
+                            script{
+                                configFileProvider([configFile(fileId: 'preview_server_props', variable: 'CONFIG_FILE')]) {
+                                    docker.withServer(configProperties['docker_url'], configProperties['docker_jenkins_certs']){
+                                        sh(script: 'docker ps')
+                                        sh(script: 'docker images')
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 stage("Deploy Server"){
                     agent {
