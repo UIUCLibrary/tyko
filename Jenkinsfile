@@ -671,8 +671,9 @@ pipeline {
                                 docker.withServer(configProperties['docker_url'], configProperties['docker_jenkins_certs']){
                                     sh(script: "docker ps")
                                     sh(returnStatus: true, script: "docker stop ${CONTAINER_NAME}")
-                                    sh(returnStatus: true, script: "docker wait ${CONTAINER_NAME}")
-                                    sh(script: "docker ps")
+                                    sh(returnStatus: true, script: "docker rm ${CONTAINER_NAME}")
+//                                     sh(returnStatus: true, script: "docker wait ${CONTAINER_NAME}")
+                                    sh(script: "docker ps --all")
                                     dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${PORT}")
                                 }
                             }
