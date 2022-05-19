@@ -87,10 +87,10 @@ pipeline {
                 defaultValue: defaultParamValues.USE_SONARQUBE,
                 description: 'Send data test data to SonarQube'
             )
-        booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: "Run Tox Tests")
+        booleanParam(name: "TEST_RUN_TOX", defaultValue: false, description: 'Run Tox Tests')
         booleanParam(name: 'DEPLOY_DOCS', defaultValue: false, description: 'Update online documentation')
-        booleanParam(name: "DEPLOY_PREVIEW_SERVER", defaultValue: false, description: 'Deploy to preview server')
-        booleanParam(name: "DEPLOY_SERVER", defaultValue: false, description: "Deploy server software to server")
+        booleanParam(name: 'DEPLOY_PREVIEW_SERVER', defaultValue: false, description: 'Deploy to preview server')
+        booleanParam(name: 'DEPLOY_PRODUCTION_SERVER', defaultValue: false, description: 'Deploy server software to server')
     }
     stages {
         stage('Documentation'){
@@ -697,16 +697,16 @@ pipeline {
                         }
                     }
                 }
-                stage("Deploy Server"){
+                stage('Deploy Production Server'){
                     agent {
-                        label "!aws"
+                        label '!aws'
                     }
                     options {
                         skipDefaultCheckout true
                         retry(3)
                     }
                     when{
-                        equals expected: true, actual: params.DEPLOY_SERVER
+                        equals expected: true, actual: params.DEPLOY_PRODUCTION_SERVER
                         beforeInput true
                     }
                     input {
@@ -720,7 +720,7 @@ pipeline {
                       }
                     }
                     stages{
-                        stage("Backing up database"){
+                        stage('Backing up database'){
                             steps{
                                 script{
                                     def remote = [:]
@@ -749,8 +749,8 @@ pipeline {
                         stage("Deploying New Production Server"){
 
                             steps{
-                                unstash "PYTHON_PACKAGES"
-                                unstash "SERVER_DEPLOY_FILES"
+                                unstash 'PYTHON_PACKAGES'
+                                unstash 'SERVER_DEPLOY_FILES'
                                 script{
                                     def remote = [:]
 
