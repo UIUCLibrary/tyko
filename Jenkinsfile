@@ -684,9 +684,14 @@ pipeline {
                             script{
                                 configFileProvider([configFile(fileId: 'preview_server_props', variable: 'CONFIG_FILE')]) {
                                     def configProperties = readProperties(file: CONFIG_FILE)
-                                    docker.withServer(configProperties['docker_url'], configProperties['docker_jenkins_certs']){
-                                        sh(script: 'docker ps')
-                                        sh(script: 'docker images')
+                                    docker.withServer(
+                                        configProperties['docker_url'],
+                                        configProperties['docker_jenkins_certs']
+                                        ){
+                                            sh(label: 'Retrieving info about Docker server',
+                                               script: '''docker ps --all
+                                                          docker images
+                                                       ''')
                                     }
                                 }
                             }
