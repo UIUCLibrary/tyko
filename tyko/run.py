@@ -10,15 +10,15 @@ import tyko
 import tyko.data_provider
 import tyko.routes
 
-from .database import init_database, create_samples
+from .database import init_database, create_samples, db as db
 from .exceptions import DataError, NoTable
 from .schema import ALEMBIC_VERSION
 
 
-def is_correct_db_version(app, database) -> bool:
+def is_correct_db_version(app, engine) -> bool:
     try:
         version = tyko.data_provider.get_schema_version(
-            db_engine=database.get_engine()
+            db_engine=engine
         )
 
         if version is None:
@@ -51,14 +51,14 @@ def create_app(
     app.register_error_handler(DataError, handle_error)
 
     app.logger.info("Configuring database")
-    database = SQLAlchemy(app, engine_options={"pool_pre_ping": True})
-    engine = database.get_engine()
+    db.init_app(app)
+    engine = db.get_engine(app)
 
     app.logger.info("Loading database connection")
     tyko_data_provider = tyko.data_provider.DataProvider(engine)
 
     app.logger.info("Checking database schema version")
-    if verify_db is True and not is_correct_db_version(app, database):
+    if verify_db is True and not is_correct_db_version(app, engine):
         app.logger.critical(f"Database requires alembic version "
                             f"{ALEMBIC_VERSION}. Please migrate or initialize "
                             f"database and try again.")
@@ -84,8 +84,9 @@ def main() -> None:
         my_app = Flask(__name__)
         my_app.config.from_object("tyko.config.Config")
         my_app.config.from_envvar("TYKO_SETTINGS", True)
-        database = SQLAlchemy(my_app)
-        data_provider = tyko.data_provider.DataProvider(database.engine)
+        db.init_app(my_app)
+        engine = db.get_engine(my_app)
+        data_provider = tyko.data_provider.DataProvider(engine)
         my_app.logger.info("Initializing Database")  # pylint: disable=E1101
         init_database(data_provider.db_engine)
         if "--create-samples" in sys.argv:

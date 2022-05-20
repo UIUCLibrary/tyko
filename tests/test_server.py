@@ -424,7 +424,7 @@ def test_db_version_test_valid():
     db.session.execute(version_table.insert().values(
         version_num=schema.ALEMBIC_VERSION))
     db.session.commit()
-    assert is_correct_db_version(app, db) is True
+    assert is_correct_db_version(app, db.engine) is True
 
 
 def test_is_correct_db_version_no_table():
@@ -433,8 +433,9 @@ def test_is_correct_db_version_no_table():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db = SQLAlchemy(app)
+    engine = db.get_engine(app)
     with pytest.raises(tyko.exceptions.NoTable):
-        is_correct_db_version(app, db)
+        is_correct_db_version(app, engine)
 
 
 def test_db_version_test_different():
@@ -452,7 +453,7 @@ def test_db_version_test_different():
     db.session.execute(version_table.insert().values(
         version_num="notvalid"))
     db.session.commit()
-    assert is_correct_db_version(app, db) is False
+    assert is_correct_db_version(app, db.engine) is False
 
 
 def test_db_version_test_no_data():
@@ -468,4 +469,4 @@ def test_db_version_test_no_data():
     )
     db.metadata.create_all(db.engine)
     db.session.commit()
-    assert is_correct_db_version(app, db) is False
+    assert is_correct_db_version(app, db.engine) is False

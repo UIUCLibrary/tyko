@@ -1,17 +1,18 @@
 import sys
 from typing import Tuple, Any, Type, List, TypedDict, Union, Mapping, cast
-
-import sqlalchemy as db
+from flask_sqlalchemy import SQLAlchemy
+import sqlalchemy
 import sqlalchemy.orm
 from sqlalchemy.orm.session import sessionmaker
 
 import tyko.schema.avtables
+
 from tyko import schema
 from .schema import formats
 from .schema import notes
 from .schema import projects
 
-
+db = SQLAlchemy()
 TykoEnumData = TypedDict('TykoEnumData', {'name': str, 'id': int})
 
 
@@ -29,7 +30,7 @@ def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
     new_collection = schema.Collection()
     new_collection.collection_name = \
         cast(
-            db.Column[db.Text],
+            sqlalchemy.Column[sqlalchemy.Text],
             "sample collection"
         )
     session.add(new_collection)
@@ -91,9 +92,13 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
     initial_session = sessionmaker(bind=engine)
     session: sqlalchemy.orm.Session = initial_session()
     if not alembic_table_exists(engine):
-        version_table = db.Table(
+        version_table = sqlalchemy.Table(
             "alembic_version", tyko.schema.avtables.AVTables.metadata,
-            db.Column("version_num", db.String(length=32), primary_key=True)
+            sqlalchemy.Column(
+                "version_num",
+                sqlalchemy.String(length=32),
+                primary_key=True
+            )
         )
         tyko.schema.avtables.AVTables.metadata.create_all(bind=engine)
         set_version_sql = \
@@ -229,7 +234,7 @@ def validate_tables(engine: sqlalchemy.engine.Engine) -> bool:
 
     existing_tables = {
         table_name for table_name in
-        db.inspect(engine).get_table_names()
+        sqlalchemy.inspect(engine).get_table_names()
         if table_name not in tables_to_discard
     }
     for table in existing_tables:
