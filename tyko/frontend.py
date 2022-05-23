@@ -20,6 +20,11 @@ from .views.object_item import ObjectItemAPI
 if TYPE_CHECKING:
     from tyko.data_provider import DataProvider
 
+END_POINT_PAGE_ITEM_DETAILS = "site.page_project_object_item_details"
+END_POINT_PAGE_PROJECT_DETAILS = "site.page_project_details"
+END_POINT_PAGE_OBJECT_DETAILS = "site.page_project_object_details"
+END_POINT_PAGE_COLLECTION_DETAILS = "site.page_collection_details"
+
 
 @dataclass
 class FormField:
@@ -296,7 +301,7 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
             breadcrumbs=self.build_breadcrumbs(
                 active_level="Project",
                 project_url=url_for(
-                    "site.page_project_details",
+                    END_POINT_PAGE_PROJECT_DETAILS,
                     project_id=entity_id
                 )
             ),
@@ -372,11 +377,11 @@ class ItemFrontend(ProjectComponentDetailFrontend):
         if "show_bread_crumb" in kwargs and kwargs['show_bread_crumb'] is True:
             breadcrumbs = self.build_breadcrumbs(
                 active_level="Item",
-                project_url=url_for("site.page_project_details",
+                project_url=url_for(END_POINT_PAGE_PROJECT_DETAILS,
                                     project_id=kwargs["project_id"]
                                     ) if "project_id" in kwargs else None,
                 item_url="",
-                object_url=url_for("site.page_project_object_details",
+                object_url=url_for(END_POINT_PAGE_OBJECT_DETAILS,
                                    project_id=kwargs["project_id"],
                                    object_id=selected_item['parent_object_id'])
             )
@@ -470,7 +475,7 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
 
                 selected_object['collection_url'] =\
                     url_for(
-                        'site.page_collection_details',
+                        END_POINT_PAGE_COLLECTION_DETAILS,
                         collection_id=collection_id
                     )
 
@@ -500,11 +505,11 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
             breadcrumbs = self.build_breadcrumbs(
                 "Object",
                 project_url=url_for(
-                    "site.page_project_details",
+                    END_POINT_PAGE_PROJECT_DETAILS,
                     project_id=selected_object['parent_project_id']
                 ),
                 object_url=url_for(
-                    "site.page_project_object_details",
+                    END_POINT_PAGE_OBJECT_DETAILS,
                     project_id=selected_object['parent_project_id'],
                     object_id=selected_object['object_id']
                 )
@@ -643,16 +648,16 @@ class FileDetailsFrontend:
         breadcrumbs = self.build_breadcrumbs(
             "File",
             project_url=url_for(
-                "site.page_project_details",
+                END_POINT_PAGE_PROJECT_DETAILS,
                 project_id=project_id
             ),
             object_url=url_for(
-                "site.page_project_object_details",
+                END_POINT_PAGE_OBJECT_DETAILS,
                 project_id=project_id,
                 object_id=object_id
             ),
             item_url=url_for(
-                "site.page_project_object_item_details",
+                END_POINT_PAGE_ITEM_DETAILS,
                 project_id=project_id,
                 object_id=object_id,
                 item_id=item_id
