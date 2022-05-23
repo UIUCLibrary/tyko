@@ -4,7 +4,7 @@
     {{ list_header("Collections") }}
     {{
         list_table(
-            url_for("collections"),
+            url_for("api.collections"),
             "collections",
             table_columns=[
                     {
@@ -25,7 +25,7 @@
     }}
 <script>
     function collectionFormatter(value, row) {
-        return '<a href="{{ url_for("page_collections") }}/'+row.collection_id +'">' + value + "</a>";
+        return '<a href="{{ url_for("site.page_collections") }}/'+row.collection_id +'">' + value + "</a>";
     }
 </script>
 {% endblock %}

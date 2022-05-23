@@ -514,20 +514,10 @@ pipeline {
                     steps {
                         timeout(10){
                             sh "mkdir -p logs"
-                            script{
-                                try{
-                                    sh (
-                                        label: "Run Tox",
-                                        script: "tox --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
-                                    )
-
-                                } catch (exc) {
-                                    sh(
-                                        label: "Run Tox with new environments",
-                                        script: "tox --recreate --parallel=auto --parallel-live --workdir .tox -vv --result-json=logs/tox_report.json"
-                                    )
-                                }
-                            }
+                            sh (
+                                label: 'Run Tox',
+                                script: 'tox --parallel=auto --parallel-live --workdir .tox -vv'
+                            )
                         }
                     }
                     post {

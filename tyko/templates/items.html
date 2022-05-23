@@ -36,7 +36,7 @@
             return x.join(" ");
         }
         function itemFormatter(value, row) {
-            return '<a href="{{ url_for("page_item") }}/'+row.item_id +'">' + value + "</a>";
+            return '<a href="{{ url_for("site.page_item") }}/'+row.item_id +'">' + value + "</a>";
         }
     </script>
 {% endblock %}

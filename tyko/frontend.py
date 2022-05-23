@@ -20,6 +20,11 @@ from .views.object_item import ObjectItemAPI
 if TYPE_CHECKING:
     from tyko.data_provider import DataProvider
 
+END_POINT_PAGE_ITEM_DETAILS = "site.page_project_object_item_details"
+END_POINT_PAGE_PROJECT_DETAILS = "site.page_project_details"
+END_POINT_PAGE_OBJECT_DETAILS = "site.page_project_object_details"
+END_POINT_PAGE_COLLECTION_DETAILS = "site.page_collection_details"
+
 
 @dataclass
 class FormField:
@@ -244,7 +249,7 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
 
     def list(self):
         return self.render_page(template="projects.html",
-                                api_path="api/project",
+                                api_path=url_for('api.projects'),
                                 )
 
     @property
@@ -268,7 +273,7 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
                 "text": status.name
             } for status in self._data_connector.get_all_project_status()
         ]
-        edit_link = f"{url_for('page_projects')}/{entity_id}/edit"
+        edit_link = f"{url_for('site.page_projects')}/{entity_id}/edit"
 
         fields = [
             Details(name="Title", key="title", editable=True),
@@ -287,7 +292,7 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
         return self.render_page(
             template="project_details.html",
             project=selected_project,
-            api_path=f"{url_for('.page_index')}api/project/{entity_id}",
+            api_path=url_for('api.project', project_id=entity_id),
             edit_link=edit_link,
             project_id=entity_id,
             valid_note_types=valid_note_types,
@@ -296,7 +301,7 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
             breadcrumbs=self.build_breadcrumbs(
                 active_level="Project",
                 project_url=url_for(
-                    "page_project_details",
+                    END_POINT_PAGE_PROJECT_DETAILS,
                     project_id=entity_id
                 )
             ),
@@ -313,7 +318,7 @@ class ProjectFrontend(ProjectComponentDetailFrontend):
             } for status in self._data_connector.get_all_project_status()
         ]
         return self.render_page(template="new_project.html",
-                                api_path="/api/project/",
+                                api_path=url_for('api.add_project'),
                                 title="New Project",
                                 project_status_options=project_status,
                                 on_success_redirect_base="/project/",
@@ -372,11 +377,11 @@ class ItemFrontend(ProjectComponentDetailFrontend):
         if "show_bread_crumb" in kwargs and kwargs['show_bread_crumb'] is True:
             breadcrumbs = self.build_breadcrumbs(
                 active_level="Item",
-                project_url=url_for("page_project_details",
+                project_url=url_for(END_POINT_PAGE_PROJECT_DETAILS,
                                     project_id=kwargs["project_id"]
                                     ) if "project_id" in kwargs else None,
                 item_url="",
-                object_url=url_for("page_project_object_details",
+                object_url=url_for(END_POINT_PAGE_OBJECT_DETAILS,
                                    project_id=kwargs["project_id"],
                                    object_id=selected_item['parent_object_id'])
             )
@@ -395,7 +400,7 @@ class ItemFrontend(ProjectComponentDetailFrontend):
             fields=fields,
             breadcrumbs=breadcrumbs,
             show_bread_crumb=kwargs.get('show_bread_crumb'),
-            api_path=url_for("item", item_id=entity_id),
+            api_path=url_for("api.item", item_id=entity_id),
             item=selected_item)
 
     @property
@@ -468,10 +473,11 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
             collection_id = selected_object['collection'].get('collection_id')
             if collection_id is not None:
 
-                collection_url = \
-                    f"{url_for('page_collections')}/{collection_id}"
-
-                selected_object['collection_url'] = collection_url
+                selected_object['collection_url'] =\
+                    url_for(
+                        END_POINT_PAGE_COLLECTION_DETAILS,
+                        collection_id=collection_id
+                    )
 
             collection_name = \
                 selected_object['collection'].get('collection_name')
@@ -499,11 +505,11 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
             breadcrumbs = self.build_breadcrumbs(
                 "Object",
                 project_url=url_for(
-                    "page_project_details",
+                    END_POINT_PAGE_PROJECT_DETAILS,
                     project_id=selected_object['parent_project_id']
                 ),
                 object_url=url_for(
-                    "page_project_object_details",
+                    END_POINT_PAGE_OBJECT_DETAILS,
                     project_id=selected_object['parent_project_id'],
                     object_id=selected_object['object_id']
                 )
@@ -515,12 +521,12 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
 
         if selected_object['parent_project_id'] is not None:
             api_route = url_for(
-                "project_object",
+                "api.project_object",
                 project_id=selected_object['parent_project_id'],
                 object_id=entity_id
             )
         else:
-            api_route = url_for('object', object_id=entity_id)
+            api_route = url_for('api.object', object_id=entity_id)
 
         return self.render_page(
             template="object_details.html",
@@ -585,7 +591,7 @@ class CollectionFrontend(FrontendEntity):
         return self.render_page(template="collection_details.html",
                                 itemType="Collection",
                                 api_path=url_for(
-                                    "collection", collection_id=entity_id),
+                                    "api.collection", collection_id=entity_id),
                                 collection=selected_object)
 
     @property
@@ -598,7 +604,7 @@ class CollectionFrontend(FrontendEntity):
 
     @property
     def entity_list_page_name(self) -> str:
-        return "page_collections"
+        return "site.page_collections"
 
 
 class NewCollectionForm(AbsFrontend):
@@ -642,16 +648,16 @@ class FileDetailsFrontend:
         breadcrumbs = self.build_breadcrumbs(
             "File",
             project_url=url_for(
-                "page_project_details",
+                END_POINT_PAGE_PROJECT_DETAILS,
                 project_id=project_id
             ),
             object_url=url_for(
-                "page_project_object_details",
+                END_POINT_PAGE_OBJECT_DETAILS,
                 project_id=project_id,
                 object_id=object_id
             ),
             item_url=url_for(
-                "page_project_object_item_details",
+                END_POINT_PAGE_ITEM_DETAILS,
                 project_id=project_id,
                 object_id=object_id,
                 item_id=item_id
@@ -659,7 +665,7 @@ class FileDetailsFrontend:
             file_url="#"
         )
         file_details = self._data_connector.get(file_id, serialize=True)
-        edit_api_path = url_for("item_files",
+        edit_api_path = url_for("api.item_files",
                                 project_id=project_id,
                                 object_id=object_id,
                                 item_id=item_id,

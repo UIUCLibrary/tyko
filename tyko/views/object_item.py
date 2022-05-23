@@ -81,12 +81,13 @@ class ObjectItemAPI(views.MethodView):
                 {
                     "item": new_item,
                     'routes': {
-                        "frontend": url_for("page_project_object_item_details",
-                                            object_id=object_id,
-                                            project_id=project_id,
-                                            item_id=new_item['item_id']
-                                            ),
-                        "api": url_for("object_item",
+                        "frontend":
+                            url_for("site.page_project_object_item_details",
+                                    object_id=object_id,
+                                    project_id=project_id,
+                                    item_id=new_item['item_id']
+                                    ),
+                        "api": url_for("api.object_item",
                                        object_id=object_id,
                                        project_id=project_id,
                                        item_id=new_item['item_id']
@@ -139,7 +140,7 @@ class ObjectItemAPI(views.MethodView):
                         project_id) -> Dict[str, str]:
 
         return {
-            "api": url_for("item_notes",
+            "api": url_for("api.item_notes",
                            note_id=note['note_id'],
                            item_id=item_id,
                            object_id=object_id,
@@ -156,7 +157,7 @@ class ObjectItemAPI(views.MethodView):
         for file_entry in files:
             updated_file_entry = file_entry.copy()
             updated_file_entry['routes'] = {
-                "api": url_for("item_files",
+                "api": url_for("api.item_files",
                                item_id=item_id,
                                object_id=object_id,
                                project_id=project_id,
@@ -234,12 +235,12 @@ class ItemAPI(views.MethodView):
 
             for file in item['files']:
                 file['routes'] = {
-                    "frontend": url_for("page_file_details",
+                    "frontend": url_for("site.page_file_details",
                                         item_id=item['item_id'],
                                         object_id=item['parent_object_id'],
                                         project_id=parent_project,
                                         file_id=file["id"]),
-                    "api": url_for("item_files",
+                    "api": url_for("api.item_files",
                                    item_id=item['item_id'],
                                    object_id=item['parent_object_id'],
                                    project_id=parent_project, id=file["id"])

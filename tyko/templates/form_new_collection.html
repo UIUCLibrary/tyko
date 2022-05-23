@@ -23,7 +23,7 @@
                                 data[formData[i].name] = formData[i].value;
                             }
                             console.log(data);
-                            collections.new("{{ url_for('add_collection') }}", data)
+                            collections.new("{{ url_for('api.add_collection') }}", data)
                                 .then((result)=>{
                                     window.location.href = JSON.parse(result)["frontend_url"];
                                 }).catch((response)=>{

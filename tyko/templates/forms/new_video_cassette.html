@@ -25,7 +25,7 @@
 <div class="mb-3 row">
     <label for="videoCassetteCassetteType" class="col-sm-2 col-form-label">Cassette Type</label>
     <div class="col-sm-10">
-        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('video_cassette_cassette_type') }}" name="cassetteTypeId" id="videoCassetteCassetteType">
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('api.video_cassette_cassette_type') }}" name="cassetteTypeId" id="videoCassetteCassetteType">
             <option disabled selected value=""></option>
         </select>
     </div>
@@ -52,7 +52,7 @@
 <div class="mb-3 row">
     <label for="videoCassetteGeneration" class="col-sm-2 col-form-label">Generation</label>
     <div class="col-sm-10">
-        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('video_cassette_generations') }}" name="generationId" id="videoCassetteGeneration">
+        <select class="form-select tyko tyko-enum-dynamic" data-enum-url="{{ url_for('api.video_cassette_generations') }}" name="generationId" id="videoCassetteGeneration">
             <option value=""></option>
         </select>
     </div>

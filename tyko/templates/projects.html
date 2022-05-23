@@ -5,7 +5,7 @@
     {% call list_table_toolbar() %}
         <button id="add"
             type="button"
-            onclick="window.location.href='{{url_for("page_project_new")}}'"
+            onclick="window.location.href='{{url_for("site.page_project_new")}}'"
             class="btn btn-primary">Create</button>
     {% endcall %}
     {{
@@ -31,7 +31,7 @@
     }}
 <script>
     function formatter(value, row) {
-        return '<a href="{{ url_for("page_projects") }}/'+row.project_id +'">' + value + "</a>";
+        return '<a href="{{ url_for("site.page_projects") }}/'+row.project_id +'">' + value + "</a>";
     }
 </script>
 {% endblock %}

@@ -9,9 +9,9 @@ from flask import url_for
 @pytest.fixture()
 def project(app):
     with app.test_client() as server:
-        # create_project_page = server.get("/project/create/")
+        server.get("/")
         return server.post(
-            "/api/project/",
+            url_for('api.projects'),
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -28,11 +28,14 @@ def namer(*args, **kwargs):
 @pytest.fixture()
 def dummy_object(app, project):
     with app.test_client() as server:
-        server.get("/project/create/")
+        server.get("/")
+
+        server.get(url_for('site.page_project_new'))
+        # server.get("/project/create/")
         project_id = project['id']
 
         return server.post(
-            url_for("project_add_object", project_id=project_id),
+            url_for("api.project_add_object", project_id=project_id),
             data=json.dumps(
                 {
                     "name": "my stupid object",
@@ -1735,14 +1738,14 @@ def test_create_new_item(
         server.get("/")
         post_results = server.post(
             url_for(
-                "object_new_item",
+                "site.object_new_item",
                 project_id=project['id'],
                 object_id=dummy_object['object']['object_id']
             ),
             data=post_data
         )
         get_result = server.get(
-            url_for('item', item_id=post_results.get_json()['item_id'])
+            url_for('api.item', item_id=post_results.get_json()['item_id'])
         )
         item = get_result.get_json()['item']
 

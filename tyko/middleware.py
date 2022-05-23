@@ -123,13 +123,13 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
             for item in current_object['items']:
                 item['routes'] = {
                     "api": url_for(
-                        'object_item',
+                        'api.object_item',
                         item_id=item['item_id'],
                         object_id=id,
                         project_id=current_object['parent_project_id']
                     ),
                     "frontend": url_for(
-                        'page_project_object_item_details',
+                        'site.page_project_object_item_details',
                         item_id=item['item_id'],
                         object_id=id,
                         project_id=current_object['parent_project_id']
@@ -202,7 +202,7 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
         )
         return jsonify({
             "id": new_object_id,
-            "url": url_for("object", object_id=new_object_id)
+            "url": url_for("api.object", object_id=new_object_id)
         })
 
     def add_note(self, project_id, object_id):  # pylint: disable=W0613
@@ -360,10 +360,11 @@ class CollectionMiddlewareEntity(AbsMiddlewareEntity):
         return jsonify(
             {
                 "id": new_collection_id,
-                "url": url_for("collection", collection_id=new_collection_id),
+                "url":
+                    url_for("api.collection", collection_id=new_collection_id),
                 "frontend_url":
                     url_for(
-                        "page_collection_details",
+                        "site.page_collection_details",
                         collection_id=new_collection_id
                     )
             }
@@ -435,13 +436,13 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
                 obj['routes'] = {
                     "frontend":
                         url_for(
-                            "page_project_object_details",
+                            "site.page_project_object_details",
                             project_id=id,
                             object_id=obj['object_id']
                         ),
                     "api":
                         url_for(
-                            "project_object",
+                            "api.project_object",
                             project_id=id,
                             object_id=obj['object_id']
                         )
@@ -475,7 +476,7 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
             serialize_note["route"] = {
                 'api':
                     url_for(
-                        "object_notes",
+                        "api.object_notes",
                         note_id=note_id,
                         object_id=object_id,
                         project_id=project_id
@@ -547,7 +548,7 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
         return jsonify(
             {
                 "id": new_project_id,
-                "url": url_for("project", project_id=new_project_id)
+                "url": url_for("api.project", project_id=new_project_id)
             }
         )
 
@@ -649,7 +650,7 @@ class ProjectMiddlewareEntity(AbsMiddlewareEntity):
         for note in notes.copy():
             note["route"] = {
                 'api': url_for(
-                    "project_notes",
+                    "api.project_notes",
                     note_id=note['note_id'],
                     project_id=project_id
                 )
@@ -782,7 +783,7 @@ class ItemMiddlewareEntity(AbsMiddlewareEntity):
         return jsonify(
             {
                 "id": new_item['item_id'],
-                "url": url_for("item", item_id=new_item['item_id'])
+                "url": url_for("api.item", item_id=new_item['item_id'])
             }
         )
 
@@ -833,13 +834,13 @@ class NotestMiddlewareEntity(AbsMiddlewareEntity):
         parent_routes = []
 
         for pid in source.get('parent_project_ids', []):
-            parent_routes.append(f"{url_for('projects')}/{pid}")
+            parent_routes.append(f"{url_for('api.projects')}/{pid}")
 
         for pid in source.get('parent_object_ids', []):
-            parent_routes.append(f"{url_for('object')}/{pid}")
+            parent_routes.append(f"{url_for('api.object')}/{pid}")
 
         for pid in source.get('parent_item_ids', []):
-            parent_routes.append(f"{url_for('item')}/{pid}")
+            parent_routes.append(f"{url_for('api.item')}/{pid}")
 
         newone['parents'] = parent_routes
         return newone
@@ -921,7 +922,7 @@ class NotestMiddlewareEntity(AbsMiddlewareEntity):
         return jsonify(
             {
                 "id": new_note_id,
-                "url": url_for("note", note_id=new_note_id)
+                "url": url_for("api.note", note_id=new_note_id)
             }
         )
 

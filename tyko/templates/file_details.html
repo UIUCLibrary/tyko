@@ -74,7 +74,7 @@
 <script type="module">
     import {routes} from "{{ url_for('static', filename="js/api.js") }}"
     import {requests} from "{{ url_for('static', filename="js/request.js") }}"
-    const all_routes = routes.all_routes("{{ url_for('list_routes') }}");
+    const all_routes = routes.all_routes("{{ url_for('api.list_routes') }}");
     const file_id = {{ file['id'] }};
 
     function get_file_annotation_route(routes, file_id, annotationId) {
@@ -175,7 +175,7 @@
 
 
 </script>
-    {{ dialog.editFileAnnotation("editAnnotationsModal", url_for('file_annotation_types')) }}
+    {{ dialog.editFileAnnotation("editAnnotationsModal", url_for('api.file_annotation_types')) }}
     {{ dialog.confirmRemoveAnnotation("removeAnnotationsModal") }}
     {% call widgets.card("Notes", "my-1")  %}
             <ul id="notesList" class="list-group list-group-flush">
@@ -218,7 +218,7 @@
                                                             {% endautoescape %}
                                                             {{note['id'] }}),
                                                         "file": Notes.fileData({{ note['file_id'] }}),
-                                                        "request": Notes.requestData("edit", "{{ url_for('file_notes', file_id=note['file_id'], id=note['id'])}}")
+                                                        "request": Notes.requestData("edit", "{{ url_for('api.file_notes', file_id=note['file_id'], id=note['id'])}}")
                                                     }
                                                 })
                                         )
@@ -233,7 +233,7 @@
                                                             {% endautoescape %}
                                                             {{note['id'] }}),
                                                         "file": Notes.fileData({{ note['file_id'] }}),
-                                                        "request": Notes.requestData("remove", "{{ url_for('file_notes', file_id=note['file_id'], id=note['id'])}}")
+                                                        "request": Notes.requestData("remove", "{{ url_for('api.file_notes', file_id=note['file_id'], id=note['id'])}}")
                                                     }
                                                 })
                                         )
@@ -326,7 +326,7 @@
 
                     modal.data['request'] = Notes.requestData(
                         "create",
-                        "{{ url_for('file_notes', file_id=file['id'] ) }}"
+                        "{{ url_for('api.file_notes', file_id=file['id'] ) }}"
                     );
 
                     modal.data['note'] = Notes.noteData(null, null);

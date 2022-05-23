@@ -19,7 +19,7 @@ class ProjectObjectAPI(views.MethodView):
                 for note in project_object.get('notes', []):
                     note['route'] = {
                         "api": url_for(
-                            'object_notes',
+                            'api.object_notes',
                             project_id=project_id,
                             object_id=object_id,
                             note_id=note['note_id']
@@ -36,13 +36,13 @@ class ProjectObjectAPI(views.MethodView):
     def _add_item_routes(self, item, object_id, project_id):
         return {
             "frontend": url_for(
-                "page_project_object_item_details",
+                "site.page_project_object_item_details",
                 project_id=project_id,
                 object_id=object_id,
                 item_id=item['item_id']
             ),
             "api": url_for(
-                "object_item",
+                "api.object_item",
                 project_id=project_id,
                 object_id=object_id,
                 item_id=item['item_id']
