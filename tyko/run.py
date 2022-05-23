@@ -8,7 +8,6 @@ from sqlalchemy.exc import OperationalError
 import tyko
 from tyko.exceptions import DataError
 import tyko.data_provider
-# import tyko.routes
 from tyko.site import site
 from tyko.api import api
 from .database import init_database, create_samples, db
@@ -35,13 +34,9 @@ def is_correct_db_version(app, engine) -> bool:
     return version == ALEMBIC_VERSION
 
 
-def create_app(
-        app: typing.Optional[Flask] = None,
-        verify_db: bool = True
-) -> Flask:
+def create_app() -> Flask:
     """Create a new flask app."""
 
-    # if app is None:
     app = Flask(__name__)
     app.logger.setLevel(logging.INFO)
 

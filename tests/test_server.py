@@ -46,10 +46,8 @@ def test_static_pages(route):
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    app = tyko.create_app(app=app, verify_db=False)
-    app.config["TESTING"] = True
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.register_blueprint(site)
+    app.register_blueprint(api)
     with app.test_client() as server:
         resp = server.get(route)
         assert resp.status == "200 OK"
