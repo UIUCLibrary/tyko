@@ -505,16 +505,21 @@ def list_routes():
             'route': str
         }
     )
-    rules: Iterable[Rule] = current_app.url_map.iter_rules()
+    rules: Iterable[Rule] = [
+        rule for rule in current_app.url_map.iter_rules()
+        if rule.rule.startswith(api.url_prefix)
+
+    ]
+
     results: List[result_type] = [
         {
-            "endpoint": rt.endpoint,
+            "route": str(rt),
             "methods": list(rt.methods),
-            "route": str(rt)
+            "endpoint": rt.endpoint,
 
         } for rt in rules
     ]
-    return jsonify(results)
+    return jsonify(sorted(results, key=lambda x: x["route"]))
 
 
 @api.route("/format/<int:id>")
