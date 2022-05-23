@@ -13,11 +13,13 @@ from tyko.views.cassette_tape import CassetteTapeThicknessAPI, \
 from tyko.views.files import ItemFilesAPI, FileNotesAPI, \
     FileAnnotationTypesAPI, \
     FileAnnotationsAPI
-from . import views
+
 from tyko.views.object_item import ItemAPI, ObjectItemAPI, ObjectItemNotesAPI
 from tyko.views.project import ProjectAPI, ProjectNotesAPI
 from tyko.views.project_object import ProjectObjectAPI, ObjectApi, \
     ProjectObjectNotesAPI
+
+from . import views
 
 FORMAT_ENUM_ROUTES = [
     (
@@ -163,8 +165,7 @@ api = Blueprint("api", __name__, url_prefix="/api")
 @api.route("/format")
 def formats():
     data_prov = data_provider.DataProvider(database.db.engine)
-    mw = middleware.Middleware(data_prov)
-    return mw.get_formats()
+    return middleware.Middleware(data_prov).get_formats()
 
 
 @api.route("/collection")
@@ -271,12 +272,15 @@ def project_object_add_note(project_id, object_id):
     return object_middleware.add_note(project_id, object_id)
 
 
-@api.route("/object/<int:object_id>", methods=[
+@api.route(
+    "/object/<int:object_id>",
+    endpoint="object",
+    methods=[
         "GET",
         "DELETE",
         "PUT",
     ])
-def object(object_id):
+def modify_project_object(object_id):
     data_prov = data_provider.DataProvider(database.db.engine)
     object_middleware = middleware.ObjectMiddlewareEntity(data_prov)
     return ObjectApi.as_view(
@@ -489,11 +493,11 @@ def objects():
     return object_middleware.get(True)
 
 
-@api.route("/object/<int:id>-pbcore.xml")
-def object_pbcore(id):
+@api.route("/object/<int:object_id>-pbcore.xml")
+def object_pbcore(object_id):
     data_prov = data_provider.DataProvider(database.db.engine)
     object_middleware = middleware.ObjectMiddlewareEntity(data_prov)
-    return object_middleware.pbcore(id=id)
+    return object_middleware.pbcore(id=object_id)
 
 
 @api.route("/")
@@ -522,11 +526,10 @@ def list_routes():
     return jsonify(sorted(results, key=lambda x: x["route"]))
 
 
-@api.route("/format/<int:id>")
-def format_by_id(id):
+@api.route("/format/<int:format_id>")
+def format_by_id(format_id):
     data_prov = data_provider.DataProvider(database.db.engine)
-    mw = middleware.Middleware(data_prov)
-    return mw.get_formats_by_id(id=id)
+    return middleware.Middleware(data_prov).get_formats_by_id(id=format_id)
 
 
 def add_enum_routes():

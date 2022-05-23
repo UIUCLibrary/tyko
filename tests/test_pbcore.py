@@ -46,7 +46,7 @@ def test_pbcore_fail_invalid_id():
         )
 
 
-def test_pbcore_valid_id(tmpdir):
+def test_pbcore_valid_id():
     app = flask.Flask(__name__, template_folder="../tyko/"
                                                 "templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
@@ -58,14 +58,10 @@ def test_pbcore_valid_id(tmpdir):
 
     app.config["TESTING"] = True
 
-    # db = SQLAlchemy(app)
-    # tyko.create_app(app, verify_db=False)
-    # tyko.database.init_database(db.engine)
     with app.test_client() as server:
         server.get("/")
         sample_collection = server.post(
             url_for('api.add_collection'),
-            # "/api/collection/",
             data=json.dumps(
                 {
                     "collection_name": "My dummy collection",
@@ -74,7 +70,6 @@ def test_pbcore_valid_id(tmpdir):
             ),
             content_type='application/json'
         ).get_json()
-
 
         sample_project = server.post(
             flask.url_for('api.add_project'),
@@ -120,7 +115,7 @@ def test_pbcore_valid_id(tmpdir):
         pbcore_xml = server.get(
             flask.url_for(
                 "api.object_pbcore",
-                id=sample_object_response['object_id']
+                object_id=sample_object_response['object_id']
             )
 
         ).get_data()

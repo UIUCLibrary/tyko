@@ -1,6 +1,5 @@
 import sys
 import logging
-import typing
 
 from flask import Flask, make_response, Response
 from sqlalchemy.exc import OperationalError
