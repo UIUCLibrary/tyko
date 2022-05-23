@@ -87,8 +87,10 @@ setup(
     description='Database for handling entering metadata for AV content',
     packages=[
         'tyko',
+        'tyko.api',
         'tyko.data_provider',
         'tyko.schema',
+        'tyko.site',
         'tyko.pbcore',
         'tyko.pbcore.templates',
         'tyko.views',
