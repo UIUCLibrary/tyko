@@ -32,9 +32,9 @@
                 {%- for child_object in project['objects'] %}
                     {{ child_entity_row(
                         child_object['name'],
-                        url_for('page_project_object_details', project_id=project_id, object_id=child_object.object_id),
+                        url_for('site.page_project_object_details', project_id=project_id, object_id=child_object.object_id),
                         "removeObjectModal",
-                        url_for('project_object', project_id=project_id, object_id=child_object.object_id)
+                        url_for('api.project_object', project_id=project_id, object_id=child_object.object_id)
                         ) }}
                 {%- endfor %}
             </tbody>
@@ -43,7 +43,7 @@
             <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newObjectModal">Add</button>
         </div>
         {{ confirm_remove_entity_modal("removeObjectModal") }}
-        {% call newEntityModal('newObjectModal', title="New Object", submitUrl=url_for("add_new_object", project_id=project_id), formId="newEdityForm") %}
+        {% call newEntityModal('newObjectModal', title="New Object", submitUrl=url_for("site.add_new_object", project_id=project_id), formId="newEdityForm") %}
             <div class="mb-3 row">
                 <label for="objectNameInput" class="col-sm-2 col-form-label">Name</label>
                 <div class="col-sm-10">
@@ -96,8 +96,8 @@
             </div>
         </div>
         {{ removeNoteModal(modalId="removeNoteModal") }}
-        {{ newNoteModal(url_for('add_project_note', project_id=project_id), modalId='newNote', formId='newNotesForm') }}
-        {{ editNoteModal(url_for('update_project_note',project_id=project_id), modalId="noteEditor") }}
+        {{ newNoteModal(url_for('site.add_project_note', project_id=project_id), modalId='newNote', formId='newNotesForm') }}
+        {{ editNoteModal(url_for('site.update_project_note',project_id=project_id), modalId="noteEditor") }}
 
     {% endcall %}
     <script>
@@ -140,7 +140,7 @@
                 location.reload();
             });
 
-        const noteTypesAPI = "{{ url_for('note_types') }}"
+        const noteTypesAPI = "{{ url_for('api.note_types') }}"
         const noteTypesData = fetch(noteTypesAPI)
             .then(response => response.json());
 

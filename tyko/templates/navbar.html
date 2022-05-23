@@ -5,16 +5,16 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item {{'active' if selected_menu_item == "Home"}}">
-                <a class="nav-link" href="{{url_for('page_index')}}">Home</a>
+                <a class="nav-link" href="{{url_for('site.page_index')}}">Home</a>
             </li>
             <li class="nav-item {{ 'active' if selected_menu_item == "About" }}">
-                <a class="nav-link" href="{{url_for('page_about')}}">About</a>
+                <a class="nav-link" href="{{url_for('site.page_about')}}">About</a>
             </li>
             <li class="nav-item {{ 'active' if selected_menu_item == "Projects" }}">
-                <a class="nav-link" href="{{url_for('page_projects')}}">Projects</a>
+                <a class="nav-link" href="{{url_for('site.page_projects')}}">Projects</a>
             </li>
             <li class="nav-item {{ 'active' if selected_menu_item == "More" }}">
-                <a class="nav-link" href="{{url_for('page_more')}}">More</a>
+                <a class="nav-link" href="{{url_for('site.page_more')}}">More</a>
             </li>
         </ul>
     </div>

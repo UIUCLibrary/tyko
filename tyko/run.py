@@ -3,15 +3,16 @@ import logging
 import typing
 
 from flask import Flask, make_response, Response
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import OperationalError
 
 import tyko
+from tyko.exceptions import DataError
 import tyko.data_provider
-import tyko.routes
-
-from .database import init_database, create_samples, db as db
-from .exceptions import DataError, NoTable
+# import tyko.routes
+from tyko.site import site
+from tyko.api import api
+from .database import init_database, create_samples, db
+from .exceptions import NoTable
 from .schema import ALEMBIC_VERSION
 
 
@@ -40,37 +41,21 @@ def create_app(
 ) -> Flask:
     """Create a new flask app."""
 
-    if app is None:
-        app = Flask(__name__)
+    # if app is None:
+    app = Flask(__name__)
     app.logger.setLevel(logging.INFO)
 
     app.logger.info("Loading configurations")
     app.config.from_object("tyko.config.Config")
     app.config.from_envvar("TYKO_SETTINGS", True)
+    app.register_blueprint(site)
+    app.register_blueprint(api)
 
     app.register_error_handler(DataError, handle_error)
-
-    app.logger.info("Configuring database")
+    #
+    # app.logger.info("Configuring database")
     db.init_app(app)
-    engine = db.get_engine(app)
-
-    app.logger.info("Loading database connection")
-    tyko_data_provider = tyko.data_provider.DataProvider(engine)
-
-    app.logger.info("Checking database schema version")
-    if verify_db is True and not is_correct_db_version(app, engine):
-        app.logger.critical(f"Database requires alembic version "
-                            f"{ALEMBIC_VERSION}. Please migrate or initialize "
-                            f"database and try again.")
-        app.add_url_rule("/", "unable_to_load", page_failed_on_startup)
-        return app
-
-    app_routes = tyko.routes.Routes(tyko_data_provider, app)
-    app.logger.info("Initializing API routes")
-    app_routes.init_api_routes()
-    app.logger.info("Initializing Website routes")
-    app_routes.init_website_routes()
-
+    init_database(db.get_engine(app))
     return app
 
 

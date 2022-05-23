@@ -1,27 +1,16 @@
 from unittest.mock import Mock, MagicMock
 
+import sqlalchemy
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-import tyko.routes
+# import tyko.routes
 import tyko.database
+import tyko.site.views
 import tyko.views.project_object
 from tyko import data_provider
-
-
-def test_get_api():
-    testing_app = Flask(__name__, template_folder="../tyko/templates")
-    testing_app.config["TESTING"] = True
-    testing_app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
-    testing_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db = SQLAlchemy(testing_app)
-    tyko.create_app(testing_app, verify_db=False)
-    tyko.database.init_database(db.engine)
-    tyko_data_provider = data_provider.DataProvider(db.engine)
-
-    routes = tyko.routes.Routes(tyko_data_provider, testing_app)
-    for r in routes.get_api_routes():
-        assert isinstance(r, tyko.routes.UrlRule)
+from tyko.api import api
+from tyko.site import site
 
 
 class TestProjectObjectAPI:
@@ -56,7 +45,7 @@ class TestNewItem:
         data_connector = Mock(spec=tyko.data_provider.ObjectDataConnector)
 
         user_view = \
-            tyko.routes.NewItem.as_view("api", data_connector=data_connector)
+            tyko.site.views.NewItem.as_view("api", data_connector=data_connector)
 
         app.add_url_rule(
             "/project/<int:project_id>/object/<int:object_id>/newItem",
@@ -78,7 +67,7 @@ class TestObjectItemNewNotes:
         data_connector = Mock(spec=tyko.data_provider.ItemDataConnector)
 
         user_view = \
-            tyko.routes.ObjectItemNewNotes.as_view(
+            tyko.site.views.ObjectItemNewNotes.as_view(
                 "api",
                 data_connector=data_connector
             )
@@ -104,7 +93,7 @@ class TestProjectNewNote:
         data_connector = Mock(spec=tyko.data_provider.ProjectDataConnector)
 
         user_view = \
-            tyko.routes.ProjectNewNote.as_view(
+            tyko.site.views.ProjectNewNote.as_view(
                 "api",
                 data_connector=data_connector
             )
@@ -129,7 +118,7 @@ class TestObjectUpdateNotes:
         data_connector = Mock(spec=tyko.data_provider.ObjectDataConnector)
 
         user_view = \
-            tyko.routes.ObjectUpdateNotes.as_view(
+            tyko.site.views.ObjectUpdateNotes.as_view(
                 "api",
                 data_connector=data_connector
             )
@@ -155,7 +144,7 @@ class TestProjectNoteUpdate:
         data_connector = Mock(spec=tyko.data_provider.ProjectDataConnector)
 
         user_view = \
-            tyko.routes.ProjectNoteUpdate.as_view(
+            tyko.site.views.ProjectNoteUpdate.as_view(
                 "api",
                 data_connector=data_connector
             )
@@ -181,7 +170,7 @@ class TestObjectItemNewFile:
         data_connector = Mock(spec=tyko.data_provider.ItemDataConnector)
 
         user_view = \
-            tyko.routes.ObjectItemNewFile.as_view(
+            tyko.site.views.ObjectItemNewFile.as_view(
                 "api",
                 data_connector=data_connector
             )
@@ -207,7 +196,7 @@ class TestProjectNewObject:
         data_connector = Mock(spec=tyko.data_provider.ProjectDataConnector)
 
         user_view = \
-            tyko.routes.ProjectNewObject.as_view(
+            tyko.site.views.ProjectNewObject.as_view(
                 "api",
                 data_connector=data_connector
             )
@@ -231,7 +220,7 @@ class TestObjectNewNotes:
         data_connector = Mock(spec=tyko.data_provider.ProjectDataConnector)
 
         user_view = \
-            tyko.routes.ObjectNewNotes.as_view(
+            tyko.site.views.ObjectNewNotes.as_view(
                 "api",
                 data_connector=data_connector
             )
@@ -256,7 +245,7 @@ class TestObjectItemNotes:
         data_connector = Mock(spec=tyko.data_provider.ItemDataConnector)
 
         user_view = \
-            tyko.routes.ObjectItemNotes.as_view(
+            tyko.site.views.ObjectItemNotes.as_view(
                 "api",
                 data_connector=data_connector
             )

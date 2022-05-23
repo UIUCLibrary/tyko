@@ -7,7 +7,9 @@
         <div class="card-body">
             <ul>
                 {% for entity in entities|sort -%}
-                    <li><a href="{{url_for(entity[1])}}">{{entity[0]}}</a></li>
+                    <li>
+                        <a href="{{url_for('site.'+entity[1])}}">{{entity[0]}}</a>
+                    </li>
                 {% endfor %}
             </ul>
         </div>
@@ -19,7 +21,7 @@
         <div class="card-body">
             <ul>
                 <li>
-                    <a href="{{ url_for('form_new_collection') }}">New Collection</a>
+                    <a href="{{ url_for('site.form_new_collection') }}">New Collection</a>
                 </li>
             </ul>
         </div>

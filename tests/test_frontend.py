@@ -1,36 +1,24 @@
 import json
 
-from flask import Flask, url_for
-from flask_sqlalchemy import SQLAlchemy
+from flask import url_for
 import pytest
-import tyko
-import tyko.database
 from tyko import frontend
 from tyko.schema.formats import format_types
 
 
-@pytest.fixture()
-def app():
-    app = Flask(__name__, template_folder="../tyko/templates")
-    app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db = SQLAlchemy(app)
-    tyko.create_app(app, verify_db=False)
-    tyko.database.init_database(db.engine)
-    return app
-
-
 def test_view_web_object_empty(app):
     with app.test_client() as server:
-        resulting_webpage = server.get("/object/1")
+        server.get("/")
+        url = url_for("site.page_object_details", object_id=1)
+        resulting_webpage = server.get(url)
         assert resulting_webpage.status_code != 200
 
 
 def test_view_web_object(app):
     with app.test_client() as server:
+        server.get('/')
         project_id = server.post(
-            "/api/project/",
+            url_for("api.add_project"),
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -40,7 +28,7 @@ def test_view_web_object(app):
         ).get_json()['id']
 
         collection_id = server.post(
-            url_for("add_collection"),
+            url_for("api.add_collection"),
             data=json.dumps(
                 {
                     "collection_name": "my dumb collection",
@@ -50,7 +38,7 @@ def test_view_web_object(app):
         ).get_json()['id']
 
         object_id = server.post(
-            url_for("project_add_object", project_id=project_id),
+            url_for("api.project_add_object", project_id=project_id),
             data=json.dumps(
                 {
                     "name": "my stupid object",
@@ -59,10 +47,9 @@ def test_view_web_object(app):
             ),
             content_type='application/json'
         ).get_json()['object']['object_id']
-        # page_project_object_details
         resulting_webpage_from_project_object = server.get(
             url_for(
-                "page_project_object_details",
+                "site.page_project_object_details",
                 project_id=project_id,
                 object_id=object_id
             )
@@ -74,7 +61,7 @@ def test_view_web_object(app):
 
         resulting_webpage_from_on_own = server.get(
             url_for(
-                "page_object_details",
+                "site.page_object_details",
                 object_id=object_id
             )
         )
@@ -83,8 +70,10 @@ def test_view_web_object(app):
 
 def test_view_web_project_details(app):
     with app.test_client() as server:
+        server.get("/")
         project_id = server.post(
-            "/api/project/",
+            url_for("api.add_project"),
+            # "/api/project/",
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -93,7 +82,7 @@ def test_view_web_project_details(app):
             content_type='application/json'
         ).get_json()['id']
         project_page_resp = server.get(
-            url_for("page_project_details", project_id=project_id)
+            url_for("site.page_project_details", project_id=project_id)
         )
         assert project_page_resp.status_code == 200
 
@@ -107,8 +96,9 @@ def test_view_web_more(app):
 
 def test_view_web_file(app):
     with app.test_client() as server:
+        server.get("/")
         new_collection_id = json.loads(server.post(
-            "/api/collection/",
+            url_for("api.add_collection"),
             data=json.dumps(
                 {
                     "collection_name": "My dummy collection",
@@ -119,7 +109,8 @@ def test_view_web_file(app):
         ).data)['id']
 
         new_project_id = json.loads(server.post(
-            "/api/project/",
+            # "/api/project/",
+            url_for("api.add_project"),
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -127,7 +118,7 @@ def test_view_web_file(app):
             ),
             content_type='application/json'
         ).data)['id']
-        new_object_url = url_for("project_add_object",
+        new_object_url = url_for("api.project_add_object",
                                  project_id=new_project_id)
 
         new_object_id = json.loads(server.post(
@@ -139,7 +130,7 @@ def test_view_web_file(app):
             }),
             content_type='application/json'
         ).data)['object']['object_id']
-        new_item_url = url_for("object_item",
+        new_item_url = url_for("api.object_item",
                                project_id=new_project_id,
                                object_id=new_object_id
                                )
@@ -152,7 +143,7 @@ def test_view_web_file(app):
             }),
             content_type='application/json'
         ).data)['item']['item_id']
-        new_file_url = url_for("project_object_item_add_file",
+        new_file_url = url_for("api.project_object_item_add_file",
                                project_id=new_project_id,
                                object_id=new_object_id,
                                item_id=new_item_id
@@ -166,7 +157,7 @@ def test_view_web_file(app):
             content_type='application/json'
         ).data)['id']
         file_page_resp = server.get(
-            url_for("page_file_details",
+            url_for("site.page_file_details",
                     project_id=new_project_id,
                     object_id=new_object_id,
                     item_id=new_item_id,
@@ -177,8 +168,9 @@ def test_view_web_file(app):
 
 def test_view_web_item(app):
     with app.test_client() as server:
+        server.get('/')
         project_id = server.post(
-            "/api/project/",
+            url_for("api.add_project"),
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -188,7 +180,7 @@ def test_view_web_item(app):
         ).get_json()['id']
 
         object_id = server.post(
-            url_for("project_add_object", project_id=project_id),
+            url_for("api.project_add_object", project_id=project_id),
             data=json.dumps(
                 {
                     "name": "my stupid object",
@@ -198,7 +190,7 @@ def test_view_web_item(app):
         ).get_json()['object']['object_id']
         new_item_rep = server.post(
             url_for(
-                'object_item',
+                'api.object_item',
                 project_id=project_id,
                 object_id=object_id
             ),
@@ -222,7 +214,7 @@ def test_view_web_item(app):
         new_item_data = new_item_rep.get_json()['item']
         resulting_webpage = server.get(
             url_for(
-                "page_project_object_item_details",
+                "site.page_project_object_item_details",
                 project_id=project_id,
                 object_id=object_id,
                 item_id=new_item_data['item_id'])

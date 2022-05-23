@@ -3,12 +3,15 @@ from sqlalchemy.orm import sessionmaker
 
 import tyko
 from tyko import schema, data_provider
+from tyko.api import api
 from tyko.run import is_correct_db_version
 import tyko.database
 import sqlalchemy
 import pytest
 import json
-from flask import Flask
+from flask import Flask, url_for
+
+from tyko.site import site
 
 TEMPLATE_FOLDER = "../tyko/templates"
 
@@ -20,21 +23,20 @@ static_page_routes = [
 ]
 
 dynamic_page_routes = [
-    "/collection",
-    "/project",
-    "/format",
-    "/item",
+    "site.page_collections",
+    "site.page_projects",
+    "site.page_formats",
+    "site.page_item",
+    "site.page_object",
 ]
 
 api_routes = [
-    "/api",
-    "/api/format",
-    "/api/project",
-    "/api/collection",
-    "/api/item",
-    "/api/object",
-
-
+    "api.list_routes",
+    "api.formats",
+    "api.projects",
+    "api.collections",
+    "api.items",
+    "api.objects",
 ]
 
 
@@ -59,11 +61,13 @@ def test_dynamic_pages(route):
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db = SQLAlchemy(app)
-    tyko.create_app(app, verify_db=False)
-    tyko.database.init_database(db.engine)
+    app.register_blueprint(site)
+    app.register_blueprint(api)
+    tyko.database.db.init_app(app)
+    tyko.database.init_database(tyko.database.db.get_engine(app))
     with app.test_client() as server:
-        resp = server.get(route)
+        server.get("/")
+        resp = server.get(url_for(route))
         assert resp.status == "200 OK"
 
 
@@ -73,9 +77,10 @@ def test_app():
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db = SQLAlchemy(app)
-    tyko.create_app(app, verify_db=False)
-    tyko.database.init_database(db.engine)
+    app.register_blueprint(site)
+    app.register_blueprint(api)
+    tyko.database.db.init_app(app)
+    tyko.database.init_database(tyko.database.db.get_engine(app))
     return app.test_client()
 
 
@@ -99,17 +104,24 @@ def test_api_routes(route):
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db = SQLAlchemy(app)
-    tyko.create_app(app, verify_db=False)
-    tyko.database.init_database(db.engine)
+    app.register_blueprint(site)
+    app.register_blueprint(api)
+    tyko.database.db.init_app(app)
+    tyko.database.init_database(tyko.database.db.get_engine(app))
+    # db = SQLAlchemy(app)
+    # tyko.create_app(app, verify_db=False)
+    # tyko.database.init_database(db.engine)
     with app.test_client() as server:
-        resp = server.get(route)
+        server.get("/")
+        resp = server.get(url_for(route))
         assert resp.status == "200 OK"
 
 
 def test_create(test_app):
+    test_app.get("/")
     resp = test_app.post(
-        "/api/project/",
+        # url_for("api.add_project"),
+        "/api/project",
         data=json.dumps(
             {
                 "title": "dummy title",
@@ -169,11 +181,17 @@ def test_create_and_read2(data_type, data_value):
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db = SQLAlchemy(app)
-    tyko.create_app(app, verify_db=False)
-    tyko.database.init_database(db.engine)
+    app.register_blueprint(site)
+    app.register_blueprint(api)
+    tyko.database.db.init_app(app)
+    tyko.database.init_database(tyko.database.db.get_engine(app))
+    # db = SQLAlchemy(app)
+    # tyko.create_app(app, verify_db=False)
+    # tyko.database.init_database(db.engine)
     with app.test_client() as server:
-        route = f"/api/{data_type}/"
+        # server.get("/")
+        # route = url_for(f"api.{data_type}")
+        route = f"/api/{data_type}"
         create_resp = server.post(
             route,
             data=json.dumps(data_value),
@@ -216,13 +234,18 @@ def test_get_object_pbcore():
     app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_IN_MEMORY
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    db = SQLAlchemy(app)
-    tyko.create_app(app, verify_db=False)
-    tyko.database.init_database(db.engine)
+    app.register_blueprint(site)
+    app.register_blueprint(api)
+    tyko.database.db.init_app(app)
+    tyko.database.init_database(tyko.database.db.get_engine(app))
+    # db = SQLAlchemy(app)
+    # tyko.create_app(app, verify_db=False)
+    # tyko.database.init_database(db.engine)
     with app.test_client() as server:
+        server.get("/")
         create_resp = server.post(
-            "/api/object/",
+            # "/api/object/",
+            url_for('api.add_object'),
             data=json.dumps(
                 {
                     "name": "my stupid object"

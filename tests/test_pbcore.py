@@ -6,6 +6,7 @@ import sqlalchemy
 import urllib.request
 import os
 
+from flask import url_for
 from flask_sqlalchemy import SQLAlchemy
 from lxml import etree
 
@@ -14,7 +15,9 @@ import tyko.data_provider.data_provider
 import tyko.exceptions
 import tyko.database
 from tyko import pbcore
+from tyko.api import api
 from tyko.schema.formats import format_types
+from tyko.site import site
 
 PBCORE_XSD_URL = "https://raw.githubusercontent.com/PBCore-AV-Metadata/PBCore_2.1/master/pbcore-2.1.xsd"
 if os.path.exists("pbcore-2.1.xsd"):
@@ -48,14 +51,21 @@ def test_pbcore_valid_id(tmpdir):
                                                 "templates")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.register_blueprint(site)
+    app.register_blueprint(api)
+    tyko.database.db.init_app(app)
+    tyko.database.init_database(tyko.database.db.get_engine(app))
+
     app.config["TESTING"] = True
 
-    db = SQLAlchemy(app)
-    tyko.create_app(app, verify_db=False)
-    tyko.database.init_database(db.engine)
+    # db = SQLAlchemy(app)
+    # tyko.create_app(app, verify_db=False)
+    # tyko.database.init_database(db.engine)
     with app.test_client() as server:
+        server.get("/")
         sample_collection = server.post(
-            "/api/collection/",
+            url_for('api.add_collection'),
+            # "/api/collection/",
             data=json.dumps(
                 {
                     "collection_name": "My dummy collection",
@@ -65,8 +75,9 @@ def test_pbcore_valid_id(tmpdir):
             content_type='application/json'
         ).get_json()
 
+
         sample_project = server.post(
-            "/api/project/",
+            flask.url_for('api.add_project'),
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -77,7 +88,7 @@ def test_pbcore_valid_id(tmpdir):
 
         sample_object_response = server.post(
             flask.url_for(
-                "project_add_object",
+                "api.project_add_object",
                 project_id=sample_project['id']
             ),
             data=json.dumps(
@@ -93,7 +104,7 @@ def test_pbcore_valid_id(tmpdir):
 
         server.post(
             flask.url_for(
-                "object_item",
+                "api.object_item",
                 project_id=sample_project['id'],
                 object_id=sample_object_response['object_id']
             ),
@@ -108,7 +119,7 @@ def test_pbcore_valid_id(tmpdir):
 
         pbcore_xml = server.get(
             flask.url_for(
-                "object_pbcore",
+                "api.object_pbcore",
                 id=sample_object_response['object_id']
             )
 

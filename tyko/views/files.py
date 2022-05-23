@@ -67,7 +67,7 @@ class ItemFilesAPI(views.MethodView):
             generation=json_request.get("generation")
         )['id']
 
-        url = url_for("item_files",
+        url = url_for("api.item_files",
                       project_id=project_id,
                       object_id=object_id,
                       item_id=item_id,
@@ -172,7 +172,7 @@ class FileNotesAPI(views.MethodView):
             {
                 "note": {
                     "url": {
-                        "api": url_for("file_notes",
+                        "api": url_for("api.file_notes",
                                        file_id=file_id,
                                        id=new_note['id']
                                        )
@@ -271,7 +271,7 @@ class FileAnnotationsAPI(views.MethodView):
             "fileAnnotation": {
                 "id": new_annotation_id,
                 "url": {
-                    "api": url_for("file_annotations",
+                    "api": url_for("api.file_annotations",
                                    file_id=file_id,
                                    annotation_id=new_annotation_id)
                 }
@@ -344,7 +344,7 @@ class FileAnnotationTypesAPI(views.MethodView):
         return jsonify({
             "fileAnnotationType": {
                 "id": new_annotation_type['type_id'],
-                "url": url_for("file_annotation_types",
+                "url": url_for("api.file_annotation_types",
                                id=new_annotation_type['type_id'])
                 }
         })

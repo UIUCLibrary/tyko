@@ -5,7 +5,7 @@ from typing import Iterator, List, Dict, Any, Optional, TypedDict, Mapping
 
 import sqlalchemy
 from sqlalchemy import true, orm
-
+import sqlalchemy.exc
 import tyko
 from tyko import schema, utils, database
 from tyko.exceptions import DataError

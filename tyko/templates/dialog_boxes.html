@@ -441,7 +441,7 @@
                             }
                             switch (mode_type) {
                                 case "create":
-                                    set_options("{{ url_for('file_annotation_types') }}", selection);
+                                    set_options("{{ url_for('api.file_annotation_types') }}", selection);
                                     textArea.val("");
                                     saveButton.text("Add")
                                     apiRequest['type'] = "create";
@@ -449,7 +449,7 @@
 
                                 case "edit":
                                     textArea.val(annotation['content']);
-                                    set_options("{{ url_for('file_annotation_types') }}", selection, annotation['type']['type_id']);
+                                    set_options("{{ url_for('api.file_annotation_types') }}", selection, annotation['type']['type_id']);
                                     saveButton.text("Update")
                                     apiRequest['type'] = "edit";
 

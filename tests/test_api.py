@@ -7,8 +7,9 @@ from tyko.schema.formats import format_types
 
 def test_project_create_and_delete(app):
     with app.test_client() as server:
+        server.get('/')
         new_project_id = json.loads(server.post(
-            "/api/project/",
+            url_for('api.add_project'),
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -21,16 +22,37 @@ def test_project_create_and_delete(app):
 
         ).data)['id']
         delete_resp = server.delete(
-            url_for("project", project_id=new_project_id)
+            url_for("api.project", project_id=new_project_id)
         )
         assert delete_resp.status_code == 204
+
+
+def test_project_posting(app):
+    with app.test_client() as server:
+        server.get('/')
+        a = url_for('api.add_project')
+
+        post_resp = server.post(
+            url_for('api.add_project'),
+            data=json.dumps(
+                {
+                    "title": "my dumb project",
+                    "project_code": "my dumb project code",
+                    "current_location": "old location",
+                    "status": "No work done"
+                }
+            ),
+            content_type='application/json'
+        )
+        assert post_resp.status_code == 200
 
 
 def test_project_update(app):
 
     with app.test_client() as server:
+        server.get('/')
         post_resp = server.post(
-            "/api/project/",
+            url_for('api.add_project'),
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -72,9 +94,10 @@ def test_project_update(app):
 def test_item_update(app):
 
     with app.test_client() as server:
-
+        server.get('/')
         post_resp = server.post(
-            "/api/item/",
+            url_for("api.add_item"),
+            # "/api/item/",
             data=json.dumps(
                 {
                     "name": "My dummy item",
@@ -90,7 +113,7 @@ def test_item_update(app):
         )
         assert post_resp.status_code == 200
         new_item_data = json.loads(post_resp.data)
-        new_item_record_url = url_for("item", item_id=new_item_data['id'])
+        new_item_record_url = url_for("api.item", item_id=new_item_data['id'])
         put_resp = server.put(
             new_item_record_url,
             data=json.dumps({
@@ -110,8 +133,9 @@ def test_item_update(app):
 def test_item_delete(app):
 
     with app.test_client() as server:
+        server.get('/')
         post_resp = server.post(
-            "/api/item/",
+            url_for("api.add_item"),
             data=json.dumps(
                 {
                     "name": "My dummy item",
@@ -128,7 +152,7 @@ def test_item_delete(app):
         assert post_resp.status_code == 200
         data = json.loads(post_resp.data)
 
-        new_item_record_url = url_for("item", item_id=data['id'])
+        new_item_record_url = url_for("api.item", item_id=data['id'])
 
         get_resp = server.get(new_item_record_url)
         assert get_resp.status_code == 200
@@ -139,8 +163,10 @@ def test_item_delete(app):
 
 def test_object_add_note(app):
     with app.test_client() as server:
+        server.get('/')
         project_id = server.post(
-            "/api/project/",
+            url_for("api.add_project"),
+            # "/api/project/",
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -150,7 +176,7 @@ def test_object_add_note(app):
         ).get_json()["id"]
 
         new_object_id = server.post(
-            url_for("project_add_object", project_id=project_id),
+            url_for("api.project_add_object", project_id=project_id),
             data=json.dumps(
                 {
                     "name": "My dummy object",
@@ -161,7 +187,7 @@ def test_object_add_note(app):
         ).get_json()['object']["object_id"]
 
         new_object_note_resp = server.post(
-            url_for("project_object_add_note",
+            url_for("api.project_object_add_note",
                     project_id=project_id,
                     object_id=new_object_id),
             data=json.dumps(
@@ -176,14 +202,14 @@ def test_object_add_note(app):
         # new_note_data = new_object_note_resp.get_json()
 
         object_notes = server.get(
-            url_for("object", object_id=new_object_id)
+            url_for("api.object", object_id=new_object_id)
         ).get_json()['object']['notes']
         assert len(object_notes) == 1
 
         new_note_id = object_notes[0]['note_id']
 
         delete_resp = server.delete(
-            url_for("object_notes",
+            url_for("api.object_notes",
                     project_id=project_id,
                     object_id=new_object_id,
                     note_id=new_note_id
@@ -192,7 +218,7 @@ def test_object_add_note(app):
         assert delete_resp.status_code == 202
 
         notes_after_deleting = server.get(
-            url_for("object", object_id=new_object_id)
+            url_for("api.object", object_id=new_object_id)
         ).get_json()['object']['notes']
 
         assert len(notes_after_deleting) == 0
@@ -201,9 +227,9 @@ def test_object_add_note(app):
 def test_object_update(app):
 
     with app.test_client() as server:
-
+        server.get('/')
         collection_one_id = json.loads(server.post(
-            "/api/collection/",
+            url_for("api.add_collection"),
             data=json.dumps(
                 {
                     "collection_name": "dumb collection",
@@ -215,7 +241,7 @@ def test_object_update(app):
         ).data)["id"]
 
         collection_two_id = json.loads(server.post(
-            "/api/collection/",
+            url_for("api.add_collection"),
             data=json.dumps(
                 {
                     "collection_name": "dumb other collection",
@@ -227,7 +253,7 @@ def test_object_update(app):
         ).data)["id"]
 
         post_resp = server.post(
-            "/api/object/",
+            url_for("api.add_object"),
             data=json.dumps(
                 {
                     "name": "My dummy object",
@@ -241,7 +267,7 @@ def test_object_update(app):
             )
         assert post_resp.status_code == 200
         post_data = json.loads(post_resp.data)
-        new_object_record_url = url_for("object", object_id=post_data['id'])
+        new_object_record_url = url_for("api.object", object_id=post_data['id'])
 
         put_resp = server.put(
             new_object_record_url,
@@ -276,8 +302,9 @@ def test_object_update(app):
 
 def test_object_delete(app):
     with app.test_client() as server:
+        server.get('/')
         post_resp = server.post(
-            "/api/object/",
+            url_for("api.add_object"),
             data=json.dumps(
                 {
                     "name": "My dummy object",
@@ -300,8 +327,9 @@ def test_object_delete(app):
 def test_note_create(app):
 
     with app.test_client() as server:
+        server.get('/')
         post_resp = server.post(
-            "/api/notes/",
+            url_for("api.add_note"),
             data=json.dumps(
                 {
                     "note_type_id": "3",
@@ -313,11 +341,11 @@ def test_note_create(app):
         assert post_resp.status_code == 200
         new_record_id = json.loads(post_resp.data)["id"]
 
-        get_all_notes = server.get("/api/notes")
+        get_all_notes = server.get(url_for('api.notes'))
         note_data = json.loads(get_all_notes.data)
         assert note_data['total'] == 1
 
-        get_resp = server.get(url_for("note", note_id=new_record_id))
+        get_resp = server.get(url_for("api.note", note_id=new_record_id))
         note_data = json.loads(get_resp.data)
         assert note_data['note']["text"] == "MY dumb note"
 
@@ -325,8 +353,9 @@ def test_note_create(app):
 def test_note_create_and_delete(app):
 
     with app.test_client() as server:
+        server.get('/')
         post_resp = server.post(
-            "/api/notes/",
+            url_for("api.add_note"),
             data=json.dumps(
                 {
                     "note_type_id": "3",
@@ -337,7 +366,7 @@ def test_note_create_and_delete(app):
             )
         assert post_resp.status_code == 200
         post_data = json.loads(post_resp.data)
-        new_record_url = url_for("note", note_id=post_data['id'])
+        new_record_url = url_for("api.note", note_id=post_data['id'])
 
         get_all_notes = server.get("/api/notes")
         note_data = json.loads(get_all_notes.data)
@@ -354,8 +383,9 @@ def test_note_create_and_delete(app):
 def test_note_update(app):
 
     with app.test_client() as server:
+        server.get('/')
         post_resp = server.post(
-            "/api/notes/",
+            url_for("api.add_note"),
             data=json.dumps(
                 {
                     "note_type_id": "3",
@@ -387,9 +417,9 @@ def test_note_update(app):
 
 def test_create_new_project_note_with_invalid_type(app):
     with app.test_client() as server:
-
+        server.get('/')
         project_post_resp = server.post(
-            "/api/project/",
+            url_for("api.add_project"),
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -402,7 +432,7 @@ def test_create_new_project_note_with_invalid_type(app):
         new_project_id = new_project_data["id"]
 
         note_post_resp = server.post(
-            url_for("project_add_note", project_id=new_project_id),
+            url_for("api.project_add_note", project_id=new_project_id),
             data=json.dumps({
                 "note_type_id": "-3",
                 "text": "MY dumb note",
@@ -415,9 +445,9 @@ def test_create_new_project_note_with_invalid_type(app):
 
 def test_create_new_project_note(app):
     with app.test_client() as server:
-
+        server.get('/')
         project_post_resp = server.post(
-            "/api/project/",
+            url_for("api.add_project"),
             data=json.dumps(
                 {
                     "title": "my dumb project",
@@ -452,7 +482,7 @@ def test_create_new_project_note(app):
 
         note_update_resp = server.put(
             url_for(
-                "project_notes",
+                "api.project_notes",
                 project_id=new_project_data['id'],
                 note_id=1
             ),
@@ -467,7 +497,7 @@ def test_create_new_project_note(app):
         assert note_update_resp.status_code == 200
 
         get_updated_note_resp = server.get(
-            url_for("note", note_id=project_notes[0]['note_id'])
+            url_for("api.note", note_id=project_notes[0]['note_id'])
         )
         assert get_updated_note_resp.status_code == 200
         updated_note = get_updated_note_resp.get_json()['note']
@@ -479,8 +509,10 @@ def test_create_new_project_note(app):
 def test_collection_update(app):
 
     with app.test_client() as server:
+        server.get("/")
+
         post_resp = server.post(
-            "/api/collection/",
+            url_for("api.add_collection"),
             data=json.dumps(
                 {
                     "collection_name": "My dummy collection",
@@ -493,7 +525,7 @@ def test_collection_update(app):
         assert post_resp.status_code == 200
         post_resp_data = json.loads(post_resp.data)
         new_record_url = \
-            url_for("collection", collection_id=post_resp_data['id'])
+            url_for("api.collection", collection_id=post_resp_data['id'])
 
         get_resp = server.get(new_record_url)
         assert get_resp.status_code == 200
@@ -544,8 +576,10 @@ def test_collection_update(app):
 
 def test_collection_delete(app):
     with app.test_client() as server:
+        server.get('/')
         post_resp = server.post(
-            "/api/collection/",
+            url_for("api.add_collection"),
+            # "/api/collection/",
             data=json.dumps(
                 {
                     "collection_name": "My dummy collection",
@@ -567,9 +601,8 @@ def test_collection_delete(app):
 
 
 def test_add_object_to_project(server_with_project):
-    project_api_url = "/api/project/1"
-    new_object_api_url = f"{project_api_url}/object"
-
+    project_api_url = url_for("api.project", project_id=1)
+    new_object_api_url = url_for('api.project_add_object', project_id=1)
     post_new_object_project_resp = server_with_project.post(
         new_object_api_url,
         data=json.dumps(
@@ -594,8 +627,8 @@ def test_add_object_to_project(server_with_project):
 
 
 def test_add_and_delete_object_to_project(server_with_project):
-    project_api_url = "/api/project/1"
-    object_api_url = f"{project_api_url}/object"
+    project_api_url = url_for("api.project", project_id=1)
+    object_api_url = url_for('api.project_add_object', project_id=1)
 
     post_new_object_project_resp = server_with_project.post(
         object_api_url,
@@ -616,7 +649,7 @@ def test_add_and_delete_object_to_project(server_with_project):
     assert len(data['objects']) == 1
 
     new_object_id = new_object_data['object_id']
-    new_object_api_url = f"{object_api_url}/{new_object_id}"
+    new_object_api_url = url_for('api.project_object', project_id=1, object_id=new_object_id)
 
     delete_resp = server_with_project.delete(new_object_api_url)
     assert delete_resp.status_code == 202
@@ -625,16 +658,16 @@ def test_add_and_delete_object_to_project(server_with_project):
 def test_add_and_delete_item_to_object(server_with_object):
     server, data = server_with_object
     formats = dict()
-    for format_type in server.get(url_for("formats")).get_json():
+    for format_type in server.get(url_for("api.formats")).get_json():
         formats[format_type['name']] = format_type['id']
 
-    test_project_url = url_for("projects")
+    test_project_url = url_for("api.projects")
     test_project = \
         json.loads(server.get(test_project_url).data)['projects'][0]
 
     test_object = test_project['objects'][0]
 
-    new_object_item_url = url_for("object_item",
+    new_object_item_url = url_for("api.object_item",
                                   project_id=test_project['project_id'],
                                   object_id=test_object['object_id']
                                   )
@@ -664,7 +697,7 @@ def test_add_and_delete_item_to_object(server_with_object):
     assert new_item['format']['name'] == "audio"
 
     object_url = url_for(
-        "object",
+        "api.object",
         object_id=test_object['object_id']
     )
 
@@ -673,7 +706,7 @@ def test_add_and_delete_item_to_object(server_with_object):
     assert len(object_data['items']) == 1
     assert object_data['items'][0]['name'] == "My dummy item"
 
-    item_api_url = url_for("object_item",
+    item_api_url = url_for("api.object_item",
                            project_id=test_project['project_id'],
                            object_id=test_object['object_id'],
                            item_id=new_item['item_id']
@@ -689,18 +722,18 @@ def test_add_and_delete_item_to_object(server_with_object):
 
 def test_create_and_get_file(server_with_object_and_item):
     projects = json.loads(
-        server_with_object_and_item.get(url_for("projects")).data
+        server_with_object_and_item.get(url_for("api.projects")).data
     )["projects"]
     project_id = projects[0]['project_id']
     project = json.loads(
         server_with_object_and_item.get(
-            url_for("project", project_id=project_id)
+            url_for("api.project", project_id=project_id)
         ).data
     )['project']
     object_id = project['objects'][0]["object_id"]
     item_id = project['objects'][0]["items"][0]["item_id"]
 
-    new_file_url = url_for("project_object_item_add_file",
+    new_file_url = url_for("api.project_object_item_add_file",
                            project_id=project_id,
                            object_id=object_id,
                            item_id=item_id
@@ -723,13 +756,13 @@ def test_create_and_get_file(server_with_object_and_item):
 
 def test_update_file_name(server_with_object_and_item):
     projects = json.loads(
-        server_with_object_and_item.get(url_for("projects")).data
+        server_with_object_and_item.get(url_for("api.projects")).data
     )["projects"]
     project = projects[0]
     project_id = project['project_id']
     object_id = project['objects'][0]["object_id"]
     item_id = project['objects'][0]["items"][0]["item_id"]
-    new_file_url = url_for("project_object_item_add_file",
+    new_file_url = url_for("api.project_object_item_add_file",
                            project_id=project_id,
                            object_id=object_id,
                            item_id=item_id
@@ -743,7 +776,7 @@ def test_update_file_name(server_with_object_and_item):
         content_type='application/json'
     ).data)['id']
 
-    new_file_route = url_for("item_files",
+    new_file_route = url_for("api.item_files",
                              project_id=project_id,
                              object_id=object_id,
                              item_id=item_id,
@@ -770,17 +803,17 @@ def test_update_file_name(server_with_object_and_item):
 def test_create_and_delete_file(server_with_object_and_item):
     server = server_with_object_and_item
     projects = json.loads(
-        server.get(url_for("projects")).data)["projects"]
+        server.get(url_for("api.projects")).data)["projects"]
 
     project_id = projects[0]['project_id']
 
     project = json.loads(
-        server.get(url_for("project", project_id=project_id)).data)['project']
+        server.get(url_for("api.project", project_id=project_id)).data)['project']
 
     object_id = project['objects'][0]["object_id"]
     item_id = project['objects'][0]["items"][0]["item_id"]
 
-    new_file_url = url_for("project_object_item_add_file",
+    new_file_url = url_for("api.project_object_item_add_file",
                            project_id=project_id,
                            object_id=object_id,
                            item_id=item_id
@@ -796,13 +829,13 @@ def test_create_and_delete_file(server_with_object_and_item):
 
 #     check that item has file
     item = \
-        json.loads(server.get(url_for("item", item_id=item_id)).data)['item']
+        json.loads(server.get(url_for("api.item", item_id=item_id)).data)['item']
 
     assert len(item['files']) == 1
 
     file_id = item['files'][0]['id']
 
-    new_file_url = url_for("item_files",
+    new_file_url = url_for("api.item_files",
                            project_id=project_id,
                            object_id=object_id,
                            item_id=item_id,
@@ -819,7 +852,7 @@ def test_create_and_delete_file_note(server_with_object_item_file):
 
     file_id = data['file_id']
 
-    file_notes_url = url_for("file_notes", file_id=file_id)
+    file_notes_url = url_for("api.file_notes", file_id=file_id)
     new_note_resp = server.post(
         file_notes_url,
         data=json.dumps(
@@ -841,7 +874,7 @@ def test_create_and_delete_file_note(server_with_object_item_file):
 
 def test_get_file_note(server_with_file_note):
     server, data = server_with_file_note
-    file_notes_url = url_for("file_notes",
+    file_notes_url = url_for("api.file_notes",
                              file_id=data['file_id'],
                              id=data['note_id']
                              )
@@ -854,7 +887,7 @@ def test_get_file_note(server_with_file_note):
 def test_update_file_note(server_with_file_note):
     server, data = server_with_file_note
 
-    file_notes_url = url_for("file_notes",
+    file_notes_url = url_for("api.file_notes",
                              file_id=data['file_id'],
                              id=data['note_id']
                              )
@@ -872,7 +905,7 @@ def test_update_file_note(server_with_file_note):
 
 def test_create_and_delete_file_annotation_types(server_with_object_item_file):
     server, data = server_with_object_item_file
-    file_annotation_types_url = url_for("file_annotation_types")
+    file_annotation_types_url = url_for("api.file_annotation_types")
 
     new_annotation_type_get_resp = server.get(file_annotation_types_url)
 
@@ -904,7 +937,7 @@ def test_create_and_delete_file_annotation_types(server_with_object_item_file):
     assert new_anno_type_data['annotation_types'][0]["name"] == "Audio Quality"
 
     file_annotation_type_url = \
-        url_for("file_annotation_types",
+        url_for("api.file_annotation_types",
                 id=new_annotation_type_resp_data['fileAnnotationType']['id'])
 
     resp = server.delete(file_annotation_type_url)
@@ -917,7 +950,7 @@ def test_create_and_delete_file_annotation(server_with_object_item_file):
     server, data = server_with_object_item_file
 
     file_id = data['file_id']
-    file_annotation_types_url = url_for("file_annotation_types")
+    file_annotation_types_url = url_for("api.file_annotation_types")
     new_annotation_type_resp = server.post(
         file_annotation_types_url,
         data=json.dumps({
@@ -934,7 +967,7 @@ def test_create_and_delete_file_annotation(server_with_object_item_file):
 
     assert isinstance(new_annotation_type_data["id"], int)
 
-    file_annotations_url = url_for("file_annotations", file_id=file_id)
+    file_annotations_url = url_for("api.file_annotations", file_id=file_id)
     new_annotation_resp = server.post(
         file_annotations_url,
         data=json.dumps(
@@ -952,7 +985,7 @@ def test_create_and_delete_file_annotation(server_with_object_item_file):
 
     assert len(annotations) == 1
 
-    annotation_url = url_for("file_annotations",
+    annotation_url = url_for("api.file_annotations",
                              file_id=file_id,
                              id=annotations[0]['id'])
 
@@ -978,7 +1011,7 @@ def test_create_add_and_remove_cassette(date, server_with_enums):
     server, data = server_with_enums
 
     object_add_url = url_for(
-        "object_item",
+        "api.object_item",
         project_id=data['project']['id'],
         object_id=data['object']['object_id']
     )
@@ -1032,7 +1065,7 @@ def test_create_and_remove_cassette_with_notes(server_with_enums):
     server, data = server_with_enums
 
     object_add_url = url_for(
-        "object_item",
+        "api.object_item",
         project_id=data['project']['id'],
         object_id=data['object']['object_id']
     )
@@ -1054,7 +1087,7 @@ def test_create_and_remove_cassette_with_notes(server_with_enums):
     new_item_data = json.loads(new_item_resp.data)
 
     # add a note to the cassette tape
-    new_item_note_url = url_for("project_object_item_add_note",
+    new_item_note_url = url_for("api.project_object_item_add_note",
                                 project_id=data['project']['id'],
                                 object_id=data['object']['object_id'],
                                 item_id=new_item_data['item']['item_id']
@@ -1120,9 +1153,9 @@ def test_update_cassette_records(key, server_key, value, server_with_cassette):
 
 
 enum_endpoints = [
-    ('cassette_tape_tape_types', {"name": "X"}, "name"),
-    ("cassette_tape_tape_thickness", {"value": "2.0", "unit": "mm"}, "value"),
-    ("cassette_tape_format_types",
+    ('api.cassette_tape_tape_types', {"name": "X"}, "name"),
+    ("api.cassette_tape_tape_thickness", {"value": "2.0", "unit": "mm"}, "value"),
+    ("api.cassette_tape_format_types",
      {"name": "ultra new cassette tape format"}, "name")
 ]
 
@@ -1201,5 +1234,6 @@ def test_api_enum_put_id(endpoint, enum_data, name_key, server_with_enums):
 def test_api_video_cassette_generation(app):
     with app.test_client() as server:
         server.get('/')
-        response = server.get(url_for('video_cassette_generations'))
+        response = server.get(url_for('api.video_cassette_generations'))
         assert {'id': 2, 'name': 'dub'} in response.get_json()
+

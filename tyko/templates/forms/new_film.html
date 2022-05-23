@@ -78,7 +78,7 @@
     <label for="filmSpeed" class="col-sm-2 col-form-label">Speed (fps)</label>
     <div class="col-sm-10">
         <select class="form-select tyko tyko-enum-dynamic"
-                data-enum-url="{{ url_for('film_film_speed') }}"
+                data-enum-url="{{ url_for('api.film_film_speed') }}"
                 name="filmSpeedId"
                 id="filmSpeed">
             <option value=""></option>
@@ -91,7 +91,7 @@
     <div class="form-group col-sm offset-sm-2">
         <label for="filmBase" class="col-form-label">Base</label>
         <select class="form-select tyko tyko-enum-dynamic"
-                data-enum-url="{{ url_for('film_film_base') }}"
+                data-enum-url="{{ url_for('api.film_film_base') }}"
                 name="filmBaseId"
                 id="filmBase">
             <option value=""></option>
@@ -100,7 +100,7 @@
     <div class="form-group col-sm">
         <label for="filmImageType" class="col-form-label">Image Type</label>
         <select class="form-select tyko tyko-enum-dynamic"
-                data-enum-url="{{ url_for('film_image_type') }}"
+                data-enum-url="{{ url_for('api.film_image_type') }}"
                 name="filmImageTypeId"
                 id="filmImageType">
             <option value=""></option>
@@ -109,7 +109,7 @@
     <div class="form-group col-sm">
         <label for="filmSoundtrack" class="col-form-label">Soundtrack</label>
         <select class="form-select tyko tyko-enum-dynamic"
-                data-enum-url="{{ url_for('film_soundtrack') }}"
+                data-enum-url="{{ url_for('api.film_soundtrack') }}"
                 name="filmSoundtrackId"
                 id="filmSoundtrack">
             <option value=""></option>
@@ -118,7 +118,7 @@
     <div class="form-group col-sm">
         <label for="filmColor" class="col-form-label">Color</label>
         <select class="form-select tyko tyko-enum-dynamic"
-                data-enum-url="{{ url_for('film_color') }}"
+                data-enum-url="{{ url_for('api.film_color') }}"
                 name="filmColorId"
                 id="filmColor">
             <option value=""></option>
@@ -147,7 +147,7 @@
         <label for="filmWind" class="col-form-label">Wind</label>
 
         <select class="form-select tyko tyko-enum-dynamic"
-                data-enum-url="{{ url_for('film_wind') }}"
+                data-enum-url="{{ url_for('api.film_wind') }}"
                 name="filmWindId"
                 id="filmWind">
             <option value=""></option>
@@ -156,7 +156,7 @@
     <div class="form-group col-sm">
         <label for="filmEmulsion" class="col-form-label">Emulsion</label>
             <select class="form-select tyko tyko-enum-dynamic"
-                    data-enum-url="{{ url_for('film_emulsion') }}"
+                    data-enum-url="{{ url_for('api.film_emulsion') }}"
                     name="filmEmulsionId"
                     id="filmEmulsion">
                 <option value=""></option>

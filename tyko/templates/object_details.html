@@ -8,7 +8,7 @@
     <div class="btn-toolbar mb-2 mb-md-0">
         <button id="btnExportGroupDrop" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Export</button>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="btnExportGroupDrop">
-            <a class="dropdown-item btn-sm dropdown-menu-sm-left" href="{{ url_for('object_pbcore', id=object['object_id']) }}" download>PBCore</a>
+            <a class="dropdown-item btn-sm dropdown-menu-sm-left" href="{{ url_for('api.object_pbcore', id=object['object_id']) }}" download>PBCore</a>
         </div>
     </div>
 {% endblock %}
@@ -21,7 +21,7 @@
                 {% with %}
                     {%  call metadata_select_dynamic_edit_widget("Collection", object['collection_name'], callback_name="callback", field_key="collection_id", update_api_path=api_path) %}
                             function callback(options){
-                                requests.get("{{url_for('collections')}}")
+                                requests.get("{{url_for('api.collections')}}")
                                     .then((result)=>{
                                         let collections = [];
                                         JSON.parse(result)['collections'].forEach((collection)=>{
@@ -118,7 +118,7 @@
                 </tr>
             {% if "parent_project_id" in object %}
 
-                {% call newEntityModal('newItemModal', title="New Item", submitUrl=url_for("object_new_item", project_id=object['parent_project_id'], object_id=object['object_id']), formId="newEdityForm") %}
+                {% call newEntityModal('newItemModal', title="New Item", submitUrl=url_for("site.object_new_item", project_id=object['parent_project_id'], object_id=object['object_id']), formId="newEdityForm") %}
                     <div class="mb-3 row">
                         <label for="itemNameInput" class="col-sm-2 col-form-label">Name</label>
                         <div class="col-sm-10">
@@ -181,7 +181,7 @@
                 </script>
 {#                {{ newItemModal("newItemModal") }}#}
 
-{#                {{ new_item_modal("newItemtModal", formats, url_for("object_item", object_id=object['object_id'], project_id=object['parent_project_id'])) }}#}
+{#                {{ new_item_modal("newItemtModal", formats, url_for("api.object_item", object_id=object['object_id'], project_id=object['parent_project_id'])) }}#}
 
             {% endif %}
             {{ confirm_remove_entity_modal2("removeItemModal", confirmButtonID="removeItemModalRemoveButton") }}
@@ -204,9 +204,9 @@
             </div>
         </div>
         {{ removeNoteModal(modalId="removeNoteModal") }}
-        {{ editNoteModal(url_for('update_object_note', project_id=object['parent_project_id'], object_id=object['object_id']), modalId="noteEditor") }}
-        {{ newNoteModal(url_for("add_object_note", project_id=object['parent_project_id'],  object_id=object['object_id']), modalId="newNote", formId="newNotesForm", noteTypeSelectorId="noteTypeSelect") }}
-        {{ setupNoteTableJS(notesTableId="notesTable", noteEditorId='noteEditor', newNoteId='newNote', newNotesFormId='newNotesForm', noteTypesUrl=url_for('note_types')) }}
+        {{ editNoteModal(url_for('site.update_object_note', project_id=object['parent_project_id'], object_id=object['object_id']), modalId="noteEditor") }}
+        {{ newNoteModal(url_for("site.add_object_note", project_id=object['parent_project_id'],  object_id=object['object_id']), modalId="newNote", formId="newNotesForm", noteTypeSelectorId="noteTypeSelect") }}
+        {{ setupNoteTableJS(notesTableId="notesTable", noteEditorId='noteEditor', newNoteId='newNote', newNotesFormId='newNotesForm', noteTypesUrl=url_for('api.note_types')) }}
     {% endcall %}
 {% endblock %}
 

@@ -77,21 +77,21 @@
                 data-name="Audio Type"
                 data-displaydata="{{ data['cassette_type']['name'] }}"
                 data-value="{{ data['cassette_type']['id'] }}"
-                data-apiroute="{{ url_for("object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
+                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
                 data-metadatakey="format_details.format_type_id"
             >
             </tr>
             <tr class="tyko-metadata-entity tyko-metadata-entity-editable tyko-metadata-entity-fulldate"
                 data-name="Inspection Date"
                 data-displaydata="{{ data['inspection_date'] }}"
-                data-apiroute="{{ url_for("object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
+                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
                 data-metadatakey="format_details.inspection_date"
             >
             </tr>
             <tr class="tyko-metadata-entity tyko-metadata-entity-editable"
                 data-name="Date Recorded"
                 data-displaydata="{{ data['date_recorded'] }}"
-                data-apiroute="{{ url_for("object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
+                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
                 data-metadatakey="format_details.date_recorded"
             >
             </tr>
@@ -100,7 +100,7 @@
                 data-name="Tape Type"
                 data-displaydata="{{ data['tape_type']['name'] if 'tape_type' in data}}"
                 data-value="{{ data['tape_type']['id'] if 'id' in data}}"
-                data-apiroute="{{ url_for("object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
+                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
                 data-metadatakey="format_details.tape_type_id"
             >
             </tr>
@@ -113,7 +113,7 @@
                 data-displaydata=""
                 {% endif %}
                 data-value="{{ data['tape_thickness']['id'] if data['tape_thickness']['id'] else "" }}"
-                data-apiroute="{{ url_for("object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
+                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
                 data-metadatakey="format_details.tape_thickness_id"
             >
             </tr>
@@ -166,7 +166,7 @@
             </div>
         </div>
     {{ widgets.confirm_remove_entity_modal2("removeFileModal") }}
-    {% call newEntityModal('newFileModal', title="New File", submitUrl=url_for('item_new_file', item_id=item['item_id'], object_id=object_id, project_id=project_id), formId="newEndityForm") %}
+    {% call newEntityModal('newFileModal', title="New File", submitUrl=url_for('site.item_new_file', item_id=item['item_id'], object_id=object_id, project_id=project_id), formId="newEndityForm") %}
         <div class="mb-3 row">
             <label for="objectNameInput" class="col-sm-2 col-form-label">File Name</label>
             <div class="col-sm-10">
@@ -226,7 +226,7 @@
         }
         </script>
 {#        {{ filesTable(api_path, item_id=item['item_id'], object_id=object_id, project_id=project_id) }}#}
-{#        {{ newFileModal("fileModal", url_for('item_files', item_id=item['item_id'], object_id=object_id, project_id=project_id)) }}#}
+{#        {{ newFileModal("fileModal", url_for('api.item_files', item_id=item['item_id'], object_id=object_id, project_id=project_id)) }}#}
     {% endcall %}
 
     {% call widgets.card("Notes", "my-1")  %}
@@ -234,7 +234,7 @@
             {{
                 notes_table2(
                     url_for(
-                        "object_item",
+                        "api.object_item",
                         project_id=project_id,
                         object_id=object_id,
                         item_id=item['item_id']
@@ -257,9 +257,9 @@
             </div>
         </div>
         {{ removeNoteModal(modalId="removeNoteModal") }}
-        {{ newNoteModal(url_for('add_item_note', project_id=project_id, object_id=object_id, item_id=item['item_id']), modalId='newNote', formId='newNotesForm') }}
-        {{ editNoteModal(url_for('update_item_note',project_id=project_id, object_id=object_id, item_id=item['item_id']), modalId="noteEditor") }}
-        {{ setupNoteTableJS(notesTableId="notesTable", noteEditorId='noteEditor', newNoteId='newNote', newNotesFormId='newNotesForm', noteTypesUrl=url_for('note_types')) }}
+        {{ newNoteModal(url_for('site.add_item_note', project_id=project_id, object_id=object_id, item_id=item['item_id']), modalId='newNote', formId='newNotesForm') }}
+        {{ editNoteModal(url_for('site.update_item_note',project_id=project_id, object_id=object_id, item_id=item['item_id']), modalId="noteEditor") }}
+        {{ setupNoteTableJS(notesTableId="notesTable", noteEditorId='noteEditor', newNoteId='newNote', newNotesFormId='newNotesForm', noteTypesUrl=url_for('api.note_types')) }}
     {% endcall %}
 
 {% include "edit_note.html" %}
