@@ -4,8 +4,6 @@ from flask import Blueprint, current_app, jsonify
 from werkzeug.routing import Rule
 
 from tyko import database, data_provider, middleware
-# from tyko.routes import NotesAPI
-# from tyko.api.views import CollectionsAPI
 
 from tyko.views.cassette_tape import CassetteTapeThicknessAPI, \
     CassetteTapeFormatTypesAPI, CassetteTapeTapeTypesAPI
