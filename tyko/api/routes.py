@@ -21,137 +21,137 @@ from tyko.views.project_object import ProjectObjectAPI, ObjectApi, \
 
 FORMAT_ENUM_ROUTES = [
     (
-        "/api/formats/video_cassette/generations",
+        "/formats/video_cassette/generations",
         'video_cassette_generations',
         "VideoCassetteGenerations"
     ),
     (
-        "/api/formats/video_cassette/cassette_type",
+        "/formats/video_cassette/cassette_type",
         'video_cassette_cassette_type',
         "VideoCassetteType"
     ),
     (
-        "/api/formats/optical/optical_types",
+        "/formats/optical/optical_types",
         'optical_optical_types',
         "OpticalType"
     ),
     (
-        "/api/formats/open_reel/sub_types",
+        "/formats/open_reel/sub_types",
         'open_reel_sub_type',
         "OpenReelSubType"
     ),
     (
-        "/api/formats/open_reel/reel_width",
+        "/formats/open_reel/reel_width",
         'open_reel_reel_width',
         "OpenReelReelWidth"
     ),
     (
-        "/api/formats/open_reel/reel_diameter",
+        "/formats/open_reel/reel_diameter",
         'open_reel_reel_diameter',
         "OpenReelReelDiameter"
     ),
     (
-        "/api/formats/open_reel/reel_thickness",
+        "/formats/open_reel/reel_thickness",
         'open_reel_reel_thickness',
         "OpenReelReelThickness"
     ),
     (
-        "/api/formats/open_reel/base",
+        "/formats/open_reel/base",
         'open_reel_base',
         "OpenReelBase"
     ),
     (
-        "/api/formats/open_reel/reel_speed",
+        "/formats/open_reel/reel_speed",
         'open_reel_reel_speed',
         "OpenReelSpeed"
     ),
     (
-        "/api/formats/open_reel/track_configuration",
+        "/formats/open_reel/track_configuration",
         'open_reel_track_configuration',
         "OpenReelTrackConfiguration"
     ),
     (
-        "/api/formats/open_reel/generation",
+        "/formats/open_reel/generation",
         'open_reel_generation',
         "OpenReelGeneration"
     ),
     (
-        "/api/formats/open_reel/wind",
+        "/formats/open_reel/wind",
         'open_reel_wind',
         "OpenReelReelWind"
     ),
     (
-        "/api/formats/grooved_disc/disc_diameter",
+        "/formats/grooved_disc/disc_diameter",
         'grooved_disc_disc_diameter',
         "GroovedDiscDiscDiameter"
     ),
     (
-        "/api/formats/grooved_disc/disc_material",
+        "/formats/grooved_disc/disc_material",
         'grooved_disc_disc_material',
         "GroovedDiscDiscMaterial"
     ),
     (
-        "/api/formats/grooved_disc/playback_direction",
+        "/formats/grooved_disc/playback_direction",
         'grooved_disc_playback_direction',
         "GroovedDiscPlaybackDirection"
     ),
     (
-        "/api/formats/grooved_disc/playback_speed",
+        "/formats/grooved_disc/playback_speed",
         'grooved_disc_playback_speed',
         "GroovedDiscPlaybackSpeed"
     ),
     (
-        "/api/formats/grooved_disc/disc_base",
+        "/formats/grooved_disc/disc_base",
         'grooved_disc_disc_base',
         "GroovedDiscDiscBase"
     ),
     (
-        "/api/formats/film/film_speed",
+        "/formats/film/film_speed",
         'film_film_speed',
         "FilmFilmSpeed"
     ),
     (
-        "/api/formats/film/film_gauge",
+        "/formats/film/film_gauge",
         'film_film_gauge',
         "FilmFilmGauge"
     ),
     (
-        "/api/formats/film/film_base",
+        "/formats/film/film_base",
         'film_film_base',
         "FilmFilmBase"
     ),
     (
-        "/api/formats/film/film_emulsion",
+        "/formats/film/film_emulsion",
         'film_emulsion',
         "FilmEmulsion"
     ),
     (
-        "/api/formats/film/soundtrack",
+        "/formats/film/soundtrack",
         'film_soundtrack',
         "FilmSoundtrack"
     ),
     (
-        "/api/formats/film/color",
+        "/formats/film/color",
         'film_color',
         "FilmColor"
     ),
     (
-        "/api/formats/film/image_type",
+        "/formats/film/image_type",
         'film_image_type',
         "FilmImageType"
     ),
     (
-        "/api/formats/film/wind",
+        "/formats/film/wind",
         'film_wind',
         "FilmWind"
     ),
     (
-        "/api/formats/audio_cassette/subtype",
+        "/formats/audio_cassette/subtype",
         'audio_cassette_subtype',
         "AudioCassetteSubtype"
     ),
     (
-        "/api/formats/audio_cassette/generation",
+        "/formats/audio_cassette/generation",
         'audio_cassette_generation',
         "AudioCassetteGeneration"
     ),
