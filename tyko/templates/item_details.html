@@ -25,38 +25,7 @@
     {% endcall %}
     {%  call widgets.card("Format Details", "my-1")  %}
             <div class="container">
-                <div class="row mb-3">
-                    {% with %}
-                        {% set format_displays = {'cassette tape': casstte_display} %}
-                        {%  if item['format']['name'] in format_displays %}
-                            {{ format_displays[item['format']['name']](item['format_details']) }}
-                        {% else %}
-                        <table class="table table-sm">
-                            <caption hidden>Metadata</caption>
-                            <thead>
-                                <tr hidden>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Data</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for field_name, field_value in item['format_details'].items() %}
-                                <tr>
-                                    <th scope="row" style="width: 16.66%">
-                                        {{field_name}}
-                                    </th>
-                                    <td>
-                                        <div id="{{field_name}}Data" class="container-sm">
-                                            <p>{{field_value}}</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% endif %}
-                    {% endwith %}
-                </div>
+                <div id="formatDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
             </div>
     {% endcall %}
 {% endblock %}

@@ -1,5 +1,6 @@
 from typing import List, Iterable, TypedDict
 
+import pkg_resources
 from flask import Blueprint, current_app, jsonify
 from werkzeug.routing import Rule
 
@@ -528,6 +529,16 @@ def list_routes():
 def format_by_id(format_id):
     data_prov = data_provider.DataProvider(database.db.engine)
     return middleware.Middleware(data_prov).get_formats_by_id(id=format_id)
+
+
+@api.route('/application_data')
+def get_application_data():
+    version = pkg_resources.get_distribution("tyko").version
+    server_color = current_app.config.get('TYKO_SERVER_COLOR')
+    return {
+        "version": version,
+        "server_color": server_color
+    }
 
 
 def add_enum_routes():
