@@ -33,6 +33,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.15.0",
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-react": "^7.17.12",
+    "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "autoprefixer": "^10.4.2",
     "babel-jest": "^27.1.0",

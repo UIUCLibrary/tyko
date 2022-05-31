@@ -1,13 +1,13 @@
 import axios from 'axios';
 import React from 'react';
 
-function FormatDetailsDisplay(props) {
+const FormatDetailsDisplay = (props) => {
   return (
     <div data-testid='display'>
       {props.children}
     </div>
   );
-}
+};
 
 export const FormatDetails = (props) => {
   const [state, setState] = React.useState({
@@ -38,7 +38,7 @@ export const FormatDetails = (props) => {
     return (<FormatDetailsDisplay>Loading...</FormatDetailsDisplay>);
   }
   if (state.error) {
-    return (<div>Error</div>);
+    return (<FormatDetailsDisplay>Error</FormatDetailsDisplay>);
   }
   const elements = [];
   const formatDetails = state.item['format_details'];
