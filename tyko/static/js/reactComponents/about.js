@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const AboutHeader = ()=> {
   return (
-    <div>
+    <div data-testid='header'>
       <h1 className="mt-5">About Tyko</h1>
       <p>For tracking av projects</p>
     </div>

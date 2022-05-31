@@ -1,16 +1,14 @@
 /**
  * @jest-environment jsdom
  */
-import renderer from 'react-test-renderer';
-import {AboutApp} from '../tyko/static/js/reactComponents/about';
+// import renderer from 'react-test-renderer';
+import {render} from "@testing-library/react"
+import {AboutApp, AboutHeader} from '../tyko/static/js/reactComponents/about';
 
 describe('AboutApp', () =>{
-  const component = renderer.create(
-      <AboutApp apiUrl="/api"/>,
-  );
-  const testInstance = component.root;
-  test('has header', ()=>{
-    const header = testInstance.findByType('h1');
-    expect(header.props.children).toBe('About Tyko');
+  const {getByTestId} = render(<AboutApp apiUrl="/api"/>);
+  const header = getByTestId('header');
+  it('should ', () => {
+    expect(header).toBeTruthy();
   });
 });
