@@ -1,7 +1,7 @@
 import React from 'react';
-import axios from "axios";
+import axios from 'axios';
 
-const AboutHeader = ()=> {
+export const AboutHeader = ()=> {
   return (
     <div>
       <h1 className="mt-5">About Tyko</h1>
