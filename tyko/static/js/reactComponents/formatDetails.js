@@ -1,6 +1,14 @@
 import axios from 'axios';
 import React from 'react';
 
+function FormatDetailsDisplay(props) {
+  return (
+    <div data-testid='display'>
+      {props.children}
+    </div>
+  );
+}
+
 export const FormatDetails = (props) => {
   const [state, setState] = React.useState({
     isLoaded: false,
@@ -27,7 +35,7 @@ export const FormatDetails = (props) => {
 
   if (!state.isLoaded) {
     changedMetadata();
-    return (<div>Loading...</div>);
+    return (<FormatDetailsDisplay>Loading...</FormatDetailsDisplay>);
   }
   if (state.error) {
     return (<div>Error</div>);
@@ -53,10 +61,12 @@ export const FormatDetails = (props) => {
     );
   }));
   return (
-    <table className="table table-sm">
-      <tbody>
-        {values}
-      </tbody>
-    </table>
+    <FormatDetailsDisplay>
+      <table className="table table-sm">
+        <tbody>
+          {values}
+        </tbody>
+      </table>
+    </FormatDetailsDisplay>
   );
 };
