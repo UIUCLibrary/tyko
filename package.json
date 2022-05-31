@@ -50,6 +50,7 @@
     "mini-css-extract-plugin": "^2.5.3",
     "mkdirp": ">=1.0.3",
     "postcss-loader": "^6.2.1",
+    "react-test-renderer": "^18.1.0",
     "sass": "^1.49.7",
     "sass-loader": "^12.4.0",
     "source-map-loader": "^3.0.1",
