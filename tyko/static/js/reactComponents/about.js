@@ -40,24 +40,37 @@ function LoadingComponent() {
     </div>
   );
 }
-
-export default function AboutApp(props) {
+function useApplicationDataApi(url) {
   const [data, setData] = React.useState(null);
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
-  useEffect(() => {
+
+  React.useEffect(()=>{
     setLoading(true);
-    axios.get(props.apiUrl)
-        .then(
-            (result) => {
-              setData(result.data);
-            })
-        .then(() => setLoading(false))
-        .catch(setError);
+    const fetchData = async () =>{
+      const dataValue = (await axios.get(url)).data;
+      setData(dataValue);
+      setLoading(false);
+    };
+    fetchData()
+        .then(()=>setLoading(false))
+        .catch((e)=> {
+          setError(e);
+        });
   }, []);
-  if (loading) return (<LoadingComponent/>);
-  if (error) return (<pre>{JSON.stringify(error)}</pre>);
-  if (!data) {
+  return [data, error, loading];
+}
+
+export default function AboutApp(props) {
+  const [data, error, loading] = useApplicationDataApi(props.apiUrl);
+
+  if (loading) {
+    return (<LoadingComponent/>);
+  }
+  if (error) {
+    return (<p>'failed'</p>);
+  }
+  if (data === null) {
     return null;
   }
   const tykoVersion = data['version'];
