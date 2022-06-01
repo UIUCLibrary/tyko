@@ -70,12 +70,6 @@ export default function AboutApp(props) {
           data: serverColor,
         },
     );
-    // extraData.push((
-    //   <dl className="row">
-    //     <dt className="col-sm-3">Server Environment</dt>
-    //     <dd className="col-sm-9">{serverColor}</dd>
-    //   </dl>
-    // ));
   }
   return (<AboutComponent tykoVersion={tykoVersion} extraData={extraData}/>);
 }

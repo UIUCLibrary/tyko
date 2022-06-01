@@ -54,10 +54,17 @@ describe('FormatDetails', ()=>{
     const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
     getByText('Loading...');
   });
+
   it('Removes text "Loading" after data has been fetched', async ()=>{
     axios.get.mockResolvedValueOnce({data: {item: mockResponseAudioCassette}});
     const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
     await waitForElementToBeRemoved(()=>getByText('Loading...'));
+  });
+
+  it('data is loaded into the document', async ()=> {
+    axios.get.mockResolvedValueOnce({data: {item: mockResponseAudioCassette}});
+    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
+    await waitForElementToBeRemoved(() => getByText('Loading...'));
     expect(getByText('my cassette title')).toBeInTheDocument();
   });
 });
