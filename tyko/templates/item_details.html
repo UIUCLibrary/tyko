@@ -24,9 +24,7 @@
         {% endcall %}
     {% endcall %}
     {%  call widgets.card("Format Details", "my-1")  %}
-            <div class="container">
-                <div id="formatDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
-            </div>
+        <div id="formatDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
     {% endcall %}
 {% endblock %}
 

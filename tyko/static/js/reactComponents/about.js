@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 
 export const AboutHeader = ()=> {
@@ -10,56 +10,15 @@ export const AboutHeader = ()=> {
   );
 };
 
-
-export function AboutApp(props) {
-  const [state, setState] = React.useState({
-    isLoaded: false,
-    error: null,
-    metadata: null,
-  });
-  const changedMetadata = () => {
-    axios.get(props.apiUrl)
-        .then(
-            (result) => {
-              setState({
-                isLoaded: true,
-                metadata: result.data,
-              });
-            },
-            (error) => {
-              setState({
-                isLoaded: true,
-                error: error,
-              });
-            },
-        );
-  };
-  if (!state.isLoaded) {
-    changedMetadata();
+function AboutComponent({tykoVersion, extraData}) {
+  const extraRows = extraData.map((item)=> {
     return (
-      <div>
-        <AboutHeader/>
-        <div>Loading...</div>
-      </div>
-    );
-  }
-  if (state.error) {
-    return (<div>Error</div>);
-  }
-  const metadata = state.metadata;
-  const tykoVersion = metadata['version'];
-  const serverColor = metadata['server_color'] ? metadata['server_color']: null;
-
-  let extraData = '';
-  if (serverColor) {
-    extraData = (
       <dl className="row">
-        <dt className="col-sm-3">Server Environment</dt>
-        <dd className="col-sm-9">{serverColor}</dd>
+        <dt className="col-sm-3">{item.label}</dt>
+        <dd className="col-sm-9">{item.data}</dd>
       </dl>
     );
-  }
-
+  });
   return (
     <div>
       <AboutHeader/>
@@ -68,7 +27,55 @@ export function AboutApp(props) {
         <dt className="col-sm-3">Version</dt>
         <dd className="col-sm-9">{tykoVersion}</dd>
       </dl>
-      {extraData}
+      {extraRows}
     </div>
   );
+}
+
+function LoadingComponent() {
+  return (
+    <div>
+      <AboutHeader/>
+      <div>Loading...</div>
+    </div>
+  );
+}
+
+export default function AboutApp(props) {
+  const [data, setData] = React.useState(null);
+  const [error, setError] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
+  useEffect(() => {
+    setLoading(true);
+    axios.get(props.apiUrl)
+        .then(
+            (result) => {
+              setData(result.data);
+            })
+        .then(() => setLoading(false))
+        .catch(setError);
+  }, []);
+  if (loading) return (<LoadingComponent/>);
+  if (error) return (<pre>{JSON.stringify(error)}</pre>);
+  if (!data) {
+    return null;
+  }
+  const tykoVersion = data['version'];
+  const serverColor = data['server_color'] ? data['server_color'] : null;
+  const extraData = [];
+  if (serverColor) {
+    extraData.push(
+        {
+          label: 'Server Environment',
+          data: serverColor,
+        },
+    );
+    // extraData.push((
+    //   <dl className="row">
+    //     <dt className="col-sm-3">Server Environment</dt>
+    //     <dd className="col-sm-9">{serverColor}</dd>
+    //   </dl>
+    // ));
+  }
+  return (<AboutComponent tykoVersion={tykoVersion} extraData={extraData}/>);
 }
