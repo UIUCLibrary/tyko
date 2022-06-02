@@ -126,7 +126,7 @@ def get_version(
     This will cycle through the strategies and use the first one that does not
     raise a InvalidVersionStrategy exception.
 
-    If all strategies fails to get a version a NoValidStrategy exception with
+    If all strategies fails to get a version, a NoValidStrategy exception will
     be raised.
 
     Args:
