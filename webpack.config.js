@@ -12,6 +12,11 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: ['babel-loader'],
+      },
+      {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/inline',
       },
@@ -33,5 +38,8 @@ module.exports = {
         ],
       },
     ],
+  },
+  resolve: {
+    extensions: ['*', '.js', '.jsx'],
   },
 };

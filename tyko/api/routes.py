@@ -3,7 +3,7 @@ from typing import List, Iterable, TypedDict
 from flask import Blueprint, current_app, jsonify
 from werkzeug.routing import Rule
 
-from tyko import database, data_provider, middleware
+from tyko import database, data_provider, middleware, utils
 
 from tyko.views.cassette_tape import CassetteTapeThicknessAPI, \
     CassetteTapeFormatTypesAPI, CassetteTapeTapeTypesAPI
@@ -528,6 +528,16 @@ def list_routes():
 def format_by_id(format_id):
     data_prov = data_provider.DataProvider(database.db.engine)
     return middleware.Middleware(data_prov).get_formats_by_id(id=format_id)
+
+
+@api.route('/application_data')
+def get_application_data():
+
+    server_color = current_app.config.get('TYKO_SERVER_COLOR')
+    return {
+        "version": utils.get_version(),
+        "server_color": server_color
+    }
 
 
 def add_enum_routes():

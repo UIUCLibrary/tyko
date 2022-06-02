@@ -1,17 +1,5 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1 class="mt-5">About Tyko</h1>
-    <p>For tracking av projects</p>
-    <div>
-        <h2 class="mt-5">Tyko Details</h2>
-        <dl class="row">
-            <dt class="col-sm-3">Version</dt>
-            <dd class="col-sm-9">{{ tyko_version }}</dd>
-            {% if server_color %}
-            <dt class="col-sm-3">Server Environment</dt>
-            <dd class="col-sm-9">{{ server_color }}</dd>
-            {% endif %}
-        </dl>
-    </div>
+    <div id="aboutApp" data-api-url="{{ url_for('api.get_application_data') }}"></div>
 {% endblock %}

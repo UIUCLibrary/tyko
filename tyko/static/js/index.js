@@ -1,15 +1,16 @@
 import $ from "expose-loader?exposes=$,jQuery!jquery";
-import('bootstrap');
-import { Tooltip, Toast, Popover, Dropdown, Button, Modal } from 'bootstrap';
+import React from 'react'
+import ReactDOM from 'react-dom'
 import {Datepicker} from 'vanillajs-datepicker';
-import('bootstrap-table');
-import bootstrapTable from "bootstrap-table/src/bootstrap-table";
 import '../css/main.scss'
-import {loadNoteTypes, loadNotesTable} from "./notes.mjs";
+import {loadNotesTable, loadNoteTypes} from "./notes.mjs";
 import {configureNoteEditor, RemoveConfirm} from "./editors.mjs"
 import * as tyko from "./tyko.mjs"
+import AboutApp from "./reactComponents/about";
+import FormatDetails from './reactComponents/formatDetails'
 
-import el from "vanillajs-datepicker/locales/el";
+import('bootstrap');
+import('bootstrap-table');
 window.$ = $
 /**
  * Add a date selection helper
@@ -86,4 +87,17 @@ function loadTykoTypes(){
     }
 }
 
+function loadReactComponents(){
+  const formatDetailsComponent = document.getElementById('formatDetails')
+  if(formatDetailsComponent){
+    ReactDOM.render(<FormatDetails apiUrl={formatDetailsComponent.dataset.tykoApiUrl}/>, formatDetailsComponent)
+  }
+
+  const aboutComponent = document.getElementById('aboutApp')
+  if(aboutComponent){
+    ReactDOM.render(<AboutApp apiUrl={aboutComponent.dataset.apiUrl}/>, aboutComponent)
+  }
+}
+
+loadReactComponents()
 loadTykoTypes()
