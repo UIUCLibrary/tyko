@@ -59,7 +59,7 @@ def serialize_precision_datetime(
     return typing.cast(datetime.date, date).strftime(formatter)
 
 
-class AbsGetVersionStrategy(abc.ABC):
+class AbsGetVersionStrategy(abc.ABC):  # pylint: disable=too-few-public-methods
     """Base class for getting version info."""
 
     @abc.abstractmethod
@@ -85,9 +85,11 @@ class PkgResourceDistributionVersionStrategy(AbsGetVersionStrategy):
     @staticmethod
     def get_from_pkg_resources() -> str:
         """Get pky version with pkg_resources."""
-        import pkg_resources
         try:
+            import pkg_resources  # pylint: disable=import-outside-toplevel
             return pkg_resources.get_distribution("tyko").version
+        except ImportError as error:
+            raise InvalidVersionStrategy from error
         except pkg_resources.DistributionNotFound as error:
             raise InvalidVersionStrategy from error
 
