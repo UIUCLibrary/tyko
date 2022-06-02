@@ -11,9 +11,9 @@
   ],
   "scripts": {
     "test": "jest",
-    "lint": "eslint  ./tyko/static/js/*.mjs ./tyko/static/js/*.js ",
+    "lint": "eslint  ./tyko/static/js/*.mjs ./tyko/static/js/*.js ./tyko/static/js/reactComponents/*.tsx ",
     "eslint-output": "eslint-output",
-    "build": "webpack",
+    "build": "webpack --progress",
     "jsdocs": "jsdoc -c docs/jsdocs_config.json -d build/jsdocs"
   },
   "repository": {
@@ -33,19 +33,26 @@
     "@babel/plugin-transform-modules-commonjs": "^7.15.0",
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-react": "^7.17.12",
+    "@babel/preset-typescript": "^7.17.12",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
     "autoprefixer": "^10.4.2",
     "babel-jest": "^27.1.0",
     "babel-loader": "^8.2.5",
     "css-loader": "^6.6.0",
-    "eslint": "^8.8.0",
+    "eslint": "^8.16.0",
     "eslint-config-google": "^0.14.0",
+    "eslint-import-resolver-typescript": "^2.7.1",
     "eslint-output": "^3.0.1",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.30.0",
+    "eslint-plugin-react-hooks": "^4.5.0",
     "expose-loader": "^3.1.0",
     "file-loader": "^6.2.0",
-    "jest": "^27.1.0",
+    "jest": "^27.5.1",
     "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^13.0.0",
     "jest-sonar-reporter": "^2.0.0",
@@ -56,6 +63,7 @@
     "sass": "^1.49.7",
     "sass-loader": "^12.4.0",
     "source-map-loader": "^3.0.1",
+    "ts-loader": "^9.3.0",
     "webpack": "^5.68.0",
     "webpack-cli": "^4.9.2"
   },
@@ -80,11 +88,13 @@
       "js",
       "json",
       "jsx",
+      "ts",
+      "tsx",
       "node",
       "mjs"
     ],
     "transform": {
-      "^.+\\.m?js$": "babel-jest"
+      "\\.[jt]sx?|(.m?js)$": "babel-jest"
     }
   },
   "jestSonar": {
@@ -106,6 +116,7 @@
     "react-dom": "^18.1.0",
     "style-loader": "^3.2.1",
     "test": "^0.6.0",
+    "typescript": "^4.7.2",
     "vanillajs-datepicker": "^1.2.0"
   }
 }

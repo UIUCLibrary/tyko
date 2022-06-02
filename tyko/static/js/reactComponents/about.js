@@ -1,62 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-
-export const AboutHeader = ()=> {
-  return (
-    <div data-testid='header'>
-      <h1 className="mt-5">About Tyko</h1>
-      <p>For tracking av projects</p>
-    </div>
-  );
-};
-
-/**
- * Format tyko version information
- * @param {tykoVersion} version running
- * @param {extraData} additional data about configuration
- * @return {JSX.Element}
- * @constructor
- */
-function AboutComponent({tykoVersion, extraData}) {
-  const extraRows = extraData.map((item)=> {
-    return (
-      <dl key={item.label} className="row">
-        <dt className="col-sm-3">{item.label}</dt>
-        <dd className="col-sm-9">{item.data}</dd>
-      </dl>
-    );
-  });
-  return (
-    <div>
-      <AboutHeader/>
-      <h2 className="mt-5">Tyko Details</h2>
-      <dl className="row">
-        <dt className="col-sm-3">Version</dt>
-        <dd className="col-sm-9">{tykoVersion}</dd>
-      </dl>
-      {extraRows}
-    </div>
-  );
-}
-AboutComponent.propTypes = {
-  tykoVersion: PropTypes.string.isRequired,
-  extraData: PropTypes.array,
-};
-
-/**
- * Loading display
- * @return {JSX.Element}
- * @constructor
- */
-function LoadingComponent() {
-  return (
-    <div>
-      <AboutHeader/>
-      <div>Loading...</div>
-    </div>
-  );
-}
+import {AboutComponent, LoadingComponent} from './aboutts';
 
 /**
  * Hook for getting application data from api

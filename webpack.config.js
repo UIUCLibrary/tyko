@@ -17,6 +17,11 @@ module.exports = {
         use: ['babel-loader'],
       },
       {
+        test: /\.(ts|tsx)$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/inline',
       },
@@ -40,6 +45,6 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['*', '.js', '.jsx'],
+    extensions: ['*', '.js', '.jsx', '.tsx'],
   },
 };

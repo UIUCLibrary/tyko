@@ -103,6 +103,7 @@ setup(
             "static/css/*.css.map",
             "static/js/*.js",
             "static/js/reactComponents/*.js",
+            "static/js/reactComponents/*.tsx",
             "static/js/*.mjs",
             "static/js/*.js.map",
             "static/pack/*",
