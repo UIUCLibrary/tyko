@@ -11,10 +11,17 @@ export const AboutHeader = ()=> {
   );
 };
 
+/**
+ * Format tyko version information
+ * @param {tykoVersion} version running
+ * @param {extraData} additional data about configuration
+ * @return {JSX.Element}
+ * @constructor
+ */
 function AboutComponent({tykoVersion, extraData}) {
   const extraRows = extraData.map((item)=> {
     return (
-      <dl className="row">
+      <dl key={item.label} className="row">
         <dt className="col-sm-3">{item.label}</dt>
         <dd className="col-sm-9">{item.data}</dd>
       </dl>
@@ -37,7 +44,11 @@ AboutComponent.propTypes = {
   extraData: PropTypes.array,
 };
 
-
+/**
+ * Loading display
+ * @return {JSX.Element}
+ * @constructor
+ */
 function LoadingComponent() {
   return (
     <div>
@@ -47,6 +58,11 @@ function LoadingComponent() {
   );
 }
 
+/**
+ * Hook for getting application data from api
+ * @param {url} url for api
+ * @return {unknown[]}
+ */
 function useApplicationDataApi(url) {
   const [data, setData] = React.useState(null);
   const [error, setError] = React.useState(null);
@@ -70,7 +86,12 @@ function useApplicationDataApi(url) {
 useApplicationDataApi.propTypes = {
   url: PropTypes.string.isRequired,
 };
-
+/**
+ * About tyko information
+ * @param {apiUrl} url for api
+ * @return {JSX.Element|null}
+ * @constructor
+ */
 export default function AboutApp({apiUrl}) {
   const [data, error, loading] = useApplicationDataApi(apiUrl);
 
