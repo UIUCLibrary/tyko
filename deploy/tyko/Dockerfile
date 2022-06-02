@@ -18,6 +18,7 @@ RUN --mount=type=cache,id=apk-cache,target=/var/cache/apk \
 
 WORKDIR /build
 COPY ["requirements.txt", "setup.py", "setup.cfg", "webpack.config.js", "pyproject.toml","MANIFEST.in", "package.json", "package-lock.json", "/build/"]
+COPY .babelrc.json  /build/
 RUN --mount=type=cache,id=custom-pip,target=/root/.cache/pip python -m pip install pip --upgrade &&\
     pip install gunicorn mysqlclient lxml flask sqlalchemy build && \
     pip wheel --wheel-dir /build/wheels gunicorn mysqlclient -r /build/requirements.txt
