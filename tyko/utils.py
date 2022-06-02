@@ -138,6 +138,7 @@ def get_version(
     """
     strategies = strategies or [
         PkgResourceDistributionVersionStrategy,
+        GitVersionStrategy
     ]
     for strategy_type in strategies:
         try:
