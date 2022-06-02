@@ -1237,3 +1237,9 @@ def test_api_video_cassette_generation(app):
         response = server.get(url_for('api.video_cassette_generations'))
         assert {'id': 2, 'name': 'dub'} in response.get_json()
 
+
+def test_api_get_application_data_has_version(app):
+    with app.test_client() as server:
+        server.get('/')
+        response = server.get(url_for('api.get_application_data'))
+        assert "version" in response.get_json()
