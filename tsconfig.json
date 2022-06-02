@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "*",
+        "tyko/static/js/*",
+        "tyko/static/js/reactComponents/*"
+      ]
+    },
+    "allowJs": true,
+    "sourceMap": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx"
+  }
+}
