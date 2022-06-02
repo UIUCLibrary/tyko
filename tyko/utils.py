@@ -1,6 +1,8 @@
+import abc
 import re
 import datetime
 import typing
+
 
 from sqlalchemy import Column, Date
 
@@ -50,3 +52,47 @@ def serialize_precision_datetime(
     if formatter is None:
         raise AttributeError("Invalid precision type")
     return typing.cast(datetime.date, date).strftime(formatter)
+
+
+class AbsGetVersionStrategy(abc.ABC):
+    @abc.abstractmethod
+    def get_version(self):
+        """Get version"""
+
+
+class StrategyError(Exception):
+    """Strategy error"""
+
+
+class NoValidStrategy(StrategyError):
+    """No valid strategy"""
+
+
+class InvalidVersionStrategy(StrategyError):
+    """Raises when strategy doesn't make sense for the current environment."""
+
+
+class PkgResourceDistributionVersionStrategy(AbsGetVersionStrategy):
+    @staticmethod
+    def get_from_pkg_resources():
+        import pkg_resources
+        try:
+            return pkg_resources.get_distribution("tyko").version
+        except pkg_resources.DistributionNotFound as error:
+            raise InvalidVersionStrategy from error
+
+    def get_version(self):
+        return self.get_from_pkg_resources()
+
+
+def get_version(strategies: typing.List[typing.Type[AbsGetVersionStrategy]] = None):
+    strategies = strategies or [
+        PkgResourceDistributionVersionStrategy
+    ]
+    for strategy_type in strategies:
+        try:
+            strategy = strategy_type()
+            return strategy.get_version()
+        except InvalidVersionStrategy:
+            continue
+    raise NoValidStrategy()

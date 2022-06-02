@@ -4,7 +4,7 @@ import pkg_resources
 from flask import Blueprint, current_app, jsonify
 from werkzeug.routing import Rule
 
-from tyko import database, data_provider, middleware
+from tyko import database, data_provider, middleware, utils
 
 from tyko.views.cassette_tape import CassetteTapeThicknessAPI, \
     CassetteTapeFormatTypesAPI, CassetteTapeTapeTypesAPI
@@ -533,10 +533,10 @@ def format_by_id(format_id):
 
 @api.route('/application_data')
 def get_application_data():
-    version = pkg_resources.get_distribution("tyko").version
+
     server_color = current_app.config.get('TYKO_SERVER_COLOR')
     return {
-        "version": version,
+        "version": utils.get_version(),
         "server_color": server_color
     }
 
