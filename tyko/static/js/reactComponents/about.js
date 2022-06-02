@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 
 export const AboutHeader = ()=> {
@@ -86,3 +87,6 @@ export default function AboutApp({apiUrl}) {
   }
   return (<AboutComponent tykoVersion={tykoVersion} extraData={extraData}/>);
 }
+AboutApp.propTypes = {
+  apiUrl: PropTypes.string.isRequired,
+};
