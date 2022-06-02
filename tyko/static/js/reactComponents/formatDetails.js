@@ -9,14 +9,14 @@ const FormatDetailsDisplay = (props) => {
   );
 };
 
-function FormatDetail(props) {
-  const value = (props.value ? <p>{props.value.toString()}</p>: null);
-
+function FormatDetail({value, label}) {
   return (
     <tr>
-      <th scope="row" width="16.66%">{props.label}</th>
+      <th scope="row" width="16.66%">{label}</th>
       <td>
-        <div className="container-sm">{value}</div>
+        <div className="container-sm">
+          {value ? <p>{value.toString()}</p>: null}
+        </div>
       </td>
     </tr>
   );
