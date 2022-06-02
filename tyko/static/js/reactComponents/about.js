@@ -32,6 +32,11 @@ function AboutComponent({tykoVersion, extraData}) {
     </div>
   );
 }
+AboutComponent.propTypes = {
+  tykoVersion: PropTypes.string.isRequired,
+  extraData: PropTypes.array,
+};
+
 
 function LoadingComponent() {
   return (
@@ -41,6 +46,7 @@ function LoadingComponent() {
     </div>
   );
 }
+
 function useApplicationDataApi(url) {
   const [data, setData] = React.useState(null);
   const [error, setError] = React.useState(null);
@@ -61,6 +67,9 @@ function useApplicationDataApi(url) {
   }, []);
   return [data, error, loading];
 }
+useApplicationDataApi.propTypes = {
+  url: PropTypes.string.isRequired,
+};
 
 export default function AboutApp({apiUrl}) {
   const [data, error, loading] = useApplicationDataApi(apiUrl);
