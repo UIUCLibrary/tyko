@@ -1,7 +1,9 @@
 import abc
 import re
 import datetime
+import shutil
 import typing
+import subprocess
 
 
 from sqlalchemy import Column, Date
@@ -85,7 +87,27 @@ class PkgResourceDistributionVersionStrategy(AbsGetVersionStrategy):
         return self.get_from_pkg_resources()
 
 
-def get_version(strategies: typing.List[typing.Type[AbsGetVersionStrategy]] = None):
+class GitVersionStrategy(AbsGetVersionStrategy):
+    @staticmethod
+    def get_git_commit() -> bytes:
+        git_command = shutil.which("git")
+        if git_command is None:
+            raise InvalidVersionStrategy("git command not found")
+        return subprocess.check_output(
+            [
+                git_command,
+                "rev-parse",
+                "HEAD"
+            ]
+        )
+
+    def get_version(self):
+        return str(self.get_git_commit())
+
+
+def get_version(
+        strategies: typing.List[typing.Type[AbsGetVersionStrategy]] = None
+):
     strategies = strategies or [
         PkgResourceDistributionVersionStrategy
     ]
