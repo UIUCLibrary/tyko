@@ -7,7 +7,7 @@ import {
   cleanup,
   waitForElementToBeRemoved,
 } from '@testing-library/react';
-import AboutApp from '../tyko/static/js/reactComponents/about';
+import AboutApp from '../tyko/static/js/reactComponents/AboutApp';
 
 const mockApplicationData = {
   server_color: 'blue',

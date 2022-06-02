@@ -6,7 +6,7 @@ import '../css/main.scss'
 import {loadNotesTable, loadNoteTypes} from "./notes.mjs";
 import {configureNoteEditor, RemoveConfirm} from "./editors.mjs"
 import * as tyko from "./tyko.mjs"
-import AboutApp from "./reactComponents/about";
+import AboutApp from "./reactComponents/AboutApp";
 import FormatDetails from './reactComponents/formatDetails'
 
 import('bootstrap');
@@ -101,3 +101,4 @@ function loadReactComponents(){
 
 loadReactComponents()
 loadTykoTypes()
+

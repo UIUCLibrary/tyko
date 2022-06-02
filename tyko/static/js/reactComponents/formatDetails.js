@@ -1,30 +1,7 @@
 import axios from 'axios';
 import React from 'react';
 import PropTypes from 'prop-types';
-
-
-/**
- * Format a row of a key value pair
- * @param {value} value of pair
- * @param {label} displayed label
- * @constructor
- */
-function FormatDetail({value, label}) {
-  return (
-    <tr>
-      <th scope="row" width="16.66%">{label}</th>
-      <td>
-        <div className="container-sm">
-          {value ? <p>{value.toString()}</p>: null}
-        </div>
-      </td>
-    </tr>
-  );
-}
-FormatDetail.propTypes = {
-  value: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-};
+import {FormatDetail} from './formatDetailsts';
 
 /**
  * Get api data for format.
