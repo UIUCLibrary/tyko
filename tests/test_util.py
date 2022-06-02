@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 import tyko.utils
 
@@ -27,6 +29,32 @@ def test_date_identify_bad_precision(date):
         assert tyko.utils.identify_precision(date)
 
 
-def test_git_version_strategy():
-    strat = tyko.utils.GitVersionStrategy()
-    assert isinstance(strat.get_version(), str)
+class TestGitVersionStrategy:
+
+    def test_get_git_commit(self, monkeypatch):
+        strategy = tyko.utils.GitVersionStrategy()
+        check_output = Mock()
+        with monkeypatch.context() as context:
+            context.setattr(
+                tyko.utils.subprocess,
+                "check_output",
+                check_output
+            )
+            context.setattr(
+                tyko.utils.os.path,
+                "exists",
+                lambda path: path == "fake_git"
+            )
+            strategy.get_git_commit(git_command="fake_git")
+        assert check_output.called is True
+
+    def test_get_version_starts_with_prefix(self, monkeypatch):
+
+        monkeypatch.setattr(
+            tyko.utils.GitVersionStrategy,
+            "get_git_commit",
+            lambda *_: "somevalue"
+        )
+        strategy = tyko.utils.GitVersionStrategy()
+        assert strategy.get_version().startswith("GIT")
+

@@ -1,6 +1,7 @@
 """Utility functions."""
 
 import abc
+import os.path
 import re
 import datetime
 import shutil
@@ -111,9 +112,10 @@ class GitVersionStrategy(AbsGetVersionStrategy):
             git hash value
 
         """
-        git_command = git_command or shutil.which("git")
-        if git_command is None:
-            raise InvalidVersionStrategy("git command not found")
+        git_command = git_command or GitVersionStrategy._get_git_command()
+        if not os.path.exists(git_command):
+            raise FileNotFoundError("Unable to locate absolute path to git")
+
         return subprocess.check_output(
             [
                 git_command,
@@ -121,6 +123,15 @@ class GitVersionStrategy(AbsGetVersionStrategy):
                 "HEAD"
             ]
         )
+
+    @staticmethod
+    def _get_git_command():
+        """Locate a git command."""
+        git_command = shutil.which("git")
+        if git_command is None:
+            raise InvalidVersionStrategy("git command not found")
+
+        return os.path.abspath(git_command)
 
     def get_version(self) -> str:
         """Get a git commit hash for a version."""
