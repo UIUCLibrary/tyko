@@ -157,10 +157,11 @@ def get_version(
         version info as a string
 
     """
-    strategies = strategies or [
-        PkgResourceDistributionVersionStrategy,
-        GitVersionStrategy
-    ]
+    if strategies is None:
+        strategies = [
+            PkgResourceDistributionVersionStrategy,
+            GitVersionStrategy
+        ]
     for strategy_type in strategies:
         try:
             strategy = strategy_type()
@@ -171,4 +172,4 @@ def get_version(
     tried_strategies = \
         ",".join(strategy.__name__ for strategy in strategies)
 
-    raise NoValidStrategy(f"Tried {tried_strategies}")
+    raise NoValidStrategy(f"Tried [{tried_strategies}]")

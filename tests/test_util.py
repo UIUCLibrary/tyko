@@ -58,3 +58,18 @@ class TestGitVersionStrategy:
         strategy = tyko.utils.GitVersionStrategy()
         assert strategy.get_version().startswith("GIT")
 
+
+def test_get_version_no_valid_raises():
+    invalid_strategy = Mock(
+        name="invalid_strategy",
+        spec=tyko.utils.AbsGetVersionStrategy
+    )
+    invalid_strategy.get_version = Mock()
+    invalid_strategy.get_version.side_effect = \
+        tyko.utils.InvalidVersionStrategy()
+
+    invalid_strategy_type = Mock(return_value=invalid_strategy)
+    invalid_strategy_type.__name__ = "invalid_strategy"
+
+    with pytest.raises(tyko.utils.NoValidStrategy):
+        tyko.utils.get_version(strategies=[invalid_strategy_type])
