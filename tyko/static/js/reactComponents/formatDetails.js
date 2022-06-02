@@ -1,13 +1,18 @@
 import axios from 'axios';
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const FormatDetailsDisplay = (props) => {
+function FormatDetailsDisplay({children}) {
   return (
     <div>
-      {props.children}
+      {children}
     </div>
   );
+}
+FormatDetailsDisplay.propTypes = {
+  children: PropTypes.node.isRequired,
 };
+
 
 function FormatDetail({value, label}) {
   return (
@@ -21,6 +26,10 @@ function FormatDetail({value, label}) {
     </tr>
   );
 }
+FormatDetail.propTypes = {
+  value: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+};
 
 
 function useFormatDetailsApi(url) {
@@ -54,13 +63,13 @@ function useFormatDetailsApi(url) {
   return [data, error, loading];
 }
 
-export default function FormatDetails(props) {
-  const [data, error, loading] = useFormatDetailsApi(props.apiUrl);
+export default function FormatDetails({apiUrl}) {
+  const [data, error, loading] = useFormatDetailsApi(apiUrl);
   if (loading) {
     return (<p>Loading...</p>);
   }
   if (error) {
-    return (<p>'failed'</p>);
+    return (<p>Failed</p>);
   }
   if (data === null) {
     return null;
@@ -81,3 +90,7 @@ export default function FormatDetails(props) {
     </FormatDetailsDisplay>
   );
 }
+FormatDetails.propTypes = {
+  apiUrl: PropTypes.string.isRequired,
+};
+
