@@ -99,9 +99,19 @@ class GitVersionStrategy(AbsGetVersionStrategy):
     """Version strategy using git version control."""
 
     @staticmethod
-    def get_git_commit() -> bytes:
-        """Get git hash of HEAD."""
-        git_command = shutil.which("git")
+    def get_git_commit(git_command=None) -> bytes:
+        """Get git hash of HEAD.
+
+        Args:
+            git_command:
+                Path to git command. If not specified, the version on the path
+                will be used.
+
+        Returns:
+            git hash value
+
+        """
+        git_command = git_command or shutil.which("git")
         if git_command is None:
             raise InvalidVersionStrategy("git command not found")
         return subprocess.check_output(
