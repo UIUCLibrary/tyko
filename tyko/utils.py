@@ -63,7 +63,7 @@ class AbsGetVersionStrategy(abc.ABC):
     """Base class for getting version info."""
 
     @abc.abstractmethod
-    def get_version(self):
+    def get_version(self) -> str:
         """Get version."""
 
 
@@ -100,7 +100,7 @@ class GitVersionStrategy(AbsGetVersionStrategy):
     """Version strategy using git version control."""
 
     @staticmethod
-    def get_git_commit(git_command=None) -> bytes:
+    def get_git_commit(git_command: typing.Optional[str] = None) -> bytes:
         """Get git hash of HEAD.
 
         Args:
@@ -125,7 +125,7 @@ class GitVersionStrategy(AbsGetVersionStrategy):
         )
 
     @staticmethod
-    def _get_git_command():
+    def _get_git_command() -> str:
         """Locate a git command."""
         git_command = shutil.which("git")
         if git_command is None:
