@@ -24,7 +24,7 @@ class AVTables(declarative_base(metaclass=DeclarativeABCMeta)):
     __abstract__ = True
 
     @abc.abstractmethod
-    def serialize(self, recurse=False) -> Mapping[str, SerializedData]:  # noqa: E501 pylint: disable=no-self-use
+    def serialize(self, recurse=False) -> Mapping[str, SerializedData]:  # noqa: E501 pylint: disable=unused-argument
         """Serialize the data so that it can be turned into a JSON format"""
         return {}
 
