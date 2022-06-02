@@ -1,6 +1,5 @@
 from typing import List, Iterable, TypedDict
 
-import pkg_resources
 from flask import Blueprint, current_app, jsonify
 from werkzeug.routing import Rule
 
