@@ -61,14 +61,14 @@ function useApplicationDataApi(url) {
   return [data, error, loading];
 }
 
-export default function AboutApp(props) {
-  const [data, error, loading] = useApplicationDataApi(props.apiUrl);
+export default function AboutApp({apiUrl}) {
+  const [data, error, loading] = useApplicationDataApi(apiUrl);
 
   if (loading) {
     return (<LoadingComponent/>);
   }
   if (error) {
-    return (<p>'failed'</p>);
+    return (<p>Failed</p>);
   }
   if (data === null) {
     return null;
