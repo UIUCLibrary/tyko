@@ -137,7 +137,7 @@ def get_version(
 
     """
     strategies = strategies or [
-        PkgResourceDistributionVersionStrategy
+        PkgResourceDistributionVersionStrategy,
     ]
     for strategy_type in strategies:
         try:
@@ -145,4 +145,8 @@ def get_version(
             return strategy.get_version()
         except InvalidVersionStrategy:
             continue
-    raise NoValidStrategy()
+
+    tried_strategies = \
+        ",".join(strategy.__class__.__name__ for strategy in strategies)
+
+    raise NoValidStrategy(f"Tried {tried_strategies}")
