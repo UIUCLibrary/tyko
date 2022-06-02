@@ -2,18 +2,13 @@ import axios from 'axios';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function FormatDetailsDisplay({children}) {
-  return (
-    <div>
-      {children}
-    </div>
-  );
-}
-FormatDetailsDisplay.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
-
+/**
+ * Format a row of a key value pair
+ * @param {value} value of pair
+ * @param {label} displayed label
+ * @constructor
+ */
 function FormatDetail({value, label}) {
   return (
     <tr>
@@ -31,7 +26,11 @@ FormatDetail.propTypes = {
   label: PropTypes.string.isRequired,
 };
 
-
+/**
+ * Get api data for format.
+ * @param {url} url of api
+ * @return {unknown[]}
+ */
 function useFormatDetailsApi(url) {
   const [data, setData] = React.useState(null);
   const [error, setError] = React.useState(null);
@@ -63,6 +62,12 @@ function useFormatDetailsApi(url) {
   return [data, error, loading];
 }
 
+/**
+ * Display format details
+ * @param {apiUrl} URL for api
+ * @return {JSX.Element|null}
+ * @constructor
+ */
 export default function FormatDetails({apiUrl}) {
   const [data, error, loading] = useFormatDetailsApi(apiUrl);
   if (loading) {
@@ -81,13 +86,13 @@ export default function FormatDetails({apiUrl}) {
     );
   }));
   return (
-    <FormatDetailsDisplay>
+    <div>
       <table className="table table-sm" data-testid='dummy'>
         <tbody>
           {values}
         </tbody>
       </table>
-    </FormatDetailsDisplay>
+    </div>
   );
 }
 FormatDetails.propTypes = {
