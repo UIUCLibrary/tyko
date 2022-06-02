@@ -6,7 +6,7 @@ import re
 import datetime
 import shutil
 import typing
-import subprocess
+import subprocess  # nosec
 
 
 from sqlalchemy import Column, Date
@@ -116,7 +116,7 @@ class GitVersionStrategy(AbsGetVersionStrategy):
         if not os.path.exists(git_command):
             raise FileNotFoundError("Unable to locate absolute path to git")
 
-        return subprocess.check_output(
+        return subprocess.check_output(  # nosec
             [
                 git_command,
                 "rev-parse",
