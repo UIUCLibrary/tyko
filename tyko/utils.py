@@ -112,7 +112,7 @@ class GitVersionStrategy(AbsGetVersionStrategy):
             git hash value
 
         """
-        git_command = git_command or GitVersionStrategy._get_git_command()
+        git_command = git_command or GitVersionStrategy.get_git_command()
         if not os.path.exists(git_command):
             raise FileNotFoundError("Unable to locate absolute path to git")
 
@@ -125,7 +125,7 @@ class GitVersionStrategy(AbsGetVersionStrategy):
         )
 
     @staticmethod
-    def _get_git_command() -> str:
+    def get_git_command() -> str:
         """Locate a git command."""
         git_command = shutil.which("git")
         if git_command is None:
