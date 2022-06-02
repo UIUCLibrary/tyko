@@ -1,6 +1,9 @@
+from __future__ import annotations
+import typing
 from flask import views, jsonify, make_response, url_for
 
-from tyko import middleware
+if typing.TYPE_CHECKING:
+    from tyko import middleware
 
 
 class ProjectObjectAPI(views.MethodView):
