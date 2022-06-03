@@ -7,7 +7,7 @@ import {loadNotesTable, loadNoteTypes} from "./notes.mjs";
 import {configureNoteEditor, RemoveConfirm} from "./editors.mjs"
 import * as tyko from "./tyko.mjs"
 import AboutApp from "./reactComponents/AboutApp";
-import FormatDetails from './reactComponents/formatDetails'
+import FormatDetails from './reactComponents/FormatDetails'
 
 import('bootstrap');
 import('bootstrap-table');
