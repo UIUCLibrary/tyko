@@ -1,5 +1,5 @@
 import {FunctionComponent, FC, useState, useEffect} from 'react';
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 
 const AboutHeader: FunctionComponent = ()=> {
   return (
@@ -71,19 +71,18 @@ interface ApiData {
  */
 const useApplicationDataApi = (url: string) => {
   const [data, setData] = useState<ApiData|null>(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error|AxiosError| null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(()=>{
     setLoading(true);
     const fetchData = async () =>{
-      const dataValue: ApiData = (await axios.get(url)).data;
-      setData(dataValue);
+      setData((await axios.get(url)).data as ApiData);
       setLoading(false);
     };
     fetchData()
         .then(()=>setLoading(false))
-        .catch((e)=> {
+        .catch((e: AxiosError | Error)=> {
           setError(e);
         });
   }, [url]);

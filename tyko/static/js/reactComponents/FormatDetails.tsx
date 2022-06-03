@@ -1,5 +1,5 @@
 import {useState, useEffect, FC} from 'react';
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 interface FormatApiData{
     key: string,
     value: string
@@ -18,13 +18,13 @@ interface ApiData{
  */
 const useFormatDetailsApi = (url: string) => {
   const [data, setData] = useState<FormatApiData[] | null>(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error|AxiosError| null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(()=>{
     setLoading(true);
     const fetchData = async () => {
-      const dataValue: ApiData = (await axios.get(url)).data;
+      const dataValue: ApiData = (await axios.get(url)).data as ApiData;
       const elements: FormatApiData[] = [];
       const formatDetails = dataValue.item['format_details'];
       Object.keys(formatDetails).forEach((objectKey) => {
@@ -39,7 +39,7 @@ const useFormatDetailsApi = (url: string) => {
 
     fetchData()
         .then(()=>setLoading(false))
-        .catch((e)=> {
+        .catch((e: AxiosError | Error)=> {
           setError(e);
         });
   }, [url]);
