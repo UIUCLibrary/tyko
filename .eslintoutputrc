@@ -19,6 +19,6 @@
     }
   ],
   "eslintConfig": {
-    "extensions": [".js",".mjs"]
+    "extensions": [".js",".mjs", ".ts", ".tsx"]
   }
 }
