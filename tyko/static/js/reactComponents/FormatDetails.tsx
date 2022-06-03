@@ -147,6 +147,54 @@ const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
+const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
+  const discBase = data['disc_base'].value as EnumMetadata;
+  const dateOfDisc = data['date_of_disc'].value as string;
+  const discDiameter = data['disc_diameter'].value as EnumMetadata;
+  const discDirection = data['disc_direction'].value as EnumMetadata;
+  const discMaterial = data['disc_material'].value as EnumMetadata;
+  const playbackSpeed = data['playback_speed'].value as EnumMetadata;
+  const sideADuration = data['side_a_duration'].value as string;
+  const sideALabel = data['side_a_label'].value as string;
+  const sideBDuration = data['side_b_duration'].value as string;
+  const sideBLabel = data['side_b_label'].value as string;
+
+  return (
+    <Fragment>
+      <FormatDetail key='discBase' label="Base">
+        {discBase.name}
+      </FormatDetail>
+      <FormatDetail key='dateOfDisc' label="Date Of Disc">
+        {dateOfDisc}
+      </FormatDetail>
+      <FormatDetail key='discDiameter' label="Disc Diameter">
+        {discDiameter.name}
+      </FormatDetail>
+      <FormatDetail key='discDirection' label="Disc Direction">
+        {discDirection.name}
+      </FormatDetail>
+      <FormatDetail key='discMaterial' label="Disc Material">
+        {discMaterial.name}
+      </FormatDetail>
+      <FormatDetail key='playbackSpeed' label="Playback Speed">
+        {playbackSpeed.name}
+      </FormatDetail>
+      <FormatDetail key='sideALabel' label="Side A Label">
+        {sideALabel}
+      </FormatDetail>
+      <FormatDetail key='sideADuration' label="Side A Duration">
+        {sideADuration}
+      </FormatDetail>
+      <FormatDetail key='sideBLabel' label="Side B Label">
+        {sideBLabel}
+      </FormatDetail>
+      <FormatDetail key='sideBDuration' label="Side B Duration">
+        {sideBDuration}
+      </FormatDetail>
+    </Fragment>
+  );
+};
+
 const AudioCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const title = data['cassette_title'].value as string;
   const cassetteType = data['cassette_type'].value as EnumMetadata;
@@ -190,6 +238,7 @@ const AudioCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
 function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
   const types: {[key: number]: FC<{data: {[key: string]: Element }}>} = {
     4: OpenReel,
+    5: GroovedDisc,
     7: AudioCassette,
   };
 
