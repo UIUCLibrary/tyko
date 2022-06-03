@@ -10,7 +10,7 @@ import {
   waitForElementToBeRemoved,
   cleanup,
 } from '@testing-library/react';
-import FormatDetails from '../tyko/static/js/reactComponents/formatDetails';
+import FormatDetails from '../tyko/static/js/reactComponents/FormatDetails';
 
 const mockResponseAudioCassette = {
   files: [],
