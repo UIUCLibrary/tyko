@@ -13,7 +13,8 @@ import {
 import FormatDetails, {
   OpenReel,
   Film,
-  GroovedDisc
+  GroovedDisc,
+  Optical,
 } from '../tyko/static/js/reactComponents/FormatDetails';
 
 const mockResponseAudioCassette = {
@@ -330,5 +331,36 @@ describe('GroovedDisc', ()=>{
   };
   it('should Render', () => {
     render(<GroovedDisc data={data}/>);
+  });
+});
+
+describe('Optical', ()=>{
+  const data = {
+    'title_of_item': {
+      'key': 'title_of_item',
+      'name': 'Title of item',
+    },
+    'date_of_item': {
+      'key': 'date_of_item',
+      'name': '12/10/2000',
+    },
+    'duration': {
+      'key': 'duration',
+      'value': '01:13:00',
+    },
+    'label': {
+      'key': 'label',
+      'value': 'my label',
+    },
+    'type': {
+      'key': 'type',
+      'value': {
+        'id': 1,
+        'name': 'foo',
+      },
+    },
+  };
+  it('should Render', () => {
+    render(<Optical data={data}/>);
   });
 });

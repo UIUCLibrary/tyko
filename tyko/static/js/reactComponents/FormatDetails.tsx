@@ -294,7 +294,7 @@ export const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
-const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
+export const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const titleOfItem = data['title_of_item'].value as string;
   const dateOfItem = data['date_of_item'].value as string;
   const duration = data['duration'].value as string;
