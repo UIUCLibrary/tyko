@@ -236,6 +236,42 @@ describe('FormatDetails', ()=>{
       expect(getByText('Title of item')).toBeInTheDocument();
     });
   });
+  describe('AudioCassette', ()=>{
+    const data = {
+      files: [],
+      format: {
+        id: 7,
+        name: 'audio cassette',
+      },
+      format_details: {
+        cassette_title: 'Title of cassette',
+        cassette_type: null,
+        date_of_cassette: '5/31/2022',
+        generation: null,
+        side_a_duration: '00:11:23',
+        side_a_label: 'Label side A',
+        side_b_duration: '00:22:23',
+        side_b_label: 'Label side B',
+      },
+      format_id: 7,
+      inspection_date: '6/28/2022',
+      item_id: 3,
+      name: 'audio cassette',
+      notes: [],
+      obj_sequence: null,
+      parent_object_id: 1,
+      transfer_date: '6/22/2022',
+    };
+
+    it('data is loaded into the document correct', async ()=> {
+      axios.get.mockResolvedValueOnce(
+          {data: {item: data}},
+      );
+      const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
+      await waitForElementToBeRemoved(() => getByText('Loading...'));
+      expect(getByText('Title of cassette')).toBeInTheDocument();
+    });
+  });
   describe('GroovedDisc', ()=> {
     const data = {
       files: [],
