@@ -149,7 +149,7 @@ export const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
-const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
+export const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const discBase = data['disc_base'].value as EnumMetadata;
   const dateOfDisc = data['date_of_disc'].value as string;
   const discDiameter = data['disc_diameter'].value as EnumMetadata;

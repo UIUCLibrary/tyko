@@ -12,7 +12,8 @@ import {
 } from '@testing-library/react';
 import FormatDetails, {
   OpenReel,
-  Film
+  Film,
+  GroovedDisc
 } from '../tyko/static/js/reactComponents/FormatDetails';
 
 const mockResponseAudioCassette = {
@@ -260,11 +261,74 @@ describe('Film', ()=>{
       'key': 'wind',
       'value': {
         'id': 1,
-        'name': 'corge',
+        'name': 'corg',
       },
     },
   };
   it('should Render', () => {
     render(<Film data={data}/>);
+  });
+});
+
+describe('GroovedDisc', ()=>{
+  const data = {
+    'date_of_disc': {
+      'key': 'date_of_disc',
+      'name': '12/10/2000',
+    },
+    'disc_base': {
+      'key': 'disc_base',
+      'value': {
+        'id': 1,
+        'name': 'foo',
+      },
+    },
+    'disc_diameter': {
+      'key': 'disc_diameter',
+      'value': {
+        'id': 1,
+        'name': 'bar',
+      },
+    },
+    'disc_direction': {
+      'key': 'disc_direction',
+      'value': {
+        'id': 1,
+        'name': 'baz',
+      },
+    },
+    'disc_material': {
+      'key': 'disc_material',
+      'value': {
+        'id': 1,
+        'name': 'qux',
+      },
+    },
+    'playback_speed': {
+      'key': 'playback_speed',
+      'value': {
+        'id': 1,
+        'name': 'quux',
+      },
+    },
+    'side_a_duration': {
+      'key': 'side_a_duration',
+      'value': '01:12:00',
+    },
+    'side_a_label': {
+      'key': 'side_a_label',
+      'value': 'Side a label',
+    },
+    'side_b_duration': {
+      'key': 'side_b_duration',
+      'value': '01:13:00',
+    },
+    'side_b_label': {
+      'key': 'side_b_label',
+      'value': 'Side b label',
+    },
+  };
+  it('should Render', () => {
+    render(<GroovedDisc data={data}/>);
   });
 });
