@@ -78,10 +78,7 @@ describe('FormatDetails', ()=>{
         },
         format_details: {
           cassette_title: 'my cassette title',
-          cassette_type: {
-            id: 5,
-            name: 'DAT',
-          },
+          cassette_type: null,
           date_of_cassette: '5/16/2022',
           generation: null,
           side_a_duration: null,
