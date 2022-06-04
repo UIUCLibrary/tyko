@@ -82,7 +82,7 @@ const FormatDetail:
   );
 };
 
-export const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
+const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const base = data['base'].value as EnumMetadata;
   const dateOfReel = data['date_of_reel'].value as string;
   const duration = data['duration'].value as string;
@@ -148,7 +148,7 @@ export const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
-export const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
+const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const discBase = data['disc_base'].value as EnumMetadata;
   const dateOfDisc = data['date_of_disc'].value as string;
   const discDiameter = data['disc_diameter'].value as EnumMetadata;
@@ -204,7 +204,7 @@ export const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
-export const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
+const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const adStripTest = data['ad_strip_test'].value;
   const adTestDate = data['ad_test_date'].value as string;
   const adTestLevel = data['ad_test_level'].value as string;
@@ -303,7 +303,7 @@ export const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
-export const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
+const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const titleOfItem = data['title_of_item'].value as string;
   const dateOfItem = data['date_of_item'].value as string;
   const duration = data['duration'].value as string;
@@ -330,7 +330,7 @@ export const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
-export const VideoCassette: FC<{
+const VideoCassette: FC<{
     data: {[key: string]: Element }
 }> = ({data}) => {
   const dateOfCassette = data['date_of_cassette'].value as string;
@@ -362,7 +362,7 @@ export const VideoCassette: FC<{
     </Fragment>
   );
 };
-export const AudioCassette: FC<{
+const AudioCassette: FC<{
     data: {[key: string]: Element }
 }> = ({data}) => {
   const title = data['cassette_title'].value as string;
