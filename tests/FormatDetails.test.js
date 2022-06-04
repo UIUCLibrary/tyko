@@ -74,6 +74,52 @@ describe('FormatDetails', ()=>{
     await waitForElementToBeRemoved(() => getByText('Loading...'));
     expect(getByText('my cassette title')).toBeInTheDocument();
   });
+  describe('Film', ()=>{
+    const data = {
+      files: [],
+      format: {
+        id: 6,
+        name: 'film',
+      },
+      format_details: {
+        ad_strip_test: null,
+        ad_test_date: '6/6/2001',
+        ad_test_level: '2',
+        can_label: 'Can label',
+        color: null,
+        date_of_film: '6/10/2022',
+        duration: '01:16:52',
+        edge_code_date: 2022,
+        film_base: null,
+        film_emulsion: null,
+        film_gauge: null,
+        film_image_type: null,
+        film_length: 144,
+        film_shrinkage: 32,
+        film_speed: null,
+        film_title: 'Title of film',
+        leader_label: 'Leader Labe',
+        soundtrack: null,
+        wind: null,
+      },
+      format_id: 6,
+      inspection_date: '5/25/2022',
+      item_id: 6,
+      name: 'Film Item',
+      notes: [],
+      obj_sequence: null,
+      parent_object_id: 1,
+      transfer_date: '7/2/2022',
+    };
+    it('data is loaded into the document correct', async ()=> {
+      axios.get.mockResolvedValueOnce(
+          {data: {item: data}},
+      );
+      const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
+      await waitForElementToBeRemoved(() => getByText('Loading...'));
+      expect(getByText('Film Shrinkage')).toBeInTheDocument();
+    });
+  });
 });
 
 describe('OpenReel', ()=>{

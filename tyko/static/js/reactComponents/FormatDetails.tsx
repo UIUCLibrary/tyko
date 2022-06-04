@@ -288,7 +288,9 @@ export const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
       <FormatDetail key='soundtrack' label='Soundtrack'>
         {soundtrack ? soundtrack.name: ''}
       </FormatDetail>
-      <FormatDetail key='wind' label='Wind'>{wind.name}</FormatDetail>
+      <FormatDetail key='wind' label='Wind'>
+        {wind ? wind.name : ''}
+      </FormatDetail>
     </Fragment>
   );
 };
