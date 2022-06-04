@@ -83,7 +83,7 @@ const FormatDetail:
   );
 };
 
-const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
+export const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const base = data['base'].value as EnumMetadata;
   const dateOfReel = data['date_of_reel'].value as string;
   const duration = data['duration'].value as string;
