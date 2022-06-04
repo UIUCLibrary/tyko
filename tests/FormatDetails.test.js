@@ -203,6 +203,39 @@ describe('FormatDetails', ()=>{
       expect(getByText('title of album')).toBeInTheDocument();
     });
   });
+  describe('Optical', ()=>{
+    const data = {
+      files: [],
+      format: {
+        id: 8,
+        name: 'optical',
+      },
+      format_details: {
+        date_of_item: '1/2/2000',
+        duration: '01:55:1',
+        label: 'Label',
+        title_of_item: 'Title of item',
+        type: null,
+      },
+      format_id: 8,
+      inspection_date: '1/2/2020',
+      item_id: 7,
+      name: 'My optical',
+      notes: [],
+      obj_sequence: null,
+      parent_object_id: 1,
+      transfer_date: '1/2/2030',
+    };
+
+    it('data is loaded into the document correct', async ()=> {
+      axios.get.mockResolvedValueOnce(
+          {data: {item: data}},
+      );
+      const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
+      await waitForElementToBeRemoved(() => getByText('Loading...'));
+      expect(getByText('Title of item')).toBeInTheDocument();
+    });
+  });
 });
 describe('OpenReel', ()=>{
   const data = {
