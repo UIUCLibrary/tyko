@@ -15,7 +15,8 @@ import FormatDetails, {
   Film,
   GroovedDisc,
   Optical,
-  VideoCassette
+  VideoCassette,
+  AudioCassette,
 } from '../tyko/static/js/reactComponents/FormatDetails';
 
 const mockResponseAudioCassette = {
@@ -401,5 +402,51 @@ describe('VideoCassette', ()=>{
   };
   it('should Render', () => {
     render(<VideoCassette data={data}/>);
+  });
+});
+
+describe('AudioCassette', ()=>{
+  const data = {
+    'cassette_title': {
+      'key': 'cassette_title',
+      'name': 'Title of item',
+    },
+    'cassette_type': {
+      'key': 'cassette_type',
+      'value': {
+        'id': 1,
+        'name': 'bar',
+      },
+    },
+    'date_of_cassette': {
+      'key': 'date_of_cassette',
+      'name': '12/10/2000',
+    },
+    'generation': {
+      'key': 'generation',
+      'value': {
+        'id': 1,
+        'name': 'foo',
+      },
+    },
+    'side_a_duration': {
+      'key': 'side_a_duration',
+      'value': '01:13:00',
+    },
+    'side_a_label': {
+      'key': 'side_a_label',
+      'value': 'my side a label',
+    },
+    'side_b_duration': {
+      'key': 'side_b_duration',
+      'value': '01:13:00',
+    },
+    'side_b_label': {
+      'key': 'side_b_label',
+      'value': 'my side b label',
+    },
+  };
+  it('should Render', () => {
+    render(<AudioCassette data={data}/>);
   });
 });

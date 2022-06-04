@@ -351,7 +351,7 @@ export const VideoCassette: FC<{data: {[key: string]: Element }}> = ({data}) => 
     </Fragment>
   );
 };
-const AudioCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
+export const AudioCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const title = data['cassette_title'].value as string;
   const cassetteType = data['cassette_type'].value as EnumMetadata;
   const dateOfCassette = data['date_of_cassette'].value as string;
