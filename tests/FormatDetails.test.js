@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import axios from 'axios';
+import React from 'react';
 import '@testing-library/jest-dom';
 
 
@@ -66,6 +67,35 @@ describe('FormatDetails', ()=>{
     const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
     await waitForElementToBeRemoved(() => getByText('Loading...'));
     expect(getByText('my cassette title')).toBeInTheDocument();
+  });
+  it('test unsupported format', async ()=>{
+    axios.get.mockResolvedValueOnce(
+        {
+          data: {
+            item: {
+              files: [],
+              format: {
+                id: -1,
+                name: 'some new format',
+              },
+              format_details: {
+                foo: 'Foo',
+              },
+              format_id: -1,
+              inspection_date: null,
+              item_id: 1,
+              name: 'some new format item',
+              notes: [],
+              obj_sequence: null,
+              parent_object_id: 1,
+              transfer_date: null,
+            },
+          },
+        },
+    );
+    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
+    await waitForElementToBeRemoved(() => getByText('Loading...'));
+    expect(getByText('Foo')).toBeInTheDocument();
   });
   it.each([
     [
