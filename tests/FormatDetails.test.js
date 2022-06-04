@@ -117,6 +117,39 @@ describe('FormatDetails', ()=>{
       expect(getByText('Title of Reel')).toBeInTheDocument();
     });
   });
+  describe('VideoCassette', ()=>{
+    const data ={
+      files: [],
+      format: {
+        id: 9,
+        name: 'video cassette',
+      },
+      format_details: {
+        cassette_type: null,
+        date_of_cassette: '1/2/2000',
+        duration: '20:30:30',
+        generation: null,
+        label: 'Label title',
+        title_of_cassette: 'Title of cassette',
+      },
+      format_id: 9,
+      inspection_date: '2/1/2000',
+      item_id: 8,
+      name: 'My video cassette item',
+      notes: [],
+      obj_sequence: null,
+      parent_object_id: 1,
+      transfer_date: '3/2/2000',
+    };
+    it('data is loaded into the document correct', async ()=> {
+      axios.get.mockResolvedValueOnce(
+          {data: {item: data}},
+      );
+      const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
+      await waitForElementToBeRemoved(() => getByText('Loading...'));
+      expect(getByText('Title of cassette')).toBeInTheDocument();
+    });
+  });
   describe('Film', ()=>{
     const data = {
       files: [],
