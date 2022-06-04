@@ -74,6 +74,49 @@ describe('FormatDetails', ()=>{
     await waitForElementToBeRemoved(() => getByText('Loading...'));
     expect(getByText('my cassette title')).toBeInTheDocument();
   });
+  describe('OpenReel', ()=>{
+    const data ={
+      files: [],
+      format: {
+        id: 4,
+        name: 'open reel',
+      },
+      format_details: {
+        base: null,
+        date_of_reel: '6/16/2022',
+        duration: '01:23:33',
+        format_subtype: null,
+        generation: null,
+        reel_brand: 'some brand',
+        reel_diameter: null,
+        reel_size: 7,
+        reel_speed: null,
+        reel_thickness: null,
+        reel_type: 'plastic',
+        reel_width: null,
+        title_of_reel: null,
+        track_configuration: null,
+        track_count: 2,
+        wind: null,
+      },
+      format_id: 4,
+      inspection_date: '6/24/2022',
+      item_id: 4,
+      name: 'Op reel name',
+      notes: [],
+      obj_sequence: null,
+      parent_object_id: 1,
+      transfer_date: '6/11/2022',
+    };
+    it('data is loaded into the document correct', async ()=> {
+      axios.get.mockResolvedValueOnce(
+          {data: {item: data}},
+      );
+      const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
+      await waitForElementToBeRemoved(() => getByText('Loading...'));
+      expect(getByText('Title of Reel')).toBeInTheDocument();
+    });
+  });
   describe('Film', ()=>{
     const data = {
       files: [],
