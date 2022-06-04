@@ -7,7 +7,7 @@ interface EnumMetadata {
 }
 interface Element {
   key: string,
-  value: string | number | EnumMetadata
+  value: string | number | boolean | EnumMetadata
 }
 
 interface FormatApiData{
@@ -105,16 +105,18 @@ const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
       <FormatDetail key='title' label="Title of Reel">
         {title}
       </FormatDetail>
-      <FormatDetail key='base' label="Base">{base.name}</FormatDetail>
+      <FormatDetail key='base' label="Base">
+        {base ? base.name : ''}
+      </FormatDetail>
       <FormatDetail key='dateOfReel' label="Date Of Reel">
         {dateOfReel}
       </FormatDetail>
       <FormatDetail key='duration' label="Duration">{duration}</FormatDetail>
       <FormatDetail key='formatSubtype' label="Type">
-        {formatSubtype.name}
+        {formatSubtype ? formatSubtype.name: ''}
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        {generation.name}
+        {generation ? generation.name: ''}
       </FormatDetail>
       <FormatDetail key='reelBrand' label="Brand of Reel">
         {reelBrand}
@@ -123,25 +125,25 @@ const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
         {`${reelDiameter.toString()}"`}
       </FormatDetail>
       <FormatDetail key='reelSpeed' label="Speed of Reel">
-        {reelSpeed.name}
+        {reelSpeed ? reelSpeed.name: ''}
       </FormatDetail>
       <FormatDetail key='reelThickness' label="Thickness of Reel">
-        {reelThickness.name}
+        {reelThickness ? reelThickness.name: ''}
       </FormatDetail>
       <FormatDetail key='reelType' label="Type of Reel">
         {reelType}
       </FormatDetail>
       <FormatDetail key='reelWidth' label="Width of Reel">
-        {reelWidth.name}
+        {reelWidth ? reelWidth.name: ''}
       </FormatDetail>
       <FormatDetail key='trackConfiguration' label="Track Configuration">
-        {trackConfiguration.name}
+        {trackConfiguration ? trackConfiguration.name: ''}
       </FormatDetail>
       <FormatDetail key='trackCount' label="Track Count">
         {trackCount.toString()}
       </FormatDetail>
       <FormatDetail key='wind' label="Wind">
-        {wind.name}
+        {wind ? wind.name: ''}
       </FormatDetail>
     </Fragment>
   );
@@ -162,22 +164,22 @@ const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
   return (
     <Fragment>
       <FormatDetail key='discBase' label="Base">
-        {discBase.name}
+        {discBase ? discBase.name : ''}
       </FormatDetail>
       <FormatDetail key='dateOfDisc' label="Date Of Disc">
         {dateOfDisc}
       </FormatDetail>
       <FormatDetail key='discDiameter' label="Disc Diameter">
-        {discDiameter.name}
+        {discDiameter ? discDiameter.name : ''}
       </FormatDetail>
       <FormatDetail key='discDirection' label="Disc Direction">
-        {discDirection.name}
+        {discDirection ? discDirection.name : ''}
       </FormatDetail>
       <FormatDetail key='discMaterial' label="Disc Material">
-        {discMaterial.name}
+        {discMaterial ? discMaterial.name : ''}
       </FormatDetail>
       <FormatDetail key='playbackSpeed' label="Playback Speed">
-        {playbackSpeed.name}
+        {playbackSpeed ? playbackSpeed.name : ''}
       </FormatDetail>
       <FormatDetail key='sideALabel' label="Side A Label">
         {sideALabel}
@@ -191,6 +193,103 @@ const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
       <FormatDetail key='sideBDuration' label="Side B Duration">
         {sideBDuration}
       </FormatDetail>
+    </Fragment>
+  );
+};
+
+const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
+  const adStripTest = data['ad_strip_test'].value;
+  const adTestDate = data['ad_test_date'].value as string;
+  const adTestLevel = data['ad_test_level'].value as string;
+  const canLabel = data['can_label'].value as string;
+  const dateOfFilm = data['date_of_film'].value as string;
+  const duration = data['duration'].value as string;
+  const filmTitle = data['film_title'].value as string;
+  const leaderLabel = data['leader_label'].value as string;
+  const edgeCodeDate = data['edge_code_date'].value as number;
+  const filmLength = data['film_length'].value as number;
+  const filmShrinkage = data['film_shrinkage'].value as number;
+  const color = data['color'].value as EnumMetadata;
+  const filmGauge = data['film_gauge'].value as EnumMetadata;
+  const filmBase = data['film_base'].value as EnumMetadata;
+  const filmEmulsion = data['film_emulsion'].value as EnumMetadata;
+  const filmImageType = data['film_image_type'].value as EnumMetadata;
+  const filmSpeed = data['film_speed'].value as EnumMetadata;
+  const soundtrack = data['soundtrack'].value as EnumMetadata;
+  const wind = data['wind'].value as EnumMetadata;
+
+  let adStripTestDisplay: string;
+  switch (adStripTest) {
+    case null:
+      adStripTestDisplay = '';
+      break;
+    case false:
+      adStripTestDisplay = 'Yes';
+      break;
+    case true:
+      adStripTestDisplay = 'Yes';
+      break;
+    default:
+      adStripTestDisplay = '';
+  }
+
+  return (
+    <Fragment>
+      <FormatDetail key='dateOfFilm' label="Date Of Film">
+        {dateOfFilm}
+      </FormatDetail>
+      <FormatDetail key='adStripTest' label="AD Strip Test Performed">
+        {adStripTestDisplay}
+      </FormatDetail>
+      <FormatDetail key='adTestDate' label="AD Test Date">
+        {adTestDate}
+      </FormatDetail>
+      <FormatDetail key='adTestLevel' label="AD Test Level">
+        {adTestLevel}
+      </FormatDetail>
+      <FormatDetail key='canLabel' label="Can Label">
+        {canLabel}
+      </FormatDetail>
+      <FormatDetail key='duration' label="Duration">
+        {duration}
+      </FormatDetail>
+      <FormatDetail key='filmTitle' label="Film Title">
+        {filmTitle}
+      </FormatDetail>
+      <FormatDetail key='leaderLabel' label="Leader Label">
+        {leaderLabel}
+      </FormatDetail>
+      <FormatDetail key='edgeCodeDate' label="Edge Code Date">
+        {edgeCodeDate.toString()}
+      </FormatDetail>
+      <FormatDetail key='filmLength' label='Film Length'>
+        {filmLength.toString()}
+      </FormatDetail>
+      <FormatDetail key='filmShrinkage' label='Film Shrinkage'>
+        {filmShrinkage.toString()}
+      </FormatDetail>
+      <FormatDetail key='color' label='Color'>
+        {color ? color.name: ''}
+      </FormatDetail>
+      <FormatDetail key='filmBase' label='Film Base'>
+        {filmBase ? filmBase.name: ''}
+      </FormatDetail>
+      <FormatDetail key='filmEmulsion' label='Film Emulsion'>
+        {filmEmulsion ? filmEmulsion.name: ''}
+      </FormatDetail>
+      <FormatDetail key='filmImageType' label='Film Image Type'>
+        {filmImageType ? filmImageType.name: ''}
+      </FormatDetail>
+      <FormatDetail key='filmSpeed' label='Film Speed'>
+        {filmSpeed ? filmSpeed.name: ''}
+      </FormatDetail>
+      <FormatDetail key='filmGauge' label='Film Gauge'>
+        {filmGauge ? filmGauge.name: ''}
+      </FormatDetail>
+      <FormatDetail key='soundtrack' label='Soundtrack'>
+        {soundtrack ? soundtrack.name: ''}
+      </FormatDetail>
+      <FormatDetail key='wind' label='Wind'>{wind.name}</FormatDetail>
     </Fragment>
   );
 };
@@ -211,13 +310,13 @@ const AudioCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
         {title}
       </FormatDetail>
       <FormatDetail key='cassetteType' label="Type">
-        {cassetteType.name}
+        {cassetteType ? cassetteType.name : ''}
       </FormatDetail>
       <FormatDetail key='dateOfCassette' label="Date of Cassette">
         {dateOfCassette}
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        {generation.name}
+        {generation ? generation.name : ''}
       </FormatDetail>
       <FormatDetail key='sideALabel' label="Side A Label">
         {sideALabel}
@@ -239,6 +338,7 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
   const types: {[key: number]: FC<{data: {[key: string]: Element }}>} = {
     4: OpenReel,
     5: GroovedDisc,
+    6: Film,
     7: AudioCassette,
   };
 
@@ -255,7 +355,7 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
   const values: JSX.Element[] = data.map(
       (
           item: {
-              value?: string | number| EnumMetadata,
+              value?: string | number| boolean| EnumMetadata,
               key: string
           },
           index: number,
