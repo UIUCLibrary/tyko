@@ -8,5 +8,5 @@ def max_workers():
 
 bind = '0.0.0.0:' + environ.get('PORT', '9182')
 max_requests = 1000
-workers = max_workers()
+workers = 1
 proc_name = 'tyko'

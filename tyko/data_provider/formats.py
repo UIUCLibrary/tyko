@@ -510,5 +510,5 @@ class VideoCassetteDataConnector(FormatConnector):
         for field in fields:
             if field not in metadata:
                 continue
-            if metadata[field].strip() == '':
+            if metadata[field] is None or metadata[field].strip() == '':
                 del metadata[field]
