@@ -435,8 +435,9 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
           },
           index: number,
       ) => {
-        const children: ReactElement =
-          item.value ? <p>{item.value.toString()}</p>: <p/>;
+        const children: ReactElement = <p>
+          {item.value ? item.value.toString(): ''}
+        </p>;
         return (
           <FormatDetail key={index.toString()} label={item.key}>
             {children}
