@@ -293,6 +293,32 @@ const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
     </Fragment>
   );
 };
+const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
+  const titleOfItem = data['title_of_item'].value as string;
+  const dateOfItem = data['date_of_item'].value as string;
+  const duration = data['duration'].value as string;
+  const label = data['label'].value as string;
+  const type = data['type'].value as EnumMetadata;
+  return (
+    <Fragment>
+      <FormatDetail key="titleOfItem" label="Title Of Item">
+        {titleOfItem}
+      </FormatDetail>
+      <FormatDetail key="dateOfItem" label="Date Of Item" >
+        {dateOfItem}
+      </FormatDetail>
+      <FormatDetail key="duration" label="Duration">
+        {duration}
+      </FormatDetail>
+      <FormatDetail key="label" label="Label">
+        {label}
+      </FormatDetail>
+      <FormatDetail key="type" label="Type">
+        {type ? type.name : ''}
+      </FormatDetail>
+    </Fragment>
+  );
+};
 
 const AudioCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const title = data['cassette_title'].value as string;
@@ -340,6 +366,7 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
     5: GroovedDisc,
     6: Film,
     7: AudioCassette,
+    8: Optical,
   };
 
   if (formatType.id in types) {
