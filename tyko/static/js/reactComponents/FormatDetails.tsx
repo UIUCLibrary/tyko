@@ -404,6 +404,12 @@ export const AudioCassette: FC<{
   );
 };
 
+/**
+ * Gget the table body
+ * @param {FormatType} formatType - Format type
+ * @param {Element[]} data - data
+ * @return {Fragment}
+ */
 function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
   const types: {[key: number]: FC<{data: {[key: string]: Element }}>} = {
     4: OpenReel,
