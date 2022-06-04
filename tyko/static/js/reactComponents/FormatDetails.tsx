@@ -227,9 +227,6 @@ const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
 
   let adStripTestDisplay: string;
   switch (adStripTest) {
-    case null:
-      adStripTestDisplay = '';
-      break;
     case false:
       adStripTestDisplay = 'No';
       break;
