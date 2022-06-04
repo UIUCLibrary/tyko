@@ -163,8 +163,47 @@ describe('FormatDetails', ()=>{
       expect(getByText('Film Shrinkage')).toBeInTheDocument();
     });
   });
-});
+  describe('GroovedDisc', ()=>{
+    const data = {
+      files: [],
+      format: {
+        id: 5,
+        name: 'grooved disc',
+      },
+      format_details: {
+        date_of_disc: '5/16/2022',
+        disc_base: null,
+        disc_diameter: null,
+        disc_direction: null,
+        disc_material: null,
+        playback_speed: null,
+        side_a_duration: '00:12:21',
+        side_a_label: 'side 1',
+        side_b_duration: '00:12:22',
+        side_b_label: 'side b',
+        title_of_album: 'title of album',
+        title_of_disc: 'title of disc',
+      },
+      format_id: 5,
+      inspection_date: '6/9/2022',
+      item_id: 5,
+      name: 'Grooved Disc Item',
+      notes: [],
+      obj_sequence: null,
+      parent_object_id: 1,
+      transfer_date: '6/29/2022',
+    };
 
+    it('data is loaded into the document correct', async ()=> {
+      axios.get.mockResolvedValueOnce(
+          {data: {item: data}},
+      );
+      const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
+      await waitForElementToBeRemoved(() => getByText('Loading...'));
+      expect(getByText('title of album')).toBeInTheDocument();
+    });
+  });
+});
 describe('OpenReel', ()=>{
   const data = {
     'base': {
@@ -364,6 +403,14 @@ describe('Film', ()=>{
 
 describe('GroovedDisc', ()=>{
   const data = {
+    'title_of_album': {
+      'key': 'title_of_album',
+      'name': 'My title',
+    },
+    'title_of_disc': {
+      'key': 'title_of_disc',
+      'name': 'My title of disc',
+    },
     'date_of_disc': {
       'key': 'date_of_disc',
       'name': '12/10/2000',

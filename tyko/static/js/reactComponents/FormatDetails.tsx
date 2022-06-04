@@ -155,6 +155,8 @@ export const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const discDirection = data['disc_direction'].value as EnumMetadata;
   const discMaterial = data['disc_material'].value as EnumMetadata;
   const playbackSpeed = data['playback_speed'].value as EnumMetadata;
+  const titleOfAlbum = data['title_of_album'].value as string;
+  const titleOfDisc = data['title_of_disc'].value as string;
   const sideADuration = data['side_a_duration'].value as string;
   const sideALabel = data['side_a_label'].value as string;
   const sideBDuration = data['side_b_duration'].value as string;
@@ -162,6 +164,12 @@ export const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
 
   return (
     <Fragment>
+      <FormatDetail key='titleOfAlbum' label="Title of Album">
+        {titleOfAlbum}
+      </FormatDetail>
+      <FormatDetail key='titleOfDisc' label="Title of Disc">
+        {titleOfDisc}
+      </FormatDetail>
       <FormatDetail key='discBase' label="Base">
         {discBase ? discBase.name : ''}
       </FormatDetail>
