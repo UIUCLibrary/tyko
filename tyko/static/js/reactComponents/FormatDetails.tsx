@@ -121,7 +121,7 @@ const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
         {reelBrand}
       </FormatDetail>
       <FormatDetail key='reelDiameter' label="Diameter of Reel">
-        {`${reelDiameter.toString()}"`}
+        {reelDiameter ? reelDiameter.toString() : ''}
       </FormatDetail>
       <FormatDetail key='reelSpeed' label="Speed of Reel">
         {reelSpeed ? reelSpeed.name: ''}
@@ -139,7 +139,7 @@ const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
         {trackConfiguration ? trackConfiguration.name: ''}
       </FormatDetail>
       <FormatDetail key='trackCount' label="Track Count">
-        {trackCount.toString()}
+        {trackCount ? trackCount.toString(): ''}
       </FormatDetail>
       <FormatDetail key='wind' label="Wind">
         {wind ? wind.name: ''}
@@ -264,13 +264,13 @@ const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
         {leaderLabel}
       </FormatDetail>
       <FormatDetail key='edgeCodeDate' label="Edge Code Date">
-        {edgeCodeDate.toString()}
+        {edgeCodeDate ? edgeCodeDate.toString() : ''}
       </FormatDetail>
       <FormatDetail key='filmLength' label='Film Length'>
-        {filmLength.toString()}
+        {filmLength ? filmLength.toString() : ''}
       </FormatDetail>
       <FormatDetail key='filmShrinkage' label='Film Shrinkage'>
-        {filmShrinkage.toString()}
+        {filmShrinkage ? filmShrinkage.toString() : ''}
       </FormatDetail>
       <FormatDetail key='color' label='Color'>
         {color ? color.name: ''}
