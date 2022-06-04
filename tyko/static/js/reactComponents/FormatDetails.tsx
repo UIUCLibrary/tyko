@@ -321,7 +321,7 @@ export const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
-const VideoCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
+export const VideoCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const dateOfCassette = data['date_of_cassette'].value as string;
   const duration = data['duration'].value as string;
   const label = data['label'].value as string;
