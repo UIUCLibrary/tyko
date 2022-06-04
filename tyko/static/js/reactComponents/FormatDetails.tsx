@@ -293,6 +293,7 @@ const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
     </Fragment>
   );
 };
+
 const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const titleOfItem = data['title_of_item'].value as string;
   const dateOfItem = data['date_of_item'].value as string;
@@ -320,6 +321,36 @@ const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
+const VideoCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
+  const dateOfCassette = data['date_of_cassette'].value as string;
+  const duration = data['duration'].value as string;
+  const label = data['label'].value as string;
+  const titleOfCassette = data['title_of_cassette'].value as string;
+  const generation = data['generation'].value as EnumMetadata;
+  const cassetteType = data['cassette_type'].value as EnumMetadata;
+  return (
+    <Fragment>
+      <FormatDetail key="dateOfCassette" label="Date Of Cassette">
+        {dateOfCassette}
+      </FormatDetail>
+      <FormatDetail key="duration" label="Duration">
+        {duration}
+      </FormatDetail>
+      <FormatDetail key="label" label="Label">
+        {label}
+      </FormatDetail>
+      <FormatDetail key="titleOfCassette" label="Title Of Cassette">
+        {titleOfCassette}
+      </FormatDetail>
+      <FormatDetail key="generation" label="Generation">
+        {generation ? generation.name : ''}
+      </FormatDetail>
+      <FormatDetail key='cassetteType' label="Type">
+        {cassetteType ? cassetteType.name : ''}
+      </FormatDetail>
+    </Fragment>
+  );
+};
 const AudioCassette: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const title = data['cassette_title'].value as string;
   const cassetteType = data['cassette_type'].value as EnumMetadata;
@@ -367,6 +398,7 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
     6: Film,
     7: AudioCassette,
     8: Optical,
+    9: VideoCassette,
   };
 
   if (formatType.id in types) {
