@@ -231,7 +231,7 @@ const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
       adStripTestDisplay = '';
       break;
     case false:
-      adStripTestDisplay = 'Yes';
+      adStripTestDisplay = 'No';
       break;
     case true:
       adStripTestDisplay = 'Yes';
