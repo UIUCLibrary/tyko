@@ -197,7 +197,7 @@ const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
-const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
+export const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
   const adStripTest = data['ad_strip_test'].value;
   const adTestDate = data['ad_test_date'].value as string;
   const adTestLevel = data['ad_test_level'].value as string;

@@ -12,6 +12,7 @@ import {
 } from '@testing-library/react';
 import FormatDetails, {
   OpenReel,
+  Film
 } from '../tyko/static/js/reactComponents/FormatDetails';
 
 const mockResponseAudioCassette = {
@@ -160,5 +161,110 @@ describe('OpenReel', ()=>{
   };
   it('should Render', () => {
     render(<OpenReel data={data}/>);
+  });
+});
+
+describe('Film', ()=>{
+  const data = {
+    'ad_strip_test': {
+      'key': 'ad_strip_test',
+      'name': true,
+    },
+    'ad_test_date': {
+      'key': 'ad_test_date',
+      'name': '12/10/2000',
+    },
+    'ad_test_level': {
+      'key': 'ad_test_level',
+      'value': 1,
+    },
+    'can_label': {
+      'key': 'can_label',
+      'value': 'my can label',
+    },
+    'date_of_film': {
+      'key': 'date_of_film',
+      'name': '12/10/2000',
+    },
+    'duration': {
+      'key': 'duration',
+      'name': '01:12:00',
+    },
+    'film_title': {
+      'key': 'film_title',
+      'name': 'my film title',
+    },
+    'leader_label': {
+      'key': 'leader_label',
+      'name': 'leader label',
+    },
+    'edge_code_date': {
+      'key': 'edge_code_date',
+      'value': 1956,
+    },
+    'film_length': {
+      'key': 'film_length',
+      'value': 500,
+    },
+    'film_shrinkage': {
+      'key': 'film_shrinkage',
+      'value': 75,
+    },
+    'color': {
+      'key': 'color',
+      'value': {
+        'id': 1,
+        'name': 'foo',
+      },
+    },
+    'film_gauge': {
+      'key': 'film_gauge',
+      'value': {
+        'id': 1,
+        'name': 'bar',
+      },
+    },
+    'film_base': {
+      'key': 'film_base',
+      'value': {
+        'id': 1,
+        'name': 'baz',
+      },
+    },
+    'film_emulsion': {
+      'key': 'film_emulsion',
+      'value': {
+        'id': 1,
+        'name': 'qux',
+      },
+    },
+    'film_image_type': {
+      'key': 'film_image_type',
+      'value': {
+        'id': 1,
+        'name': 'quux',
+      },
+    },
+    'film_speed': {
+      'key': 'film_speed',
+      'value': {
+        'id': 1,
+        'name': 'quuz',
+      },
+    },
+    'soundtrack': {
+      'key': 'soundtrack',
+      'value': 2,
+    },
+    'wind': {
+      'key': 'wind',
+      'value': {
+        'id': 1,
+        'name': 'corge',
+      },
+    },
+  };
+  it('should Render', () => {
+    render(<Film data={data}/>);
   });
 });
