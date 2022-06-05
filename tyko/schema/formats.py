@@ -486,6 +486,7 @@ class Optical(AVFormat, ABC):
         details = {
             'title_of_item': self.title_of_item,
             'label': self.label,
+            'date_of_item': self.date_of_item,
             'type':
                 self.optical_type.serialize()
                 if self.optical_type is not None else None,
