@@ -1,6 +1,6 @@
 import $ from "expose-loader?exposes=$,jQuery!jquery";
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Datepicker} from 'vanillajs-datepicker';
 import '../css/main.scss'
 import {loadNotesTable, loadNoteTypes} from "./notes.mjs";
@@ -8,6 +8,7 @@ import {configureNoteEditor, RemoveConfirm} from "./editors.mjs"
 import * as tyko from "./tyko.mjs"
 import AboutApp from "./reactComponents/AboutApp";
 import FormatDetails from './reactComponents/FormatDetails'
+import Items from './reactComponents/Items';
 
 import('bootstrap');
 import('bootstrap-table');
@@ -88,14 +89,29 @@ function loadTykoTypes(){
 }
 
 function loadReactComponents(){
+  const objectItems = document.getElementById('objectItem')
+  if(objectItems){
+    const root = createRoot(objectItems);
+    const onAccepted = (event) =>{
+      console.log("hello")
+    }
+    root.render(<Items apiUrl={objectItems.dataset.tykoApiUrl}/>)
+
+  } else {
+    console.log('no')
+  }
   const formatDetailsComponent = document.getElementById('formatDetails')
   if(formatDetailsComponent){
-    ReactDOM.render(<FormatDetails apiUrl={formatDetailsComponent.dataset.tykoApiUrl}/>, formatDetailsComponent)
+    const root = createRoot(formatDetailsComponent);
+    root.render(
+        <FormatDetails apiUrl={formatDetailsComponent.dataset.tykoApiUrl}/>
+    )
   }
 
   const aboutComponent = document.getElementById('aboutApp')
   if(aboutComponent){
-    ReactDOM.render(<AboutApp apiUrl={aboutComponent.dataset.apiUrl}/>, aboutComponent)
+    const root = createRoot(aboutComponent);
+    root.render(<AboutApp apiUrl={aboutComponent.dataset.apiUrl}/>)
   }
 }
 
