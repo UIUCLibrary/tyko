@@ -450,7 +450,6 @@ const FormatSpecificFields:FC<{type: ApiEnum| null}> = ({type}) =>{
   if (!type) {
     return (<></>);
   }
-  // const [Format, selectFormat] = useState<FC| null>(null);
   const options: {[key: string]: FC} = {
     'audio cassette': CassetteOnlyData,
     // 'film': 'filmOnlyData',
@@ -460,19 +459,10 @@ const FormatSpecificFields:FC<{type: ApiEnum| null}> = ({type}) =>{
     // 'video cassette': 'videoCassetteOnlyData',
   };
   const Format = type.name in options ? options[type.name] : null;
-  // selectFormat(type.name in options ? options[type.name] : null);
   if (!Format) {
     return <div>NN</div>;
   }
   return (<div>{<Format/>}</div>);
-  // if (type.name in options) {
-  //   return (
-  //     <div>{options[type.name]}</div>
-  //   );
-  // }
-  // return (
-  //   <div>{type.name}</div>
-  // );
 };
 interface NewItemModalProps{
   submitUrl: string,
