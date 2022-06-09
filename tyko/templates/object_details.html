@@ -106,16 +106,22 @@
     </div>
 {% endmacro %}
 {% block secondary_details %}
+
     {% call card("Items", 'my-1') %}
-        <div id="objectItem" data-tyko-api-url="{{ url_for("api.project_object", project_id=object['parent_project_id'], object_id=object['object_id']) }}"></div>
-                <tr>
-                    <td></td>
-                    <td>
-                        <div class="btn-group float-end" role="group">
-                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newItemModal">Add</button>
-                        </div>
-                    </td>
-                </tr>
+        <div
+                id="objectItemsApp"
+                data-tyko-api-url="{{ url_for("api.list_routes") }}"
+                data-project-id="{{ object['parent_project_id'] }}"
+                data-object-id="{{ object['object_id'] }}"
+                data-new-item-submit-url="{{ url_for("site.object_new_item", project_id=object['parent_project_id'], object_id=object['object_id']) }}"
+        ></div>
+{#        <div id="objectItem" data-tyko-api-url="{{ url_for("api.project_object", project_id=object['parent_project_id'], object_id=object['object_id']) }}"></div>#}
+{#                <tr>#}
+{#                    <td></td>#}
+{#                    <td>#}
+{#                        <div class="float-end new-item-button" data-tyko-api-url="{{ url_for("api.list_routes")}}"></div>#}
+{#                    </td>#}
+{#                </tr>#}
             {% if "parent_project_id" in object %}
 
                 {% call newEntityModal('newItemModal', title="New Item", submitUrl=url_for("site.object_new_item", project_id=object['parent_project_id'], object_id=object['object_id']), formId="newEdityForm") %}
@@ -212,5 +218,5 @@
 
 {% block scripts %}
     {{ super() }}
-    {{ remove_modal_event_scripts("removeItemModal") }}
+{#    {{ remove_modal_event_scripts("removeItemModal") }}#}
 {% endblock %}

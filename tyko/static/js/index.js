@@ -8,7 +8,7 @@ import {configureNoteEditor, RemoveConfirm} from "./editors.mjs"
 import * as tyko from "./tyko.mjs"
 import AboutApp from "./reactComponents/AboutApp";
 import FormatDetails from './reactComponents/FormatDetails'
-import Items from './reactComponents/Items';
+import Items, {NewItemButton, ObjectItemsApp} from './reactComponents/Items';
 
 import('bootstrap');
 import('bootstrap-table');
@@ -89,17 +89,32 @@ function loadTykoTypes(){
 }
 
 function loadReactComponents(){
+  for(const element of document.getElementsByClassName('new-item-button')){
+    const root = createRoot(element)
+
+    root.render(<NewItemButton apiPath={element.dataset.tykoApiUrl}/>)
+  }
+  const objectItemsApp = document.getElementById('objectItemsApp')
+  if(objectItemsApp){
+    const root = createRoot(objectItemsApp);
+    root.render(
+        <ObjectItemsApp
+            apiUrl={objectItemsApp.dataset.tykoApiUrl}
+            projectId={objectItemsApp.dataset.projectId}
+            objectId={objectItemsApp.dataset.objectId}
+            newItemSubmitUrl={objectItemsApp.dataset.newItemSubmitUrl}
+        />
+    )
+  }
+
   const objectItems = document.getElementById('objectItem')
+
   if(objectItems){
     const root = createRoot(objectItems);
-    const onAccepted = (event) =>{
-      console.log("hello")
-    }
-    root.render(<Items apiUrl={objectItems.dataset.tykoApiUrl}/>)
 
-  } else {
-    console.log('no')
+    root.render(<Items apiUrl={objectItems.dataset.tykoApiUrl}/>)
   }
+
   const formatDetailsComponent = document.getElementById('formatDetails')
   if(formatDetailsComponent){
     const root = createRoot(formatDetailsComponent);
