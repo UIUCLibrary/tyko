@@ -217,11 +217,11 @@ function ItemOptionsButton(
  * Items list
  * @constructor
  */
-export function Items(
+export default function Items(
     {
-      items,
+      items=[],
       onRemoval,
-    }: { items: Item[], onRemoval? :(url: string)=>void}) {
+    }: { items?: Item[], onRemoval? :(url: string)=>void}) {
   const itemsRendered = items.map((i: Item) => {
     return (
       <tr key={i.item_id}>
