@@ -8,9 +8,8 @@ import {render} from '@testing-library/react';
 import Items, {NewItemModal} from '../tyko/static/js/reactComponents/Items';
 import React from 'react';
 
-jest.mock('vanillajs-datepicker', ()=>{
+jest.mock('vanillajs-datepicker', ()=>{});
 
-})
 describe('Items', ()=>{
   const items = [
     {
@@ -30,7 +29,12 @@ describe('Items', ()=>{
       },
     },
   ];
-  const {getByText} = render(<Items items={items}/>);
+  const {getByText} = render(
+      <table>
+        <tbody>
+          <Items items={items}/>
+        </tbody>
+      </table>);
   test('include name', ()=>{
     expect(getByText('bar')).toBeInTheDocument();
   });
