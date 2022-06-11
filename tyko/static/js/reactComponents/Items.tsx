@@ -470,7 +470,9 @@ interface NewItemModalProps{
   onAccepted?: ()=>void
 }
 
-const NewItemModal: FC<NewItemModalProps> = ({submitUrl, show, onAccepted})=>{
+export const NewItemModal: FC<NewItemModalProps> = (
+    {submitUrl, show, onAccepted},
+)=>{
   const [
     selectedFormat,
     setSelectedFormat,

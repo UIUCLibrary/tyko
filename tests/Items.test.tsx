@@ -5,8 +5,9 @@
 'use strict';
 import '@testing-library/jest-dom';
 import {render} from '@testing-library/react';
-import Items from '../tyko/static/js/reactComponents/Items';
+import Items, {NewItemModal} from '../tyko/static/js/reactComponents/Items';
 import React from 'react';
+
 jest.mock('vanillajs-datepicker', ()=>{
 
 })
@@ -32,5 +33,11 @@ describe('Items', ()=>{
   const {getByText} = render(<Items items={items}/>);
   test('include name', ()=>{
     expect(getByText('bar')).toBeInTheDocument();
+  });
+});
+describe('NewItemModal', ()=>{
+  test('has Select a Format', ()=>{
+    const {getByText} = render(<NewItemModal submitUrl="/foo" show={true}/>);
+    expect(getByText(/Select a Format/)).toBeInTheDocument();
   });
 });
