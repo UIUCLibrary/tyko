@@ -446,7 +446,7 @@ const CassetteOnlyData: FC = ()=>{
     </>
   );
 };
-const FormatSpecificFields:FC<{type: ApiEnum| null}> = ({type}) =>{
+export const FormatSpecificFields:FC<{type: ApiEnum| null}> = ({type}) =>{
   if (!type) {
     return (<></>);
   }

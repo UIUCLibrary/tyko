@@ -49,7 +49,9 @@ def create_app() -> Flask:
     #
     # app.logger.info("Configuring database")
     db.init_app(app)
-    init_database(db.get_engine(app))
+    engine = db.get_engine(app)
+    init_database(engine)
+    create_samples(engine)
     return app
 
 

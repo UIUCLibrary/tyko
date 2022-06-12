@@ -4,8 +4,11 @@
 
 'use strict';
 import '@testing-library/jest-dom';
-import {render} from '@testing-library/react';
-import Items, {NewItemModal} from '../tyko/static/js/reactComponents/Items';
+import {render, waitFor} from '@testing-library/react';
+import Items, {
+  FormatSpecificFields,
+  NewItemModal,
+} from '../tyko/static/js/reactComponents/Items';
 import React from 'react';
 
 jest.mock('vanillajs-datepicker', ()=>{});
@@ -45,3 +48,18 @@ describe('NewItemModal', ()=>{
     expect(getByText(/Select a Format/)).toBeInTheDocument();
   });
 });
+
+describe('FormatSpecificFields', ()=>{
+  describe('audio cassette', ()=>{
+    test('Title of Cassette', async ()=>{
+      const type = {
+        id: 1,
+        name: 'audio cassette',
+      };
+      const {getByText} = render(<FormatSpecificFields type={type}/>);
+      await waitFor(()=>{
+        expect(getByText('Title of Cassette')).toBeInTheDocument();
+      });
+    });
+  });
+})
