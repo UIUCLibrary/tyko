@@ -67,7 +67,7 @@ describe('FormatSpecificFields', ()=>{
 });
 describe('CassetteOnlyData', ()=>{
   beforeEach(()=>{
-    axios.get = jest.fn((url) => {
+    axios.get = jest.fn((url: string): Promise<any> => {
       if (url === '/api/formats/audio_cassette/generation') {
         return Promise.resolve({data: [
           {
