@@ -302,7 +302,7 @@ interface ApiEnum{
     id: number
     name: string
   }
-const CassetteOnlyData: FC = ()=>{
+export const CassetteOnlyData: FC = ()=>{
   const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
   const [subtypes, setSubTypes] = useState<ApiEnum[]|null>(null);
   const getGenerations =() => {

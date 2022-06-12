@@ -3,9 +3,11 @@
  */
 
 'use strict';
+import axios from 'axios';
 import '@testing-library/jest-dom';
 import {render, waitFor} from '@testing-library/react';
 import Items, {
+  CassetteOnlyData,
   FormatSpecificFields,
   NewItemModal,
 } from '../tyko/static/js/reactComponents/Items';
@@ -62,4 +64,41 @@ describe('FormatSpecificFields', ()=>{
       });
     });
   });
-})
+});
+describe('CassetteOnlyData', ()=>{
+  beforeEach(()=>{
+    axios.get = jest.fn((url) => {
+      if (url === '/api/formats/audio_cassette/generation') {
+        return Promise.resolve({data: [
+          {
+            id: 1,
+            name: 'foo',
+          },
+          {
+            id: 2,
+            name: 'bar',
+          },
+        ]});
+      }
+      if (url === '/api/formats/audio_cassette/subtype') {
+        return Promise.resolve({data: [
+          {
+            id: 2,
+            name: 'bar',
+          },
+          {
+            id: 3,
+            name: 'baz',
+          },
+        ]});
+      }
+      return Promise.resolve({data: []});
+    });
+  });
+  test('Title of Cassette', async ()=>{
+    const {getByText} = render(<CassetteOnlyData/>);
+    await waitFor(()=>{
+      expect(getByText('Title of Cassette')).toBeInTheDocument();
+    });
+  });
+});
