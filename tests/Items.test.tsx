@@ -5,6 +5,7 @@
 'use strict';
 import axios from 'axios';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import {render, waitFor} from '@testing-library/react';
 import Items, {
   CassetteOnlyData,
@@ -45,9 +46,41 @@ describe('Items', ()=>{
   });
 });
 describe('NewItemModal', ()=>{
-  test('has Select a Format', ()=>{
+  beforeEach(()=>{
+    axios.get = jest.fn((url: string): Promise<any> => {
+      if (url === '/api/format') {
+        return Promise.resolve(
+            {
+              data: [
+                {
+                  id: 1,
+                  name: 'foo format',
+                },
+                {
+                  id: 2,
+                  name: 'bar format',
+                },
+              ],
+            },
+        );
+      }
+      return Promise.resolve({});
+    });
+  });
+  test('has Select a Format', async ()=>{
     const {getByText} = render(<NewItemModal submitUrl="/foo" show={true}/>);
-    expect(getByText(/Select a Format/)).toBeInTheDocument();
+    await waitFor(()=> {
+      expect(getByText(/Select a Format/)).toBeInTheDocument();
+    });
+  });
+  test('selection', async ()=>{
+    const {getByText, getByLabelText} = render(
+        <NewItemModal submitUrl="/foo" show={true}/>
+    );
+    await waitFor(()=> {
+      userEvent.selectOptions(getByLabelText('Format'), '2');
+      expect((getByText('bar format') as HTMLOptionElement).selected).toBeTruthy();
+    });
   });
 });
 

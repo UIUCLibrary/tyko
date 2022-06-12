@@ -246,13 +246,13 @@ export default function Items(
   );
 }
 
-interface SelectDate{
+interface ISelectDate{
   dateFormat: string,
   name: string
   placeholder?: string,
 }
 
-const SelectDate: FC<SelectDate> = ({dateFormat, name, placeholder}) =>{
+const SelectDate: FC<ISelectDate> = ({dateFormat, name, placeholder}) =>{
   const inputText = useRef<HTMLInputElement>(null);
   return (
     <Form.Group className="input-group">
@@ -544,7 +544,7 @@ export const NewItemModal: FC<NewItemModalProps> = (
         );
       }).catch((error) => console.error(error));
     }
-  });
+  }, []);
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) =>{
     if (event.target.value) {
       setSelectedFormat(getFormat(parseInt(event.target.value)));
@@ -552,6 +552,9 @@ export const NewItemModal: FC<NewItemModalProps> = (
       setSelectedFormat(null);
     }
   };
+  if (!options){
+    return <>loading...</>;
+  }
   return (
     <Modal show={isOpen} size="lg" ref={newItemDialog}>
       <Modal.Header>
@@ -576,7 +579,7 @@ export const NewItemModal: FC<NewItemModalProps> = (
             </Form.Group>
           </Form.Group>
           <Form.Group className="mb-3 row">
-            <Form.Label className="col-sm-2 col-form-label">Format</Form.Label>
+            <Form.Label htmlFor='itemFormatSelection' className="col-sm-2 col-form-label">Format</Form.Label>
             <Form.Group className="col-sm-10">
               <Form.Select
                 name="format_id"
