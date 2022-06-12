@@ -522,12 +522,8 @@ export const NewItemModal: FC<NewItemModalProps> = (
       }
     })).catch(console.error);
 
-    // x.submit();
-    // event.target.submit()
-    // window.location.href =
     setIsOpen(false);
     return false;
-    // location.reload()
   };
 
   useEffect(()=>{
