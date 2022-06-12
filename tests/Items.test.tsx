@@ -21,7 +21,7 @@ describe('Items', ()=>{
       files: [],
       format: {
         id: 1,
-        name: 'foo format',
+        name: 'audio cassette',
       },
       elements: [],
       format_details: {},
@@ -52,6 +52,35 @@ describe('NewItemModal', ()=>{
 });
 
 describe('FormatSpecificFields', ()=>{
+  beforeEach(()=>{
+    axios.get = jest.fn((url: string): Promise<any> => {
+      if (url === '/api/formats/audio_cassette/generation') {
+        return Promise.resolve({data: [
+          {
+            id: 1,
+            name: 'foo',
+          },
+          {
+            id: 2,
+            name: 'bar',
+          },
+        ]});
+      }
+      if (url === '/api/formats/audio_cassette/subtype') {
+        return Promise.resolve({data: [
+          {
+            id: 2,
+            name: 'bar',
+          },
+          {
+            id: 3,
+            name: 'baz',
+          },
+        ]});
+      }
+      return Promise.resolve({data: []});
+    });
+  });
   describe('audio cassette', ()=>{
     test('Title of Cassette', async ()=>{
       const type = {

@@ -305,7 +305,7 @@ interface ApiEnum{
 export const CassetteOnlyData: FC = ()=>{
   const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
   const [subtypes, setSubTypes] = useState<ApiEnum[]|null>(null);
-  const getGenerations =() => {
+  const getGenerations = () => {
     axios.get('/api/formats/audio_cassette/generation')
         .then((res)=> {
           setGenerations(
@@ -313,7 +313,9 @@ export const CassetteOnlyData: FC = ()=>{
                   res.data as ApiEnum[]
               ).sort((a, b) => a.name < b.name ? -1: 1),
           );
-        }).catch((console.error));
+        }).catch((error) => {
+          console.error(error);
+        });
   };
   const getSubTypes =() => {
     axios.get('/api/formats/audio_cassette/subtype')
@@ -323,7 +325,9 @@ export const CassetteOnlyData: FC = ()=>{
                   res.data as ApiEnum[]
               ).sort((a, b) => a.name < b.name ? -1: 1),
           );
-        }).catch((console.error));
+        }).catch((error) => {
+          console.error(error);
+        });
   };
 
   useEffect(()=>{
@@ -386,7 +390,7 @@ export const CassetteOnlyData: FC = ()=>{
           <Form.Select name="generationId" id="generation" defaultValue={''}>
             <option value=""></option>
             {
-              generations?.map((i)=>
+              generations.map((i)=>
                 <option key={i.id} value={i.id}>{i.name}</option>,
               )
             }
