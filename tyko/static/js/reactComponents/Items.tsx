@@ -326,13 +326,17 @@ export const CassetteOnlyData: FC = ()=>{
         }).catch((console.error));
   };
 
-  if (!generations) {
+  useEffect(()=>{
     getGenerations();
+  }, []);
+  useEffect(()=>{
+    getSubTypes();
+  }, []);
+
+  if (!generations || !subtypes) {
+    return (<>Loading...</>);
   }
 
-  if (!subtypes) {
-    getSubTypes();
-  }
   return (
     <>
       <Form.Group className="mb-3 row">
@@ -364,11 +368,11 @@ export const CassetteOnlyData: FC = ()=>{
           <Form.Select
             name="cassetteTypeId"
             id="cassetteType"
-            defaultValue={''}>
-            <option value=""></option>
+            defaultValue=''>
+            <option value=""/>
             {
-              subtypes?.map((i)=>
-                <option key={i.id} value={i.id}>{i.name}</option>,
+              subtypes.map(
+                  (i)=><option key={i.id} value={i.id}>{i.name}</option>,
               )
             }
           </Form.Select>
