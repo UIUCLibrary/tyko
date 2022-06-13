@@ -557,13 +557,6 @@ export const NewItemModal: FC<NewItemModalProps> = (
   [show],
   );
 
-  const options = (formats == null)? null: formats.map(
-      (apiResponse: ApiEnum) => (
-        <option key={apiResponse.id} value={apiResponse.id}>
-          {apiResponse.name}
-        </option>
-      ),
-  );
 
   useEffect(()=>{
     if (!formats) {
@@ -576,9 +569,17 @@ export const NewItemModal: FC<NewItemModalProps> = (
       }).catch((error) => console.error(error));
     }
   }, []);
-  if (!options) {
-    return <>loading...</>;
-  }
+
+    const options = (formats == null)? null: formats.map(
+      (apiResponse: ApiEnum) => (
+        <option key={apiResponse.id} value={apiResponse.id}>
+          {apiResponse.name}
+        </option>
+      ),
+  );
+  // if (!options) {
+  //   return <>loading...</>;
+  // }
 
   const handleSubmit = (event: React.SyntheticEvent) => {
     if (onAccepted) {
@@ -588,13 +589,13 @@ export const NewItemModal: FC<NewItemModalProps> = (
 
   const form = (
     <form id="formId" title='newItem' onSubmit={handleSubmit}>
-      <FormBody options={options} formats={formats ? formats : []}/>
+      <FormBody options={options? options: []} formats={formats ? formats : []}/>
       <FormFooter/>
     </form>
   );
 
   return (
-    <Modal show={isOpen} size="lg" ref={newItemDialog}>
+    <Modal data-testid='newItemModal' show={isOpen} size="lg" ref={newItemDialog}>
       <Modal.Header>
         <h5 className="modal-title" id="titleId">New Item</h5>
         <button
@@ -612,9 +613,13 @@ export const NewItemModal: FC<NewItemModalProps> = (
 
 export const NewItemButton: FC<{
   onAccepted?: (event: React.SyntheticEvent)=>void
-}> = ({onAccepted})=> {
+  onShow?: ()=>void
+}> = ({onAccepted, onShow})=> {
   const [dialogShown, setDialogShown] = useState<boolean>(false);
   const onClick = ()=>{
+    if (onShow) {
+      onShow();
+    }
     setDialogShown(true);
   };
   const handleAccepted = (event: React.SyntheticEvent) => {
@@ -625,7 +630,10 @@ export const NewItemButton: FC<{
   };
   return (
     <React.Fragment>
-      <button className="btn btn-primary btn-sm" onClick={onClick}>
+      <button
+        data-testid='addButton'
+        className="btn btn-primary btn-sm"
+        onClick={onClick}>
         Add
       </button>
       <NewItemModal show={dialogShown} onAccepted={handleAccepted}/>

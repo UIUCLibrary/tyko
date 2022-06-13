@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import {render, waitFor} from '@testing-library/react';
 import Items, {
   CassetteOnlyData,
-  FormatSpecificFields,
+  FormatSpecificFields, NewItemButton,
   NewItemModal,
 } from '../tyko/static/js/reactComponents/Items';
 import React from 'react';
@@ -86,7 +86,18 @@ describe('NewItemModal', ()=>{
     });
   });
 });
+describe('NewItemButton', ()=>{
+  const onShow = jest.fn();
 
+  const {getByTestId} = render(<NewItemButton onShow={onShow}/>);
+  test('clicking button calls onShow', async ()=>{
+    await waitFor(async ()=>{
+      const button = getByTestId('addButton');
+      await userEvent.click(button);
+      expect(onShow).toBeCalled();
+    });
+  });
+});
 describe('FormatSpecificFields', ()=>{
   beforeEach(()=>{
     axios.get = jest.fn((url: string): Promise<any> => {
