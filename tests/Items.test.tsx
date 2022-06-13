@@ -66,20 +66,23 @@ describe('NewItemModal', ()=>{
       }
       return Promise.resolve({});
     });
+    axios.post = jest.fn((url: string): Promise<any> => {
+      return Promise.resolve();
+    });
   });
   test('has Select a Format', async ()=>{
-    const {getByText} = render(<NewItemModal submitUrl="/foo" show={true}/>);
+    const {getByText} = render(<NewItemModal show={true}/>);
     await waitFor(()=> {
       expect(getByText(/Select a Format/)).toBeInTheDocument();
     });
   });
   test('selection', async ()=>{
-    const {getByText, getByLabelText} = render(
-        <NewItemModal submitUrl="/foo" show={true}/>
-    );
+    const {getByText, getByLabelText} = render(<NewItemModal show={true}/>);
     await waitFor(()=> {
       userEvent.selectOptions(getByLabelText('Format'), '2');
-      expect((getByText('bar format') as HTMLOptionElement).selected).toBeTruthy();
+      expect(
+          (getByText('bar format') as HTMLOptionElement).selected
+      ).toBeTruthy();
     });
   });
 });

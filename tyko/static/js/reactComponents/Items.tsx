@@ -472,24 +472,85 @@ export const FormatSpecificFields:FC<{type: ApiEnum| null}> = ({type}) =>{
   }
   return (<div>{<Format/>}</div>);
 };
-interface NewItemModalProps{
-  submitUrl: string,
-  show: boolean,
-  onAccepted?: ()=>void
-}
 
-export const NewItemModal: FC<NewItemModalProps> = (
-    {submitUrl, show, onAccepted},
-)=>{
+
+const FormFooter = () => {
+  return (
+    <Modal.Footer>
+      <button className="btn btn-primary" type="submit">Create</button>
+    </Modal.Footer>
+  );
+};
+interface IFormBody {
+  options: JSX.Element[]
+  formats:ApiEnum[]
+}
+const FormBody:FC<IFormBody> = (
+    {
+      options,
+      formats,
+    } )=> {
+  const getFormat = (id: number, formats:ApiEnum[]): ApiEnum | null => {
+    for ( const format of formats) {
+      if (format.id === id) {
+        return format;
+      }
+    }
+    return null;
+  };
   const [
     selectedFormat,
     setSelectedFormat,
   ] = useState<ApiEnum|null>(null);
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) =>{
+    if (event.target.value) {
+      setSelectedFormat(
+          getFormat(parseInt(event.target.value), formats));
+    } else {
+      setSelectedFormat(null);
+    }
+  };
+  return (
+    <Modal.Body>
+      <Form.Group className="mb-3 row">
+        <Form.Label className="col-sm-2 col-form-label">Name</Form.Label>
+        <Form.Group className="col-sm-10">
+          <input
+            type="text" id="itemNameInput"
+            className="form-control"
+            name="name" required></input>
+        </Form.Group>
+      </Form.Group>
+      <Form.Group className="mb-3 row">
+        <Form.Label htmlFor='itemFormatSelection'
+          className="col-sm-2 col-form-label">Format</Form.Label>
+        <Form.Group className="col-sm-10">
+          <Form.Select
+            name="format_id"
+            id="itemFormatSelection"
+            onChange={handleChange}
+            required defaultValue={''}>
+            <option value="" disabled>Select a Format</option>
+            {options}
+          </Form.Select>
+        </Form.Group>
+      </Form.Group>
+      <FormatSpecificFields type={selectedFormat}/>
+    </Modal.Body>
+  );
+};
 
+interface NewItemModalProps{
+  show: boolean,
+  onAccepted?: (event: React.SyntheticEvent)=>void
+}
+
+export const NewItemModal: FC<NewItemModalProps> = (
+    {show, onAccepted},
+)=>{
   const [isOpen, setIsOpen] = useState(show);
   const [formats, setFormats] = useState<ApiEnum[]| null>(null);
   const newItemDialog = useRef(null);
-
   useEffect(()=>{
     setIsOpen(show);
   },
@@ -503,36 +564,6 @@ export const NewItemModal: FC<NewItemModalProps> = (
         </option>
       ),
   );
-  const getFormat = (id: number): ApiEnum | null => {
-    if (formats === null) {
-      console.error('formats not loaded');
-      return null;
-    }
-    for ( const f of formats) {
-      if (f.id === id) {
-        return f;
-      }
-    }
-    return null;
-  };
-
-  const handleSubmit = (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    const formProps = Object.fromEntries(formData);
-    axios.post(submitUrl, formProps, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }}).then((() =>{
-      setIsOpen(false);
-      if (onAccepted) {
-        onAccepted();
-      }
-    })).catch(console.error);
-
-    setIsOpen(false);
-    return false;
-  };
 
   useEffect(()=>{
     if (!formats) {
@@ -545,16 +576,23 @@ export const NewItemModal: FC<NewItemModalProps> = (
       }).catch((error) => console.error(error));
     }
   }, []);
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) =>{
-    if (event.target.value) {
-      setSelectedFormat(getFormat(parseInt(event.target.value)));
-    } else {
-      setSelectedFormat(null);
-    }
-  };
-  if (!options){
+  if (!options) {
     return <>loading...</>;
   }
+
+  const handleSubmit = (event: React.SyntheticEvent) => {
+    if (onAccepted) {
+      onAccepted(event);
+    }
+  };
+
+  const form = (
+    <form id="formId" title='newItem' onSubmit={handleSubmit}>
+      <FormBody options={options} formats={formats ? formats : []}/>
+      <FormFooter/>
+    </form>
+  );
+
   return (
     <Modal show={isOpen} size="lg" ref={newItemDialog}>
       <Modal.Header>
@@ -567,50 +605,23 @@ export const NewItemModal: FC<NewItemModalProps> = (
         </button>
 
       </Modal.Header>
-      <form id="formId" onSubmit={handleSubmit}>
-        <Modal.Body>
-          <Form.Group className="mb-3 row">
-            <Form.Label className="col-sm-2 col-form-label">Name</Form.Label>
-            <Form.Group className="col-sm-10">
-              <input
-                type="text" id="itemNameInput"
-                className="form-control"
-                name="name" required></input>
-            </Form.Group>
-          </Form.Group>
-          <Form.Group className="mb-3 row">
-            <Form.Label htmlFor='itemFormatSelection' className="col-sm-2 col-form-label">Format</Form.Label>
-            <Form.Group className="col-sm-10">
-              <Form.Select
-                name="format_id"
-                id="itemFormatSelection"
-                onChange={handleChange}
-                required defaultValue={''}>
-                <option value="" disabled>Select a Format</option>
-                {options}
-              </Form.Select>
-            </Form.Group>
-          </Form.Group>
-          <FormatSpecificFields type={selectedFormat}/>
-        </Modal.Body>
-        <Modal.Footer>
-          <button className="btn btn-primary" type="submit">Create</button>
-        </Modal.Footer>
-      </form>
+      {form}
     </Modal>
   );
 };
 
-interface NewItemButtonProps{
-  newItemSubmitUrl: string,
-  onAccepted?: ()=>void
-}
-export const NewItemButton: FC<NewItemButtonProps> = (
-    {newItemSubmitUrl, onAccepted},
-)=> {
+export const NewItemButton: FC<{
+  onAccepted?: (event: React.SyntheticEvent)=>void
+}> = ({onAccepted},)=> {
   const [dialogShown, setDialogShown] = useState<boolean>(false);
   const onClick = ()=>{
     setDialogShown(true);
+  };
+  const handleAccepted = (event: React.SyntheticEvent) => {
+    if (onAccepted) {
+      onAccepted(event);
+      setDialogShown(false);
+    }
   };
   return (
     <React.Fragment>
@@ -618,9 +629,8 @@ export const NewItemButton: FC<NewItemButtonProps> = (
         onClick={onClick}
       >Add</button>
       <NewItemModal
-        submitUrl={newItemSubmitUrl}
         show={dialogShown}
-        onAccepted={onAccepted}
+        onAccepted={handleAccepted}
       />
     </React.Fragment>
   );
@@ -693,9 +703,16 @@ export function ObjectItemsApp(
     return (<div>Loading ...</div>);
   }
 
-  const newItemSubmitted = ()=>{
-    setObjectApiUrl(objectApiUrl);
-    update();
+  const newItemSubmitted = (event: React.SyntheticEvent)=>{
+    event.preventDefault();
+    const formData = new FormData(event.target as HTMLFormElement);
+    const formProps = Object.fromEntries(formData);
+    axios.post(newItemSubmitUrl, formProps, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }}).then((() =>{
+      update();
+    })).catch(console.error);
   };
 
   if (!objectApiUrl) {
@@ -729,10 +746,7 @@ export function ObjectItemsApp(
             <td></td>
             <td></td>
             <td>
-              <NewItemButton
-                newItemSubmitUrl={newItemSubmitUrl}
-                onAccepted={newItemSubmitted}
-              />
+              <NewItemButton onAccepted={newItemSubmitted}/>
             </td>
           </tr>
         </tbody>
