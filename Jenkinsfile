@@ -665,6 +665,10 @@ pipeline {
                                                   docker rm ${CONTAINER_NAME}
                                                   """
                                        )
+                                    sh(label: 'Remove existing image if any',
+                                       script: "docker rmi ${DOCKER_IMAGE_NAME}",
+                                       returnStatus: true
+                                       )
                                     dockerImage.run("--name ${CONTAINER_NAME} -p 8081:${configProperties['exposed_port']}")
                                 }
                             }
