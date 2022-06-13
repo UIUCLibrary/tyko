@@ -577,9 +577,9 @@ export const NewItemModal: FC<NewItemModalProps> = (
         </option>
       ),
   );
-  // if (!options) {
-  //   return <>loading...</>;
-  // }
+  if (!options) {
+    return <>loading...</>;
+  }
 
   const handleSubmit = (event: React.SyntheticEvent) => {
     if (onAccepted) {
@@ -589,7 +589,7 @@ export const NewItemModal: FC<NewItemModalProps> = (
 
   const form = (
     <form id="formId" title='newItem' onSubmit={handleSubmit}>
-      <FormBody options={options? options: []} formats={formats ? formats : []}/>
+      <FormBody options={options} formats={formats ? formats : []}/>
       <FormFooter/>
     </form>
   );
@@ -616,16 +616,17 @@ export const NewItemButton: FC<{
   onShow?: ()=>void
 }> = ({onAccepted, onShow})=> {
   const [dialogShown, setDialogShown] = useState<boolean>(false);
-  const onClick = ()=>{
-    if (onShow) {
-      onShow();
-    }
-    setDialogShown(true);
-  };
+
   const handleAccepted = (event: React.SyntheticEvent) => {
     if (onAccepted) {
       onAccepted(event);
       setDialogShown(false);
+    }
+  };
+  const onClick = ()=>{
+    setDialogShown(true);
+    if (onShow) {
+      onShow();
     }
   };
   return (

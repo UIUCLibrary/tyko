@@ -6,7 +6,7 @@
 import axios from 'axios';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import {render, waitFor} from '@testing-library/react';
+import {render, waitFor, fireEvent} from '@testing-library/react';
 import Items, {
   CassetteOnlyData,
   FormatSpecificFields, NewItemButton,
@@ -83,18 +83,6 @@ describe('NewItemModal', ()=>{
       expect(
           (getByText('bar format') as HTMLOptionElement).selected
       ).toBeTruthy();
-    });
-  });
-});
-describe('NewItemButton', ()=>{
-  const onShow = jest.fn();
-
-  const {getByTestId} = render(<NewItemButton onShow={onShow}/>);
-  test('clicking button calls onShow', async ()=>{
-    await waitFor(async ()=>{
-      const button = getByTestId('addButton');
-      await userEvent.click(button);
-      expect(onShow).toBeCalled();
     });
   });
 });
@@ -176,5 +164,14 @@ describe('CassetteOnlyData', ()=>{
     await waitFor(()=>{
       expect(getByText('Title of Cassette')).toBeInTheDocument();
     });
+  });
+});
+describe('NewItemButton', ()=>{
+  const onShow = jest.fn();
+  test('click calls show', ()=>{
+    const {getByTestId} = render(<NewItemButton onShow={onShow}/>);
+    const button = getByTestId('addButton');
+    fireEvent.click(button);
+    expect(onShow).toBeCalled();
   });
 });
