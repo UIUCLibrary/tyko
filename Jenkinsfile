@@ -659,7 +659,8 @@ pipeline {
                                 def configProperties = readProperties(file: CONFIG_FILE)
                                 def dockerImage = docker.build(DOCKER_IMAGE_NAME, '-f deploy/tyko/Dockerfile .')
                                 docker.withServer(configProperties['docker_url'], configProperties['docker_jenkins_certs']){
-                                    sh(returnStatus: true,
+                                    sh(label: 'Remove existing container if any',
+                                       returnStatus: true,
                                        script: """docker stop ${CONTAINER_NAME}
                                                   docker rm ${CONTAINER_NAME}
                                                   """
