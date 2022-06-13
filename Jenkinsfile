@@ -657,8 +657,8 @@ pipeline {
                         configFileProvider([configFile(fileId: 'preview_server_props', variable: 'CONFIG_FILE')]) {
                             script{
                                 def configProperties = readProperties(file: CONFIG_FILE)
-                                def dockerImage = docker.build(DOCKER_IMAGE_NAME, '-f deploy/tyko/Dockerfile .')
                                 docker.withServer(configProperties['docker_url'], configProperties['docker_jenkins_certs']){
+                                    def dockerImage = docker.build(DOCKER_IMAGE_NAME, '-f deploy/tyko/Dockerfile .')
                                     sh(label: 'Remove existing container if any',
                                        returnStatus: true,
                                        script: """docker stop ${CONTAINER_NAME}
