@@ -625,13 +625,10 @@ export const NewItemButton: FC<{
   };
   return (
     <React.Fragment>
-      <button className="btn btn-primary btn-sm"
-        onClick={onClick}
-      >Add</button>
-      <NewItemModal
-        show={dialogShown}
-        onAccepted={handleAccepted}
-      />
+      <button className="btn btn-primary btn-sm" onClick={onClick}>
+        Add
+      </button>
+      <NewItemModal show={dialogShown} onAccepted={handleAccepted}/>
     </React.Fragment>
   );
 };
