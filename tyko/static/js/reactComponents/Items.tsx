@@ -612,7 +612,7 @@ export const NewItemModal: FC<NewItemModalProps> = (
 
 export const NewItemButton: FC<{
   onAccepted?: (event: React.SyntheticEvent)=>void
-}> = ({onAccepted},)=> {
+}> = ({onAccepted})=> {
   const [dialogShown, setDialogShown] = useState<boolean>(false);
   const onClick = ()=>{
     setDialogShown(true);
