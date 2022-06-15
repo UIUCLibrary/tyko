@@ -258,7 +258,7 @@ def page_item():
     return item_pages.list()
 
 
-@site.route('/item/<string:item_id>')
+@site.route('/item/<int:item_id>')
 def page_item_details(item_id):
     data_prov = data_provider.DataProvider(database.db.engine)
     item_pages = frontend.ItemFrontend(data_prov)
