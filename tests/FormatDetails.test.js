@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 import {
   render,
   waitForElementToBeRemoved,
-  cleanup,
+  cleanup, waitFor,
 } from '@testing-library/react';
 import FormatDetails from '../tyko/static/js/reactComponents/FormatDetails';
 
@@ -51,9 +51,12 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('FormatDetails', ()=>{
-  it('displays text "loading" while fetching data', ()=>{
-    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
-    getByText('Loading...');
+  it('displays text "loading" while fetching data', async ()=>{
+    const {getByText} = await waitFor(()=>{
+      return render(<FormatDetails apiUrl='/foo'/>);
+    });
+    const element = await waitFor(()=>getByText('Loading...'));
+    expect(element).toBeTruthy();
   });
 
   it('Removes text "Loading" after data has been fetched', async ()=>{
@@ -827,6 +830,8 @@ describe('FormatDetails', ()=>{
     );
     const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
     await waitForElementToBeRemoved(() => getByText('Loading...'));
-    expect(getByText(expectedString)).toBeInTheDocument();
+    await (()=>{
+      expect(getByText(expectedString)).toBeInTheDocument();
+    });
   });
 });

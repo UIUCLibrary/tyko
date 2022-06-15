@@ -4,6 +4,7 @@ env:
 extends:
   - google
   - plugin:react/recommended
+  - plugin:react/jsx-runtime
 globals:
   Atomics: readonly
   SharedArrayBuffer: readonly
@@ -39,3 +40,6 @@ overrides:
         "plugin:import/typescript",
         "plugin:react-hooks/recommended",
     ]
+settings:
+  react:
+    version: "detect"

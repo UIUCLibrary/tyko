@@ -5,33 +5,44 @@ import axios from 'axios';
 import {
   render,
   cleanup,
-  waitForElementToBeRemoved,
+  waitForElementToBeRemoved, waitFor,
 } from '@testing-library/react';
 import AboutApp from '../tyko/static/js/reactComponents/AboutApp';
 
-const mockApplicationData = {
-  server_color: 'blue',
-  version: '0.0.1.dev1',
-};
+// const mockApplicationData = {
+//   server_color: 'blue',
+//   version: '0.0.1.dev1',
+// };
 beforeEach(() => {
-  axios.get = jest.fn(() => {});
+  axios.get = jest.fn(() => {
+    return Promise.resolve(
+        {
+          data: {
+            server_color: 'blue',
+            version: '0.0.1.dev1',
+          },
+        },
+    );
+  });
 });
 
-afterEach(cleanup);
+// afterEach(cleanup);
 describe('AboutApp', () => {
-  const {getByTestId} = render(<AboutApp apiUrl="/api"/>);
-  it('header should exists ', () => {
-    const header = getByTestId('header');
-    expect(header).toBeTruthy();
+  test('header should exists ', async () => {
+    const {getByTestId} = render(<AboutApp apiUrl="/api"/>);
+    await waitFor(async ()=>{
+      expect(getByTestId('header')).toBeTruthy();
+    });
   });
 
-  it('displays text "loading" while fetching data', () => {
-    axios.get.mockResolvedValueOnce({data: {data: mockApplicationData}});
+  it('displays text "loading" while fetching data', async () => {
     const {getByText} = render(<AboutApp apiUrl='/foo'/>);
-    getByText('Loading...');
+    const loading = await waitFor(async ()=>{
+      return getByText('Loading...');
+    });
+    expect(loading);
   });
   it('Removes text "Loading" after data has been fetched', async () => {
-    axios.get.mockResolvedValueOnce({data: {data: mockApplicationData}});
     const {getByText} = render(<AboutApp apiUrl='/foo'/>);
     await waitForElementToBeRemoved(() => {
       return getByText('Loading...');
