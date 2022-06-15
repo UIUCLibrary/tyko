@@ -98,7 +98,6 @@ setup(
     package_data={
         "": [
             "templates/*.html",
-            "templates/forms/*.html",
             "static/css/*.css",
             "static/css/*.css.map",
             "static/js/*.js",
