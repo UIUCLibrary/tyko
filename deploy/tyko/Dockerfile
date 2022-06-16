@@ -47,7 +47,8 @@ VOLUME /database
 ARG TYKO_SERVER_COLOR
 ARG TYKO_USERNAME
 ARG TYKO_PASSWORD
-ARG DB_URI=sqlite:////tyko.db
+RUN mkdir -p /app/db/
+ARG DB_URI=sqlite:////app/db/tyko.db
 # Create a config file
 RUN echo "SQLALCHEMY_DATABASE_URI = '${DB_URI}'" > /app/config.cfg \
   && echo "SQLALCHEMY_TRACK_MODIFICATIONS = False" >> /app/config.cfg \

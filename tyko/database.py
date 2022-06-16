@@ -1,9 +1,21 @@
 import sys
-from typing import Tuple, Any, Type, List, TypedDict, Union, Mapping, cast
+import itertools
+from typing import (
+    Tuple,
+    Any,
+    Type,
+    List,
+    TypedDict,
+    Union,
+    Mapping,
+    cast,
+    Iterable
+)
 from flask_sqlalchemy import SQLAlchemy
 import sqlalchemy
 import sqlalchemy.orm
 from sqlalchemy.orm.session import sessionmaker
+
 
 import tyko.schema.avtables
 
@@ -17,26 +29,30 @@ TykoEnumData = TypedDict('TykoEnumData', {'name': str, 'id': int})
 
 
 def alembic_table_exists(engine) -> bool:
-    import packaging.version
+    import packaging.version  # pylint: disable=import-outside-toplevel
     if packaging.version.parse(sqlalchemy.__version__) < \
             packaging.version.parse("1.4"):
         return engine.dialect.has_table(engine, "alembic_version")
-    else:
-        return sqlalchemy.inspect(engine).has_table("alembic_version")
+    return sqlalchemy.inspect(engine).has_table("alembic_version")
 
 
 def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
-    print("Adding sample collection")
-    new_collection = schema.Collection()
-    new_collection.collection_name = \
-        cast(
-            sqlalchemy.Column[sqlalchemy.Text],
-            "sample collection"
-        )
-    session.add(new_collection)
+    if not session.query(schema.Collection).filter_by(
+            collection_name='sample collection'
+    ).first():
+        print("Adding sample collection ")
+        new_collection = schema.Collection()
+        new_collection.collection_name = \
+            cast(
+                sqlalchemy.Column[sqlalchemy.Text],
+                "sample collection"
+            )
+        session.add(new_collection)
 
 
-def _populate_enum_tables(session: sqlalchemy.orm.Session) -> None:
+def _get_enum_tables(
+        session: sqlalchemy.orm.Session
+) -> Iterable[formats.EnumTable]:
     enum_table_classes: List[Type[formats.EnumTable]] = [
         formats.OpenReelSubType,
         formats.OpenReelReelWidth,
@@ -67,12 +83,12 @@ def _populate_enum_tables(session: sqlalchemy.orm.Session) -> None:
         formats.AudioCassetteGeneration
 
     ]
-
     for enum_table_class in enum_table_classes:
         for new_type_name in enum_table_class.default_values:
-            new_type = enum_table_class()
-            new_type.name = new_type_name
-            session.add(new_type)
+            if session.query(
+                enum_table_class
+            ).filter_by(name=new_type_name).first() is None:
+                yield enum_table_class(name=new_type_name)
 
 
 def create_samples(engine: sqlalchemy.engine.Engine) -> None:
@@ -109,17 +125,21 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
 
     for i in session.query(notes.NoteTypes):
         session.delete(i)
-    _populate_note_type_table(session)
 
     for i in session.query(formats.FormatTypes):
         session.delete(i)
 
-    _populate_format_types_table(session)
-
-    _populate_enum_tables(session)
-
-    _populate_starting_project_status(
-        session, project_status_table=projects.ProjectStatus)
+    session.add_all(
+        itertools.chain(
+            _iter_format_types_table(session),
+            _get_enum_tables(session),
+            _iter_note_type_table(session),
+            _iter_starting_project_status(
+                session,
+                project_status_table=projects.ProjectStatus
+            )
+        )
+    )
 
     session.commit()
     session.close()
@@ -131,34 +151,39 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
         raise IOError("Table data has changed")
 
 
-def _populate_note_type_table(session: sqlalchemy.orm.Session) -> None:
-    print("Populating NoteTypes Table")
-    for note_type, note_metadata in notes.note_types.items():
-        note_id = note_metadata[0]
+def _iter_note_type_table(
+        session: sqlalchemy.orm.Session
+) -> Iterable[notes.NoteTypes]:
+    for (note_type, note_metadata) in notes.note_types.items():
+        if session.query(notes.NoteTypes).filter_by(
+                name=note_type
+        ).first() is None:
+            yield notes.NoteTypes(name=note_type, id=note_metadata[0])
 
-        new_note_type = notes.NoteTypes(name=note_type, id=note_id)
-        session.add(new_note_type)
 
-
-def _populate_starting_project_status(
+def _iter_starting_project_status(
         session: sqlalchemy.orm.Session,
-        project_status_table: Type[projects.ProjectStatus]) -> None:
-
-    print(f"Populating {project_status_table.__tablename__} Table")
+        project_status_table: Type[projects.ProjectStatus]
+) -> Iterable[projects.ProjectStatus]:
     statuses = ['In progress', "Complete", "No work done"]
     for status in statuses:
-        new_status = project_status_table(name=status)
-        session.add(new_status)
+        if session.query(
+                project_status_table
+        ).filter_by(name=status).first() is None:
+            yield project_status_table(name=status)
 
 
-def _populate_format_types_table(session: sqlalchemy.orm.Session) -> None:
-    print("Populating project_status_type Table")
-    for format_type, format_metadata in formats.format_types.items():
-        format_id = format_metadata[0]
+def _iter_format_types_table(
+        session: sqlalchemy.orm.Session
+) -> Iterable[formats.FormatTypes]:
 
-        new_format_type = formats.FormatTypes(name=format_type,
-                                              id=format_id)
-        session.add(new_format_type)
+    for (format_type, format_metadata) in formats.format_types.items():
+        if session.query(
+            formats.FormatTypes
+        ).filter_by(
+            name=format_type,
+        ).first() is None:
+            yield formats.FormatTypes(name=format_type, id=format_metadata[0])
 
 
 def validate_enumerated_tables(engine: sqlalchemy.engine.Engine) -> bool:
@@ -196,7 +221,7 @@ def validate_enumerate_table_data(
                 Tuple[int]
             ]
         ]
-                                  ) -> bool:
+) -> bool:
 
     session = sessionmaker(bind=engine)()
     valid = True
@@ -245,6 +270,7 @@ def validate_tables(engine: sqlalchemy.engine.Engine) -> bool:
             expected_table_names.remove(table)
 
     if len(expected_table_names) > 0:
-        print("Missing tables [{}]".format(",".join(expected_table_names)))
+        missing_tables = ",".join(expected_table_names)
+        print(f"Missing tables [{missing_tables}]")
         valid = False
     return valid
