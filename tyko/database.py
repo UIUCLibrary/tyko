@@ -26,14 +26,17 @@ def alembic_table_exists(engine) -> bool:
 
 
 def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
-    print("Adding sample collection")
-    new_collection = schema.Collection()
-    new_collection.collection_name = \
-        cast(
-            sqlalchemy.Column[sqlalchemy.Text],
-            "sample collection"
-        )
-    session.add(new_collection)
+    if not session.query(schema.Collection).filter_by(
+            collection_name='sample collection'
+    ).first():
+        print("Adding sample collection ")
+        new_collection = schema.Collection()
+        new_collection.collection_name = \
+            cast(
+                sqlalchemy.Column[sqlalchemy.Text],
+                "sample collection"
+            )
+        session.add(new_collection)
 
 
 def _populate_enum_tables(session: sqlalchemy.orm.Session) -> None:
@@ -67,12 +70,16 @@ def _populate_enum_tables(session: sqlalchemy.orm.Session) -> None:
         formats.AudioCassetteGeneration
 
     ]
-
+    values = []
     for enum_table_class in enum_table_classes:
-        for new_type_name in enum_table_class.default_values:
-            new_type = enum_table_class()
-            new_type.name = new_type_name
-            session.add(new_type)
+        values += [
+            enum_table_class(name=new_type_name) for
+            new_type_name in enum_table_class.default_values
+            if session.query(
+                enum_table_class
+            ).filter_by(name=new_type_name).first() is None
+        ]
+    session.add_all(values)
 
 
 def create_samples(engine: sqlalchemy.engine.Engine) -> None:
@@ -133,11 +140,13 @@ def init_database(engine: sqlalchemy.engine.Engine) -> None:
 
 def _populate_note_type_table(session: sqlalchemy.orm.Session) -> None:
     print("Populating NoteTypes Table")
-    for note_type, note_metadata in notes.note_types.items():
-        note_id = note_metadata[0]
-
-        new_note_type = notes.NoteTypes(name=note_type, id=note_id)
-        session.add(new_note_type)
+    session.add_all(
+        notes.NoteTypes(name=note_type, id=note_metadata[0])
+        for (note_type, note_metadata) in notes.note_types.items()
+        if session.query(
+            notes.NoteTypes
+        ).filter_by(name=note_type).first() is None
+    )
 
 
 def _populate_starting_project_status(
@@ -146,19 +155,26 @@ def _populate_starting_project_status(
 
     print(f"Populating {project_status_table.__tablename__} Table")
     statuses = ['In progress', "Complete", "No work done"]
-    for status in statuses:
-        new_status = project_status_table(name=status)
-        session.add(new_status)
+    session.add_all(
+        project_status_table(name=status)
+        for status in statuses
+        if session.query(
+            project_status_table
+        ).filter_by(name=status).first() is None
+    )
 
 
 def _populate_format_types_table(session: sqlalchemy.orm.Session) -> None:
     print("Populating project_status_type Table")
-    for format_type, format_metadata in formats.format_types.items():
-        format_id = format_metadata[0]
-
-        new_format_type = formats.FormatTypes(name=format_type,
-                                              id=format_id)
-        session.add(new_format_type)
+    session.add_all(
+        formats.FormatTypes(name=format_type, id=format_metadata[0])
+        for (format_type, format_metadata) in formats.format_types.items()
+        if session.query(
+            formats.FormatTypes
+        ).filter_by(
+            name=format_type,
+        ).first() is None
+    )
 
 
 def validate_enumerated_tables(engine: sqlalchemy.engine.Engine) -> bool:
@@ -196,7 +212,7 @@ def validate_enumerate_table_data(
                 Tuple[int]
             ]
         ]
-                                  ) -> bool:
+) -> bool:
 
     session = sessionmaker(bind=engine)()
     valid = True
