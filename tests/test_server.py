@@ -491,3 +491,13 @@ def test_db_version_test_no_data():
     db.metadata.create_all(db.engine)
     db.session.commit()
     assert is_correct_db_version(app, db.engine) is False
+
+
+def test_create_samples_creates_a_collection():
+    engine = sqlalchemy.create_engine(SQLITE_IN_MEMORY)
+    tyko.database.init_database(engine)
+    session_maker = sessionmaker(bind=engine)
+    session = session_maker()
+    assert session.query(schema.Collection).first() is None
+    tyko.database.create_samples(engine)
+    assert session.query(schema.Collection).first() is not None
