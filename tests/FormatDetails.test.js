@@ -67,7 +67,7 @@ describe('FormatDetails', ()=>{
 
   it('data is loaded into the document', async ()=> {
     axios.get.mockResolvedValueOnce({data: {item: mockResponseAudioCassette}});
-    const {getByDisplayValue} = render(<FormatDetails apiUrl='/foo'/>);
+    const {getByDisplayValue, getByText} = render(<FormatDetails apiUrl='/foo'/>);
     await waitForElementToBeRemoved(() => getByText('Loading...'));
     expect(getByDisplayValue('my cassette title')).toBeInTheDocument();
   });

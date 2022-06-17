@@ -106,50 +106,65 @@ const OpenReel: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   const trackCount = data['track_count'].value as number;
   const wind = data['wind'].value as EnumMetadata;
 
+  const readOnlyMode = true;
   return (
     <Fragment>
       <FormatDetail key='title' label="Title of Reel">
-        {title}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={title}/>
       </FormatDetail>
       <FormatDetail key='base' label="Base">
-        {base ? base.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={base ? base.name : ''}/>
       </FormatDetail>
       <FormatDetail key='dateOfReel' label="Date Of Reel">
-        {dateOfReel}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={dateOfReel}/>
       </FormatDetail>
       <FormatDetail key='duration' label="Duration">{duration}</FormatDetail>
       <FormatDetail key='formatSubtype' label="Type">
-        {formatSubtype ? formatSubtype.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={formatSubtype ? formatSubtype.name : ''}/>
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        {generation ? generation.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={generation ? generation.name : ''}/>
       </FormatDetail>
       <FormatDetail key='reelBrand' label="Brand of Reel">
-        {reelBrand}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={reelBrand}/>
       </FormatDetail>
       <FormatDetail key='reelDiameter' label="Diameter of Reel">
-        {reelDiameter ? reelDiameter.toString() : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={reelDiameter ? reelDiameter.toString() : ''}/>
       </FormatDetail>
       <FormatDetail key='reelSpeed' label="Speed of Reel">
-        {reelSpeed ? reelSpeed.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={reelSpeed ? reelSpeed.name : ''}/>
       </FormatDetail>
       <FormatDetail key='reelThickness' label="Thickness of Reel">
-        {reelThickness ? reelThickness.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={reelThickness ? reelThickness.name : ''}/>
       </FormatDetail>
       <FormatDetail key='reelType' label="Type of Reel">
-        {reelType}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={reelType}/>
       </FormatDetail>
       <FormatDetail key='reelWidth' label="Width of Reel">
-        {reelWidth ? reelWidth.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={reelWidth ? reelWidth.name : ''}/>
       </FormatDetail>
       <FormatDetail key='trackConfiguration' label="Track Configuration">
-        {trackConfiguration ? trackConfiguration.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={trackConfiguration ? trackConfiguration.name : ''}/>
       </FormatDetail>
       <FormatDetail key='trackCount' label="Track Count">
-        {trackCount ? trackCount.toString() : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={trackCount ? trackCount.toString() : ''}/>
       </FormatDetail>
       <FormatDetail key='wind' label="Wind">
-        {wind ? wind.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={wind ? wind.name : ''}/>
       </FormatDetail>
     </Fragment>
   );
@@ -168,44 +183,56 @@ const GroovedDisc: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   const sideALabel = data['side_a_label'].value as string;
   const sideBDuration = data['side_b_duration'].value as string;
   const sideBLabel = data['side_b_label'].value as string;
-
+  const readOnlyMode = true;
   return (
     <Fragment>
       <FormatDetail key='titleOfAlbum' label="Title of Album">
-        {titleOfAlbum}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={titleOfAlbum}/>
       </FormatDetail>
       <FormatDetail key='titleOfDisc' label="Title of Disc">
-        {titleOfDisc}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={titleOfDisc}/>
       </FormatDetail>
       <FormatDetail key='discBase' label="Base">
-        {discBase ? discBase.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={discBase ? discBase.name : ''}/>
       </FormatDetail>
       <FormatDetail key='dateOfDisc' label="Date Of Disc">
-        {dateOfDisc}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={dateOfDisc}/>
       </FormatDetail>
       <FormatDetail key='discDiameter' label="Disc Diameter">
-        {discDiameter ? discDiameter.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={discDiameter ? discDiameter.name : ''}/>
       </FormatDetail>
       <FormatDetail key='discDirection' label="Disc Direction">
-        {discDirection ? discDirection.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={discDirection ? discDirection.name : ''}/>
       </FormatDetail>
       <FormatDetail key='discMaterial' label="Disc Material">
-        {discMaterial ? discMaterial.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={discMaterial ? discMaterial.name : ''}/>
       </FormatDetail>
       <FormatDetail key='playbackSpeed' label="Playback Speed">
-        {playbackSpeed ? playbackSpeed.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={playbackSpeed ? playbackSpeed.name : ''}/>
       </FormatDetail>
       <FormatDetail key='sideALabel' label="Side A Label">
-        {sideALabel}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={sideALabel}/>
       </FormatDetail>
       <FormatDetail key='sideADuration' label="Side A Duration">
-        {sideADuration}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={sideADuration}/>
       </FormatDetail>
       <FormatDetail key='sideBLabel' label="Side B Label">
-        {sideBLabel}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={sideBLabel}/>
       </FormatDetail>
       <FormatDetail key='sideBDuration' label="Side B Duration">
-        {sideBDuration}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={sideBDuration}/>
       </FormatDetail>
     </Fragment>
   );
@@ -332,22 +359,28 @@ const Optical: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   const duration = data['duration'].value as string;
   const label = data['label'].value as string;
   const type = data['type'].value as EnumMetadata;
+  const readOnlyMode = true;
   return (
     <Fragment>
       <FormatDetail key="titleOfItem" label="Title Of Item">
-        {titleOfItem}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={titleOfItem}/>
       </FormatDetail>
       <FormatDetail key="dateOfItem" label="Date Of Item">
-        {dateOfItem}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={dateOfItem}/>
       </FormatDetail>
       <FormatDetail key="duration" label="Duration">
-        {duration}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={duration}/>
       </FormatDetail>
       <FormatDetail key="label" label="Label">
-        {label}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={label}/>
       </FormatDetail>
       <FormatDetail key="type" label="Type">
-        {type ? type.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={type ? type.name : ''}/>
       </FormatDetail>
     </Fragment>
   );
@@ -362,25 +395,32 @@ const VideoCassette: FC<{
   const titleOfCassette = data['title_of_cassette'].value as string;
   const generation = data['generation'].value as EnumMetadata;
   const cassetteType = data['cassette_type'].value as EnumMetadata;
+  const readOnlyMode = true;
   return (
     <Fragment>
       <FormatDetail key="dateOfCassette" label="Date Of Cassette">
-        {dateOfCassette}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={dateOfCassette}/>
       </FormatDetail>
       <FormatDetail key="duration" label="Duration">
-        {duration}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={duration}/>
       </FormatDetail>
       <FormatDetail key="label" label="Label">
-        {label}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={label}/>
       </FormatDetail>
       <FormatDetail key="titleOfCassette" label="Title Of Cassette">
-        {titleOfCassette}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={titleOfCassette}/>
       </FormatDetail>
       <FormatDetail key="generation" label="Generation">
-        {generation ? generation.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={generation ? generation.name : ''}/>
       </FormatDetail>
       <FormatDetail key='cassetteType' label="Type">
-        {cassetteType ? cassetteType.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={cassetteType ? cassetteType.name : ''}/>
       </FormatDetail>
     </Fragment>
   );
