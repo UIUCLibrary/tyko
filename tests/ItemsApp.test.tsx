@@ -6,6 +6,7 @@
 import axios from 'axios';
 import '@testing-library/jest-dom';
 import {
+  fireEvent,
   render,
   waitFor,
   waitForElementToBeRemoved,
@@ -101,5 +102,16 @@ describe('EditableField', ()=>{
   test('display', ()=>{
     const {getByDisplayValue} = render(<EditableField display="Dummy"/>);
     expect(getByDisplayValue('Dummy')).toBeInTheDocument();
+  });
+  test('Edit button', ()=>{
+    const {getByText} = render(<EditableField display="Dummy"/>);
+    expect(getByText('Edit')).toBeInTheDocument();
+  });
+  test('Confirm button', async ()=>{
+    const {getByText} = render(<EditableField display="Dummy"/>);
+    await waitFor(()=> {
+      fireEvent.click(getByText('Edit'));
+    });
+    expect(getByText('Confirm')).toBeInTheDocument();
   });
 });
