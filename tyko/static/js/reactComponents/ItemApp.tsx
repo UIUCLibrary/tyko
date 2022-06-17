@@ -165,9 +165,13 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
         setIsLoading(false);
       }).catch(setError);
     }
-  }, [apiData, apiUrl]);
+  }, [apiData, apiUrl, setApiData, setIsLoading]);
   if (error) {
-    return <Panel title="Details">Some kind of error</Panel>;
+    return <Panel title="Details">
+      <Alert variant="danger">
+        <h4>Failed to load the data</h4>
+        <pre id="errorDetails">{error.message}</pre>
+      </Alert></Panel>;
   }
   if (!apiData) {
     if (isLoading) {
@@ -244,7 +248,7 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
     }
     return <Panel title="Details">
       <Alert variant="danger">
-        <h4>Failed to load data</h4><pre id="errorDetails">{message}</pre>
+        <h4>Failed to load the data</h4><pre id="errorDetails">{message}</pre>
       </Alert>
     </Panel>;
   }
