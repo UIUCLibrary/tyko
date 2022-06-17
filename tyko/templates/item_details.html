@@ -5,27 +5,8 @@
 {% import "_item_macros.html" as item_widgets %}
 {% from "dialog_boxes.html" import newEntityModal, editNoteModal, newNoteModal, removeNoteModal, setupNoteTableJS %}
 {% block main_details %}
-    {%  call widgets.card("Details", "my-1")  %}
-        {% call metadata_table() %}
-            <tr>
-                {{widgets.metadata_text_edit_widget("Name", item['name'], 'name', api_path)}}
-            </tr>
-            <tr>
-                {{widgets.metadata_number_edit_widget("Object Sequence", item['obj_sequence'], 'obj_sequence', api_path)}}
-            </tr>
-            <tr>
-                <th id="formatType">Format Type</th>
-                <td>
-                    <div class="container">
-                        {{ item['format']['name'] }}
-                    </div>
-                </td>
-            </tr>
-        {% endcall %}
-    {% endcall %}
-    {%  call widgets.card("Format Details", "my-1")  %}
-        <div id="formatDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
-    {% endcall %}
+    <div id="itemDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
+    <div id="formatDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
 {% endblock %}
 
 {% macro casstte_display(data) %}

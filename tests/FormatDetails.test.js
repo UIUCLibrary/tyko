@@ -67,9 +67,9 @@ describe('FormatDetails', ()=>{
 
   it('data is loaded into the document', async ()=> {
     axios.get.mockResolvedValueOnce({data: {item: mockResponseAudioCassette}});
-    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
+    const {getByDisplayValue} = render(<FormatDetails apiUrl='/foo'/>);
     await waitForElementToBeRemoved(() => getByText('Loading...'));
-    expect(getByText('my cassette title')).toBeInTheDocument();
+    expect(getByDisplayValue('my cassette title')).toBeInTheDocument();
   });
   it('test unsupported format', async ()=>{
     axios.get.mockResolvedValueOnce(

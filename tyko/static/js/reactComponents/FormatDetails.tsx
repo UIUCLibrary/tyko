@@ -1,26 +1,33 @@
+import Form from 'react-bootstrap/Form';
+import Table from 'react-bootstrap/Table';
+
 import {useState, useEffect, FC, Fragment, ReactElement} from 'react';
 import axios, {AxiosError} from 'axios';
+import Panel from './Panel';
 interface EnumMetadata {
-    id: number
-    name: string
+  id: number
+  name: string
 }
+
 interface Element {
   key: string,
   value: string | number | boolean | EnumMetadata
 }
 
-interface FormatApiData{
-    format: EnumMetadata
-    elements: Element[]
+interface FormatApiData {
+  format: EnumMetadata
+  elements: Element[]
 }
-interface ApiData{
-    item:{
-        format: EnumMetadata,
-        format_details: {
-            [key: string]: string
-        }
+
+interface ApiData {
+  item: {
+    format: EnumMetadata,
+    format_details: {
+      [key: string]: string
     }
+  }
 }
+
 /**
  * Get api data for format.
  * @param {url} url of api
@@ -28,10 +35,10 @@ interface ApiData{
  */
 const useFormatDetailsApi = (url: string) => {
   const [data, setData] = useState<FormatApiData | null>(null);
-  const [error, setError] = useState<Error|AxiosError| null>(null);
+  const [error, setError] = useState<Error | AxiosError | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
       const dataValue: ApiData = (await axios.get(url)).data as ApiData;
@@ -51,8 +58,8 @@ const useFormatDetailsApi = (url: string) => {
     };
 
     fetchData()
-        .then(()=>setLoading(false))
-        .catch((e: AxiosError | Error)=> {
+        .then(() => setLoading(false))
+        .catch((e: AxiosError | Error) => {
           setError(e);
         });
   }, [url]);
@@ -66,23 +73,23 @@ const useFormatDetailsApi = (url: string) => {
  * @constructor
  */
 const FormatDetail:
-  FC<{
-    label: string,
-    children?: string | JSX.Element | JSX.Element[]
-}> = ({label, children}) =>{
-  return (
-    <tr>
-      <th scope="row">{label}</th>
-      <td>
-        <div className="container-sm">
-          {children}
-        </div>
-      </td>
-    </tr>
-  );
-};
+    FC<{
+      label: string,
+      children?: string | JSX.Element | JSX.Element[]
+    }> = ({label, children}) => {
+      return (
+        <tr>
+          <th style={{width: '25%'}} scope="row">{label}</th>
+          <td>
+            <div className="container-sm">
+              {children}
+            </div>
+          </td>
+        </tr>
+      );
+    };
 
-const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
+const OpenReel: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   const base = data['base'].value as EnumMetadata;
   const dateOfReel = data['date_of_reel'].value as string;
   const duration = data['duration'].value as string;
@@ -112,10 +119,10 @@ const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
       </FormatDetail>
       <FormatDetail key='duration' label="Duration">{duration}</FormatDetail>
       <FormatDetail key='formatSubtype' label="Type">
-        {formatSubtype ? formatSubtype.name: ''}
+        {formatSubtype ? formatSubtype.name : ''}
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        {generation ? generation.name: ''}
+        {generation ? generation.name : ''}
       </FormatDetail>
       <FormatDetail key='reelBrand' label="Brand of Reel">
         {reelBrand}
@@ -124,31 +131,31 @@ const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
         {reelDiameter ? reelDiameter.toString() : ''}
       </FormatDetail>
       <FormatDetail key='reelSpeed' label="Speed of Reel">
-        {reelSpeed ? reelSpeed.name: ''}
+        {reelSpeed ? reelSpeed.name : ''}
       </FormatDetail>
       <FormatDetail key='reelThickness' label="Thickness of Reel">
-        {reelThickness ? reelThickness.name: ''}
+        {reelThickness ? reelThickness.name : ''}
       </FormatDetail>
       <FormatDetail key='reelType' label="Type of Reel">
         {reelType}
       </FormatDetail>
       <FormatDetail key='reelWidth' label="Width of Reel">
-        {reelWidth ? reelWidth.name: ''}
+        {reelWidth ? reelWidth.name : ''}
       </FormatDetail>
       <FormatDetail key='trackConfiguration' label="Track Configuration">
-        {trackConfiguration ? trackConfiguration.name: ''}
+        {trackConfiguration ? trackConfiguration.name : ''}
       </FormatDetail>
       <FormatDetail key='trackCount' label="Track Count">
-        {trackCount ? trackCount.toString(): ''}
+        {trackCount ? trackCount.toString() : ''}
       </FormatDetail>
       <FormatDetail key='wind' label="Wind">
-        {wind ? wind.name: ''}
+        {wind ? wind.name : ''}
       </FormatDetail>
     </Fragment>
   );
 };
 
-const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
+const GroovedDisc: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   const discBase = data['disc_base'].value as EnumMetadata;
   const dateOfDisc = data['date_of_disc'].value as string;
   const discDiameter = data['disc_diameter'].value as EnumMetadata;
@@ -204,7 +211,7 @@ const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
   );
 };
 
-const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
+const Film: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   const adStripTest = data['ad_strip_test'].value;
   const adTestDate = data['ad_test_date'].value as string;
   const adTestLevel = data['ad_test_level'].value as string;
@@ -236,71 +243,90 @@ const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
     default:
       adStripTestDisplay = '';
   }
-
+  const readOnlyMode = true;
   return (
     <Fragment>
       <FormatDetail key='dateOfFilm' label="Date Of Film">
-        {dateOfFilm}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={dateOfFilm}/>
       </FormatDetail>
       <FormatDetail key='adStripTest' label="AD Strip Test Performed">
-        {adStripTestDisplay}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={adStripTestDisplay}/>
       </FormatDetail>
       <FormatDetail key='adTestDate' label="AD Test Date">
-        {adTestDate}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={adTestDate}/>
       </FormatDetail>
       <FormatDetail key='adTestLevel' label="AD Test Level">
-        {adTestLevel}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={adTestLevel}/>
       </FormatDetail>
       <FormatDetail key='canLabel' label="Can Label">
-        {canLabel}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={canLabel}/>
       </FormatDetail>
       <FormatDetail key='duration' label="Duration">
-        {duration}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={duration}/>
       </FormatDetail>
       <FormatDetail key='filmTitle' label="Film Title">
-        {filmTitle}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={filmTitle}/>
       </FormatDetail>
       <FormatDetail key='leaderLabel' label="Leader Label">
-        {leaderLabel}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={leaderLabel}/>
       </FormatDetail>
       <FormatDetail key='edgeCodeDate' label="Edge Code Date">
-        {edgeCodeDate ? edgeCodeDate.toString() : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={edgeCodeDate ? edgeCodeDate.toString() : ''}/>
       </FormatDetail>
       <FormatDetail key='filmLength' label='Film Length'>
-        {filmLength ? filmLength.toString() : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={filmLength ? filmLength.toString() : ''}/>
       </FormatDetail>
       <FormatDetail key='filmShrinkage' label='Film Shrinkage'>
-        {filmShrinkage ? filmShrinkage.toString() : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={filmShrinkage ? filmShrinkage.toString() : ''}/>
       </FormatDetail>
       <FormatDetail key='color' label='Color'>
-        {color ? color.name: ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={color ? color.name : ''}/>
       </FormatDetail>
       <FormatDetail key='filmBase' label='Film Base'>
-        {filmBase ? filmBase.name: ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={filmBase ? filmBase.name : ''}/>
       </FormatDetail>
       <FormatDetail key='filmEmulsion' label='Film Emulsion'>
-        {filmEmulsion ? filmEmulsion.name: ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={filmEmulsion ? filmEmulsion.name : ''}/>
       </FormatDetail>
       <FormatDetail key='filmImageType' label='Film Image Type'>
-        {filmImageType ? filmImageType.name: ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={filmImageType ? filmImageType.name : ''}/>
       </FormatDetail>
       <FormatDetail key='filmSpeed' label='Film Speed'>
-        {filmSpeed ? filmSpeed.name: ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={filmSpeed ? filmSpeed.name : ''}/>
       </FormatDetail>
       <FormatDetail key='filmGauge' label='Film Gauge'>
-        {filmGauge ? filmGauge.name: ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={filmGauge ? filmGauge.name : ''}/>
       </FormatDetail>
       <FormatDetail key='soundtrack' label='Soundtrack'>
-        {soundtrack ? soundtrack.name: ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={soundtrack ? soundtrack.name : ''}/>
       </FormatDetail>
       <FormatDetail key='wind' label='Wind'>
-        {wind ? wind.name : ''}
+        <Form.Control size={'sm'} readOnly={readOnlyMode}
+          defaultValue={wind ? wind.name : ''}/>
       </FormatDetail>
     </Fragment>
   );
 };
 
-const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
+const Optical: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   const titleOfItem = data['title_of_item'].value as string;
   const dateOfItem = data['date_of_item'].value as string;
   const duration = data['duration'].value as string;
@@ -311,7 +337,7 @@ const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
       <FormatDetail key="titleOfItem" label="Title Of Item">
         {titleOfItem}
       </FormatDetail>
-      <FormatDetail key="dateOfItem" label="Date Of Item" >
+      <FormatDetail key="dateOfItem" label="Date Of Item">
         {dateOfItem}
       </FormatDetail>
       <FormatDetail key="duration" label="Duration">
@@ -328,7 +354,7 @@ const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
 };
 
 const VideoCassette: FC<{
-    data: {[key: string]: Element }
+  data: { [key: string]: Element }
 }> = ({data}) => {
   const dateOfCassette = data['date_of_cassette'].value as string;
   const duration = data['duration'].value as string;
@@ -360,7 +386,7 @@ const VideoCassette: FC<{
   );
 };
 const AudioCassette: FC<{
-    data: {[key: string]: Element }
+  data: { [key: string]: Element }
 }> = ({data}) => {
   const title = data['cassette_title'].value as string;
   const cassetteType = data['cassette_type'].value as EnumMetadata;
@@ -370,32 +396,42 @@ const AudioCassette: FC<{
   const sideALabel = data['side_a_label'].value as string;
   const sideBDuration = data['side_b_duration'].value as string;
   const sideBLabel = data['side_b_label'].value as string;
-
+  const readOnlyMode = true;
   return (
     <Fragment>
       <FormatDetail key='cassetteTitle' label="Cassette Title">
-        {title}
+        <Form.Control size={'sm'} defaultValue={title}
+          readOnly={readOnlyMode}/>
       </FormatDetail>
       <FormatDetail key='cassetteType' label="Type">
-        {cassetteType ? cassetteType.name : ''}
+        <Form.Control size={'sm'}
+          defaultValue={cassetteType ? cassetteType.name : ''}
+          readOnly={readOnlyMode}/>
       </FormatDetail>
       <FormatDetail key='dateOfCassette' label="Date of Cassette">
-        {dateOfCassette}
+        <Form.Control size={'sm'} defaultValue={dateOfCassette}
+          readOnly={readOnlyMode}/>
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        {generation ? generation.name : ''}
+        <Form.Control size={'sm'}
+          defaultValue={generation ? generation.name : ''}
+          readOnly={readOnlyMode}/>
       </FormatDetail>
       <FormatDetail key='sideALabel' label="Side A Label">
-        {sideALabel}
+        <Form.Control size={'sm'} defaultValue={sideALabel}
+          readOnly={readOnlyMode}/>
       </FormatDetail>
       <FormatDetail key='sideADuration' label="Side A Duration">
-        {sideADuration}
+        <Form.Control size={'sm'} defaultValue={sideADuration}
+          readOnly={readOnlyMode}/>
       </FormatDetail>
       <FormatDetail key='sideBLabel' label="Side B Label">
-        {sideBLabel}
+        <Form.Control size={'sm'} defaultValue={sideBLabel}
+          readOnly={readOnlyMode}/>
       </FormatDetail>
       <FormatDetail key='sideBDuration' label="Side B Duration">
-        {sideBDuration}
+        <Form.Control size={'sm'} defaultValue={sideBDuration}
+          readOnly={readOnlyMode}/>
       </FormatDetail>
     </Fragment>
   );
@@ -408,7 +444,7 @@ const AudioCassette: FC<{
  * @return {Fragment}
  */
 function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
-  const types: {[key: number]: FC<{data: {[key: string]: Element }}>} = {
+  const types: { [key: number]: FC<{ data: { [key: string]: Element } }> } = {
     4: OpenReel,
     5: GroovedDisc,
     6: Film,
@@ -420,7 +456,7 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
   if (formatType.id in types) {
     const Type = types[formatType.id];
 
-    const sortedData: {[key: string]: Element } = {};
+    const sortedData: { [key: string]: Element } = {};
     for (const element of data) {
       sortedData[element.key] = element;
     }
@@ -430,13 +466,13 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
   const values: JSX.Element[] = data.map(
       (
           item: {
-              value?: string | number| boolean| EnumMetadata,
-              key: string
+            value?: string | number | boolean | EnumMetadata,
+            key: string
           },
           index: number,
       ) => {
         const children: ReactElement = <p>
-          {item.value ? item.value.toString(): ''}
+          {item.value ? item.value.toString() : ''}
         </p>;
         return (
           <FormatDetail key={index.toString()} label={item.key}>
@@ -447,9 +483,9 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
   return (<Fragment>{values}</Fragment>);
 }
 
-interface FormatType{
-    id: number
-    name: string
+interface FormatType {
+  id: number
+  name: string
 }
 
 /**
@@ -460,9 +496,9 @@ interface FormatType{
  */
 export default function FormatDetails({apiUrl}: { apiUrl: string }) {
   const [data, error, loading] = useFormatDetailsApi(apiUrl) as [
-      data: FormatApiData,
-      error: undefined,
-      loading: boolean
+    data: FormatApiData,
+    error: undefined,
+    loading: boolean
   ];
 
   if (loading) {
@@ -477,13 +513,13 @@ export default function FormatDetails({apiUrl}: { apiUrl: string }) {
 
   const values = getTableBody(data.format, data.elements);
   return (
-    <div>
-      <table className="table table-sm" data-testid='dummy'>
+    <Panel title="Format Details">
+      <Table data-testid='dummy'>
         <tbody>
           {values}
         </tbody>
-      </table>
-    </div>
+      </Table>
+    </Panel>
   );
 }
 

@@ -6,27 +6,13 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import Card from 'react-bootstrap/Card';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
 import axios from 'axios';
 import {Button, Form} from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
+import Panel from './Panel';
 
-interface IPanel{
-  title: string
-  children: JSX.Element | JSX.Element[] | string
-}
-const Panel: FC<IPanel>= ({title, children}) =>{
-  return (
-    <Card>
-      <Card.Header>{title}</Card.Header>
-      <Card.Body>
-        {children}
-      </Card.Body>
-    </Card>
-  );
-};
 interface IEditableField{
   display: string | number | null
   type?: string
@@ -195,7 +181,7 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
     const objectSequence = apiData ? apiData.obj_sequence : null;
     const tableBody = <>
       <tr>
-        <th style={{width: '16.66%'}}>Name</th>
+        <th style={{width: '25%'}}>Name</th>
         <td>
           <EditableField
             display={objectName}
@@ -208,7 +194,7 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
         </td>
       </tr>
       <tr>
-        <th style={{width: '16.66%'}}>Object Sequence</th>
+        <th style={{width: '25%'}}>Object Sequence</th>
         <td>
           <EditableField
             display={objectSequence}
@@ -227,7 +213,7 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
       <tr>
       </tr>
       <tr>
-        <th style={{width: '16.66%'}}>Format Type</th>
+        <th style={{width: '25%'}}>Format Type</th>
         <td>
           <Form.Control value={formatName ? formatName : ''} readOnly/>
         </td>
@@ -263,4 +249,3 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
     </Panel>;
   }
 }
-
