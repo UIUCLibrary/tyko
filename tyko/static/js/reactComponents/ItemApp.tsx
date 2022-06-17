@@ -65,7 +65,12 @@ export const EditableField:FC<IEditableField> = (
     if (editMode) {
       setButtons(
           <>
-            <Button variant="outline-primary" size="sm" onClick={handleAccept}>
+            <Button
+              variant="outline-primary"
+              size="sm"
+              onClick={handleAccept}
+              data-testid={`confirm-button-${display ? display: ''}`}
+            >
               Confirm
             </Button>
             <Button variant="outline-danger" size="sm" onClick={handleCancel}>
@@ -75,7 +80,12 @@ export const EditableField:FC<IEditableField> = (
     } else {
       setButtons(
           <>
-            <Button variant="secondary" size="sm" onClick={setEditMode}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={setEditMode}
+              data-testid={`edit-button-${display ? display : ''}`}
+            >
               Edit
             </Button>
           </>,

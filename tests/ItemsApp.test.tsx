@@ -11,7 +11,12 @@ import {
   waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react';
-import {ItemDetails, EditableField} from '../tyko/static/js/reactComponents/ItemApp';
+
+import {
+  ItemDetails,
+  EditableField,
+} from '../tyko/static/js/reactComponents/ItemApp';
+
 import React from 'react';
 
 describe('ItemDetails', ()=>{
@@ -132,6 +137,17 @@ describe('EditableField', ()=>{
     await waitFor(()=> {
       fireEvent.click(getByText('Edit'));
       fireEvent.click(getByText('Cancel'));
+    });
+    expect(getByText('Edit')).toBeInTheDocument();
+  });
+  test('Clicking outside of area when in edit more cancels', async ()=>{
+    const {getByText} = render(
+        <EditableField display="Dummy"/>,
+    );
+
+    await waitFor(()=> {
+      fireEvent.click(getByText('Edit'));
+      fireEvent.blur(getByText('Confirm'));
     });
     expect(getByText('Edit')).toBeInTheDocument();
   });
