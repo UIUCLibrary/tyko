@@ -9,6 +9,8 @@ import * as tyko from "./tyko.mjs"
 import AboutApp from "./reactComponents/AboutApp";
 import FormatDetails from './reactComponents/FormatDetails'
 import Items, {NewItemButton, ObjectItemsApp} from './reactComponents/Items';
+import {ItemDetails} from './reactComponents/ItemApp';
+
 
 import('bootstrap');
 import('bootstrap-table');
@@ -121,6 +123,11 @@ function loadReactComponents(){
     root.render(
         <FormatDetails apiUrl={formatDetailsComponent.dataset.tykoApiUrl}/>
     )
+  }
+
+  const itemDetails = document.getElementById('itemDetails')
+  if(itemDetails){
+    createRoot(itemDetails).render(<ItemDetails apiUrl={formatDetailsComponent.dataset.tykoApiUrl}/>)
   }
 
   const aboutComponent = document.getElementById('aboutApp')
