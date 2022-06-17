@@ -124,4 +124,15 @@ describe('EditableField', ()=>{
     });
     expect(submit).toBeCalled();
   });
+  test('Cancel button brings back view mode', async ()=>{
+    const {getByText} = render(
+        <EditableField display="Dummy"/>,
+    );
+
+    await waitFor(()=> {
+      fireEvent.click(getByText('Edit'));
+      fireEvent.click(getByText('Cancel'));
+    });
+    expect(getByText('Edit')).toBeInTheDocument();
+  });
 });
