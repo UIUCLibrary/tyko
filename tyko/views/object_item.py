@@ -164,7 +164,7 @@ class ObjectItemAPI(views.MethodView):
                                id=file_entry['id']
                                ),
                 "frontend": url_for(
-                    "page_file_details",
+                    "site.page_file_details",
                     item_id=item_id,
                     object_id=object_id,
                     project_id=project_id,
