@@ -107,11 +107,21 @@ describe('EditableField', ()=>{
     const {getByText} = render(<EditableField display="Dummy"/>);
     expect(getByText('Edit')).toBeInTheDocument();
   });
-  test('Confirm button', async ()=>{
-    const {getByText} = render(<EditableField display="Dummy"/>);
+  test('Confirm button calls onSubmit', async ()=>{
+    const submit = jest.fn();
+    const {getByText} = render(
+        <EditableField display="Dummy" onSubmit={submit}/>,
+    );
+
     await waitFor(()=> {
       fireEvent.click(getByText('Edit'));
     });
-    expect(getByText('Confirm')).toBeInTheDocument();
+    const confirmButton = getByText('Confirm');
+
+    expect(confirmButton).toBeInTheDocument();
+    await waitFor(()=> {
+      fireEvent.click(confirmButton);
+    });
+    expect(submit).toBeCalled();
   });
 });
