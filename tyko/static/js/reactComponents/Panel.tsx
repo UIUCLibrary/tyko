@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React from 'react';
 import Card from 'react-bootstrap/Card';
 
 export interface IPanel{
@@ -21,4 +21,4 @@ export default function Panel({title, children}: IPanel) {
       </Card.Body>
     </Card>
   );
-};
+}
