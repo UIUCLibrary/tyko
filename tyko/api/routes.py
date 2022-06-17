@@ -446,7 +446,8 @@ def add_item():
 
 
 @api.route(
-    "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>/notes",
+    "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>/"
+    "notes",
     methods=["POST"]
 )
 def project_object_item_add_note(project_id, object_id, item_id):
