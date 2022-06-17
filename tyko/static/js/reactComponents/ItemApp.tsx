@@ -35,7 +35,7 @@ interface IEditableField{
 }
 
 
-const EditableField:FC<IEditableField> = (
+export const EditableField:FC<IEditableField> = (
     {display, type, inputProps, onSubmit},
 )=>{
   const [buttons, setButtons] = useState<JSX.Element|null>(null);

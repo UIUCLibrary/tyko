@@ -8,9 +8,9 @@ import '@testing-library/jest-dom';
 import {
   render,
   waitFor,
-  waitForElementToBeRemoved
+  waitForElementToBeRemoved,
 } from '@testing-library/react';
-import {ItemDetails} from '../tyko/static/js/reactComponents/ItemApp';
+import {ItemDetails, EditableField} from '../tyko/static/js/reactComponents/ItemApp';
 import React from 'react';
 
 describe('ItemDetails', ()=>{
@@ -94,5 +94,12 @@ describe('ItemDetails', ()=>{
 
       consoleErrorMock.mockRestore();
     });
+  });
+});
+
+describe('EditableField', ()=>{
+  test('display', ()=>{
+    const {getByDisplayValue} = render(<EditableField display="Dummy"/>);
+    expect(getByDisplayValue('Dummy')).toBeInTheDocument();
   });
 });
