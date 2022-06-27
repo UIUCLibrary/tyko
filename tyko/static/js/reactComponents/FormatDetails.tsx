@@ -3,7 +3,7 @@ import Table from 'react-bootstrap/Table';
 
 import {useState, useEffect, FC, Fragment, ReactElement} from 'react';
 import axios, {AxiosError} from 'axios';
-import Panel from './Panel';
+import {IItemMetadata} from './ItemApp';
 interface EnumMetadata {
   id: number
   name: string
@@ -528,38 +528,34 @@ interface FormatType {
   name: string
 }
 
+interface IData {
+  apiData: IItemMetadata
+  apiUrl: string
+  onUpdated: ()=>void
+}
+
+
 /**
  * Display format details
  * @param {apiUrl} URL for api
  * @return {JSX.Element}
  * @constructor
  */
-export default function FormatDetails({apiUrl}: { apiUrl: string }) {
-  const [data, error, loading] = useFormatDetailsApi(apiUrl) as [
-    data: FormatApiData,
-    error: undefined,
-    loading: boolean
-  ];
-
-  if (loading) {
-    return (<p>Loading...</p>);
-  }
-  if (error) {
-    return (<p>Failed</p>);
-  }
-  if (data === null) {
-    return null;
-  }
-
-  const values = getTableBody(data.format, data.elements);
+export default function FormatDetails({apiData, apiUrl, onUpdated}:IData ) {
+  const elements: Element[] = [];
+  const formatDetails = apiData['format_details'];
+  Object.keys(formatDetails).forEach((objectKey) => {
+    elements.push({
+      key: objectKey,
+      value: formatDetails[objectKey],
+    });
+  });
+  const values = getTableBody(apiData.format, elements);
   return (
-    <Panel title="Format Details">
-      <Table data-testid='dummy'>
-        <tbody>
-          {values}
-        </tbody>
-      </Table>
-    </Panel>
+    <Table data-testid='dummy'>
+      <tbody>
+        {values}
+      </tbody>
+    </Table>
   );
 }
-

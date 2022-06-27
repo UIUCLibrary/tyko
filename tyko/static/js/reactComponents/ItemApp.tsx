@@ -11,7 +11,6 @@ import Table from 'react-bootstrap/Table';
 import axios from 'axios';
 import {Button, Form} from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
-import Panel from './Panel';
 
 interface IEditableField{
   display: string | number | null
@@ -115,7 +114,7 @@ interface INote {
   text: string
 
 }
-interface IItemMetadata {
+export interface IItemMetadata {
 
   files: IFile[],
   format: {
@@ -138,43 +137,17 @@ const updateData = async (url: string, key: string, value: string) => {
   data[key] = value;
   return axios.put(url, data);
 };
+interface IData {
+  apiData: IItemMetadata
+  apiUrl: string
+  onUpdated?: ()=>void
+}
 
 /**
- *
- * @param {string} apiUrl
+ * d
  * @constructor
  */
-export function ItemDetails({apiUrl}: {apiUrl: string}) {
-  const [apiData, setApiData] = useState<IItemMetadata | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    const loadData = async (url: string) => {
-      setIsLoading(true);
-      const data = (await axios.get(url)).data as {item: IItemMetadata};
-      return data.item;
-    };
-    if (!isLoading && !apiData) {
-      loadData(apiUrl).then((results) => {
-        setApiData(results);
-        setIsLoading(false);
-      }).catch(setError);
-    }
-  }, [apiData, apiUrl, setApiData, setIsLoading]);
-  if (error) {
-    return <Panel title="Details">
-      <Alert variant="danger">
-        <h4>Failed to load the data</h4>
-        <pre id="errorDetails">{error.message}</pre>
-      </Alert></Panel>;
-  }
-  if (!apiData) {
-    if (isLoading) {
-      return <Panel title="Details">Loading...</Panel>;
-    }
-    return <Panel title="Details">No data</Panel>;
-  }
+export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
   try {
     const objectName = apiData ? apiData.name : null;
     const formatName = apiData ? apiData.format.name : null;
@@ -187,7 +160,11 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
             display={objectName}
             onSubmit={(value)=> {
               updateData(apiUrl, 'name', value)
-                  .then(()=> setApiData(null))
+                  .then(()=> {
+                    if (onUpdated) {
+                      onUpdated();
+                    }
+                  } )
                   .catch(console.error);
             }}
           />
@@ -203,8 +180,10 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
             onSubmit={(value)=> {
               updateData(apiUrl, 'obj_sequence', value)
                   .then(()=> {
-                    setApiData(null);
-                  })
+                    if (onUpdated) {
+                      onUpdated();
+                    }
+                  } )
                   .catch(console.error);
             }}
           />
@@ -232,9 +211,7 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
         </tbody>
       </Table>
     </>;
-    return (<Panel title="Details">
-      {table}
-    </Panel>);
+    return (<>{table}</>);
   } catch (errorThrown) {
     let message = '';
 
@@ -242,10 +219,11 @@ export function ItemDetails({apiUrl}: {apiUrl: string}) {
       message = errorThrown.message;
       console.error(errorThrown.stack);
     }
-    return <Panel title="Details">
+    return (
       <Alert variant="danger">
-        <h4>Failed to load the data</h4><pre id="errorDetails">{message}</pre>
+        <h4>Failed to load the data</h4>
+        <pre id="errorDetails">{message}</pre>
       </Alert>
-    </Panel>;
+    );
   }
 }

@@ -51,53 +51,34 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('FormatDetails', ()=>{
-  it('displays text "loading" while fetching data', async ()=>{
-    const {getByText} = await waitFor(()=>{
-      return render(<FormatDetails apiUrl='/foo'/>);
-    });
-    const element = await waitFor(()=>getByText('Loading...'));
-    expect(element).toBeTruthy();
-  });
-
-  it('Removes text "Loading" after data has been fetched', async ()=>{
-    axios.get.mockResolvedValueOnce({data: {item: mockResponseAudioCassette}});
-    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
-    await waitForElementToBeRemoved(()=>getByText('Loading...'));
-  });
-
-  it('data is loaded into the document', async ()=> {
-    axios.get.mockResolvedValueOnce({data: {item: mockResponseAudioCassette}});
-    const {getByDisplayValue, getByText} = render(<FormatDetails apiUrl='/foo'/>);
-    await waitForElementToBeRemoved(() => getByText('Loading...'));
+  it('data is loaded into the document', ()=> {
+    const {getByDisplayValue} = render(
+        <FormatDetails apiData={mockResponseAudioCassette} apiUrl='/foo'/>,
+    );
     expect(getByDisplayValue('my cassette title')).toBeInTheDocument();
   });
-  it('test unsupported format', async ()=>{
-    axios.get.mockResolvedValueOnce(
-        {
-          data: {
-            item: {
-              files: [],
-              format: {
-                id: -1,
-                name: 'some new format',
-              },
-              format_details: {
-                foo: 'Foo',
-              },
-              format_id: -1,
-              inspection_date: null,
-              item_id: 1,
-              name: 'some new format item',
-              notes: [],
-              obj_sequence: null,
-              parent_object_id: 1,
-              transfer_date: null,
-            },
-          },
-        },
-    );
-    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
-    await waitForElementToBeRemoved(() => getByText('Loading...'));
+  it('test unsupported format', ()=>{
+    const mockData = {
+      files: [],
+      format: {
+        id: -1,
+        name: 'some new format',
+      },
+      format_details: {
+        foo: 'Foo',
+      },
+      format_id: -1,
+      inspection_date: null,
+      item_id: 1,
+      name: 'some new format item',
+      notes: [],
+      obj_sequence: null,
+      parent_object_id: 1,
+      transfer_date: null,
+    };
+    const {getByText} =
+      render(<FormatDetails apiData={mockData} apiUrl='/foo'/>);
+
     expect(getByText('Foo')).toBeInTheDocument();
   });
   it.each([
@@ -825,11 +806,7 @@ describe('FormatDetails', ()=>{
       'Title of item',
     ],
   ])('Test format %p', async (name, data, expectedString)=>{
-    axios.get.mockResolvedValueOnce(
-        {data: {item: data}},
-    );
-    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
-    await waitForElementToBeRemoved(() => getByText('Loading...'));
+    const {getByText} = render(<FormatDetails apiData={data} apiUrl='/foo'/>);
     await (()=>{
       expect(getByText(expectedString)).toBeInTheDocument();
     });

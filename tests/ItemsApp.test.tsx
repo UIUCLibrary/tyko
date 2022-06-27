@@ -14,12 +14,26 @@ import {
 
 import {
   ItemDetails,
-  EditableField,
+  EditableField, IItemMetadata,
 } from '../tyko/static/js/reactComponents/ItemApp';
 
 import React from 'react';
 
 describe('ItemDetails', ()=>{
+  const dummyData = {
+    name: 'dummy',
+    files: [],
+    obj_sequence: 1,
+    format: {
+      name: 'foo',
+      id: 1,
+    },
+    item_id: 1,
+    format_id: 1,
+    format_details: {},
+    notes: [],
+    parent_object_id: 1,
+  };
   beforeEach(()=>{
     axios.get = jest.fn((url: string): Promise<any> => {
       if (url === '/api/dummy') {
@@ -53,47 +67,35 @@ describe('ItemDetails', ()=>{
       return Promise.resolve();
     });
   });
-  test('has Details title', async ()=>{
-    const {getByText} = await waitFor(async ()=> {
-      const element = render(<ItemDetails apiUrl="/api/dummy"/>);
-      await waitForElementToBeRemoved(()=>element.getByText('Loading...'));
-      return element;
-    });
-    expect(getByText('Details')).toBeInTheDocument();
+  test('has Object Sequence', ()=>{
+    const {getByText} = render(
+        <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
+    );
+    expect(getByText('Object Sequence')).toBeInTheDocument();
   });
   test('has a name', async ()=>{
-    const {getByText} = await waitFor(async ()=> {
-      const element = render(<ItemDetails apiUrl="/api/dummy"/>);
-      await waitForElementToBeRemoved(()=>element.getByText('Loading...'));
-      return element;
-    });
+    const {getByText} = render(
+        <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
+    );
+
     await waitFor(()=> {
       expect(getByText('Name')).toBeInTheDocument();
     });
   });
 
   describe('invalid', ()=>{
-    test('error message on bad fetch', async ()=>{
-      const {getByText} = await waitFor(async ()=> {
-        const element = render(<ItemDetails apiUrl="/api/invalid"/>);
-        await waitForElementToBeRemoved(()=>element.getByText('Loading...'));
-        return element;
-      });
-      await waitFor(()=> {
-        expect(getByText('Failed to load the data')).toBeInTheDocument();
-      });
-    });
     test('error message on bad parsing', async ()=>{
       const consoleErrorMock = jest.spyOn(
           global.console,
           'error',
       ).mockImplementation();
 
-      const {getByText} = await waitFor(async ()=> {
-        const element = render(<ItemDetails apiUrl="/api/bad"/>);
-        await waitForElementToBeRemoved(()=>element.getByText('Loading...'));
-        return element;
-      });
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const badData: IItemMetadata = {'gabage': '1212'};
+      const {getByText} = render(
+          <ItemDetails apiData={badData} apiUrl="/api/bad"/>,
+      );
       await waitFor(()=> {
         expect(getByText('Failed to load the data')).toBeInTheDocument();
       });
