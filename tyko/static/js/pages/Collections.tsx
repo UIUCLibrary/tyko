@@ -50,7 +50,6 @@ export default function Collections() {
   }
   return (
     <div>
-      <TykoNavBar/>
       <h1>Collections</h1>
       <Table variant='striped'>
         <thead>

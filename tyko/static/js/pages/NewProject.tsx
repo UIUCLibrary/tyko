@@ -38,7 +38,6 @@ export default function NewProject() {
   );
   return (
     <div>
-      <TykoNavBar/>
       <h1>New Project</h1>
       <Form onSubmit={submitNewProject}>
         <Form.Group>

@@ -198,8 +198,7 @@ export default function ProjectDetails() {
     notesPanel = <>do stuff here</>;
   }
   return (
-    <div>
-      <TykoNavBar/>
+    <>
       <Container fluid={true}>
         <h1>Project</h1>
         <Row>
@@ -224,7 +223,7 @@ export default function ProjectDetails() {
           </Col>
         </Row>
       </Container>
-    </div>
+    </>
   );
 }
 

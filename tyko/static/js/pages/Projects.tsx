@@ -69,7 +69,6 @@ export default function Projects() {
     );
   }
   return <div>
-    <TykoNavBar/>
     <h1>Projects</h1>
     <div>
       <Link to="/projects/new">

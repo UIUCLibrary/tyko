@@ -85,7 +85,6 @@ export default function CollectionDetails() {
   }
   return (
     <div>
-      <TykoNavBar/>
       <h1>Collection Details</h1>
       <div className="mb-3">
         <Card>

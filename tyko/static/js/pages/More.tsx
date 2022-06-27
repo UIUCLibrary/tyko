@@ -1,4 +1,4 @@
-import TykoNavBar from '../reactComponents/TykoNavBar';
+import {Link} from 'react-router-dom';
 import Panel from '../reactComponents/Panel';
 /**
  * k
@@ -6,18 +6,17 @@ import Panel from '../reactComponents/Panel';
  */
 export default function More() {
   return <div>
-    <TykoNavBar/>
     <h1>More</h1>
     <Panel title="Entities">
       <ul>
-        <li><a href="/collections">Collections</a></li>
-        <li><a href="/formats">Formats</a></li>
-        <li><a href="/projects">Projects</a></li>
+        <li><Link to="/collections">Collections</Link></li>
+        <li><Link to="/formats">Formats</Link></li>
+        <li><Link to="/projects">Projects</Link></li>
       </ul>
     </Panel>
     <Panel title="Forms">
       <ul>
-        <li><a href="/collection/new">New Collection</a></li>
+        <li><Link to="/collection/new">New Collection</Link></li>
       </ul>
     </Panel>
   </div>;

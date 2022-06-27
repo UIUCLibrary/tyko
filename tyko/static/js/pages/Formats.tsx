@@ -40,7 +40,6 @@ export default function Formats() {
   }
   return (
     <div>
-      <TykoNavBar/>
       <h1>Formats</h1>
       <Table variant='striped'>
         <thead>

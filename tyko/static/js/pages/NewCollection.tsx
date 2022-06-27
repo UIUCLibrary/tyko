@@ -28,7 +28,6 @@ export default function NewCollection() {
 
   return (
     <div>
-      <TykoNavBar/>
       <h1>New Collection</h1>
       <Form onSubmit={submitNewCollection}>
         <Form.Group>

@@ -149,7 +149,6 @@ export default function ObjectDetails() {
   }
   return (
     <div>
-      <TykoNavBar/>
       <Container fluid={true}>
         <h1>Object</h1>
         <Row>

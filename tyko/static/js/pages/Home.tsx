@@ -1,4 +1,6 @@
 import TykoNavBar from '../reactComponents/TykoNavBar';
+import {Outlet} from 'react-router-dom';
+import {Container} from 'react-bootstrap';
 
 /**
  * @return {JSXElement}
@@ -6,6 +8,8 @@ import TykoNavBar from '../reactComponents/TykoNavBar';
 export default function Home() {
   return <div>
     <TykoNavBar/>
-    <h1>Home</h1>
+    <Container>
+      <Outlet />
+    </Container>
   </div>;
 }

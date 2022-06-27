@@ -63,7 +63,6 @@ export default function ItemDetails() {
   }
   return (
     <div>
-      <TykoNavBar/>
       <Container fluid={true}>
         <h1>Items</h1>
         <Row>
