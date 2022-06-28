@@ -76,6 +76,57 @@ def strip_empty_strings(data):
     return data
 
 
+def update_cassette(item: formats.AudioCassette, changed_data: Dict[str, Any]):
+    data = changed_data.copy()
+    if data_of_cassette := data.pop('date_of_cassette'):
+        precision = utils.identify_precision(data_of_cassette)
+        item.recording_date = \
+            utils.create_precision_datetime(data_of_cassette, precision)
+
+        item.recording_date_precision = precision
+
+    if cassette_title := data.pop('cassette_title', None):
+        item.title_of_cassette = cassette_title
+
+    if (cassette_type_id := data.pop('cassette_type_id')) is not None:
+        if cassette_type_id == '':
+            item.tape_subtype = None
+        else:
+            item.tape_subtype_id = int(cassette_type_id)
+
+    if (generation := data.pop('generation_id', None)) is not None:
+        if generation == '':
+            item.generation = None
+        else:
+             item.generation_id = generation
+
+    if side_a_label := data.pop('side_a_label', None):
+        item.side_a_label = side_a_label
+
+    if side_a_duration := data.pop('side_a_duration', None):
+        item.side_a_duration = side_a_duration
+
+    if side_b_label := data.pop('side_b_label', None):
+        item.side_b_label = side_b_label
+
+    if side_b_duration := data.pop('side_b_duration', None):
+        item.side_b_duration = side_b_duration
+
+    if len(data.items()) > 0:
+        raise KeyError(f"Unknown keys {data.keys()}")
+
+
+def update_format_specific_details(
+        format_type: str,
+        changed_data,
+        session,
+        item
+):
+    if format_type == 'audio_cassettes':
+        update_cassette(item, changed_data)
+    session.commit()
+
+
 class ItemDataConnector(AbsNotesConnector):
 
     @staticmethod
@@ -232,8 +283,10 @@ class ItemDataConnector(AbsNotesConnector):
                 item.obj_sequence = int(changed_data["obj_sequence"])
 
             if "format_details" in changed_data:
-                format_details = changed_data['format_details']
-                self.update_cassette_tape(session, format_details, item)
+                update_format_specific_details(
+                    format_type=item.type,
+                    changed_data=changed_data['format_details'], session=session, item=item)
+                # self.update_cassette_tape(session, format_details, item)
 
             try:
                 session.add(item)

@@ -8,9 +8,11 @@ import React, {
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import {Datepicker} from 'vanillajs-datepicker';
+import {CalendarEvent} from 'react-bootstrap-icons';
+
 import axios from 'axios';
 import {Button, ProgressBar, Col, Row, CloseButton} from 'react-bootstrap';
-interface ApiEnum{
+export interface ApiEnum{
   id: number
   name: string
 }
@@ -210,23 +212,25 @@ export default function Items(
 interface ISelectDate{
   dateFormat: string,
   name: string
+  defaultValue?: string
   placeholder?: string,
   disabled?: boolean
 }
 
-const SelectDate: FC<ISelectDate> = (
-    {dateFormat, name, placeholder, disabled},
+export const SelectDate: FC<ISelectDate> = (
+    {dateFormat, name, placeholder, disabled, defaultValue},
 ) =>{
   const inputText = useRef<HTMLInputElement>(null);
   return (
     <Form.Group className="input-group">
-      <Form.Control type="text"
+      <Form.Control
+        type="text"
         name={name}
+        defaultValue={defaultValue}
         placeholder={placeholder}
         ref={inputText}
         disabled={disabled ? disabled: false}
-      >
-      </Form.Control>
+      />
       <Button
         type="button"
         variant="outline-secondary"
@@ -238,7 +242,7 @@ const SelectDate: FC<ISelectDate> = (
         }
         disabled={disabled ? disabled: false}
       >
-        <em className="bi bi-calendar-event"></em>
+        <CalendarEvent/>
       </Button>
     </Form.Group>
   );
@@ -263,7 +267,7 @@ function openDateSelect(
   datepicker.show();
 }
 
-const sortNameAlpha = (a: ApiEnum, b: ApiEnum) =>{
+export const sortNameAlpha = (a: ApiEnum, b: ApiEnum) =>{
   return a.name < b.name ? -1: 1;
 };
 

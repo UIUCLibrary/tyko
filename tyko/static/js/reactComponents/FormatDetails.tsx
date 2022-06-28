@@ -1,9 +1,17 @@
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
-
-import {useState, useEffect, FC, Fragment, ReactElement} from 'react';
+import React, {
+  useState,
+  useEffect,
+  FC,
+  Fragment,
+  ReactElement,
+  useReducer,
+} from 'react';
 import axios, {AxiosError} from 'axios';
 import {IItemMetadata} from './ItemApp';
+import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
+import {Button, ButtonGroup, Col, Spinner} from 'react-bootstrap';
 interface EnumMetadata {
   id: number
   name: string
@@ -89,7 +97,7 @@ const FormatDetail:
       );
     };
 
-const OpenReel: FC<{ data: { [key: string]: Element } }> = ({data}) => {
+const OpenReel: FC<IFormatType> = ({data, editMode}) => {
   const base = data['base'].value as EnumMetadata;
   const dateOfReel = data['date_of_reel'].value as string;
   const duration = data['duration'].value as string;
@@ -170,7 +178,7 @@ const OpenReel: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   );
 };
 
-const GroovedDisc: FC<{ data: { [key: string]: Element } }> = ({data}) => {
+const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
   const discBase = data['disc_base'].value as EnumMetadata;
   const dateOfDisc = data['date_of_disc'].value as string;
   const discDiameter = data['disc_diameter'].value as EnumMetadata;
@@ -238,7 +246,7 @@ const GroovedDisc: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   );
 };
 
-const Film: FC<{ data: { [key: string]: Element } }> = ({data}) => {
+const Film: FC<IFormatType> = ({data, editMode}) => {
   const adStripTest = data['ad_strip_test'].value;
   const adTestDate = data['ad_test_date'].value as string;
   const adTestLevel = data['ad_test_level'].value as string;
@@ -353,7 +361,7 @@ const Film: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   );
 };
 
-const Optical: FC<{ data: { [key: string]: Element } }> = ({data}) => {
+const Optical: FC<IFormatType> = ({data, editMode}) => {
   const titleOfItem = data['title_of_item'].value as string;
   const dateOfItem = data['date_of_item'].value as string;
   const duration = data['duration'].value as string;
@@ -386,9 +394,7 @@ const Optical: FC<{ data: { [key: string]: Element } }> = ({data}) => {
   );
 };
 
-const VideoCassette: FC<{
-  data: { [key: string]: Element }
-}> = ({data}) => {
+const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
   const dateOfCassette = data['date_of_cassette'].value as string;
   const duration = data['duration'].value as string;
   const label = data['label'].value as string;
@@ -425,9 +431,49 @@ const VideoCassette: FC<{
     </Fragment>
   );
 };
-const AudioCassette: FC<{
-  data: { [key: string]: Element }
-}> = ({data}) => {
+
+const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
+  const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
+  const [subtypes, setSubTypes] = useState<ApiEnum[]|null>(null);
+
+  useEffect(()=>{
+    if (editMode) {
+      if (!loading) {
+        if (!generations) {
+          setLoading(true);
+          axios.get('/api/formats/audio_cassette/generation')
+              .then((res)=> {
+                setGenerations((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!subtypes) {
+          setLoading(true);
+          axios.get('/api/formats/audio_cassette/subtype')
+              .then((res)=> {
+                setSubTypes((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+      } else {
+        if (generations && subtypes) {
+          setLoading(false);
+        }
+      }
+    }
+  }, [editMode, generations, subtypes]);
+  if (loading) {
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </td>
+
+      </tr>
+    );
+  }
+
   const title = data['cassette_title'].value as string;
   const cassetteType = data['cassette_type'].value as EnumMetadata;
   const dateOfCassette = data['date_of_cassette'].value as string;
@@ -436,55 +482,152 @@ const AudioCassette: FC<{
   const sideALabel = data['side_a_label'].value as string;
   const sideBDuration = data['side_b_duration'].value as string;
   const sideBLabel = data['side_b_label'].value as string;
-  const readOnlyMode = true;
+  const readOnlyMode = !editMode;
+
+  const cassetteDateField =
+      editMode ? (
+            <Form.Group>
+              <SelectDate
+                name='date_of_cassette'
+                dateFormat='m/dd/yyyy'
+                defaultValue={dateOfCassette ? dateOfCassette: ''}
+              />
+            </Form.Group>
+          ):
+          (
+              <Form.Control
+                size={'sm'}
+                defaultValue={dateOfCassette}
+                plaintext={true}
+                readOnly={readOnlyMode}
+              />
+          );
+
+  const generationOptions = generations?.map((generation) => {
+    return (
+      <option key={generation.id} value={generation.id}>
+        {generation.name}
+      </option>
+    );
+  });
+
+  const subtypeOptions = subtypes?.map((generation) => {
+    return (
+      <option key={generation.id} value={generation.id}>
+        {generation.name}
+      </option>
+    );
+  });
+  const generationField =
+      editMode ?
+          (
+              <Form.Select
+                name='generation_id'
+                defaultValue={generation ? generation.id : ''}
+              >
+                <option key={-1} value=''></option>
+                {generationOptions}
+              </Form.Select>
+          ):
+          (
+            <Form.Control
+              size={'sm'}
+              plaintext={true}
+              defaultValue={generation ? generation.name : ''}
+              readOnly={readOnlyMode}
+            />
+          );
+  const cassetteTypeField =
+      editMode ?
+          (
+              <Form.Select
+                name='cassette_type_id'
+                defaultValue={cassetteType ? cassetteType.id: ''}
+              >
+                <option key={-1} value=''></option>
+                {subtypeOptions}
+              </Form.Select>
+          ):
+          (
+              <Form.Control
+                size={'sm'}
+                defaultValue={cassetteType ? cassetteType.name : ''}
+                plaintext={true}
+                readOnly={readOnlyMode}/>
+          );
   return (
     <Fragment>
       <FormatDetail key='cassetteTitle' label="Cassette Title">
-        <Form.Control size={'sm'} defaultValue={title}
+        <Form.Control
+          name='cassette_title'
+          size={'sm'}
+          defaultValue={title}
+          plaintext={readOnlyMode}
           readOnly={readOnlyMode}/>
       </FormatDetail>
       <FormatDetail key='cassetteType' label="Type">
-        <Form.Control size={'sm'}
-          defaultValue={cassetteType ? cassetteType.name : ''}
-          readOnly={readOnlyMode}/>
+        {cassetteTypeField}
       </FormatDetail>
       <FormatDetail key='dateOfCassette' label="Date of Cassette">
-        <Form.Control size={'sm'} defaultValue={dateOfCassette}
-          readOnly={readOnlyMode}/>
+        {cassetteDateField}
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        <Form.Control size={'sm'}
-          defaultValue={generation ? generation.name : ''}
-          readOnly={readOnlyMode}/>
+        {generationField}
       </FormatDetail>
       <FormatDetail key='sideALabel' label="Side A Label">
-        <Form.Control size={'sm'} defaultValue={sideALabel}
+        <Form.Control
+          name="side_a_label"
+          size={'sm'}
+          defaultValue={sideALabel}
+          plaintext={readOnlyMode}
           readOnly={readOnlyMode}/>
       </FormatDetail>
       <FormatDetail key='sideADuration' label="Side A Duration">
-        <Form.Control size={'sm'} defaultValue={sideADuration}
-          readOnly={readOnlyMode}/>
+        <Form.Control
+          name="side_a_duration"
+          size={'sm'}
+          defaultValue={sideADuration}
+          plaintext={readOnlyMode}
+          readOnly={readOnlyMode}
+        />
       </FormatDetail>
       <FormatDetail key='sideBLabel' label="Side B Label">
-        <Form.Control size={'sm'} defaultValue={sideBLabel}
-          readOnly={readOnlyMode}/>
+        <Form.Control
+          name="side_b_label"
+          size={'sm'}
+          defaultValue={sideBLabel}
+          plaintext={readOnlyMode}
+          readOnly={readOnlyMode}
+        />
       </FormatDetail>
       <FormatDetail key='sideBDuration' label="Side B Duration">
-        <Form.Control size={'sm'} defaultValue={sideBDuration}
+        <Form.Control
+          name="side_b_duration"
+          size={'sm'}
+          defaultValue={sideBDuration}
+          plaintext={readOnlyMode}
           readOnly={readOnlyMode}/>
       </FormatDetail>
     </Fragment>
   );
 };
-
+interface IFormatType{
+  data: { [key: string]: Element }
+  editMode: boolean
+}
 /**
  * Gget the table body
  * @param {FormatType} formatType - Format type
+ * @param {boolean} editMode - editMode
  * @param {Element[]} data - data
  * @return {Fragment}
  */
-function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
-  const types: { [key: number]: FC<{ data: { [key: string]: Element } }> } = {
+function getTableBody(
+    formatType: FormatType,
+    editMode: boolean,
+    data: Element[],
+): JSX.Element {
+  const types: { [key: number]: FC<IFormatType> } = {
     4: OpenReel,
     5: GroovedDisc,
     6: Film,
@@ -500,7 +643,9 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
     for (const element of data) {
       sortedData[element.key] = element;
     }
-    return (<Type data={sortedData}/>);
+    return (
+      <Type data={sortedData} editMode={editMode}/>
+    );
   }
 
   const values: JSX.Element[] = data.map(
@@ -534,6 +679,7 @@ interface IData {
   onUpdated: ()=>void
 }
 
+// function edited
 
 /**
  * Display format details
@@ -542,6 +688,7 @@ interface IData {
  * @constructor
  */
 export default function FormatDetails({apiData, apiUrl, onUpdated}:IData ) {
+  const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
   const elements: Element[] = [];
   const formatDetails = apiData['format_details'];
   Object.keys(formatDetails).forEach((objectKey) => {
@@ -550,12 +697,35 @@ export default function FormatDetails({apiData, apiUrl, onUpdated}:IData ) {
       value: formatDetails[objectKey],
     });
   });
-  const values = getTableBody(apiData.format, elements);
+  const values = getTableBody(apiData.format, editMode, elements);
+  const handleUpdate = (event: React.SyntheticEvent)=> {
+    event.preventDefault();
+    const formData = new FormData(event.target as HTMLFormElement);
+    const formProps = Object.fromEntries(formData);
+    axios.put(apiUrl, {'format_details': formProps}).then(()=>{
+      if (onUpdated) {
+        onUpdated();
+      }
+    }).catch(console.error);
+  };
   return (
-    <Table data-testid='dummy'>
-      <tbody>
-        {values}
-      </tbody>
-    </Table>
+    <>
+      <Form onSubmit={handleUpdate}>
+        <Table data-testid='dummy'>
+          <tbody>
+            {values}
+          </tbody>
+        </Table>
+        <ButtonGroup hidden={!editMode}>
+          <Button variant={'outline-danger'} onClick={setEditMode}>
+            Cancel
+          </Button>
+          <Button type='submit' variant={'outline-primary'}>
+            Confirm
+          </Button>
+        </ButtonGroup>
+        <Button hidden={editMode} onClick={setEditMode}>Edit</Button>
+      </Form>
+    </>
   );
 }

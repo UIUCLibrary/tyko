@@ -27,10 +27,10 @@ import Items, {
 } from '../tyko/static/js/reactComponents/Items';
 import React from 'react';
 
-jest.mock('vanillajs-datepicker', ()=>{});
+jest.mock('vanillajs-datepicker', ()=> {});
 
 describe('Items', ()=>{
-  const onRemoval = (url: string) =>{
+  const onRemoval = (url: string) => {
 
   };
   test('include name', ()=>{

@@ -1,6 +1,5 @@
-import TykoNavBar from '../reactComponents/TykoNavBar';
 import React, {useEffect, useState} from 'react';
-import {Col, Container, Form, Row} from 'react-bootstrap';
+import {Col, Row, Spinner} from 'react-bootstrap';
 import Panel from '../reactComponents/Panel';
 import {
   ItemDetails as ItemDetailsDetails,
@@ -45,10 +44,37 @@ export default function ItemDetails() {
   let filesPanel;
   let notesPanel;
   if (!apiData) {
-    detailsPanel = <h1>Loading...</h1>;
-    formatDetailsPanel = <h1>Loading...</h1>;
-    filesPanel = <h1>Loading...</h1>;
-    notesPanel = <h1>Loading...</h1>;
+    detailsPanel = <>
+      <div style={{textAlign: 'center'}}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    </>;
+
+    formatDetailsPanel = <>
+      <div style={{textAlign: 'center'}}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    </>;
+
+    filesPanel = <>
+      <div style={{textAlign: 'center'}}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    </>;
+
+    notesPanel = <>
+      <div style={{textAlign: 'center'}}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    </>;
   } else {
     detailsPanel = <ItemDetailsDetails
       apiData={apiData}
@@ -63,33 +89,31 @@ export default function ItemDetails() {
   }
   return (
     <div>
-      <Container fluid={true}>
-        <h1>Items</h1>
-        <Row>
-          <Col md={{span: 6}}>
-            <Row>
-              <Panel title="Details">
-                {detailsPanel}
-              </Panel>
-              <Panel title="Format Details">
-                {formatDetailsPanel}
-              </Panel>
-            </Row>
-          </Col>
-          <Col md={{span: 6}}>
-            <Row>
-              <Panel title="Files">
-                {filesPanel}
-              </Panel>
-            </Row>
-            <Row>
-              <Panel title="Notes">
-                {notesPanel}
-              </Panel>
-            </Row>
-          </Col>
-        </Row>
-      </Container>
+      <h1>Item Details</h1>
+      <Row>
+        <Col md={{span: 6}}>
+          <Row>
+            <Panel title="Details">
+              {detailsPanel}
+            </Panel>
+            <Panel title="Format Details">
+              {formatDetailsPanel}
+            </Panel>
+          </Row>
+        </Col>
+        <Col md={{span: 6}}>
+          <Row>
+            <Panel title="Files">
+              {filesPanel}
+            </Panel>
+          </Row>
+          <Row>
+            <Panel title="Notes">
+              {notesPanel}
+            </Panel>
+          </Row>
+        </Col>
+      </Row>
     </div>
   );
 }

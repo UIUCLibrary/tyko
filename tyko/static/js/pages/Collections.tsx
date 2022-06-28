@@ -1,4 +1,3 @@
-import TykoNavBar from '../reactComponents/TykoNavBar';
 import Table from 'react-bootstrap/Table';
 import {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';

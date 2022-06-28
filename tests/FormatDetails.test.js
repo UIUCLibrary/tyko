@@ -12,7 +12,7 @@ import {
   cleanup, waitFor,
 } from '@testing-library/react';
 import FormatDetails from '../tyko/static/js/reactComponents/FormatDetails';
-
+jest.mock('vanillajs-datepicker', ()=>{});
 const mockResponseAudioCassette = {
   files: [],
   format: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import Card from 'react-bootstrap/Card';
-
+import Container from 'react-bootstrap/Container';
 export interface IPanel{
   title: string
   children: JSX.Element | JSX.Element[] | string
@@ -14,11 +14,13 @@ export interface IPanel{
  */
 export default function Panel({title, children}: IPanel) {
   return (
-    <Card className="my-1">
-      <Card.Header>{title}</Card.Header>
-      <Card.Body>
-        {children}
-      </Card.Body>
-    </Card>
+    <Container>
+      <Card className="mb-1">
+        <Card.Header>{title}</Card.Header>
+        <Card.Body>
+          {children}
+        </Card.Body>
+      </Card>
+    </Container>
   );
 }

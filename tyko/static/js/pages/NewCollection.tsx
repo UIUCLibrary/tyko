@@ -1,4 +1,3 @@
-import TykoNavBar from '../reactComponents/TykoNavBar';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import {Col, Row} from 'react-bootstrap';

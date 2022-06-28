@@ -1,5 +1,4 @@
 import {useParams} from 'react-router-dom';
-import TykoNavBar from '../reactComponents/TykoNavBar';
 import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
 import {useEffect, useState} from 'react';

@@ -1,4 +1,3 @@
-import TykoNavBar from '../reactComponents/TykoNavBar';
 import {Col, Container, Form, Row} from 'react-bootstrap';
 import Panel from '../reactComponents/Panel';
 import React, {FC, useEffect, useState} from 'react';

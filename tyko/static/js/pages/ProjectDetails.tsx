@@ -1,6 +1,5 @@
 import Panel from '../reactComponents/Panel';
 import {Link, useParams} from 'react-router-dom';
-import TykoNavBar from '../reactComponents/TykoNavBar';
 import {Col, Container, Form, Row} from 'react-bootstrap';
 import React, {useEffect, useState, FC} from 'react';
 import {EditableField} from '../reactComponents/ItemApp';

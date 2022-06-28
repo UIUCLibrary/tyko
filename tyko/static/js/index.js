@@ -12,6 +12,7 @@ import Items, {NewItemButton, ObjectItemsApp} from './reactComponents/Items';
 import {ItemDetails} from './reactComponents/ItemApp';
 import axios from 'axios';
 import Panel from './reactComponents/Panel';
+import {Spinner} from 'react-bootstrap';
 
 
 import('bootstrap');
@@ -142,7 +143,11 @@ function loadReactComponents() {
     const root = createRoot(itemDetails);
     root.render(
         <Panel title='Details'>
-            Loading...
+          <p style={{textAlign: 'center'}}>
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+          </p>
         </Panel>);
     axios.get(formatDetailsComponent.dataset.tykoApiUrl).then((resp)=>{
       root.render(

@@ -1,4 +1,3 @@
-import TykoNavBar from '../reactComponents/TykoNavBar';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
