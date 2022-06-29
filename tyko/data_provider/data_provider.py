@@ -1,7 +1,7 @@
 import abc
 from abc import ABC, ABCMeta
 from datetime import datetime
-from typing import Iterator, List, Dict, Any, Optional, TypedDict, Mapping
+from typing import Iterator, List, Dict, Any, Optional, TypedDict, Mapping, Union, Callable
 
 import sqlalchemy
 from sqlalchemy import true, orm
@@ -76,44 +76,111 @@ def strip_empty_strings(data):
     return data
 
 
-def update_cassette(item: formats.AudioCassette, changed_data: Dict[str, Any]):
-    data = changed_data.copy()
-    if data_of_cassette := data.pop('date_of_cassette'):
+def update_film(
+        item: formats.Film,
+        changed_data: Dict[str, Optional[Union[str, bool, int]]]):
+    if data_of_film := changed_data.pop('date_of_film', None):
+        precision = utils.identify_precision(data_of_film)
+        item.recording_date = \
+            utils.create_precision_datetime(data_of_film, precision)
+
+        item.recording_date_precision = precision
+
+    if data_of_ad_test := changed_data.pop('ad_test_date', None):
+        item.ad_test_date = \
+            utils.create_precision_datetime(data_of_ad_test)
+
+    if data_of_ad_level := changed_data.pop('ad_test_level', None):
+        item.ad_test_level = data_of_ad_level
+
+    if can_label := changed_data.pop('can_label', None):
+        item.can_label = can_label
+
+    if duration := changed_data.pop('duration', None):
+        item.duration = duration
+
+    if title_of_film := changed_data.pop('film_title', None):
+        item.title_of_film = title_of_film
+
+    if leader_label := changed_data.pop('leader_label', None):
+        item.leader_label = leader_label
+
+    if edge_code_date := changed_data.pop('edge_code_date', None):
+        item.edge_code_date = edge_code_date
+
+    if film_length := changed_data.pop('film_length', None):
+        item.length = film_length
+
+    if film_shrinkage := changed_data.pop('film_shrinkage', None):
+        item.film_shrinkage = film_shrinkage
+
+    if film_color_id := changed_data.pop('film_color_id', None):
+        item.color_id = film_color_id
+
+    if film_base_id := changed_data.pop('film_base_id', None):
+        item.film_base_id = film_base_id
+
+    if film_emulsion_id := changed_data.pop('film_emulsion_id', None):
+        item.emulsion_id = film_emulsion_id
+
+    if image_type_id := changed_data.pop('image_type_id', None):
+        item.image_type_id = image_type_id
+
+    if film_speed_id := changed_data.pop('film_speed_id', None):
+        item.film_speed_id = film_speed_id
+
+    if film_gauge_id := changed_data.pop('film_gauge_id', None):
+        item.film_gauge_id = film_gauge_id
+
+    if soundtrack_id := changed_data.pop('soundtrack_id', None):
+        item.soundtrack_id = soundtrack_id
+
+    if wind_id := changed_data.pop('wind_id', None):
+        item.wind_id = wind_id
+
+
+def update_cassette(
+        item: formats.AudioCassette,
+        changed_data: Dict[str, Optional[Union[str, bool, int]]]):
+
+    if data_of_cassette := changed_data.pop('date_of_cassette'):
         precision = utils.identify_precision(data_of_cassette)
         item.recording_date = \
             utils.create_precision_datetime(data_of_cassette, precision)
 
         item.recording_date_precision = precision
 
-    if cassette_title := data.pop('cassette_title', None):
+    if cassette_title := changed_data.pop('cassette_title', None):
         item.title_of_cassette = cassette_title
 
-    if (cassette_type_id := data.pop('cassette_type_id', None)) is not None:
+    if (
+            cassette_type_id := changed_data.pop('cassette_type_id', None)
+    ) is not None:
         if cassette_type_id == '':
             item.tape_subtype = None
         else:
             item.tape_subtype_id = int(cassette_type_id)
 
-    if (generation := data.pop('generation_id', None)) is not None:
+    if (generation := changed_data.pop('generation_id', None)) is not None:
         if generation == '':
             item.generation = None
         else:
-             item.generation_id = generation
+            item.generation_id = generation
 
-    if side_a_label := data.pop('side_a_label', None):
+    if side_a_label := changed_data.pop('side_a_label', None):
         item.side_a_label = side_a_label
 
-    if side_a_duration := data.pop('side_a_duration', None):
+    if side_a_duration := changed_data.pop('side_a_duration', None):
         item.side_a_duration = side_a_duration
 
-    if side_b_label := data.pop('side_b_label', None):
+    if side_b_label := changed_data.pop('side_b_label', None):
         item.side_b_label = side_b_label
 
-    if side_b_duration := data.pop('side_b_duration', None):
+    if side_b_duration := changed_data.pop('side_b_duration', None):
         item.side_b_duration = side_b_duration
 
-    if len(data.items()) > 0:
-        raise KeyError(f"Unknown keys {data.keys()}")
+    if len(changed_data.items()) > 0:
+        raise KeyError(f"Unknown keys {changed_data.keys()}")
 
 
 def update_format_specific_details(
@@ -122,8 +189,24 @@ def update_format_specific_details(
         session,
         item
 ):
-    if format_type == 'audio_cassettes':
-        update_cassette(item, changed_data)
+    data = changed_data.copy()
+    update_formats: Dict[
+        str,
+        Callable[
+            [
+                AVFormat,
+                Dict[str, Optional[Union[str, bool, int]]]
+            ],
+            None
+        ]
+    ] = {
+        "audio_cassettes": update_cassette,
+        "films": update_film
+    }
+    update_format = update_formats.get(format_type)
+    if update_format is None:
+        raise KeyError(f'Unknown format type {format_type}')
+    update_format(item, data)
     session.commit()
 
 

@@ -6,12 +6,14 @@ import React, {
   FC,
   Fragment,
   ReactElement,
-  useReducer,
+  useReducer, useRef,
 } from 'react';
 import axios, {AxiosError} from 'axios';
 import {IItemMetadata} from './ItemApp';
 import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
 import {Button, ButtonGroup, Col, Spinner} from 'react-bootstrap';
+import {number} from 'prop-types';
+import {min} from '@popperjs/core/lib/utils/math';
 interface EnumMetadata {
   id: number
   name: string
@@ -35,6 +37,38 @@ interface ApiData {
     }
   }
 }
+const createEnumField = (
+    name: string,
+    current: EnumMetadata,
+    all: ApiEnum[] | null,
+    editMode: boolean,
+)=>{
+  if (editMode) {
+    return (
+      <Form.Select
+        name={name}
+        defaultValue={current ? current.id : ''}
+      >
+        <option key={-1} value=''/>
+        {all ? createEnumOptions(all) :(<></>)}
+      </Form.Select>
+    );
+  }
+  return (
+    <Form.Control
+      size={'sm'}
+      readOnly={!editMode}
+      plaintext={!editMode}
+      defaultValue={current ? current.name : ''}
+    />
+  );
+};
+
+const createEnumOptions = (enumList: EnumMetadata[])=>{
+  return enumList.map((item) => {
+    return (<option key={item.id} value={item.id}>{item.name}</option>);
+  });
+};
 
 /**
  * Get api data for format.
@@ -246,8 +280,82 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
   );
 };
 
+const createNullField = (name: string) =>{
+  return <Form.Control name={name} value='' readOnly={true} plaintext={true}/>;
+};
+
+const createNumberField = (
+    name: string,
+    current: number | null,
+    editMode: boolean,
+    minimum: number | null = null,
+    maximum: number | null = null,
+)=>{
+  return (
+    <Form.Control
+      name={name}
+      type='number'
+      min={minimum === null ? undefined: minimum}
+      max={maximum === null ? undefined: maximum}
+      readOnly={!editMode}
+      plaintext={!editMode}
+      defaultValue={current ? current: undefined}/>
+  );
+};
+const createTextField = (name: string, current: string, editMode: boolean)=>{
+  return (
+    <Form.Control
+      name={name}
+      readOnly={!editMode}
+      plaintext={!editMode}
+      defaultValue={current}/>
+  );
+};
+
+const createDateField = (
+    name: string,
+    current: string | null,
+    dateFormat: string,
+    editMode: boolean,
+)=>{
+  if (editMode) {
+    return (
+      <Form.Group>
+        <SelectDate
+          name={name}
+          dateFormat={dateFormat}
+          defaultValue={current ? current: ''}
+        />
+      </Form.Group>
+    );
+  }
+  return (
+    <Form.Control
+      name={name}
+      readOnly={!editMode}
+      plaintext={!editMode}
+      defaultValue={current ? current: ''}/>
+  );
+};
 const Film: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
   const adStripTest = data['ad_strip_test'].value;
+
+  const [
+    adStripPerformed,
+    setAdStripPerformed,
+  ] = useReducer((state) => !state, adStripTest as boolean);
+
+  const [speeds, setSpeeds] = useState<ApiEnum[]|null>(null);
+  const [bases, setBases] = useState<ApiEnum[]|null>(null);
+  const [imageTypes, setImageTypes] = useState<ApiEnum[]|null>(null);
+  const [soundtracks, setSoundtracks] = useState<ApiEnum[]|null>(null);
+  const [filmGauges, setFilmGauges] = useState<ApiEnum[]|null>(null);
+  const [colors, setColors] = useState<ApiEnum[]|null>(null);
+  const [winds, setWinds] = useState<ApiEnum[]|null>(null);
+  const [emulsions, setEmulsions] = useState<ApiEnum[]|null>(null);
+
+
   const adTestDate = data['ad_test_date'].value as string;
   const adTestLevel = data['ad_test_level'].value as string;
   const canLabel = data['can_label'].value as string;
@@ -267,95 +375,203 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
   const soundtrack = data['soundtrack'].value as EnumMetadata;
   const wind = data['wind'].value as EnumMetadata;
 
-  let adStripTestDisplay: string;
-  switch (adStripTest) {
-    case false:
-      adStripTestDisplay = 'No';
-      break;
-    case true:
-      adStripTestDisplay = 'Yes';
-      break;
-    default:
-      adStripTestDisplay = '';
+  const selectedAdStrip = useRef<HTMLInputElement>(null);
+
+  useEffect(()=>{
+    if (editMode) {
+      if (!loading) {
+        if (!speeds) {
+          setLoading(true);
+          axios.get('/api/formats/film/film_speed')
+              .then((res)=> {
+                setSpeeds((res.data as ApiEnum[]));
+              }).catch(console.error);
+        }
+        if (!bases) {
+          setLoading(true);
+          axios.get('/api/formats/film/film_base')
+              .then((res)=> {
+                setBases((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!imageTypes) {
+          setLoading(true);
+          axios.get('/api/formats/film/image_type')
+              .then((res)=> {
+                setImageTypes((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!soundtracks) {
+          setLoading(true);
+          axios.get('/api/formats/film/soundtrack')
+              .then((res)=> {
+                setSoundtracks((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!colors) {
+          setLoading(true);
+          axios.get('/api/formats/film/color')
+              .then((res)=> {
+                setColors((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!winds) {
+          setLoading(true);
+          axios.get('/api/formats/film/wind')
+              .then((res)=> {
+                setWinds((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!emulsions) {
+          setLoading(true);
+          axios.get('/api/formats/film/film_emulsion')
+              .then((res)=> {
+                setEmulsions((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!filmGauges) {
+          setLoading(true);
+          axios.get('/api/formats/film/film_gauge')
+              .then((res)=> {
+                setFilmGauges((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+      } else {
+        if (
+          speeds &&
+          bases &&
+          imageTypes &&
+          soundtracks &&
+          colors &&
+          winds &&
+          emulsions &&
+          filmGauges
+        ) {
+          setLoading(false);
+        }
+      }
+    }
+  }, [
+    editMode,
+    speeds,
+    bases,
+    imageTypes,
+    colors,
+    winds,
+    emulsions,
+    filmGauges,
+  ]);
+  if (loading) {
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </td>
+
+      </tr>
+    );
   }
-  const readOnlyMode = true;
+
   return (
     <Fragment>
       <FormatDetail key='dateOfFilm' label="Date Of Film">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={dateOfFilm}/>
+        {createDateField('date_of_film', dateOfFilm, 'm/dd/yyyy', editMode)}
       </FormatDetail>
       <FormatDetail key='adStripTest' label="AD Strip Test Performed">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={adStripTestDisplay}/>
+        <Form.Check
+          checked={adStripPerformed}
+          type="checkbox"
+          ref={selectedAdStrip}
+          onChange={setAdStripPerformed}
+          disabled={!editMode}
+        />
       </FormatDetail>
       <FormatDetail key='adTestDate' label="AD Test Date">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={adTestDate}/>
+        <fieldset disabled={!adStripPerformed}>
+          { adStripPerformed ?
+              createDateField(
+                  'ad_test_date',
+                  adTestDate,
+                  'm/dd/yyyy',
+                  editMode,
+              ): createNullField('adTestDate')
+          }
+        </fieldset>
       </FormatDetail>
       <FormatDetail key='adTestLevel' label="AD Test Level">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={adTestLevel}/>
+        <fieldset disabled={!adStripPerformed}>
+          { adStripPerformed ?
+              createNumberField(
+                  'ad_test_level',
+                adTestLevel ? parseInt(adTestLevel): null,
+                editMode,
+                0,
+              ): createNullField('adTestLevel')
+          }
+        </fieldset>
       </FormatDetail>
       <FormatDetail key='canLabel' label="Can Label">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={canLabel}/>
+        {createTextField('can_label', canLabel, editMode)}
       </FormatDetail>
       <FormatDetail key='duration' label="Duration">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={duration}/>
+        {createTextField('duration', duration, editMode)}
       </FormatDetail>
       <FormatDetail key='filmTitle' label="Film Title">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={filmTitle}/>
+        {createTextField('film_title', filmTitle, editMode)}
       </FormatDetail>
       <FormatDetail key='leaderLabel' label="Leader Label">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={leaderLabel}/>
+        {createTextField('leader_label', leaderLabel, editMode)}
       </FormatDetail>
       <FormatDetail key='edgeCodeDate' label="Edge Code Date">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={edgeCodeDate ? edgeCodeDate.toString() : ''}/>
+        {createNumberField(
+            'edge_code_date',
+            edgeCodeDate ? edgeCodeDate: null,
+            editMode,
+            0,
+        )}
       </FormatDetail>
       <FormatDetail key='filmLength' label='Film Length'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={filmLength ? filmLength.toString() : ''}/>
+        {createNumberField(
+            'film_length',
+            filmLength ? filmLength: null,
+            editMode,
+            0,
+        )}
       </FormatDetail>
       <FormatDetail key='filmShrinkage' label='Film Shrinkage'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={filmShrinkage ? filmShrinkage.toString() : ''}/>
+        {createNumberField(
+            'film_shrinkage',
+            filmShrinkage ? filmShrinkage: null,
+            editMode,
+            0,
+            100,
+        )}
       </FormatDetail>
       <FormatDetail key='color' label='Color'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={color ? color.name : ''}/>
+        {createEnumField('film_color_id', color, colors, editMode)}
       </FormatDetail>
       <FormatDetail key='filmBase' label='Film Base'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={filmBase ? filmBase.name : ''}/>
+        {createEnumField('film_base_id', filmBase, bases, editMode)}
       </FormatDetail>
       <FormatDetail key='filmEmulsion' label='Film Emulsion'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={filmEmulsion ? filmEmulsion.name : ''}/>
+        {createEnumField('film_emulsion_id', filmEmulsion, emulsions, editMode)}
       </FormatDetail>
       <FormatDetail key='filmImageType' label='Film Image Type'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={filmImageType ? filmImageType.name : ''}/>
+        {createEnumField('image_type_id', filmImageType, imageTypes, editMode)}
       </FormatDetail>
       <FormatDetail key='filmSpeed' label='Film Speed'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={filmSpeed ? filmSpeed.name : ''}/>
+        {createEnumField('film_speed_id', filmSpeed, speeds, editMode)}
       </FormatDetail>
       <FormatDetail key='filmGauge' label='Film Gauge'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={filmGauge ? filmGauge.name : ''}/>
+        {createEnumField('film_gauge_id', filmGauge, filmGauges, editMode)}
       </FormatDetail>
       <FormatDetail key='soundtrack' label='Soundtrack'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={soundtrack ? soundtrack.name : ''}/>
+        {createEnumField('soundtrack_id', soundtrack, soundtracks, editMode)}
       </FormatDetail>
       <FormatDetail key='wind' label='Wind'>
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={wind ? wind.name : ''}/>
+        {createEnumField('wind_id', wind, winds, editMode)}
       </FormatDetail>
     </Fragment>
   );
@@ -511,10 +727,10 @@ const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
     );
   });
 
-  const subtypeOptions = subtypes?.map((generation) => {
+  const subtypeOptions = subtypes?.map((subtype) => {
     return (
-      <option key={generation.id} value={generation.id}>
-        {generation.name}
+      <option key={subtype.id} value={subtype.id}>
+        {subtype.name}
       </option>
     );
   });
