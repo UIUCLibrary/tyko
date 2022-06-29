@@ -88,7 +88,7 @@ def update_cassette(item: formats.AudioCassette, changed_data: Dict[str, Any]):
     if cassette_title := data.pop('cassette_title', None):
         item.title_of_cassette = cassette_title
 
-    if (cassette_type_id := data.pop('cassette_type_id')) is not None:
+    if (cassette_type_id := data.pop('cassette_type_id', None)) is not None:
         if cassette_type_id == '':
             item.tape_subtype = None
         else:
