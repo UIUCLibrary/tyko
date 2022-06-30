@@ -1,7 +1,16 @@
 import abc
 from abc import ABC, ABCMeta
 from datetime import datetime
-from typing import Iterator, List, Dict, Any, Optional, TypedDict, Mapping, Union, Callable
+from typing import \
+    Iterator, \
+    List, \
+    Dict, \
+    Any, \
+    Optional, \
+    TypedDict, \
+    Mapping, \
+    Union, \
+    Callable
 
 import sqlalchemy
 from sqlalchemy import true, orm
@@ -92,7 +101,10 @@ def update_groove_discs(
     if disc_diameter_id := changed_data.pop('disc_diameter_id', None):
         item.disc_diameter_id = disc_diameter_id
 
-    if playback_direction_id := changed_data.pop('playback_direction_id', None):
+    if playback_direction_id := changed_data.pop(
+            'playback_direction_id',
+            None
+    ):
         item.playback_direction_id = playback_direction_id
 
     if disc_material_id := changed_data.pop('disc_material_id', None):
@@ -381,7 +393,7 @@ class ItemDataConnector(AbsNotesConnector):
             transfer_date = format_data.pop('transfer_date', None)
             inspection_date = format_data.pop('inspection_date', None)
             parent_object_id = format_data.pop('object_id', None)
-            medusa_uuid = format_data.pop('medusa_uuid', None)
+            format_data.pop('medusa_uuid', None)
 
             new_item = self.create_new_format_item(session, format_data)
             new_item.object_id = parent_object_id
@@ -421,8 +433,8 @@ class ItemDataConnector(AbsNotesConnector):
             if "format_details" in changed_data:
                 update_format_specific_details(
                     format_type=item.type,
-                    changed_data=changed_data['format_details'], session=session, item=item)
-                # self.update_cassette_tape(session, format_details, item)
+                    changed_data=changed_data['format_details'],
+                    session=session, item=item)
 
             try:
                 session.add(item)
