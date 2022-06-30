@@ -58,8 +58,11 @@ class ObjectItemAPI(views.MethodView):
         connectors = {
             "audio cassette": data_provider.formats.AudioCassetteDataConnector,
             'cassette tape': data_provider.formats.AudioCassetteDataConnector,
+            "film": data_provider.formats.FilmDataConnector,
             'grooved disc': data_provider.formats.GroovedDiscDataConnector,
-
+            'open reel': data_provider.formats.OpenReelDataConnector,
+            'optical': data_provider.formats.OpticalDataConnector,
+            "video cassette": data_provider.formats.VideoCassetteDataConnector
         }
         connector_class = connectors.get(format_type['name'])
         if connector_class is not None:
