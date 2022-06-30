@@ -183,10 +183,7 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
   const [playbackSpeeds, setPlaybackSpeeds] = useState<ApiEnum[]|null>(null);
 
   const [loading, setLoading] = useState(false);
-  // const discMaterial = data['disc_material'].value as EnumMetadata;
-  // const playbackSpeed = data['playback_speed'].value as EnumMetadata;
-  const readOnlyMode = true;
-  useEffect(()=>{
+   useEffect(()=>{
     if (editMode) {
       if (!loading) {
         if (!discDiameters) {
