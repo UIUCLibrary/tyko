@@ -1,4 +1,5 @@
 import abc
+import warnings
 from abc import ABC, ABCMeta
 from datetime import datetime
 from typing import \
@@ -327,10 +328,14 @@ def update_format_specific_details(
         "open_reels": update_open_reel
     }
     update_format = update_formats.get(format_type)
-    if update_format is None:
-        raise KeyError(f'Unknown format type {format_type}')
-    update_format(item, data)
-    session.commit()
+    if update_format is not None:
+        update_format(item, data)
+        session.commit()
+    else:
+        warnings.warn(
+            f'Unknown format type {format_type}. Not updating',
+            UserWarning
+        )
 
 
 class ItemDataConnector(AbsNotesConnector):
