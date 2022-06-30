@@ -1,7 +1,6 @@
-// import React from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-import {Button, Container} from 'react-bootstrap';
+import Container from 'react-bootstrap/Container';
 
 /**
  * ddd

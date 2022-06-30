@@ -8,9 +8,7 @@ import {
 import FormatDetails from '../reactComponents/FormatDetails';
 import {useParams} from 'react-router-dom';
 import axios from 'axios';
-interface IApiData {
-  files: any[]
-}
+
 /**
  * d
  * @constructor

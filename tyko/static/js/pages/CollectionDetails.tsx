@@ -1,9 +1,8 @@
 import {useParams} from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
-import Table from 'react-bootstrap/Table';
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import {Col, Form, Row} from 'react-bootstrap';
+import {Col, Form, Row, Spinner} from 'react-bootstrap';
 interface ICollection{
   collection_id: number
   collection_name: string
@@ -28,59 +27,73 @@ export default function CollectionDetails() {
       setData(((await axios.get(url)).data as APIData).collection);
     };
     if (collectionId) {
-      fetchData(`/api/collection/${collectionId}`).then().catch(console.log);
+      fetchData(`/api/collection/${collectionId}`)
+          .then()
+          .catch(console.log)
+          .finally(()=>setLoading(false));
     }
   }, [collectionId]);
   let content;
-  if (!data) {
-    content = <div>Loading</div>;
+  if (loading) {
+    content = <>
+      <div style={{textAlign: 'center'}}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    </>;
   } else {
-    content = (
-      <Form>
-        <Form.Group>
-          <Row>
-            <Col sm={2}>
-              <Form.Label>Name</Form.Label>
-            </Col>
-            <Col>
-              <Form.Control
-                defaultValue={data.collection_name}
-                readOnly={true}/>
-            </Col>
-          </Row>
-        </Form.Group>
-        <Form.Group>
-          <Row>
-            <Col sm={2}>
-              <Form.Label>Department</Form.Label>
-            </Col>
-            <Col>
-              <Form.Control defaultValue={data.department} readOnly={true}/>
-            </Col>
-          </Row>
-        </Form.Group>
-        <Form.Group>
-          <Row>
-            <Col sm={2}>
-              <Form.Label>Contact</Form.Label>
-            </Col>
-            <Col>
-              <Form.Control defaultValue={data.contact} readOnly={true}/>
-            </Col>
-          </Row>
-        </Form.Group>
-        <Form.Group>
-          <Row>
-            <Col sm={2}>
-              <Form.Label>Record Series</Form.Label>
-            </Col>
-            <Col>
-              <Form.Control defaultValue={data.record_series} readOnly={true}/>
-            </Col>
-          </Row>
-        </Form.Group>
-      </Form>
-    );
+    if (!data) {
+      content = <div></div>;
+    } else {
+      content = (
+        <Form>
+          <Form.Group>
+            <Row>
+              <Col sm={2}>
+                <Form.Label>Name</Form.Label>
+              </Col>
+              <Col>
+                <Form.Control
+                  defaultValue={data.collection_name}
+                  readOnly={true}/>
+              </Col>
+            </Row>
+          </Form.Group>
+          <Form.Group>
+            <Row>
+              <Col sm={2}>
+                <Form.Label>Department</Form.Label>
+              </Col>
+              <Col>
+                <Form.Control defaultValue={data.department} readOnly={true}/>
+              </Col>
+            </Row>
+          </Form.Group>
+          <Form.Group>
+            <Row>
+              <Col sm={2}>
+                <Form.Label>Contact</Form.Label>
+              </Col>
+              <Col>
+                <Form.Control defaultValue={data.contact} readOnly={true}/>
+              </Col>
+            </Row>
+          </Form.Group>
+          <Form.Group>
+            <Row>
+              <Col sm={2}>
+                <Form.Label>Record Series</Form.Label>
+              </Col>
+              <Col>
+                <Form.Control defaultValue={data.record_series}
+                  readOnly={true}/>
+              </Col>
+            </Row>
+          </Form.Group>
+        </Form>
+      );
+    }
   }
   return (
     <div>

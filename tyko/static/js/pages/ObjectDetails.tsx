@@ -1,4 +1,4 @@
-import {Button, ButtonGroup, Col, Container, Form, Row} from 'react-bootstrap';
+import {ButtonGroup, Col, Container, Form, Row} from 'react-bootstrap';
 import Panel from '../reactComponents/Panel';
 import React, {FC, useEffect, useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
@@ -30,8 +30,8 @@ interface IObjectApi {
   name: string,
   notes: any[],
   object_id: number,
-  originals_rec_date: any,
-  originals_return_date: any,
+  originals_rec_date: string,
+  originals_return_date: string,
   parent_project_id: number,
   routes: {
     api: string,

@@ -11,9 +11,7 @@ import React, {
 import axios, {AxiosError} from 'axios';
 import {IItemMetadata} from './ItemApp';
 import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
-import {Button, ButtonGroup, Col, Spinner} from 'react-bootstrap';
-import {number} from 'prop-types';
-import {min} from '@popperjs/core/lib/utils/math';
+import {Button, ButtonGroup, Spinner} from 'react-bootstrap';
 interface EnumMetadata {
   id: number
   name: string
@@ -70,44 +68,6 @@ const createEnumOptions = (enumList: EnumMetadata[])=>{
   });
 };
 
-/**
- * Get api data for format.
- * @param {url} url of api
- * @return {unknown[]}
- */
-const useFormatDetailsApi = (url: string) => {
-  const [data, setData] = useState<FormatApiData | null>(null);
-  const [error, setError] = useState<Error | AxiosError | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setLoading(true);
-    const fetchData = async () => {
-      const dataValue: ApiData = (await axios.get(url)).data as ApiData;
-      const elements: Element[] = [];
-      const formatDetails = dataValue.item['format_details'];
-      Object.keys(formatDetails).forEach((objectKey) => {
-        elements.push({
-          key: objectKey,
-          value: formatDetails[objectKey],
-        });
-      });
-      setData({
-        format: dataValue.item.format,
-        elements: elements,
-      });
-      setLoading(false);
-    };
-
-    fetchData()
-        .then(() => setLoading(false))
-        .catch((e: AxiosError | Error) => {
-          setError(e);
-        });
-  }, [url]);
-
-  return [data, error, loading];
-};
 
 /**
  * Format a row of a key value pair
