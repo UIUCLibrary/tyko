@@ -208,7 +208,6 @@ def update_film(
     UpdateFilm().update(item, changed_data)
 
 
-
 def update_cassette(
         item: formats.AudioCassette,
         changed_data: Dict[str, Optional[Union[str, bool, int]]]):
