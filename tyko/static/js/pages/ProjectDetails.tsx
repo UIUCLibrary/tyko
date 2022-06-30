@@ -16,22 +16,7 @@ const updateData = async (url: string, key: string, value: string) => {
 interface IObject {
   barcode: string|null
   collection_id: number
-  // "contact": null,
-  // "items": [
-  //   {
-  //     "format": {
-  //       "id": 6,
-  //       "name": "film"
-  //     },
-  //     "item_id": 1,
-  //     "name": "l;lkl"
-  //   }
-  // ],
   name: string
-  // "notes": [],
-  // "object_id": 1,
-  // "originals_rec_date": null,
-  // "originals_return_date": null,
   routes: {
     api: string
     frontend: string
@@ -48,9 +33,6 @@ interface IProjectApi {
     title: string
   }
 }
-// interface IProjectDetails {
-//   projectId: number
-// }
 
 interface IProjectDetails {
   apiData: IProjectApi
