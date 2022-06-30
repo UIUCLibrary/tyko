@@ -276,6 +276,10 @@ describe('FormatDetails', ()=>{
             'id': 1,
             'name': 'baz',
           },
+          reel_diameter: {
+            'id': 1,
+            'name': 'baz',
+          },
           reel_thickness: {
             'id': 1,
             'name': 'qux',

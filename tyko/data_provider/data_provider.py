@@ -85,6 +85,58 @@ def strip_empty_strings(data):
     return data
 
 
+def update_open_reel(
+        item: formats.OpenReel,
+        changed_data: Dict[str, Optional[Union[str, bool, int]]]):
+    if date_of_reel := changed_data.pop('date_of_reel', None):
+        item.date_of_reel = utils.create_precision_datetime(date_of_reel)
+
+    if title_of_reel := changed_data.pop('title_of_reel', None):
+        item.title_of_reel = title_of_reel
+
+    if base_id := changed_data.pop('base_id', None):
+        item.base_id = base_id
+
+    if format_subtype_id := changed_data.pop('format_subtype_id', None):
+        item.subtype_id = format_subtype_id
+
+    if generation_id := changed_data.pop('generation_id', None):
+        item.generation_id = generation_id
+
+    if reel_brand := changed_data.pop('reel_brand', None):
+        item.reel_brand = reel_brand
+
+    if duration := changed_data.pop('duration', None):
+        item.duration = duration
+
+    if reel_diameter_id := changed_data.pop('reel_diameter_id', None):
+        item.reel_diameter_id = reel_diameter_id
+
+    if reel_speed_id := changed_data.pop('reel_speed_id', None):
+        item.reel_speed_id = reel_speed_id
+
+    if reel_thickness_id := changed_data.pop('reel_thickness_id', None):
+        item.reel_thickness_id = reel_thickness_id
+
+    if reel_width_id := changed_data.pop('reel_width_id', None):
+        item.reel_width_id = reel_width_id
+
+    if track_configuration_id := changed_data.pop(
+            'track_configuration_id',
+            None
+    ):
+        item.track_configuration_id = track_configuration_id
+
+    if track_count := changed_data.pop('track_count', None):
+        item.track_count = track_count
+
+    if wind_id := changed_data.pop('wind_id', None):
+        item.wind_id = wind_id
+
+    if reel_type := changed_data.pop('reel_type', None):
+        item.reel_type = reel_type
+
+
 def update_groove_discs(
         item: formats.GroovedDisc,
         changed_data: Dict[str, Optional[Union[str, bool, int]]]):
@@ -271,7 +323,8 @@ def update_format_specific_details(
     ] = {
         "audio_cassettes": update_cassette,
         "films": update_film,
-        "grooved_discs": update_groove_discs
+        "grooved_discs": update_groove_discs,
+        "open_reels": update_open_reel
     }
     update_format = update_formats.get(format_type)
     if update_format is None:

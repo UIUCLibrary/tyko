@@ -202,6 +202,7 @@ class ItemAPI(views.MethodView):
         if "obj_sequence" in json_request:
             obj_sequence = json_request.get("obj_sequence")
             new_item["obj_sequence"] = int(obj_sequence)
+        new_item['format_details'] = json_request.get('format_details', {})
         return new_item
 
     def put(self, item_id):

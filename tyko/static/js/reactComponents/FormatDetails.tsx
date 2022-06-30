@@ -11,7 +11,7 @@ import React, {
 import axios, {AxiosError} from 'axios';
 import {IItemMetadata} from './ItemApp';
 import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
-import {Button, ButtonGroup, Spinner} from 'react-bootstrap';
+import {Button, ButtonGroup, ProgressBar, Spinner} from 'react-bootstrap';
 interface EnumMetadata {
   id: number
   name: string
@@ -92,81 +92,300 @@ const FormatDetail:
     };
 
 const OpenReel: FC<IFormatType> = ({data, editMode}) => {
-  const base = data['base'].value as EnumMetadata;
-  const dateOfReel = data['date_of_reel'].value as string;
-  const duration = data['duration'].value as string;
-  const title = data['title_of_reel'].value as string;
-  const formatSubtype = data['format_subtype'].value as EnumMetadata;
-  const generation = data['generation'].value as EnumMetadata;
-  const reelBrand = data['reel_brand'].value as string;
-  const reelDiameter = data['reel_size'].value as number;
-  const reelSpeed = data['reel_speed'].value as EnumMetadata;
-  const reelThickness = data['reel_thickness'].value as EnumMetadata;
-  const reelType = data['reel_type'].value as string;
-  const reelWidth = data['reel_width'].value as EnumMetadata;
-  const trackConfiguration = data['track_configuration'].value as EnumMetadata;
-  const trackCount = data['track_count'].value as number;
-  const wind = data['wind'].value as EnumMetadata;
+  const [loadedEnums, setLoadedEnums] = useState(0);
+  const [tapeBases, setTapeBases] = useState<ApiEnum[]|null>(null);
+  const [
+    formatSubtypes,
+    setFormatSubtypes,
+  ] = useState<ApiEnum[]|null>(null);
+  const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
+  const [reelDiameters, setReelDiameters] = useState<ApiEnum[]|null>(null);
+  const [reelSpeeds, setReelSpeeds] = useState<ApiEnum[]|null>(null);
+  const [reelThicknesses, setReelThicknesses] = useState<ApiEnum[]|null>(null);
+  const [reelWidths, setReelWidths] = useState<ApiEnum[]|null>(null);
+  const [
+    trackConfigurations,
+    setTrackConfigurations,
+  ] = useState<ApiEnum[]|null>(null);
+  const [winds, setWinds] = useState<ApiEnum[]|null>(null);
 
-  const readOnlyMode = true;
+  const trackCount = data['track_count'].value as number;
+
+  const [loading, setLoading] = useState(false);
+
+  const enumValues = [
+    tapeBases,
+    formatSubtypes,
+    generations,
+    reelSpeeds,
+    reelThicknesses,
+    reelWidths,
+    trackConfigurations,
+    reelDiameters,
+    winds,
+  ];
+
+  useEffect(()=>{
+    if (editMode) {
+      let completed = 0;
+      enumValues .forEach((enumValues) => {
+        if (enumValues) {
+          completed = completed + 1;
+        }
+      });
+      setLoadedEnums(completed);
+
+      if (!loading) {
+        if (!tapeBases) {
+          setLoading(true);
+          axios.get('/api/formats/open_reel/base')
+              .then((res)=> {
+                setTapeBases((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!reelDiameters) {
+          setLoading(true);
+          axios.get('/api/formats/open_reel/reel_diameter')
+              .then((res)=> {
+                setReelDiameters((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!formatSubtypes) {
+          setLoading(true);
+          axios.get('/api/formats/open_reel/sub_types')
+              .then((res)=> {
+                setFormatSubtypes((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!reelSpeeds) {
+          setLoading(true);
+          axios.get('/api/formats/open_reel/reel_speed')
+              .then((res)=> {
+                setReelSpeeds((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!generations) {
+          setLoading(true);
+          axios.get('/api/formats/open_reel/generation')
+              .then((res)=> {
+                setGenerations((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!reelThicknesses) {
+          setLoading(true);
+          axios.get('/api/formats/open_reel/reel_thickness')
+              .then((res)=> {
+                setReelThicknesses((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!reelWidths) {
+          setLoading(true);
+          axios.get('/api/formats/open_reel/reel_width')
+              .then((res)=> {
+                setReelWidths((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!trackConfigurations) {
+          setLoading(true);
+          axios.get('/api/formats/open_reel/track_configuration')
+              .then((res)=> {
+                setTrackConfigurations(
+                    (res.data as ApiEnum[]).sort(sortNameAlpha),
+                );
+              }).catch(console.error);
+        }
+        if (!winds) {
+          setLoading(true);
+          axios.get('/api/formats/open_reel/wind')
+              .then((res)=> {
+                setWinds((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+      } else {
+        if (
+          tapeBases &&
+          formatSubtypes &&
+          generations &&
+          reelSpeeds &&
+          reelThicknesses &&
+          reelWidths &&
+          reelDiameters &&
+          winds &&
+          trackConfigurations
+        ) {
+          setLoading(false);
+        }
+      }
+    }
+  }, [
+    editMode,
+    tapeBases,
+    formatSubtypes,
+    generations,
+    reelSpeeds,
+    reelThicknesses,
+    reelWidths,
+    winds,
+    trackConfigurations,
+  ]);
+  if (loading) {
+    const percentEnumsLoaded =
+        Math.round((loadedEnums / enumValues.length) * 100);
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <ProgressBar
+            now={percentEnumsLoaded}
+            label={`Loading.. ${percentEnumsLoaded}%`}
+          />
+        </td>
+      </tr>
+    );
+  }
   return (
     <Fragment>
       <FormatDetail key='title' label="Title of Reel">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={title}/>
+        {
+          createTextField(
+              'title_of_reel',
+              data['title_of_reel'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='base' label="Base">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={base ? base.name : ''}/>
+        {
+          createEnumField(
+              'base_id',
+              data['base'].value as EnumMetadata,
+              tapeBases,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='dateOfReel' label="Date Of Reel">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={dateOfReel}/>
+        {
+          createDateField(
+              'date_of_reel',
+              data['date_of_reel'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
-      <FormatDetail key='duration' label="Duration">{duration}</FormatDetail>
+      <FormatDetail key='duration' label="Duration">
+        {
+          createTextField(
+              'duration',
+              data['duration'].value as string,
+              editMode,
+          )
+        }
+      </FormatDetail>
       <FormatDetail key='formatSubtype' label="Type">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={formatSubtype ? formatSubtype.name : ''}/>
+        {
+          createEnumField(
+              'format_subtype_id',
+              data['format_subtype'].value as EnumMetadata,
+              formatSubtypes,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={generation ? generation.name : ''}/>
+        {
+          createEnumField(
+              'generation_id',
+              data['generation'].value as EnumMetadata,
+              generations,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelBrand' label="Brand of Reel">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={reelBrand}/>
+        {
+          createTextField('reel_brand',
+              data['reel_brand'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelDiameter' label="Diameter of Reel">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={reelDiameter ? reelDiameter.toString() : ''}/>
+        {
+          createEnumField(
+              'reel_diameter_id',
+              data['reel_diameter'].value as EnumMetadata,
+              reelDiameters,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelSpeed' label="Speed of Reel">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={reelSpeed ? reelSpeed.name : ''}/>
+        {
+          createEnumField(
+              'reel_speed_id',
+              data['reel_speed'].value as EnumMetadata,
+              reelSpeeds,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelThickness' label="Thickness of Reel">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={reelThickness ? reelThickness.name : ''}/>
+        {
+          createEnumField(
+              'reel_thickness_id',
+              data['reel_thickness'].value as EnumMetadata,
+              reelThicknesses,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelType' label="Type of Reel">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={reelType}/>
+        {
+          createTextField(
+              'reel_type',
+              data['reel_type'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelWidth' label="Width of Reel">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={reelWidth ? reelWidth.name : ''}/>
+        {
+          createEnumField(
+              'reel_width_id',
+              data['reel_width'].value as EnumMetadata,
+              reelWidths,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='trackConfiguration' label="Track Configuration">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={trackConfiguration ? trackConfiguration.name : ''}/>
+        {
+          createEnumField(
+              'track_configuration_id',
+              data['track_configuration'].value as EnumMetadata,
+              trackConfigurations,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='trackCount' label="Track Count">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={trackCount ? trackCount.toString() : ''}/>
+        {createNumberField(
+            'track_count',
+            trackCount ? trackCount: null,
+            editMode,
+            0,
+        )}
       </FormatDetail>
       <FormatDetail key='wind' label="Wind">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={wind ? wind.name : ''}/>
+        {
+          createEnumField(
+              'wind_id',
+              data['wind'].value as EnumMetadata,
+              winds,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
