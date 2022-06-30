@@ -213,68 +213,207 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
 };
 
 const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
-  const discBase = data['disc_base'].value as EnumMetadata;
-  const dateOfDisc = data['date_of_disc'].value as string;
-  const discDiameter = data['disc_diameter'].value as EnumMetadata;
-  const discDirection = data['disc_direction'].value as EnumMetadata;
-  const discMaterial = data['disc_material'].value as EnumMetadata;
-  const playbackSpeed = data['playback_speed'].value as EnumMetadata;
-  const titleOfAlbum = data['title_of_album'].value as string;
-  const titleOfDisc = data['title_of_disc'].value as string;
-  const sideADuration = data['side_a_duration'].value as string;
-  const sideALabel = data['side_a_label'].value as string;
-  const sideBDuration = data['side_b_duration'].value as string;
-  const sideBLabel = data['side_b_label'].value as string;
+  const [discBases, setDiscBases] = useState<ApiEnum[]|null>(null);
+  const [discDiameters, setDiscDiameter] = useState<ApiEnum[]|null>(null);
+  const [
+    playbackDirections,
+    setPlaybackDirections,
+  ] = useState<ApiEnum[]|null>(null);
+  const [discMaterials, setDiscMaterials] = useState<ApiEnum[]|null>(null);
+  const [playbackSpeeds, setPlaybackSpeeds] = useState<ApiEnum[]|null>(null);
+
+  const [loading, setLoading] = useState(false);
+  // const discMaterial = data['disc_material'].value as EnumMetadata;
+  // const playbackSpeed = data['playback_speed'].value as EnumMetadata;
   const readOnlyMode = true;
+  useEffect(()=>{
+    if (editMode) {
+      if (!loading) {
+        if (!discDiameters) {
+          setLoading(true);
+          axios.get('/api/formats/grooved_disc/disc_diameter')
+              .then((res)=> {
+                setDiscDiameter((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!playbackDirections) {
+          setLoading(true);
+          axios.get('/api/formats/grooved_disc/playback_direction')
+              .then((res)=> {
+                setPlaybackDirections(
+                    (res.data as ApiEnum[]).sort(sortNameAlpha),
+                );
+              }).catch(console.error);
+        }
+        if (!discMaterials) {
+          setLoading(true);
+          axios.get('/api/formats/grooved_disc/disc_material')
+              .then((res)=> {
+                setDiscMaterials((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!playbackSpeeds) {
+          setLoading(true);
+          axios.get('/api/formats/grooved_disc/playback_speed')
+              .then((res)=> {
+                setPlaybackSpeeds((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+        if (!discBases) {
+          setLoading(true);
+          axios.get('/api/formats/grooved_disc/disc_base')
+              .then((res)=> {
+                setDiscBases((res.data as ApiEnum[]).sort(sortNameAlpha));
+              }).catch(console.error);
+        }
+      } else {
+        if (
+          discDiameters &&
+          playbackDirections &&
+          discMaterials &&
+          playbackSpeeds &&
+          discBases
+        ) {
+          setLoading(false);
+        }
+      }
+    }
+  }, [
+    editMode,
+    discDiameters,
+    playbackDirections,
+    discMaterials,
+    playbackSpeeds,
+    discBases,
+  ]);
+
+  if (loading) {
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </td>
+      </tr>
+    );
+  }
+
   return (
     <Fragment>
       <FormatDetail key='titleOfAlbum' label="Title of Album">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={titleOfAlbum}/>
+        {
+          createTextField(
+              'title_of_album',
+              data['title_of_album'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='titleOfDisc' label="Title of Disc">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={titleOfDisc}/>
+        {
+          createTextField(
+              'title_of_disc',
+              data['title_of_disc'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='discBase' label="Base">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={discBase ? discBase.name : ''}/>
+        {
+          createEnumField(
+              'disc_base_id',
+              data['disc_base'].value as EnumMetadata,
+              discBases,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='dateOfDisc' label="Date Of Disc">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={dateOfDisc}/>
+        {
+          createDateField(
+              'date_of_disc',
+              data['date_of_disc'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='discDiameter' label="Disc Diameter">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={discDiameter ? discDiameter.name : ''}/>
+        {
+          createEnumField(
+              'disc_diameter_id',
+              data['disc_diameter'].value as EnumMetadata,
+              discDiameters,
+              editMode,
+          )
+        }
       </FormatDetail>
-      <FormatDetail key='discDirection' label="Disc Direction">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={discDirection ? discDirection.name : ''}/>
+      <FormatDetail key='discDirection' label="Playback Direction">
+        {
+          createEnumField(
+              'playback_direction_id',
+              data['playback_direction'].value as EnumMetadata,
+              playbackDirections,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='discMaterial' label="Disc Material">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={discMaterial ? discMaterial.name : ''}/>
+        {
+          createEnumField(
+              'disc_material_id',
+              data['disc_material'].value as EnumMetadata,
+              discMaterials,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='playbackSpeed' label="Playback Speed">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={playbackSpeed ? playbackSpeed.name : ''}/>
+        {
+          createEnumField(
+              'playback_speed_id',
+              data['playback_speed'].value as EnumMetadata,
+              playbackSpeeds,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideALabel' label="Side A Label">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={sideALabel}/>
+        {
+          createTextField(
+              'side_a_label',
+              data['side_a_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideADuration' label="Side A Duration">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={sideADuration}/>
+        {
+          createTextField(
+              'side_a_duration',
+              data['side_a_duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideBLabel' label="Side B Label">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={sideBLabel}/>
+        {
+          createTextField(
+              'side_b_label',
+              data['side_b_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideBDuration' label="Side B Duration">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={sideBDuration}/>
+        {
+          createTextField(
+              'side_b_duration',
+              data['side_b_duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
@@ -469,7 +608,6 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
             <span className="visually-hidden">Loading...</span>
           </Spinner>
         </td>
-
       </tr>
     );
   }

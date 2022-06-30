@@ -622,7 +622,7 @@ describe('FormatDetails', ()=>{
           date_of_disc: '5/16/2022',
           disc_base: null,
           disc_diameter: null,
-          disc_direction: null,
+          playback_direction: null,
           disc_material: null,
           playback_speed: null,
           side_a_duration: '00:12:21',
@@ -655,7 +655,7 @@ describe('FormatDetails', ()=>{
           date_of_disc: null,
           disc_base: null,
           disc_diameter: null,
-          disc_direction: null,
+          playback_direction: null,
           disc_material: null,
           playback_speed: null,
           side_a_duration: null,
@@ -694,7 +694,7 @@ describe('FormatDetails', ()=>{
             'id': 1,
             'name': 'bar',
           },
-          disc_direction: {
+          playback_direction: {
             'id': 1,
             'name': 'baz',
           },

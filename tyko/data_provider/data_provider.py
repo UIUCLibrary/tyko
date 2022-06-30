@@ -76,6 +76,47 @@ def strip_empty_strings(data):
     return data
 
 
+def update_groove_discs(
+        item: formats.GroovedDisc,
+        changed_data: Dict[str, Optional[Union[str, bool, int]]]):
+
+    if title_of_album := changed_data.pop('title_of_album', None):
+        item.title_of_album = title_of_album
+
+    if title_of_disc := changed_data.pop('title_of_disc', None):
+        item.title_of_disc = title_of_disc
+
+    if disc_base_id := changed_data.pop('disc_base_id', None):
+        item.disc_base_id = disc_base_id
+
+    if disc_diameter_id := changed_data.pop('disc_diameter_id', None):
+        item.disc_diameter_id = disc_diameter_id
+
+    if playback_direction_id := changed_data.pop('playback_direction_id', None):
+        item.playback_direction_id = playback_direction_id
+
+    if disc_material_id := changed_data.pop('disc_material_id', None):
+        item.disc_material_id = disc_material_id
+
+    if playback_speed_id := changed_data.pop('playback_speed_id', None):
+        item.playback_speed_id = playback_speed_id
+
+    if side_a_label := changed_data.pop('side_a_label', None):
+        item.side_a_label = side_a_label
+
+    if side_a_duration := changed_data.pop('side_a_duration', None):
+        item.side_a_duration = side_a_duration
+
+    if side_b_label := changed_data.pop('side_b_label', None):
+        item.side_b_label = side_b_label
+
+    if side_b_duration := changed_data.pop('side_b_duration', None):
+        item.side_b_duration = side_b_duration
+
+    if date_of_disc := changed_data.pop('date_of_disc', None):
+        item.date_of_disc = utils.create_precision_datetime(date_of_disc)
+
+
 def update_film(
         item: formats.Film,
         changed_data: Dict[str, Optional[Union[str, bool, int]]]):
@@ -201,7 +242,8 @@ def update_format_specific_details(
         ]
     ] = {
         "audio_cassettes": update_cassette,
-        "films": update_film
+        "films": update_film,
+        "grooved_discs": update_groove_discs
     }
     update_format = update_formats.get(format_type)
     if update_format is None:
@@ -326,9 +368,20 @@ class ItemDataConnector(AbsNotesConnector):
         try:
             format_data = kwargs.copy()
             strip_empty_strings(format_data)
-            transfer_date = format_data.pop('transferDate', None)
-            inspection_date = format_data.pop('inspectionDate', None)
+            files = format_data.pop("files", [])
+
+            if 'inspectionDate' in format_data:
+                format_data['inspection_date'] = \
+                    format_data.pop('inspectionDate')
+
+            if 'transferDate' in format_data:
+                format_data['transfer_date'] = \
+                    format_data.pop('transferDate')
+
+            transfer_date = format_data.pop('transfer_date', None)
+            inspection_date = format_data.pop('inspection_date', None)
             parent_object_id = format_data.pop('object_id', None)
+            medusa_uuid = format_data.pop('medusa_uuid', None)
 
             new_item = self.create_new_format_item(session, format_data)
             new_item.object_id = parent_object_id
@@ -343,7 +396,7 @@ class ItemDataConnector(AbsNotesConnector):
                     utils.create_precision_datetime(
                         inspection_date
                     )
-            for instance_file in kwargs.get("files", []):
+            for instance_file in files:
                 new_file = InstantiationFile(file_name=instance_file['name'])
 
                 new_item.files.append(new_file)
@@ -1133,7 +1186,8 @@ class ObjectDataConnector(AbsNotesConnector):
                 ItemDataConnector
             )
             item_connector = connector(self.session_maker)
-            new_item_id = item_connector.create(**data)['item_id']
+            new_data = data.copy()
+            new_item_id = item_connector.create(**new_data)['item_id']
 
             matching_object.items.append(
                 item_connector.get(id=new_item_id)

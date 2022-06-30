@@ -991,7 +991,7 @@ def dummy_object(app, project):
             {
                 "files": [],
                 "format_details":{
-                    'disc_direction': {
+                    'playback_direction': {
                         "name": 'In to Out',
                         "id":
                             formats
@@ -1103,7 +1103,7 @@ def dummy_object(app, project):
                             'Glass'
                         ) + 1,
                     },
-                    'disc_direction': {
+                    'playback_direction': {
                         "name": 'In to Out',
                         "id":
                             formats.GroovedDiscPlaybackDirection

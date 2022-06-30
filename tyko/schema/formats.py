@@ -410,7 +410,7 @@ class GroovedDisc(AVFormat, ABC):
                 self.disc_material.serialize() if self.disc_material else None,
             "disc_base":
                 self.disc_base.serialize() if self.disc_base else None,
-            "disc_direction":
+            "playback_direction":
                 self.playback_direction.serialize()
                 if self.playback_direction else None,
             "playback_speed":

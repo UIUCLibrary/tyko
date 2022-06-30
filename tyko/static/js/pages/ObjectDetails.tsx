@@ -1,10 +1,13 @@
-import {Col, Container, Form, Row} from 'react-bootstrap';
+import {Button, ButtonGroup, Col, Container, Form, Row} from 'react-bootstrap';
 import Panel from '../reactComponents/Panel';
 import React, {FC, useEffect, useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import axios from 'axios';
 import {EditableField} from '../reactComponents/ItemApp';
 import Table from 'react-bootstrap/Table';
+import {
+  NewItemButton,
+} from '../reactComponents/Items';
 
 interface IItem {
   format: {
@@ -49,9 +52,24 @@ const updateData = async (url: string, key: string, value: string) => {
   return axios.put(url, data);
 };
 
+
 const ObjectItems: FC<IDetails> = (
     {apiData, apiUrl, onUpdated},
 ) => {
+  const handleNewItemSubmitted = (event: React.SyntheticEvent)=>{
+    event.preventDefault();
+    const formData = new FormData(event.target as HTMLFormElement);
+    const formProps = Object.fromEntries(formData);
+    axios.post(apiUrl, formProps)
+        .then(()=>{
+          if (onUpdated) {
+            onUpdated();
+          }
+        })
+        .catch(console.error);
+  };
+
+
   const rows = apiData.items.map((item, index) =>{
     return <tr key={index}>
       <td><Link to={item.routes.frontend}>{item.name}</Link></td>
@@ -71,9 +89,13 @@ const ObjectItems: FC<IDetails> = (
       {rows}
     </tbody>
   </Table>;
+
   return (
     <>
       {table}
+      <ButtonGroup className={'float-end'}>
+        <NewItemButton onAccepted={handleNewItemSubmitted}/>
+      </ButtonGroup>
     </>
   );
 };
@@ -116,6 +138,9 @@ export default function ObjectDetails() {
     setApiData(((await axios.get(url)).data as IObjectApi));
   };
 
+  const newItemApiUrl = (projectId && objectId) ?
+      `/api/project/${projectId}/object/${objectId}/item`: '';
+
   const apiUrl = (projectId && objectId) ?
     `/api/project/${projectId}/object/${objectId}` : '';
 
@@ -142,7 +167,7 @@ export default function ObjectDetails() {
       onUpdated={()=>setApiData(null)}/>;
     itemsPanel = <ObjectItems
       apiData={apiData}
-      apiUrl={apiUrl}
+      apiUrl={newItemApiUrl}
       onUpdated={()=>setApiData(null)}/>;
     notesPanel = <h1>TO DO</h1>;
   }
