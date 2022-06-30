@@ -129,67 +129,84 @@ def update_groove_discs(
         item.date_of_disc = utils.create_precision_datetime(date_of_disc)
 
 
+class UpdateFilm:
+    @staticmethod
+    def update_enum_values(item, changed_data):
+
+        if film_color_id := changed_data.pop('film_color_id', None):
+            item.color_id = film_color_id
+
+        if film_base_id := changed_data.pop('film_base_id', None):
+            item.film_base_id = film_base_id
+
+        if film_emulsion_id := changed_data.pop('film_emulsion_id', None):
+            item.emulsion_id = film_emulsion_id
+
+        if image_type_id := changed_data.pop('image_type_id', None):
+            item.image_type_id = image_type_id
+
+        if film_speed_id := changed_data.pop('film_speed_id', None):
+            item.film_speed_id = film_speed_id
+
+        if film_gauge_id := changed_data.pop('film_gauge_id', None):
+            item.film_gauge_id = film_gauge_id
+
+        if soundtrack_id := changed_data.pop('soundtrack_id', None):
+            item.soundtrack_id = soundtrack_id
+
+        if wind_id := changed_data.pop('wind_id', None):
+            item.wind_id = wind_id
+
+    @staticmethod
+    def update_ad_test(item, changed_data):
+
+        if data_of_ad_test := changed_data.pop('ad_test_date', None):
+            item.ad_test_date = \
+                utils.create_precision_datetime(data_of_ad_test)
+
+        if data_of_ad_level := changed_data.pop('ad_test_level', None):
+            item.ad_test_level = data_of_ad_level
+
+    @staticmethod
+    def update(item, changed_data):
+        if data_of_film := changed_data.pop('date_of_film', None):
+            precision = utils.identify_precision(data_of_film)
+            item.recording_date = \
+                utils.create_precision_datetime(data_of_film, precision)
+
+            item.recording_date_precision = precision
+
+        UpdateFilm.update_ad_test(item, changed_data)
+
+        if can_label := changed_data.pop('can_label', None):
+            item.can_label = can_label
+
+        if duration := changed_data.pop('duration', None):
+            item.duration = duration
+
+        if title_of_film := changed_data.pop('film_title', None):
+            item.title_of_film = title_of_film
+
+        if leader_label := changed_data.pop('leader_label', None):
+            item.leader_label = leader_label
+
+        if edge_code_date := changed_data.pop('edge_code_date', None):
+            item.edge_code_date = edge_code_date
+
+        if film_length := changed_data.pop('film_length', None):
+            item.length = film_length
+
+        if film_shrinkage := changed_data.pop('film_shrinkage', None):
+            item.film_shrinkage = film_shrinkage
+
+        UpdateFilm.update_enum_values(item, changed_data)
+
+
 def update_film(
         item: formats.Film,
         changed_data: Dict[str, Optional[Union[str, bool, int]]]):
-    if data_of_film := changed_data.pop('date_of_film', None):
-        precision = utils.identify_precision(data_of_film)
-        item.recording_date = \
-            utils.create_precision_datetime(data_of_film, precision)
+    UpdateFilm().update(item, changed_data)
 
-        item.recording_date_precision = precision
-
-    if data_of_ad_test := changed_data.pop('ad_test_date', None):
-        item.ad_test_date = \
-            utils.create_precision_datetime(data_of_ad_test)
-
-    if data_of_ad_level := changed_data.pop('ad_test_level', None):
-        item.ad_test_level = data_of_ad_level
-
-    if can_label := changed_data.pop('can_label', None):
-        item.can_label = can_label
-
-    if duration := changed_data.pop('duration', None):
-        item.duration = duration
-
-    if title_of_film := changed_data.pop('film_title', None):
-        item.title_of_film = title_of_film
-
-    if leader_label := changed_data.pop('leader_label', None):
-        item.leader_label = leader_label
-
-    if edge_code_date := changed_data.pop('edge_code_date', None):
-        item.edge_code_date = edge_code_date
-
-    if film_length := changed_data.pop('film_length', None):
-        item.length = film_length
-
-    if film_shrinkage := changed_data.pop('film_shrinkage', None):
-        item.film_shrinkage = film_shrinkage
-
-    if film_color_id := changed_data.pop('film_color_id', None):
-        item.color_id = film_color_id
-
-    if film_base_id := changed_data.pop('film_base_id', None):
-        item.film_base_id = film_base_id
-
-    if film_emulsion_id := changed_data.pop('film_emulsion_id', None):
-        item.emulsion_id = film_emulsion_id
-
-    if image_type_id := changed_data.pop('image_type_id', None):
-        item.image_type_id = image_type_id
-
-    if film_speed_id := changed_data.pop('film_speed_id', None):
-        item.film_speed_id = film_speed_id
-
-    if film_gauge_id := changed_data.pop('film_gauge_id', None):
-        item.film_gauge_id = film_gauge_id
-
-    if soundtrack_id := changed_data.pop('soundtrack_id', None):
-        item.soundtrack_id = soundtrack_id
-
-    if wind_id := changed_data.pop('wind_id', None):
-        item.wind_id = wind_id
 
 
 def update_cassette(
