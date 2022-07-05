@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Col, Row, Spinner} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 import Panel from '../reactComponents/Panel';
 import {
   ItemDetails as ItemDetailsDetails,
@@ -8,6 +8,7 @@ import {
 import FormatDetails from '../reactComponents/FormatDetails';
 import {useParams} from 'react-router-dom';
 import axios from 'axios';
+import {LoadingIndeterminate} from '../reactComponents/Common';
 
 /**
  * d
@@ -44,33 +45,25 @@ export default function ItemDetails() {
   if (!apiData) {
     detailsPanel = <>
       <div style={{textAlign: 'center'}}>
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
+        <LoadingIndeterminate/>
       </div>
     </>;
 
     formatDetailsPanel = <>
       <div style={{textAlign: 'center'}}>
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
+        <LoadingIndeterminate/>
       </div>
     </>;
 
     filesPanel = <>
       <div style={{textAlign: 'center'}}>
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
+        <LoadingIndeterminate/>
       </div>
     </>;
 
     notesPanel = <>
       <div style={{textAlign: 'center'}}>
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
+        <LoadingIndeterminate/>
       </div>
     </>;
   } else {

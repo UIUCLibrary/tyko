@@ -1,13 +1,12 @@
 import {ButtonGroup, Col, Container, Form, Row} from 'react-bootstrap';
 import Panel from '../reactComponents/Panel';
 import React, {FC, useEffect, useState} from 'react';
-import {useParams, Link} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import axios from 'axios';
 import {EditableField} from '../reactComponents/ItemApp';
 import Table from 'react-bootstrap/Table';
-import {
-  NewItemButton,
-} from '../reactComponents/Items';
+import {NewItemButton} from '../reactComponents/Items';
+import {LoadingIndeterminate} from '../reactComponents/Common';
 
 interface IItem {
   format: {
@@ -157,9 +156,9 @@ export default function ObjectDetails() {
   let notesPanel;
   let itemsPanel;
   if (!apiData) {
-    detailsPanel = <h1>Loading...</h1>;
-    itemsPanel = <h1>Loading...</h1>;
-    notesPanel = <h1>Loading...</h1>;
+    detailsPanel = <LoadingIndeterminate/>;
+    itemsPanel = <LoadingIndeterminate/>;
+    notesPanel = <LoadingIndeterminate/>;
   } else {
     detailsPanel = <ObjectDetailsDetails
       apiData={apiData}
@@ -200,3 +199,4 @@ export default function ObjectDetails() {
     </div>
   );
 }
+

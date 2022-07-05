@@ -12,7 +12,7 @@ import Items, {NewItemButton, ObjectItemsApp} from './reactComponents/Items';
 import {ItemDetails} from './reactComponents/ItemApp';
 import axios from 'axios';
 import Panel from './reactComponents/Panel';
-import {Spinner} from 'react-bootstrap';
+import {LoadingIndeterminate} from './reactComponents/Common';
 
 
 import('bootstrap');
@@ -144,9 +144,7 @@ function loadReactComponents() {
     root.render(
         <Panel title='Details'>
           <p style={{textAlign: 'center'}}>
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
+            <LoadingIndeterminate/>;
           </p>
         </Panel>);
     axios.get(formatDetailsComponent.dataset.tykoApiUrl).then((resp)=>{

@@ -1,10 +1,12 @@
+import {LoadingIndeterminate} from '../reactComponents/Common';
 import Panel from '../reactComponents/Panel';
 import {Link, useParams} from 'react-router-dom';
-import {Col, Container, Form, Row} from 'react-bootstrap';
+import {ButtonGroup, Col, Container, Form, Row} from 'react-bootstrap';
 import React, {useEffect, useState, FC} from 'react';
 import {EditableField} from '../reactComponents/ItemApp';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
+import Button from 'react-bootstrap/Button';
 
 const updateData = async (url: string, key: string, value: string) => {
   const data: {[key: string]: string} = {};
@@ -112,6 +114,9 @@ const ProjectDetailDetails: FC<IProjectDetails> = (
 const ProjectObjects: FC<IProjectDetails> = (
     {apiData, apiUrl, onUpdated},
 ) =>{
+  const handleCreateObject = () =>{
+    console.log('Create a new object');
+  };
   const rows = apiData.project.objects.map((data, index) => {
     return (
       <tr key={index}>
@@ -134,6 +139,9 @@ const ProjectObjects: FC<IProjectDetails> = (
   </Table>;
   return (<>
     {table}
+    <ButtonGroup className="float-end">
+      <Button onClick={handleCreateObject}>Create</Button>
+    </ButtonGroup>
   </>);
 };
 
@@ -164,9 +172,9 @@ export default function ProjectDetails() {
   let objectsPanel;
   let notesPanel;
   if (!apiData) {
-    detailsPanel = <h1>Loading...</h1>;
-    objectsPanel = <h1>Loading...</h1>;
-    notesPanel = <h1>Loading...</h1>;
+    detailsPanel = <LoadingIndeterminate/>;
+    objectsPanel = <LoadingIndeterminate/>;
+    notesPanel = <LoadingIndeterminate/>;
   } else {
     detailsPanel = <ProjectDetailDetails
       apiData={apiData}

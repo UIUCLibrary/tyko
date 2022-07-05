@@ -1,5 +1,6 @@
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
+import {LoadingIndeterminate} from './Common';
 import React, {
   useState,
   useEffect,
@@ -11,7 +12,7 @@ import React, {
 import axios, {AxiosError} from 'axios';
 import {IItemMetadata} from './ItemApp';
 import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
-import {Button, ButtonGroup, ProgressBar, Spinner} from 'react-bootstrap';
+import {Button, ButtonGroup, ProgressBar} from 'react-bootstrap';
 interface EnumMetadata {
   id: number
   name: string
@@ -467,9 +468,7 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
+          <LoadingIndeterminate/>
         </td>
       </tr>
     );
@@ -780,9 +779,7 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
+          <LoadingIndeterminate/>
         </td>
       </tr>
     );
@@ -995,11 +992,8 @@ const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
+          <LoadingIndeterminate/>
         </td>
-
       </tr>
     );
   }

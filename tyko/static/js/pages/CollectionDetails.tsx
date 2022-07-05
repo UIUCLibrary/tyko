@@ -2,7 +2,8 @@ import {useParams} from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import {Col, Form, Row, Spinner} from 'react-bootstrap';
+import {Col, Form, Row} from 'react-bootstrap';
+import {LoadingIndeterminate} from '../reactComponents/Common';
 interface ICollection{
   collection_id: number
   collection_name: string
@@ -35,13 +36,7 @@ export default function CollectionDetails() {
   }, [collectionId]);
   let content;
   if (loading) {
-    content = <>
-      <div style={{textAlign: 'center'}}>
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
-      </div>
-    </>;
+    content = <LoadingIndeterminate/>;
   } else {
     if (!data) {
       content = <div></div>;
