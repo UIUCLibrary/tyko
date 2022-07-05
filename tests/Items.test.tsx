@@ -294,7 +294,7 @@ describe('ObjectItemsApp', ()=>{
           newItemSubmitUrl='/submitme'
         />);
     await waitFor(async ()=> {
-      return await waitForElementToBeRemoved(()=>getByText('loading...'));
+      return await waitForElementToBeRemoved(()=>getByText('Loading...'));
     });
     await waitFor(()=> getByText('Format'));
     await waitFor(()=>{
@@ -324,7 +324,7 @@ describe('ObjectItemsApp', ()=>{
     });
 
     await waitFor(()=> {
-      return waitForElementToBeRemoved(()=>getByText('Loading ...'));
+      return waitForElementToBeRemoved(()=>getByText('Loading...'));
     });
 
     await waitFor(()=> getByText('Format'));

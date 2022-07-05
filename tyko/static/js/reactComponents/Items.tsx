@@ -11,7 +11,8 @@ import {Datepicker} from 'vanillajs-datepicker';
 import {CalendarEvent} from 'react-bootstrap-icons';
 
 import axios from 'axios';
-import {Button, ProgressBar, Col, Row, CloseButton} from 'react-bootstrap';
+import {Button, Col, Row, CloseButton} from 'react-bootstrap';
+import {LoadingIndeterminate, LoadingPercent} from './Common';
 export interface ApiEnum{
   id: number
   name: string
@@ -407,10 +408,7 @@ export const FilmOnlyData: FC = ()=>{
   ) {
     return (
       <div>
-        <ProgressBar
-          now={percentEnumsLoaded}
-          label={`Loading.. ${percentEnumsLoaded}%`}
-        />
+        <LoadingPercent percentLoaded={percentEnumsLoaded}/>
       </div>
     );
   }
@@ -673,10 +671,7 @@ export const CassetteOnlyData: FC = ()=>{
   if (!generations || !subtypes) {
     return (
       <div>
-        <ProgressBar
-          now={percentEnumsLoaded}
-          label={`Loading.. ${percentEnumsLoaded}%`}
-        />
+        <LoadingPercent percentLoaded={percentEnumsLoaded}/>
       </div>
     );
   }
@@ -847,10 +842,7 @@ export const GrooveDiscOnlyData: FC = ()=>{
   ) {
     return (
       <div>
-        <ProgressBar
-          now={percentEnumsLoaded}
-          label={`Loading.. ${percentEnumsLoaded}%`}
-        />
+        <LoadingPercent percentLoaded={percentEnumsLoaded}/>
       </div>
     );
   }
@@ -1109,10 +1101,7 @@ export const OpenReelOnlyData: FC = ()=>{
   ) {
     return (
       <div>
-        <ProgressBar
-          now={percentEnumsLoaded}
-          label={`Loading.. ${percentEnumsLoaded}%`}
-        />
+        <LoadingPercent percentLoaded={percentEnumsLoaded}/>
       </div>
     );
   }
@@ -1371,10 +1360,7 @@ export const OpticalOnlyData: FC = ()=>{
   if (!opticalTypes) {
     return (
       <div>
-        <ProgressBar
-          now={percentEnumsLoaded}
-          label={`Loading.. ${percentEnumsLoaded}%`}
-        />
+        <LoadingPercent percentLoaded={percentEnumsLoaded}/>
       </div>
     );
   }
@@ -1481,10 +1467,7 @@ export const VideoOnlyData: FC = ()=>{
   if (!generations || ! videoTypes) {
     return (
       <div>
-        <ProgressBar
-          now={percentEnumsLoaded}
-          label={`Loading.. ${percentEnumsLoaded}%`}
-        />
+        <LoadingPercent percentLoaded={percentEnumsLoaded}/>
       </div>
     );
   }
@@ -1716,7 +1699,7 @@ export const NewItemModal: FC<NewItemModalProps> = (
       ),
   );
   if (!options) {
-    return <>loading...</>;
+    return <LoadingIndeterminate/>;
   }
   const handleClose = () => {
     setIsOpen(false);
@@ -1862,7 +1845,7 @@ export function ObjectItemsApp(
     }
   }, [objectResult]);
   if (!loaded) {
-    return (<div>Loading ...</div>);
+    return (<div><LoadingIndeterminate/></div>);
   }
 
   const newItemSubmitted = (event: React.SyntheticEvent)=>{

@@ -2,6 +2,7 @@ import Table from 'react-bootstrap/Table';
 import {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
+import {LoadingIndeterminate} from '../reactComponents/Common';
 interface ICollection {
       collection_id: number,
       collection_name: string,
@@ -34,7 +35,7 @@ export default function Collections() {
   let rows;
   if (!data) {
     if (loading) {
-      rows = <tr><td>Loading</td><td></td></tr>;
+      rows = <tr><td><LoadingIndeterminate/></td><td></td></tr>;
     } else {
       rows = <tr><td>failed</td></tr>;
     }

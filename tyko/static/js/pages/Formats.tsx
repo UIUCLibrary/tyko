@@ -1,6 +1,7 @@
 import Table from 'react-bootstrap/Table';
 import {useEffect, useState} from 'react';
 import axios from 'axios';
+import {LoadingIndeterminate} from '../reactComponents/Common';
 interface IFormat{
   id: number
   name: string
@@ -26,7 +27,7 @@ export default function Formats() {
   let rows;
   if (!data) {
     if (loading) {
-      rows = <tr><td>Loading</td><td></td></tr>;
+      rows = <tr><td><LoadingIndeterminate/></td><td></td></tr>;
     } else {
       rows = <tr><td>failed</td></tr>;
     }

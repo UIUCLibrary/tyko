@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import {Button} from 'react-bootstrap';
+import {LoadingIndeterminate} from '../reactComponents/Common';
 import {Link} from 'react-router-dom';
 /**
  * @return {JSXElement} sdsd
@@ -47,7 +48,7 @@ export default function Projects() {
   if (!data) {
     if (loading) {
       rows = <tr>
-        <td>Loading</td>
+        <td><LoadingIndeterminate/></td>
         <td></td>
       </tr>;
     } else {

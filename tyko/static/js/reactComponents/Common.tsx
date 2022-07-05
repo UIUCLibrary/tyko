@@ -1,5 +1,5 @@
-import {Spinner} from 'react-bootstrap';
-import React from 'react';
+import {ProgressBar, Spinner} from 'react-bootstrap';
+import React, {FC} from 'react';
 
 export const LoadingIndeterminate = () => {
   return (
@@ -8,5 +8,15 @@ export const LoadingIndeterminate = () => {
         <span className="visually-hidden">Loading...</span>
       </Spinner>
     </div>
+  );
+};
+
+
+export const LoadingPercent : FC<{percentLoaded: number}>= ({percentLoaded}) =>{
+  return (
+    <ProgressBar
+      now={percentLoaded}
+      label={`Loading.. ${percentLoaded}%`}
+    />
   );
 };

@@ -1,6 +1,6 @@
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
-import {LoadingIndeterminate} from './Common';
+import {LoadingIndeterminate, LoadingPercent} from './Common';
 import React, {
   useState,
   useEffect,
@@ -12,7 +12,7 @@ import React, {
 import axios, {AxiosError} from 'axios';
 import {IItemMetadata} from './ItemApp';
 import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
-import {Button, ButtonGroup, ProgressBar} from 'react-bootstrap';
+import {Button, ButtonGroup} from 'react-bootstrap';
 interface EnumMetadata {
   id: number
   name: string
@@ -235,10 +235,7 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <ProgressBar
-            now={percentEnumsLoaded}
-            label={`Loading.. ${percentEnumsLoaded}%`}
-          />
+          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
         </td>
       </tr>
     );

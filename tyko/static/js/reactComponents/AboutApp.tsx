@@ -1,5 +1,6 @@
 import {FunctionComponent, FC, useState, useEffect} from 'react';
 import axios, {AxiosError} from 'axios';
+import {LoadingIndeterminate} from './Common';
 
 const AboutHeader: FunctionComponent = ()=> {
   return (
@@ -54,7 +55,7 @@ const LoadingComponent: FC = ()=> {
   return (
     <div>
       <AboutHeader/>
-      <div>Loading...</div>
+      <div><LoadingIndeterminate/></div>
     </div>
   );
 };
