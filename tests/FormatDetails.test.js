@@ -9,7 +9,8 @@ import '@testing-library/jest-dom';
 import {
   render,
   waitForElementToBeRemoved,
-  cleanup, waitFor,
+  fireEvent,
+  screen, waitFor, getByDisplayValue,
 } from '@testing-library/react';
 import FormatDetails from '../tyko/static/js/reactComponents/FormatDetails';
 jest.mock('vanillajs-datepicker', ()=>{});
@@ -41,14 +42,167 @@ const mockResponseAudioCassette = {
   parent_object_id: 1,
   transfer_date: null,
 };
+//
+// beforeEach(() => {
+//   axios.get = jest.fn(() => {
+//     Promise.resolve({data: {data: mockResponseAudioCassette}});
+//   });
+// });
 
-beforeEach(() => {
-  axios.get = jest.fn(() => {
-    Promise.resolve({data: {data: mockResponseAudioCassette}});
+// afterEach(cleanup);
+describe('GroovedDisc', ()=>{
+  const mockResponseGroovedDisc = {
+    format_details: {
+      title_of_album: '',
+      title_of_disc: 'foo',
+      disc_base: null,
+      date_of_disc: null,
+      disc_diameter: null,
+      playback_direction: null,
+      disc_material: null,
+      playback_speed: null,
+      side_a_label: null,
+      side_a_duration: null,
+      side_b_label: null,
+      side_b_duration: null,
+    },
+    format: {
+      id: 5,
+      name: 'grooved disc',
+    },
+    format_id: 5,
+  };
+  const {getByText, getByLabelText} = render(
+      <FormatDetails apiData={mockResponseGroovedDisc} apiUrl='/foo'/>,
+  );
+
+  const mockEnums = {
+    '/api/formats/grooved_disc/disc_base': [
+      {
+        'id': 1,
+        'name': 'Glass',
+      },
+      {
+        'id': 2,
+        'name': 'Cardboard',
+      },
+      {
+        'id': 3,
+        'name': 'Aluminum',
+      },
+      {
+        'id': 4,
+        'name': 'Unknown',
+      },
+    ],
+    '/api/formats/grooved_disc/playback_speed': [
+      {
+        'id': 1,
+        'name': '33 1/3',
+      },
+      {
+        'id': 2,
+        'name': '45',
+      },
+      {
+        'id': 3,
+        'name': '78',
+      },
+    ],
+    '/api/formats/grooved_disc/disc_material': [
+      {
+        'id': 1,
+        'name': 'Shellac/78',
+      },
+      {
+        'id': 2,
+        'name': 'Lacquer',
+      },
+      {
+        'id': 3,
+        'name': 'Vinyl',
+      },
+      {
+        'id': 4,
+        'name': 'Edison Diamond',
+      },
+    ],
+    '/api/formats/grooved_disc/playback_direction': [
+      {
+        'id': 1,
+        'name': 'In to Out',
+      },
+      {
+        'id': 2,
+        'name': 'Out to In',
+      },
+    ],
+    '/api/formats/grooved_disc/disc_diameter': [
+      {
+        'id': 1,
+        'name': '7',
+      },
+      {
+        'id': 2,
+        'name': '8',
+      },
+      {
+        'id': 3,
+        'name': '10',
+      },
+      {
+        'id': 4,
+        'name': '12',
+      },
+      {
+        'id': 5,
+        'name': '16',
+      },
+    ],
+  };
+  beforeEach(()=>{
+    axios.get = jest.fn((url) => {
+      return Promise.resolve({data: mockEnums[url]});
+    });
+  });
+  test('edit', async ()=>{
+    expect(screen.getByDisplayValue('foo')).toHaveAttribute('readonly');
+    await waitFor(()=>{
+      fireEvent.click(getByText('Edit'));
+      return waitForElementToBeRemoved(()=>getByText('Loading...'));
+    });
+    expect(screen.getByDisplayValue('foo')).not.toHaveAttribute('readonly');
   });
 });
+describe('video cassette', ()=>{
+  test('video cassette', async ()=>{
+    const mockResponseVideoCassette = {
+      format_details: {
+        date_of_cassette: '',
+        title_of_cassette: 'foo',
+        duration: '',
+        label: '',
+        generation: null,
+        cassette_type: null,
+      },
+      format: {
+        id: 9,
+        name: 'video cassette',
+      },
+      format_id: 9,
+    };
+    const {getByText, getByLabelText, getByDisplayValue} = await waitFor(()=>{
+      return render(
+          <FormatDetails apiData={mockResponseVideoCassette} apiUrl='/foo'/>,
+      );
+    });
+    await waitFor(()=>{
+      return getByText('Edit').click();
+    });
 
-afterEach(cleanup);
+    expect(getByDisplayValue('foo')).toBeInTheDocument();
+  });
+});
 
 describe('FormatDetails', ()=>{
   it('data is loaded into the document', ()=> {
