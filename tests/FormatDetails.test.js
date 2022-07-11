@@ -44,7 +44,6 @@ const mockResponseAudioCassette = {
   parent_object_id: 1,
   transfer_date: null,
 };
-//
 // beforeEach(() => {
 //   axios.get = jest.fn(() => {
 //     Promise.resolve({data: {data: mockResponseAudioCassette}});
@@ -131,6 +130,8 @@ describe('FormatDetails', ()=> {
     '/api/formats/film/film_emulsion': [],
     '/api/formats/film/film_gauge': [],
     '/api/formats/film/soundtrack': [],
+    '/api/formats/audio_cassette/generation': [],
+    '/api/formats/audio_cassette/subtype': [],
     '/api/formats/grooved_disc/disc_diameter': [
       {
         'id': 1,
@@ -161,6 +162,26 @@ describe('FormatDetails', ()=> {
   });
   describe('items', () => {
     const cases = [
+      [
+        {
+          format_details: {
+            cassette_title: 'foo',
+            cassette_type: null,
+            date_of_cassette: null,
+            generation: null,
+            side_a_duration: null,
+            side_a_label: null,
+            side_b_duration: null,
+            side_b_label: null,
+          },
+          format: {
+            id: 7,
+            name: 'audio cassette',
+          },
+          format_id: 7,
+        },
+        'foo',
+      ],
       [
         {
           format_details: {
