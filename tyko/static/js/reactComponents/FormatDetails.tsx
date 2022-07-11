@@ -658,6 +658,7 @@ const createDateField = (
   );
 };
 const Film: FC<IFormatType> = ({data, editMode}) => {
+  const [loadedEnums, setLoadedEnums] = useState(0);
   const [loading, setLoading] = useState(false);
   const adStripTest = data['ad_strip_test'].value;
 
@@ -675,30 +676,28 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
   const [winds, setWinds] = useState<ApiEnum[]|null>(null);
   const [emulsions, setEmulsions] = useState<ApiEnum[]|null>(null);
 
-
-  const adTestDate = data['ad_test_date'].value as string;
   const adTestLevel = data['ad_test_level'].value as string;
-  const canLabel = data['can_label'].value as string;
-  const dateOfFilm = data['date_of_film'].value as string;
-  const duration = data['duration'].value as string;
-  const filmTitle = data['film_title'].value as string;
-  const leaderLabel = data['leader_label'].value as string;
-  const edgeCodeDate = data['edge_code_date'].value as number;
-  const filmLength = data['film_length'].value as number;
-  const filmShrinkage = data['film_shrinkage'].value as number;
-  const color = data['color'].value as EnumMetadata;
-  const filmGauge = data['film_gauge'].value as EnumMetadata;
-  const filmBase = data['film_base'].value as EnumMetadata;
-  const filmEmulsion = data['film_emulsion'].value as EnumMetadata;
-  const filmImageType = data['film_image_type'].value as EnumMetadata;
-  const filmSpeed = data['film_speed'].value as EnumMetadata;
-  const soundtrack = data['soundtrack'].value as EnumMetadata;
-  const wind = data['wind'].value as EnumMetadata;
-
   const selectedAdStrip = useRef<HTMLInputElement>(null);
 
+  const enumValues = [
+    speeds,
+    bases,
+    imageTypes,
+    soundtracks,
+    filmGauges,
+    colors,
+    winds,
+    emulsions,
+  ];
   useEffect(()=>{
     if (editMode) {
+      let completed = 0;
+      enumValues.forEach((enumValues) => {
+        if (enumValues) {
+          completed = completed + 1;
+        }
+      });
+      setLoadedEnums(completed);
       if (!loading) {
         if (!speeds) {
           setLoading(true);
@@ -783,10 +782,12 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
     filmGauges,
   ]);
   if (loading) {
+    const percentEnumsLoaded =
+        Math.round((loadedEnums / enumValues.length) * 100);
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent/>
+          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
         </td>
       </tr>
     );
@@ -795,7 +796,14 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
   return (
     <Fragment>
       <FormatDetail key='dateOfFilm' label="Date Of Film">
-        {createDateField('date_of_film', dateOfFilm, 'm/dd/yyyy', editMode)}
+        {
+          createDateField(
+              'date_of_film',
+              data['date_of_film'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='adStripTest' label="AD Strip Test Performed">
         <Form.Check
@@ -811,7 +819,7 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
           { adStripPerformed ?
               createDateField(
                   'ad_test_date',
-                  adTestDate,
+                  data['ad_test_date'].value as string,
                   'm/dd/yyyy',
                   editMode,
               ): createNullField('adTestDate')
@@ -831,65 +839,152 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
         </fieldset>
       </FormatDetail>
       <FormatDetail key='canLabel' label="Can Label">
-        {createTextField('can_label', canLabel, editMode)}
+        {
+          createTextField(
+              'can_label',
+              data['can_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='duration' label="Duration">
-        {createTextField('duration', duration, editMode)}
+        {
+          createTextField(
+              'duration',
+              data['duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmTitle' label="Film Title">
-        {createTextField('film_title', filmTitle, editMode)}
+        {
+          createTextField(
+              'film_title',
+              data['film_title'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='leaderLabel' label="Leader Label">
-        {createTextField('leader_label', leaderLabel, editMode)}
+        {
+          createTextField(
+              'leader_label',
+              data['leader_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='edgeCodeDate' label="Edge Code Date">
-        {createNumberField(
-            'edge_code_date',
-            edgeCodeDate ? edgeCodeDate: null,
-            editMode,
-            0,
-        )}
+        {
+          createNumberField(
+              'edge_code_date',
+              data['edge_code_date'].value as number,
+              editMode,
+              0,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmLength' label='Film Length'>
-        {createNumberField(
-            'film_length',
-            filmLength ? filmLength: null,
+        {
+          createNumberField(
+              'film_length',
+            data['film_length'].value as number,
             editMode,
             0,
-        )}
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmShrinkage' label='Film Shrinkage'>
-        {createNumberField(
-            'film_shrinkage',
-            filmShrinkage ? filmShrinkage: null,
+        {
+          createNumberField(
+              'film_shrinkage',
+            data['film_shrinkage'].value as number,
             editMode,
             0,
             100,
-        )}
+          )
+        }
       </FormatDetail>
       <FormatDetail key='color' label='Color'>
-        {createEnumField('film_color_id', color, colors, editMode)}
+        {
+          createEnumField(
+              'film_color_id',
+              data['color'].value as EnumMetadata,
+              colors,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmBase' label='Film Base'>
-        {createEnumField('film_base_id', filmBase, bases, editMode)}
+        {
+          createEnumField(
+              'film_base_id',
+              data['film_base'].value as EnumMetadata,
+              bases,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmEmulsion' label='Film Emulsion'>
-        {createEnumField('film_emulsion_id', filmEmulsion, emulsions, editMode)}
+        {
+          createEnumField(
+              'film_emulsion_id',
+              data['film_emulsion'].value as EnumMetadata,
+              emulsions,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmImageType' label='Film Image Type'>
-        {createEnumField('image_type_id', filmImageType, imageTypes, editMode)}
+        {
+          createEnumField(
+              'image_type_id',
+              data['film_image_type'].value as EnumMetadata,
+              imageTypes,
+              editMode,
+          )
+
+        }
       </FormatDetail>
       <FormatDetail key='filmSpeed' label='Film Speed'>
-        {createEnumField('film_speed_id', filmSpeed, speeds, editMode)}
+        {
+          createEnumField(
+              'film_speed_id',
+              data['film_speed'].value as EnumMetadata,
+              speeds,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmGauge' label='Film Gauge'>
-        {createEnumField('film_gauge_id', filmGauge, filmGauges, editMode)}
+        {
+          createEnumField(
+              'film_gauge_id',
+              data['film_gauge'].value as EnumMetadata,
+              filmGauges,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='soundtrack' label='Soundtrack'>
-        {createEnumField('soundtrack_id', soundtrack, soundtracks, editMode)}
+        {
+          createEnumField(
+              'soundtrack_id',
+              data['soundtrack'].value as EnumMetadata,
+              soundtracks,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='wind' label='Wind'>
-        {createEnumField('wind_id', wind, winds, editMode)}
+        {
+          createEnumField(
+              'wind_id',
+              data['wind'].value as EnumMetadata,
+              winds,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
