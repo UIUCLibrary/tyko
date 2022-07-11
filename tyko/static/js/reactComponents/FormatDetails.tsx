@@ -390,6 +390,7 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
 };
 
 const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
+  const [loadedEnums, setLoadedEnums] = useState(0);
   const [discBases, setDiscBases] = useState<ApiEnum[]|null>(null);
   const [discDiameters, setDiscDiameter] = useState<ApiEnum[]|null>(null);
   const [
@@ -400,6 +401,13 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
   const [playbackSpeeds, setPlaybackSpeeds] = useState<ApiEnum[]|null>(null);
 
   const [loading, setLoading] = useState(false);
+  const enumValues = [
+    discBases,
+    discDiameters,
+    playbackDirections,
+    discMaterials,
+    playbackSpeeds,
+  ];
   useEffect(()=>{
     if (editMode) {
       if (!loading) {
@@ -462,15 +470,16 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
   ]);
 
   if (loading) {
+    const percentEnumsLoaded =
+        Math.round((loadedEnums / enumValues.length) * 100);
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent/>
+          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
         </td>
       </tr>
     );
   }
-
   return (
     <Fragment>
       <FormatDetail key='titleOfAlbum' label="Title of Album">
