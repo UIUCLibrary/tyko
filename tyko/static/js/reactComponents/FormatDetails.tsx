@@ -397,6 +397,13 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
   ];
   useEffect(()=>{
     if (editMode) {
+      let completed = 0;
+      enumValues.forEach((enumValue) => {
+        if (enumValue) {
+          completed = completed + 1;
+        }
+      });
+      setLoadedEnums(completed);
       if (!loading) {
         if (!discDiameters) {
           setLoading(true);
@@ -679,8 +686,8 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
   useEffect(()=>{
     if (editMode) {
       let completed = 0;
-      enumValues.forEach((enumValues) => {
-        if (enumValues) {
+      enumValues.forEach((enumValue) => {
+        if (enumValue) {
           completed = completed + 1;
         }
       });
@@ -986,8 +993,8 @@ const Optical: FC<IFormatType> = ({data, editMode}) => {
   useEffect(()=>{
     if (editMode) {
       let completed = 0;
-      enumValues.forEach((enumValues) => {
-        if (enumValues) {
+      enumValues.forEach((enumValue) => {
+        if (enumValue) {
           completed = completed + 1;
         }
       });
@@ -1086,8 +1093,8 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
   useEffect(()=>{
     if (editMode) {
       let completed = 0;
-      enumValues.forEach((enumValues) => {
-        if (enumValues) {
+      enumValues.forEach((enumValue) => {
+        if (enumValue) {
           completed = completed + 1;
         }
       });
@@ -1209,8 +1216,8 @@ const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
   useEffect(()=>{
     if (editMode) {
       let completed = 0;
-      enumValues.forEach((enumValues) => {
-        if (enumValues) {
+      enumValues.forEach((enumValue) => {
+        if (enumValue) {
           completed = completed + 1;
         }
       });
