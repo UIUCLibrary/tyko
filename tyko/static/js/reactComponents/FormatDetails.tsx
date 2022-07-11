@@ -983,7 +983,7 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
     </Fragment>
   );
 };
-const useEnums = (mapping: [[string, string]]| null):
+const useEnums = (mapping: Array<[string, string]>| null):
     [number, { [key: string]: ApiEnum[]} | null, boolean] =>{
   const [loading, setLoading] = useState(false);
   const [loadedEnums, setLoadedEnums] = useState(0);
@@ -1252,53 +1252,37 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
 };
 
 const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['generations', '/api/formats/audio_cassette/generation'],
+        ['subtypes', '/api/formats/audio_cassette/subtype'],
+      ]: null,
+  );
   const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
   const [subtypes, setSubTypes] = useState<ApiEnum[]|null>(null);
-  const [loading, setLoading] = useState(false);
-  const [loadedEnums, setLoadedEnums] = useState(0);
-  const enumValues = [
-    generations,
-    subtypes,
-  ];
-
   useEffect(()=>{
     if (editMode) {
-      let completed = 0;
-      enumValues.forEach((enumValue) => {
-        if (enumValue) {
-          completed = completed + 1;
-        }
-      });
-      setLoadedEnums(completed);
-      if (!loading) {
-        if (!generations) {
-          setLoading(true);
-          axios.get('/api/formats/audio_cassette/generation')
-              .then((res)=> {
-                setGenerations((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!subtypes) {
-          setLoading(true);
-          axios.get('/api/formats/audio_cassette/subtype')
-              .then((res)=> {
-                setSubTypes((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-      } else {
-        if (generations && subtypes) {
-          setLoading(false);
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setGenerations(enums['generations']);
+          setSubTypes(enums['subtypes']);
         }
       }
     }
-  }, [editMode, generations, subtypes]);
+  }, [enums, percentEnumsLoaded, editMode]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
   if (loading) {
-    const percentEnumsLoaded =
-        Math.round((loadedEnums / enumValues.length) * 100);
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
         </td>
       </tr>
     );
@@ -1319,7 +1303,7 @@ const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
           createEnumField(
               'cassette_type_id',
               data['cassette_type'].value as EnumMetadata,
-              generations,
+              subtypes,
               editMode,
           )
         }
