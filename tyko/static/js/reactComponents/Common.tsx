@@ -12,11 +12,12 @@ export const LoadingIndeterminate = () => {
 };
 
 
-export const LoadingPercent : FC<{percentLoaded: number}>= ({percentLoaded}) =>{
+export const LoadingPercent : FC<{percentLoaded?: number}>= ({percentLoaded}) =>{
+  const label = percentLoaded? `Loading... ${percentLoaded}%` : 'Loading... ';
   return (
     <ProgressBar
-      now={percentLoaded}
-      label={`Loading.. ${percentLoaded}%`}
+      now={percentLoaded ? percentLoaded : 0}
+      label={label}
     />
   );
 };
