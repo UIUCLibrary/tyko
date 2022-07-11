@@ -162,6 +162,24 @@ describe('FormatDetails', ()=> {
   });
   describe('items', () => {
     const cases = [
+      // [
+      //   {
+      //     format_details: {
+      //       date_of_cassette: null,
+      //       duration: null,
+      //       title_of_cassette: 'foo',
+      //       generation: null,
+      //       cassette_type: null,
+      //       label: null,
+      //     },
+      //     format: {
+      //       id: 9,
+      //       name: 'video cassette',
+      //     },
+      //     format_id: 9,
+      //   },
+      //   'foo',
+      // ],
       [
         {
           format_details: {
