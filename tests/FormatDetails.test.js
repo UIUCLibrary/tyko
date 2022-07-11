@@ -5,14 +5,16 @@ import axios from 'axios';
 import React from 'react';
 import '@testing-library/jest-dom';
 
-
 import {
-  render,
-  waitForElementToBeRemoved,
   fireEvent,
-  screen, waitFor, getByDisplayValue, cleanup,
+  getByDisplayValue,
+  render,
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
 } from '@testing-library/react';
 import FormatDetails from '../tyko/static/js/reactComponents/FormatDetails';
+
 jest.mock('vanillajs-datepicker', ()=>{});
 const mockResponseAudioCassette = {
   files: [],
@@ -149,74 +151,70 @@ describe('FormatDetails', ()=> {
       return Promise.resolve({data: mockEnums[url]});
     });
   });
-  describe('OpenReel', () => {
-    const mockResponseOpenReel = {
-      format_details: {
-        title_of_reel: 'bar',
-        track_count: 1,
-        base: null,
-        date_of_reel: '2/20/1986',
-        duration: '00:01:24',
-        format_subtype: null,
-        generation: null,
-        reel_brand: null,
-        reel_diameter: null,
-        reel_speed: null,
-        reel_thickness: null,
-        reel_type: null,
-        reel_width: null,
-        track_configuration: null,
-        wind: null,
-      },
-      format: {
-        id: 4,
-        name: 'open reel',
-      },
-      format_id: 4,
-    };
-    test('edit', async () => {
-      render(<FormatDetails apiData={mockResponseOpenReel} apiUrl='/foo'/>);
-      expect(screen.getByDisplayValue('bar')).toHaveAttribute('readonly');
+  describe('items', () => {
+    const cases = [
+      [
+        {
+          format_details: {
+            title_of_reel: 'foo',
+            track_count: 1,
+            base: null,
+            date_of_reel: '2/20/1986',
+            duration: '00:01:24',
+            format_subtype: null,
+            generation: null,
+            reel_brand: null,
+            reel_diameter: null,
+            reel_speed: null,
+            reel_thickness: null,
+            reel_type: null,
+            reel_width: null,
+            track_configuration: null,
+            wind: null,
+          },
+          format: {
+            id: 4,
+            name: 'open reel',
+          },
+          format_id: 4,
+        },
+        'foo',
+      ],
+      [
+        {
+          format_details: {
+            title_of_album: '',
+            title_of_disc: 'foo',
+            disc_base: null,
+            date_of_disc: null,
+            disc_diameter: null,
+            playback_direction: null,
+            disc_material: null,
+            playback_speed: null,
+            side_a_label: null,
+            side_a_duration: null,
+            side_b_label: null,
+            side_b_duration: null,
+          },
+          format: {
+            id: 5,
+            name: 'grooved disc',
+          },
+          format_id: 5,
+        },
+        'foo',
+      ],
+    ];
+    test.each(cases)('edit %p', async (metadata, expectedValue) => {
+      render(
+          <FormatDetails apiData={metadata} apiUrl='/foo'/>,
+      );
+      expect(screen.getByDisplayValue(expectedValue)).toHaveAttribute('readonly');
       await waitFor(() => {
         fireEvent.click(screen.getByText('Edit'));
         return waitForElementToBeRemoved(() => screen.getByRole('progressbar'));
       });
-      expect(screen.getByDisplayValue('bar')).not.toHaveAttribute('readonly');
-    });
-  });
-  describe('GroovedDisc', () => {
-    const mockResponseGroovedDisc = {
-      format_details: {
-        title_of_album: '',
-        title_of_disc: 'foo',
-        disc_base: null,
-        date_of_disc: null,
-        disc_diameter: null,
-        playback_direction: null,
-        disc_material: null,
-        playback_speed: null,
-        side_a_label: null,
-        side_a_duration: null,
-        side_b_label: null,
-        side_b_duration: null,
-      },
-      format: {
-        id: 5,
-        name: 'grooved disc',
-      },
-      format_id: 5,
-    };
-
-    test('edit', async () => {
-      render(
-          <FormatDetails apiData={mockResponseGroovedDisc} apiUrl='/foo'/>,
-      );
-      expect(screen.getByDisplayValue('foo')).toHaveAttribute('readonly');
-      await waitFor(() => {
-        fireEvent.click(screen.getByText('Edit'));
-        return waitForElementToBeRemoved(() => screen.getByText('Loading...'));
-      });
-      expect(screen.getByDisplayValue('foo')).not.toHaveAttribute('readonly');
+      expect(screen.getByDisplayValue(expectedValue)).not.toHaveAttribute('readonly');
     });
   });
 });

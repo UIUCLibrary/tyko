@@ -465,7 +465,7 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingIndeterminate/>
+          <LoadingPercent/>
         </td>
       </tr>
     );
