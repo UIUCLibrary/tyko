@@ -377,7 +377,18 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
 };
 
 const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
-  const [loadedEnums, setLoadedEnums] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['disc_base', '/api/formats/grooved_disc/disc_base'],
+        ['disc_diameter', '/api/formats/grooved_disc/disc_diameter'],
+        ['playback_direction', '/api/formats/grooved_disc/playback_direction'],
+        ['disc_material', '/api/formats/grooved_disc/disc_material'],
+        ['playback_speed', '/api/formats/grooved_disc/playback_speed'],
+      ]: null,
+  );
+
+  // const [loadedEnums, setLoadedEnums] = useState(0);
   const [discBases, setDiscBases] = useState<ApiEnum[]|null>(null);
   const [discDiameters, setDiscDiameter] = useState<ApiEnum[]|null>(null);
   const [
@@ -386,90 +397,117 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
   ] = useState<ApiEnum[]|null>(null);
   const [discMaterials, setDiscMaterials] = useState<ApiEnum[]|null>(null);
   const [playbackSpeeds, setPlaybackSpeeds] = useState<ApiEnum[]|null>(null);
-
-  const [loading, setLoading] = useState(false);
-  const enumValues = [
-    discBases,
-    discDiameters,
-    playbackDirections,
-    discMaterials,
-    playbackSpeeds,
-  ];
   useEffect(()=>{
     if (editMode) {
-      let completed = 0;
-      enumValues.forEach((enumValue) => {
-        if (enumValue) {
-          completed = completed + 1;
-        }
-      });
-      setLoadedEnums(completed);
-      if (!loading) {
-        if (!discDiameters) {
-          setLoading(true);
-          axios.get('/api/formats/grooved_disc/disc_diameter')
-              .then((res)=> {
-                setDiscDiameter((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!playbackDirections) {
-          setLoading(true);
-          axios.get('/api/formats/grooved_disc/playback_direction')
-              .then((res)=> {
-                setPlaybackDirections(
-                    (res.data as ApiEnum[]).sort(sortNameAlpha),
-                );
-              }).catch(console.error);
-        }
-        if (!discMaterials) {
-          setLoading(true);
-          axios.get('/api/formats/grooved_disc/disc_material')
-              .then((res)=> {
-                setDiscMaterials((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!playbackSpeeds) {
-          setLoading(true);
-          axios.get('/api/formats/grooved_disc/playback_speed')
-              .then((res)=> {
-                setPlaybackSpeeds((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!discBases) {
-          setLoading(true);
-          axios.get('/api/formats/grooved_disc/disc_base')
-              .then((res)=> {
-                setDiscBases((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-      } else {
-        if (
-          discDiameters &&
-          playbackDirections &&
-          discMaterials &&
-          playbackSpeeds &&
-          discBases
-        ) {
-          setLoading(false);
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setDiscBases(enums['disc_base']);
+          setDiscDiameter(enums['disc_diameter']);
+          setPlaybackDirections(enums['playback_direction']);
+          setDiscMaterials(enums['disc_material']);
+          setPlaybackSpeeds(enums['playback_speed']);
         }
       }
     }
-  }, [
-    editMode,
-    discDiameters,
-    playbackDirections,
-    discMaterials,
-    playbackSpeeds,
-    discBases,
-  ]);
+  }, [enums, percentEnumsLoaded, editMode]);
+  // const enumValues = [
+  //   discBases,
+  //   discDiameters,
+  //   playbackDirections,
+  //   discMaterials,
+  //   playbackSpeeds,
+  // ];
+  // useEffect(()=>{
+  //   if (editMode) {
+  //     let completed = 0;
+  //     enumValues.forEach((enumValue) => {
+  //       if (enumValue) {
+  //         completed = completed + 1;
+  //       }
+  //     });
+  //     setLoadedEnums(completed);
+  //     if (!loading) {
+  //       if (!discDiameters) {
+  //         setLoading(true);
+  //         axios.get('/api/formats/grooved_disc/disc_diameter')
+  //             .then((res)=> {
+  //               setDiscDiameter((res.data as ApiEnum[]).sort(sortNameAlpha));
+  //             }).catch(console.error);
+  //       }
+  //       if (!playbackDirections) {
+  //         setLoading(true);
+  //         axios.get('/api/formats/grooved_disc/playback_direction')
+  //             .then((res)=> {
+  //               setPlaybackDirections(
+  //                   (res.data as ApiEnum[]).sort(sortNameAlpha),
+  //               );
+  //             }).catch(console.error);
+  //       }
+  //       if (!discMaterials) {
+  //         setLoading(true);
+  //         axios.get('/api/formats/grooved_disc/disc_material')
+  //             .then((res)=> {
+  //               setDiscMaterials((res.data as ApiEnum[]).sort(sortNameAlpha));
+  //             }).catch(console.error);
+  //       }
+  //       if (!playbackSpeeds) {
+  //         setLoading(true);
+  //         axios.get('/api/formats/grooved_disc/playback_speed')
+  //             .then((res)=> {
+  //               setPlaybackSpeeds((res.data as ApiEnum[]).sort(sortNameAlpha));
+  //             }).catch(console.error);
+  //       }
+  //       if (!discBases) {
+  //         setLoading(true);
+  //         axios.get('/api/formats/grooved_disc/disc_base')
+  //             .then((res)=> {
+  //               setDiscBases((res.data as ApiEnum[]).sort(sortNameAlpha));
+  //             }).catch(console.error);
+  //       }
+  //     } else {
+  //       if (
+  //         discDiameters &&
+  //         playbackDirections &&
+  //         discMaterials &&
+  //         playbackSpeeds &&
+  //         discBases
+  //       ) {
+  //         setLoading(false);
+  //       }
+  //     }
+  //   }
+  // }, [
+  //   editMode,
+  //   discDiameters,
+  //   playbackDirections,
+  //   discMaterials,
+  //   playbackSpeeds,
+  //   discBases,
+  // ]);
 
+  // if (loading) {
+  //   const percentEnumsLoaded =
+  //       Math.round((loadedEnums / enumValues.length) * 100);
+  //   return (
+  //     <tr>
+  //       <td rowSpan={2} style={{textAlign: 'center'}}>
+  //         <LoadingPercent percentLoaded={percentEnumsLoaded}/>
+  //       </td>
+  //     </tr>
+  //   );
+  // }
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
   if (loading) {
-    const percentEnumsLoaded =
-        Math.round((loadedEnums / enumValues.length) * 100);
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
         </td>
       </tr>
     );
