@@ -10,7 +10,7 @@ import {
   render,
   waitForElementToBeRemoved,
   fireEvent,
-  screen, waitFor, getByDisplayValue,
+  screen, waitFor, getByDisplayValue, cleanup,
 } from '@testing-library/react';
 import FormatDetails from '../tyko/static/js/reactComponents/FormatDetails';
 jest.mock('vanillajs-datepicker', ()=>{});
@@ -50,32 +50,7 @@ const mockResponseAudioCassette = {
 // });
 
 // afterEach(cleanup);
-describe('GroovedDisc', ()=>{
-  const mockResponseGroovedDisc = {
-    format_details: {
-      title_of_album: '',
-      title_of_disc: 'foo',
-      disc_base: null,
-      date_of_disc: null,
-      disc_diameter: null,
-      playback_direction: null,
-      disc_material: null,
-      playback_speed: null,
-      side_a_label: null,
-      side_a_duration: null,
-      side_b_label: null,
-      side_b_duration: null,
-    },
-    format: {
-      id: 5,
-      name: 'grooved disc',
-    },
-    format_id: 5,
-  };
-  const {getByText, getByLabelText} = render(
-      <FormatDetails apiData={mockResponseGroovedDisc} apiUrl='/foo'/>,
-  );
-
+describe('FormatDetails', ()=> {
   const mockEnums = {
     '/api/formats/grooved_disc/disc_base': [
       {
@@ -137,6 +112,15 @@ describe('GroovedDisc', ()=>{
         'name': 'Out to In',
       },
     ],
+    '/api/formats/open_reel/base': [],
+    '/api/formats/open_reel/reel_diameter': [],
+    '/api/formats/open_reel/sub_types': [],
+    '/api/formats/open_reel/reel_speed': [],
+    '/api/formats/open_reel/generation': [],
+    '/api/formats/open_reel/reel_thickness': [],
+    '/api/formats/open_reel/reel_width': [],
+    '/api/formats/open_reel/track_configuration': [],
+    '/api/formats/open_reel/wind': [],
     '/api/formats/grooved_disc/disc_diameter': [
       {
         'id': 1,
@@ -160,18 +144,80 @@ describe('GroovedDisc', ()=>{
       },
     ],
   };
-  beforeEach(()=>{
+  beforeEach(() => {
     axios.get = jest.fn((url) => {
       return Promise.resolve({data: mockEnums[url]});
     });
   });
-  test('edit', async ()=>{
-    expect(screen.getByDisplayValue('foo')).toHaveAttribute('readonly');
-    await waitFor(()=>{
-      fireEvent.click(getByText('Edit'));
-      return waitForElementToBeRemoved(()=>getByText('Loading...'));
+  describe('OpenReel', () => {
+    const mockResponseOpenReel = {
+      format_details: {
+        title_of_reel: 'bar',
+        track_count: 1,
+        base: null,
+        date_of_reel: '2/20/1986',
+        duration: '00:01:24',
+        format_subtype: null,
+        generation: null,
+        reel_brand: null,
+        reel_diameter: null,
+        reel_speed: null,
+        reel_thickness: null,
+        reel_type: null,
+        reel_width: null,
+        track_configuration: null,
+        wind: null,
+      },
+      format: {
+        id: 4,
+        name: 'open reel',
+      },
+      format_id: 4,
+    };
+    test('edit', async () => {
+      render(<FormatDetails apiData={mockResponseOpenReel} apiUrl='/foo'/>);
+      expect(screen.getByDisplayValue('bar')).toHaveAttribute('readonly');
+      await waitFor(() => {
+        fireEvent.click(screen.getByText('Edit'));
+        return waitForElementToBeRemoved(() => screen.getByRole('progressbar'));
+      });
+      expect(screen.getByDisplayValue('bar')).not.toHaveAttribute('readonly');
     });
-    expect(screen.getByDisplayValue('foo')).not.toHaveAttribute('readonly');
+  });
+  describe('GroovedDisc', () => {
+    const mockResponseGroovedDisc = {
+      format_details: {
+        title_of_album: '',
+        title_of_disc: 'foo',
+        disc_base: null,
+        date_of_disc: null,
+        disc_diameter: null,
+        playback_direction: null,
+        disc_material: null,
+        playback_speed: null,
+        side_a_label: null,
+        side_a_duration: null,
+        side_b_label: null,
+        side_b_duration: null,
+      },
+      format: {
+        id: 5,
+        name: 'grooved disc',
+      },
+      format_id: 5,
+    };
+
+    test('edit', async () => {
+      render(
+          <FormatDetails apiData={mockResponseGroovedDisc} apiUrl='/foo'/>,
+      );
+      expect(screen.getByDisplayValue('foo')).toHaveAttribute('readonly');
+      await waitFor(() => {
+        fireEvent.click(screen.getByText('Edit'));
+        return waitForElementToBeRemoved(() => screen.getByText('Loading...'));
+      });
+      expect(screen.getByDisplayValue('foo')).not.toHaveAttribute('readonly');
+    });
   });
 });
 describe('video cassette', ()=>{
@@ -191,16 +237,16 @@ describe('video cassette', ()=>{
       },
       format_id: 9,
     };
-    const {getByText, getByLabelText, getByDisplayValue} = await waitFor(()=>{
+    await waitFor(()=>{
       return render(
           <FormatDetails apiData={mockResponseVideoCassette} apiUrl='/foo'/>,
       );
     });
     await waitFor(()=>{
-      return getByText('Edit').click();
+      return screen.getByText('Edit').click();
     });
 
-    expect(getByDisplayValue('foo')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('foo')).toBeInTheDocument();
   });
 });
 
