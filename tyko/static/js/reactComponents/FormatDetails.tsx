@@ -1133,57 +1133,37 @@ const Optical: FC<IFormatType> = ({data, editMode}) => {
 
 const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
   const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['generations', '/api/formats/video_cassette/generations'],
+        ['subtypes', '/api/formats/video_cassette/cassette_types'],
+      ]: null,
+  );
   const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
   const [cassetteTypes, setCassetteTypes] = useState<ApiEnum[]|null>(null);
-  const [loadedEnums, setLoadedEnums] = useState(0);
-  const enumValues = [generations, cassetteTypes];
 
   useEffect(()=>{
     if (editMode) {
-      let completed = 0;
-      enumValues.forEach((enumValue) => {
-        if (enumValue) {
-          completed = completed + 1;
-        }
-      });
-      setLoadedEnums(completed);
-      if (!loading) {
-        if (!generations) {
-          setLoading(true);
-          axios.get('/api/formats/video_cassette/generations')
-              .then((res)=> {
-                setGenerations((res.data as ApiEnum[]));
-              }).catch(console.error);
-        }
-        if (!cassetteTypes) {
-          setLoading(true);
-          axios.get('/api/formats/video_cassette/cassette_types')
-              .then((res)=> {
-                setCassetteTypes((res.data as ApiEnum[]));
-              }).catch(console.error);
-        }
-      } else {
-        if (
-          generations &&
-          cassetteTypes
-        ) {
-          setLoading(false);
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setGenerations(enums['generations']);
+          setCassetteTypes(enums['subtypes']);
         }
       }
     }
-  }, [
-    editMode,
-    generations,
-    cassetteTypes,
-  ]);
-
+  }, [enums, percentEnumsLoaded, editMode]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
   if (loading) {
-    const percentEnumsLoaded =
-        Math.round((loadedEnums / enumValues.length) * 100);
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
         </td>
       </tr>
     );
