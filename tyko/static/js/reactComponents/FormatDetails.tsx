@@ -919,38 +919,99 @@ const Optical: FC<IFormatType> = ({data, editMode}) => {
 };
 
 const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
+  const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
+  const [cassetteTypes, setCassetteTypes] = useState<ApiEnum[]|null>(null);
+  const [loadedEnums, setLoadedEnums] = useState(0);
+  const enumValues = [];
+
+  useEffect(()=>{
+    if (editMode) {
+      if (!loading) {
+        if (!generations) {
+          setLoading(true);
+          axios.get('/api/formats/video_cassette/generations')
+              .then((res)=> {
+                setGenerations((res.data as ApiEnum[]));
+              }).catch(console.error);
+        }
+        if (!cassetteTypes) {
+          setLoading(true);
+          axios.get('/api/formats/video_cassette/cassette_type')
+              .then((res)=> {
+                setCassetteTypes((res.data as ApiEnum[]));
+              }).catch(console.error);
+        }
+      } else {
+        if (
+          generations &&
+          cassetteTypes
+        ) {
+          setLoading(false);
+        }
+      }
+    }
+  }, [
+    editMode,
+    generations,
+    cassetteTypes,
+  ]);
+
   const dateOfCassette = data['date_of_cassette'].value as string;
   const duration = data['duration'].value as string;
   const label = data['label'].value as string;
   const titleOfCassette = data['title_of_cassette'].value as string;
-  const generation = data['generation'].value as EnumMetadata;
-  const cassetteType = data['cassette_type'].value as EnumMetadata;
-  const readOnlyMode = true;
+  if (loading) {
+    const percentEnumsLoaded =
+        Math.round((loadedEnums / enumValues.length) * 100);
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
+        </td>
+      </tr>
+    );
+  }
   return (
     <Fragment>
       <FormatDetail key="dateOfCassette" label="Date Of Cassette">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={dateOfCassette}/>
+        {
+          createDateField(
+              'date_of_cassette',
+              dateOfCassette,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="duration" label="Duration">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={duration}/>
+        {createTextField('duration', duration, editMode)}
       </FormatDetail>
       <FormatDetail key="label" label="Label">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={label}/>
+        {createTextField('label', label, editMode)}
       </FormatDetail>
       <FormatDetail key="titleOfCassette" label="Title Of Cassette">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={titleOfCassette}/>
+        {createTextField('title_of_cassette', titleOfCassette, editMode)}
       </FormatDetail>
       <FormatDetail key="generation" label="Generation">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={generation ? generation.name : ''}/>
+        {
+          createEnumField(
+              'generation',
+              data['generation'].value as EnumMetadata,
+              generations,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='cassetteType' label="Type">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={cassetteType ? cassetteType.name : ''}/>
+        {
+          createEnumField(
+              'cassette_type',
+              data['cassette_type'].value as EnumMetadata,
+              cassetteTypes,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
