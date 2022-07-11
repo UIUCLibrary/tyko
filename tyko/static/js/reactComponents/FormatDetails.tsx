@@ -652,8 +652,19 @@ const createDateField = (
   );
 };
 const Film: FC<IFormatType> = ({data, editMode}) => {
-  const [loadedEnums, setLoadedEnums] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['film_speeds', '/api/formats/film/film_speed'],
+        ['film_bases', '/api/formats/film/film_base'],
+        ['image_types', '/api/formats/film/image_type'],
+        ['soundtracks', '/api/formats/film/soundtrack'],
+        ['colors', '/api/formats/film/color'],
+        ['winds', '/api/formats/film/wind'],
+        ['film_emulsions', '/api/formats/film/film_emulsion'],
+        ['film_gauges', '/api/formats/film/film_gauge'],
+      ]: null,
+  );
   const adStripTest = data['ad_strip_test'].value;
 
   const [
@@ -673,120 +684,38 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
   const adTestLevel = data['ad_test_level'].value as string;
   const selectedAdStrip = useRef<HTMLInputElement>(null);
 
-  const enumValues = [
-    speeds,
-    bases,
-    imageTypes,
-    soundtracks,
-    filmGauges,
-    colors,
-    winds,
-    emulsions,
-  ];
   useEffect(()=>{
     if (editMode) {
-      let completed = 0;
-      enumValues.forEach((enumValue) => {
-        if (enumValue) {
-          completed = completed + 1;
-        }
-      });
-      setLoadedEnums(completed);
-      if (!loading) {
-        if (!speeds) {
-          setLoading(true);
-          axios.get('/api/formats/film/film_speed')
-              .then((res)=> {
-                setSpeeds((res.data as ApiEnum[]));
-              }).catch(console.error);
-        }
-        if (!bases) {
-          setLoading(true);
-          axios.get('/api/formats/film/film_base')
-              .then((res)=> {
-                setBases((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!imageTypes) {
-          setLoading(true);
-          axios.get('/api/formats/film/image_type')
-              .then((res)=> {
-                setImageTypes((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!soundtracks) {
-          setLoading(true);
-          axios.get('/api/formats/film/soundtrack')
-              .then((res)=> {
-                setSoundtracks((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!colors) {
-          setLoading(true);
-          axios.get('/api/formats/film/color')
-              .then((res)=> {
-                setColors((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!winds) {
-          setLoading(true);
-          axios.get('/api/formats/film/wind')
-              .then((res)=> {
-                setWinds((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!emulsions) {
-          setLoading(true);
-          axios.get('/api/formats/film/film_emulsion')
-              .then((res)=> {
-                setEmulsions((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!filmGauges) {
-          setLoading(true);
-          axios.get('/api/formats/film/film_gauge')
-              .then((res)=> {
-                setFilmGauges((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-      } else {
-        if (
-          speeds &&
-          bases &&
-          imageTypes &&
-          soundtracks &&
-          colors &&
-          winds &&
-          emulsions &&
-          filmGauges
-        ) {
-          setLoading(false);
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setSpeeds(enums['film_speeds']);
+          setBases(enums['film_bases']);
+          setImageTypes(enums['image_types']);
+          setSoundtracks(enums['soundtracks']);
+          setColors(enums['colors']);
+          setWinds(enums['winds']);
+          setEmulsions(enums['film_emulsions']);
+          setFilmGauges(enums['film_gauges']);
         }
       }
     }
-  }, [
-    editMode,
-    speeds,
-    bases,
-    imageTypes,
-    colors,
-    winds,
-    soundtracks,
-    emulsions,
-    filmGauges,
-  ]);
+  }, [enums, percentEnumsLoaded, editMode]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
   if (loading) {
-    const percentEnumsLoaded =
-        Math.round((loadedEnums / enumValues.length) * 100);
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
         </td>
       </tr>
     );
   }
-
   return (
     <Fragment>
       <FormatDetail key='dateOfFilm' label="Date Of Film">
@@ -984,32 +913,41 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
   );
 };
 const useEnums = (mapping: Array<[string, string]>| null):
-    [number, { [key: string]: ApiEnum[]} | null, boolean] =>{
+    [number, { [key: string]: ApiEnum[]} | null, boolean] => {
   const [loading, setLoading] = useState(false);
   const [loadedEnums, setLoadedEnums] = useState(0);
   const [enums, setEnums] = useState<{[key: string]:ApiEnum[]}| null>(null);
+
+  const checkCompleted = (values: {[key: string]:ApiEnum[]}) =>{
+    if (!mapping) {
+      return 0;
+    }
+    let completed = 0;
+    if (!values) {
+      return 0;
+    }
+    mapping.forEach(([enumValue, _url]) => {
+      if (values[enumValue]) {
+        completed = completed + 1;
+      }
+    });
+    return completed;
+  };
+
   useEffect(()=>{
     if (mapping) {
-      let completed = 0;
-      mapping.forEach(([enumValue, _url]) => {
-        if (enums !== null) {
-          if (enums[enumValue]) {
-            completed = completed + 1;
-          }
-        }
-      });
-      setLoadedEnums(completed);
       if (!enums) {
         if (!loading) {
-          mapping.map(([key, url]) => {
+          mapping.forEach(([key, url]) => {
             setLoading(true);
             axios.get(url)
                 .then((res) => {
                   const data = res.data as ApiEnum[];
                   setEnums((prevState) => {
                     if (prevState !== null) {
-                      prevState[key] = data;
-                      return prevState;
+                      const newData: { [key: string]: ApiEnum[] } = {};
+                      newData[key] = data;
+                      return {...prevState, ...newData};
                     }
                     const newData: { [key: string]: ApiEnum[] } = {};
                     newData[key] = data;
@@ -1021,7 +959,8 @@ const useEnums = (mapping: Array<[string, string]>| null):
         }
       }
     }
-  }, [mapping]);
+  }, [mapping, loading, enums]);
+
   useEffect(()=>{
     if (mapping) {
       if (loading) {
@@ -1037,8 +976,12 @@ const useEnums = (mapping: Array<[string, string]>| null):
               }
             },
         );
-        setLoading(!loadedEverything);
       }
+    }
+  }, [enums]);
+  useEffect(()=>{
+    if (enums) {
+      setLoadedEnums(checkCompleted(enums));
     }
   }, [enums]);
   const percentDone = mapping ? (loadedEnums/mapping.length): 0;
