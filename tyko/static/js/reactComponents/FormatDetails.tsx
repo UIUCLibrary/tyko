@@ -1,6 +1,6 @@
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
-import {LoadingIndeterminate, LoadingPercent} from './Common';
+import {LoadingPercent} from './Common';
 import React, {
   useState,
   useEffect,
@@ -1084,7 +1084,7 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
       <FormatDetail key="generation" label="Generation">
         {
           createEnumField(
-              'generation',
+              'generation_id',
               data['generation'].value as EnumMetadata,
               generations,
               editMode,
@@ -1106,12 +1106,24 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
 };
 
 const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
-  const [loading, setLoading] = useState(false);
   const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
   const [subtypes, setSubTypes] = useState<ApiEnum[]|null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loadedEnums, setLoadedEnums] = useState(0);
+  const enumValues = [
+    generations,
+    subtypes,
+  ];
 
   useEffect(()=>{
     if (editMode) {
+      let completed = 0;
+      enumValues.forEach((enumValues) => {
+        if (enumValues) {
+          completed = completed + 1;
+        }
+      });
+      setLoadedEnums(completed);
       if (!loading) {
         if (!generations) {
           setLoading(true);
@@ -1135,148 +1147,92 @@ const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
     }
   }, [editMode, generations, subtypes]);
   if (loading) {
+    const percentEnumsLoaded =
+        Math.round((loadedEnums / enumValues.length) * 100);
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent/>
+          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
         </td>
       </tr>
     );
   }
-
-  const title = data['cassette_title'].value as string;
-  const cassetteType = data['cassette_type'].value as EnumMetadata;
-  const dateOfCassette = data['date_of_cassette'].value as string;
-  const generation = data['generation'].value as EnumMetadata;
-  const sideADuration = data['side_a_duration'].value as string;
-  const sideALabel = data['side_a_label'].value as string;
-  const sideBDuration = data['side_b_duration'].value as string;
-  const sideBLabel = data['side_b_label'].value as string;
-  const readOnlyMode = !editMode;
-
-  const cassetteDateField =
-      editMode ? (
-            <Form.Group>
-              <SelectDate
-                name='date_of_cassette'
-                dateFormat='m/dd/yyyy'
-                defaultValue={dateOfCassette ? dateOfCassette: ''}
-              />
-            </Form.Group>
-          ):
-          (
-              <Form.Control
-                size={'sm'}
-                defaultValue={dateOfCassette}
-                plaintext={true}
-                readOnly={readOnlyMode}
-              />
-          );
-
-  const generationOptions = generations?.map((generation) => {
-    return (
-      <option key={generation.id} value={generation.id}>
-        {generation.name}
-      </option>
-    );
-  });
-
-  const subtypeOptions = subtypes?.map((subtype) => {
-    return (
-      <option key={subtype.id} value={subtype.id}>
-        {subtype.name}
-      </option>
-    );
-  });
-  const generationField =
-      editMode ?
-          (
-              <Form.Select
-                name='generation_id'
-                defaultValue={generation ? generation.id : ''}
-              >
-                <option key={-1} value=''></option>
-                {generationOptions}
-              </Form.Select>
-          ):
-          (
-            <Form.Control
-              size={'sm'}
-              plaintext={true}
-              defaultValue={generation ? generation.name : ''}
-              readOnly={readOnlyMode}
-            />
-          );
-  const cassetteTypeField =
-      editMode ?
-          (
-              <Form.Select
-                name='cassette_type_id'
-                defaultValue={cassetteType ? cassetteType.id: ''}
-              >
-                <option key={-1} value=''></option>
-                {subtypeOptions}
-              </Form.Select>
-          ):
-          (
-              <Form.Control
-                size={'sm'}
-                defaultValue={cassetteType ? cassetteType.name : ''}
-                plaintext={true}
-                readOnly={readOnlyMode}/>
-          );
   return (
     <Fragment>
       <FormatDetail key='cassetteTitle' label="Cassette Title">
-        <Form.Control
-          name='cassette_title'
-          size={'sm'}
-          defaultValue={title}
-          plaintext={readOnlyMode}
-          readOnly={readOnlyMode}/>
+        {
+          createTextField(
+              'cassette_title',
+              data['cassette_title'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='cassetteType' label="Type">
-        {cassetteTypeField}
+        {
+          createEnumField(
+              'cassette_type_id',
+              data['cassette_type'].value as EnumMetadata,
+              generations,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='dateOfCassette' label="Date of Cassette">
-        {cassetteDateField}
+        {
+          createDateField(
+              'date_of_cassette',
+              data['date_of_cassette'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        {generationField}
+        {
+          createEnumField(
+              'generation_id',
+              data['generation'].value as EnumMetadata,
+              generations,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideALabel' label="Side A Label">
-        <Form.Control
-          name="side_a_label"
-          size={'sm'}
-          defaultValue={sideALabel}
-          plaintext={readOnlyMode}
-          readOnly={readOnlyMode}/>
+        {
+          createTextField(
+              'side_a_label',
+              data['side_a_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideADuration' label="Side A Duration">
-        <Form.Control
-          name="side_a_duration"
-          size={'sm'}
-          defaultValue={sideADuration}
-          plaintext={readOnlyMode}
-          readOnly={readOnlyMode}
-        />
+        {
+          createTextField(
+              'side_a_duration',
+              data['side_a_duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideBLabel' label="Side B Label">
-        <Form.Control
-          name="side_b_label"
-          size={'sm'}
-          defaultValue={sideBLabel}
-          plaintext={readOnlyMode}
-          readOnly={readOnlyMode}
-        />
+        {
+          createTextField(
+              'side_b_label',
+              data['side_b_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideBDuration' label="Side B Duration">
-        <Form.Control
-          name="side_b_duration"
-          size={'sm'}
-          defaultValue={sideBDuration}
-          plaintext={readOnlyMode}
-          readOnly={readOnlyMode}/>
+        {
+          createTextField(
+              'side_b_duration',
+              data['side_b_duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
