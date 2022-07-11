@@ -129,7 +129,7 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
   useEffect(()=>{
     if (editMode) {
       let completed = 0;
-      enumValues .forEach((enumValues) => {
+      enumValues.forEach((enumValues) => {
         if (enumValues) {
           completed = completed + 1;
         }
@@ -769,6 +769,7 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
     imageTypes,
     colors,
     winds,
+    soundtracks,
     emulsions,
     filmGauges,
   ]);
@@ -923,10 +924,17 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
   const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
   const [cassetteTypes, setCassetteTypes] = useState<ApiEnum[]|null>(null);
   const [loadedEnums, setLoadedEnums] = useState(0);
-  const enumValues = [];
+  const enumValues = [generations, cassetteTypes];
 
   useEffect(()=>{
     if (editMode) {
+      let completed = 0;
+      enumValues.forEach((enumValues) => {
+        if (enumValues) {
+          completed = completed + 1;
+        }
+      });
+      setLoadedEnums(completed);
       if (!loading) {
         if (!generations) {
           setLoading(true);
@@ -957,10 +965,6 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
     cassetteTypes,
   ]);
 
-  const dateOfCassette = data['date_of_cassette'].value as string;
-  const duration = data['duration'].value as string;
-  const label = data['label'].value as string;
-  const titleOfCassette = data['title_of_cassette'].value as string;
   if (loading) {
     const percentEnumsLoaded =
         Math.round((loadedEnums / enumValues.length) * 100);
@@ -978,20 +982,38 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
         {
           createDateField(
               'date_of_cassette',
-              dateOfCassette,
+              data['date_of_cassette'].value as string,
               'm/dd/yyyy',
               editMode,
           )
         }
       </FormatDetail>
       <FormatDetail key="duration" label="Duration">
-        {createTextField('duration', duration, editMode)}
+        {
+          createTextField(
+              'duration',
+            data['duration'].value as string,
+            editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="label" label="Label">
-        {createTextField('label', label, editMode)}
+        {
+          createTextField(
+              'label',
+              data['label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="titleOfCassette" label="Title Of Cassette">
-        {createTextField('title_of_cassette', titleOfCassette, editMode)}
+        {
+          createTextField(
+              'title_of_cassette',
+              data['title_of_cassette'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="generation" label="Generation">
         {

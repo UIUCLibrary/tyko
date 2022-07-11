@@ -289,12 +289,16 @@ describe('FormatDetails', ()=> {
       render(
           <FormatDetails apiData={metadata} apiUrl='/foo'/>,
       );
-      expect(screen.getByDisplayValue(expectedValue)).toHaveAttribute('readonly');
+      expect(
+          screen.getByDisplayValue(expectedValue),
+      ).toHaveAttribute('readonly');
       await waitFor(() => {
         fireEvent.click(screen.getByText('Edit'));
         return waitForElementToBeRemoved(() => screen.getByRole('progressbar'));
       });
-      expect(screen.getByDisplayValue(expectedValue)).not.toHaveAttribute('readonly');
+      expect(
+          screen.getByDisplayValue(expectedValue),
+      ).not.toHaveAttribute('readonly');
     });
   });
 });
