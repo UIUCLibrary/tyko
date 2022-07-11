@@ -983,49 +983,97 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
     </Fragment>
   );
 };
+const useEnums = (mapping: [[string, string]]| null):
+    [number, { [key: string]: ApiEnum[]} | null, boolean] =>{
+  const [loading, setLoading] = useState(false);
+  const [loadedEnums, setLoadedEnums] = useState(0);
+  const [enums, setEnums] = useState<{[key: string]:ApiEnum[]}| null>(null);
+  useEffect(()=>{
+    if (mapping) {
+      let completed = 0;
+      mapping.forEach(([enumValue, _url]) => {
+        if (enums !== null) {
+          if (enums[enumValue]) {
+            completed = completed + 1;
+          }
+        }
+      });
+      setLoadedEnums(completed);
+      if (!enums) {
+        if (!loading) {
+          mapping.map(([key, url]) => {
+            setLoading(true);
+            axios.get(url)
+                .then((res) => {
+                  const data = res.data as ApiEnum[];
+                  setEnums((prevState) => {
+                    if (prevState !== null) {
+                      prevState[key] = data;
+                      return prevState;
+                    }
+                    const newData: { [key: string]: ApiEnum[] } = {};
+                    newData[key] = data;
+                    return newData;
+                  });
+                })
+                .catch(console.error);
+          });
+        }
+      }
+    }
+  }, [mapping]);
+  useEffect(()=>{
+    if (mapping) {
+      if (loading) {
+        let loadedEverything = true;
+        mapping.every(
+            ([enumValue, _url]) => {
+              if (enums !== null) {
+                if ( (enumValue in enums) ) {
+                  return true;
+                }
+                loadedEverything = false;
+                return false;
+              }
+            },
+        );
+        setLoading(!loadedEverything);
+      }
+    }
+  }, [enums]);
+  const percentDone = mapping ? (loadedEnums/mapping.length): 0;
+  return [percentDone, enums, loading];
+};
 
 const Optical: FC<IFormatType> = ({data, editMode}) => {
   const [loading, setLoading] = useState(false);
   const [opticalTypes, setOpticalTypes] = useState<ApiEnum[]|null>(null);
-  const [loadedEnums, setLoadedEnums] = useState(0);
-  const enumValues = [opticalTypes];
-
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['optical_types', '/api/formats/optical/optical_types'],
+      ]: null,
+  );
   useEffect(()=>{
     if (editMode) {
-      let completed = 0;
-      enumValues.forEach((enumValue) => {
-        if (enumValue) {
-          completed = completed + 1;
-        }
-      });
-      setLoadedEnums(completed);
-      if (!loading) {
-        if (!opticalTypes) {
-          setLoading(true);
-          axios.get('/api/formats/optical/optical_types')
-              .then((res)=> {
-                setOpticalTypes((res.data as ApiEnum[]));
-              }).catch(console.error);
-        }
-      } else {
-        if (
-          opticalTypes
-        ) {
-          setLoading(false);
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setOpticalTypes(enums['optical_types']);
         }
       }
     }
-  }, [
-    editMode,
-    opticalTypes,
-  ]);
+  }, [enums, percentEnumsLoaded, editMode]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
   if (loading) {
-    const percentEnumsLoaded =
-        Math.round((loadedEnums / enumValues.length) * 100);
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
         </td>
       </tr>
     );
