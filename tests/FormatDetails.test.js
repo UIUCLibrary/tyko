@@ -123,6 +123,14 @@ describe('FormatDetails', ()=> {
     '/api/formats/open_reel/reel_width': [],
     '/api/formats/open_reel/track_configuration': [],
     '/api/formats/open_reel/wind': [],
+    '/api/formats/film/film_base': [],
+    '/api/formats/film/film_speed': [],
+    '/api/formats/film/image_type': [],
+    '/api/formats/film/color': [],
+    '/api/formats/film/wind': [],
+    '/api/formats/film/film_emulsion': [],
+    '/api/formats/film/film_gauge': [],
+    '/api/formats/film/soundtrack': [],
     '/api/formats/grooved_disc/disc_diameter': [
       {
         'id': 1,
@@ -153,6 +161,37 @@ describe('FormatDetails', ()=> {
   });
   describe('items', () => {
     const cases = [
+      [
+        {
+          format_details: {
+            ad_strip_test: null,
+            ad_test_date: null,
+            ad_test_level: null,
+            can_label: 'foo',
+            date_of_film: null,
+            duration: null,
+            film_title: null,
+            leader_label: null,
+            edge_code_date: null,
+            film_length: null,
+            film_shrinkage: null,
+            film_gauge: null,
+            film_base: null,
+            film_emulsion: null,
+            film_image_type: null,
+            film_speed: null,
+            soundtrack: null,
+            wind: null,
+            color: null,
+          },
+          format: {
+            id: 6,
+            name: 'film',
+          },
+          format_id: 6,
+        },
+        'foo',
+      ],
       [
         {
           format_details: {
