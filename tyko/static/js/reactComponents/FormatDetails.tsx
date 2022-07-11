@@ -887,33 +887,99 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
 };
 
 const Optical: FC<IFormatType> = ({data, editMode}) => {
-  const titleOfItem = data['title_of_item'].value as string;
-  const dateOfItem = data['date_of_item'].value as string;
-  const duration = data['duration'].value as string;
-  const label = data['label'].value as string;
-  const type = data['type'].value as EnumMetadata;
-  const readOnlyMode = true;
+  const [loading, setLoading] = useState(false);
+  const [opticalTypes, setOpticalTypes] = useState<ApiEnum[]|null>(null);
+  const [loadedEnums, setLoadedEnums] = useState(0);
+  const enumValues = [opticalTypes];
+
+  useEffect(()=>{
+    if (editMode) {
+      let completed = 0;
+      enumValues.forEach((enumValues) => {
+        if (enumValues) {
+          completed = completed + 1;
+        }
+      });
+      setLoadedEnums(completed);
+      if (!loading) {
+        if (!opticalTypes) {
+          setLoading(true);
+          axios.get('/api/formats/optical/optical_types')
+              .then((res)=> {
+                setOpticalTypes((res.data as ApiEnum[]));
+              }).catch(console.error);
+        }
+      } else {
+        if (
+          opticalTypes
+        ) {
+          setLoading(false);
+        }
+      }
+    }
+  }, [
+    editMode,
+    opticalTypes,
+  ]);
+  if (loading) {
+    const percentEnumsLoaded =
+        Math.round((loadedEnums / enumValues.length) * 100);
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
+        </td>
+      </tr>
+    );
+  }
   return (
     <Fragment>
       <FormatDetail key="titleOfItem" label="Title Of Item">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={titleOfItem}/>
+        {
+          createTextField(
+              'title_of_item',
+              data['title_of_item'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="dateOfItem" label="Date Of Item">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={dateOfItem}/>
+        {
+          createDateField(
+              'date_of_item',
+              data['date_of_item'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="duration" label="Duration">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={duration}/>
+        {
+          createTextField(
+              'duration',
+              data['duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="label" label="Label">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={label}/>
+        {
+          createTextField(
+              'label',
+              data['label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="type" label="Type">
-        <Form.Control size={'sm'} readOnly={readOnlyMode}
-          defaultValue={type ? type.name : ''}/>
+        {
+          createEnumField(
+              'type',
+              data['type'].value as EnumMetadata,
+              opticalTypes,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
@@ -945,7 +1011,7 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
         }
         if (!cassetteTypes) {
           setLoading(true);
-          axios.get('/api/formats/video_cassette/cassette_type')
+          axios.get('/api/formats/video_cassette/cassette_types')
               .then((res)=> {
                 setCassetteTypes((res.data as ApiEnum[]));
               }).catch(console.error);

@@ -132,8 +132,9 @@ describe('FormatDetails', ()=> {
     '/api/formats/film/soundtrack': [],
     '/api/formats/audio_cassette/generation': [],
     '/api/formats/audio_cassette/subtype': [],
+    '/api/formats/optical/optical_types': [],
     '/api/formats/video_cassette/generations': [],
-    '/api/formats/video_cassette/cassette_type': [],
+    '/api/formats/video_cassette/cassette_types': [],
     '/api/formats/grooved_disc/disc_diameter': [
       {
         'id': 1,
@@ -179,6 +180,23 @@ describe('FormatDetails', ()=> {
             name: 'video cassette',
           },
           format_id: 9,
+        },
+        'foo',
+      ],
+      [
+        {
+          format_details: {
+            title_of_item: 'foo',
+            date_of_item: null,
+            duration: null,
+            label: null,
+            type: null,
+          },
+          format: {
+            id: 8,
+            name: 'optical',
+          },
+          format_id: 8,
         },
         'foo',
       ],
@@ -300,35 +318,6 @@ describe('FormatDetails', ()=> {
           screen.getByDisplayValue(expectedValue),
       ).not.toHaveAttribute('readonly');
     });
-  });
-});
-describe('video cassette', ()=>{
-  test('video cassette', async ()=>{
-    const mockResponseVideoCassette = {
-      format_details: {
-        date_of_cassette: '',
-        title_of_cassette: 'foo',
-        duration: '',
-        label: '',
-        generation: null,
-        cassette_type: null,
-      },
-      format: {
-        id: 9,
-        name: 'video cassette',
-      },
-      format_id: 9,
-    };
-    await waitFor(()=>{
-      return render(
-          <FormatDetails apiData={mockResponseVideoCassette} apiUrl='/foo'/>,
-      );
-    });
-    await waitFor(()=>{
-      return screen.getByText('Edit').click();
-    });
-
-    expect(screen.getByDisplayValue('foo')).toBeInTheDocument();
   });
 });
 
