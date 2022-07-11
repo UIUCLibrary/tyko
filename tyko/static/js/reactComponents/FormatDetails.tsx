@@ -9,7 +9,7 @@ import React, {
   ReactElement,
   useReducer, useRef,
 } from 'react';
-import axios, {AxiosError} from 'axios';
+import axios from 'axios';
 import {IItemMetadata} from './ItemApp';
 import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
 import {Button, ButtonGroup} from 'react-bootstrap';
@@ -23,19 +23,6 @@ interface Element {
   value: string | number | boolean | EnumMetadata
 }
 
-interface FormatApiData {
-  format: EnumMetadata
-  elements: Element[]
-}
-
-interface ApiData {
-  item: {
-    format: EnumMetadata,
-    format_details: {
-      [key: string]: string
-    }
-  }
-}
 const createEnumField = (
     name: string,
     current: EnumMetadata,
@@ -129,8 +116,8 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
   useEffect(()=>{
     if (editMode) {
       let completed = 0;
-      enumValues.forEach((enumValues) => {
-        if (enumValues) {
+      enumValues.forEach((enumValue) => {
+        if (enumValue) {
           completed = completed + 1;
         }
       });
