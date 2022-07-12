@@ -99,3 +99,79 @@ def test_update_cassette(data_changed, expected_values):
     assert all(
         getattr(item, key) == value for key, value in expected_values.items()
     ), f"expected {expected_values} to be in {item.__dict__}"
+
+
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'date_of_reel': '10/21/1990'},
+            {
+                'date_of_reel': datetime(1990, 10, 21, 0, 0),
+            }
+        ),
+        (
+            {'title_of_reel': 'spam'},
+            {'title_of_reel': 'spam'}
+        ),
+        (
+            {'reel_brand': 'bacon'},
+            {'reel_brand': 'bacon'}
+        ),
+        (
+            {'base_id': 1},
+            {'base_id': 1},
+        ),
+        (
+            {'format_subtype_id': 1},
+            {'subtype_id': 1},
+        ),
+        (
+            {'generation_id': 1},
+            {'generation_id': 1},
+        ),
+        (
+            {'duration': '00:01:02'},
+            {'duration': '00:01:02'}
+        ),
+        (
+            {'reel_diameter_id': 1},
+            {'reel_diameter_id': 1},
+        ),
+        (
+            {'reel_speed_id': 1},
+            {'reel_speed_id': 1},
+        ),
+        (
+            {'reel_thickness_id': 1},
+            {'reel_thickness_id': 1},
+        ),
+        (
+            {'reel_width_id': 1},
+            {'reel_width_id': 1},
+        ),
+        (
+            {'track_configuration_id': 1},
+            {'track_configuration_id': 1},
+        ),
+        (
+            {'track_count': 2},
+            {'track_count': 2},
+        ),
+        (
+            {'wind_id': 1},
+            {'wind_id': 1},
+        ),
+        (
+            {'reel_type': 'plastic'},
+            {'reel_type': 'plastic'},
+        ),
+    ]
+)
+def test_update_open_reel(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.OpenReel)
+    tyko.data_provider.data_provider.update_open_reel(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+
