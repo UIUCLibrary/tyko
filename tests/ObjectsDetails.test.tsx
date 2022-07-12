@@ -16,7 +16,7 @@ import {Route, Routes, MemoryRouter} from 'react-router-dom';
 import ObjectDetails from '../tyko/static/js/pages/ObjectDetails';
 jest.mock('vanillajs-datepicker', ()=>{});
 
-describe('Details exists', () => {
+describe('ObjectDetails', () => {
   beforeEach(()=>{
     axios.get = jest.fn((url: string): Promise<any> => {
       if (url === '/api/project/1/object/1') {
