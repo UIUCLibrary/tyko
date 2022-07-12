@@ -99,9 +99,7 @@ def _create_sample_collection(session: sqlalchemy.orm.Session) -> schema.Collect
     return new_collection
 
 
-def _get_enum_tables(
-        session: sqlalchemy.orm.Session
-) -> Iterable[formats.EnumTable]:
+def _populate_enum_tables(session: sqlalchemy.orm.Session) -> None:
     enum_table_classes: List[Type[formats.EnumTable]] = [
         formats.OpenReelSubType,
         formats.OpenReelReelWidth,
@@ -310,7 +308,7 @@ def validate_enumerate_table_data(
 
 
 def validate_tables(engine: sqlalchemy.engine.Engine) -> bool:
-    """Validate all requireed tables exist."""
+    """Validate all required tables exist."""
     tables_to_discard = [
         "alembic_version"
     ]
