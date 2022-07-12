@@ -5,14 +5,17 @@ import axios from 'axios';
 import React from 'react';
 import '@testing-library/jest-dom';
 
-
 import {
+  fireEvent,
+  getByDisplayValue,
   render,
+  screen,
+  waitFor,
   waitForElementToBeRemoved,
-  cleanup, waitFor,
 } from '@testing-library/react';
 import FormatDetails from '../tyko/static/js/reactComponents/FormatDetails';
 
+jest.mock('vanillajs-datepicker', ()=>{});
 const mockResponseAudioCassette = {
   files: [],
   format: {
@@ -41,63 +44,312 @@ const mockResponseAudioCassette = {
   parent_object_id: 1,
   transfer_date: null,
 };
+// beforeEach(() => {
+//   axios.get = jest.fn(() => {
+//     Promise.resolve({data: {data: mockResponseAudioCassette}});
+//   });
+// });
 
-beforeEach(() => {
-  axios.get = jest.fn(() => {
-    Promise.resolve({data: {data: mockResponseAudioCassette}});
+// afterEach(cleanup);
+describe('FormatDetails', ()=> {
+  const mockEnums = {
+    '/api/formats/grooved_disc/disc_base': [
+      {
+        'id': 1,
+        'name': 'Glass',
+      },
+      {
+        'id': 2,
+        'name': 'Cardboard',
+      },
+      {
+        'id': 3,
+        'name': 'Aluminum',
+      },
+      {
+        'id': 4,
+        'name': 'Unknown',
+      },
+    ],
+    '/api/formats/grooved_disc/playback_speed': [
+      {
+        'id': 1,
+        'name': '33 1/3',
+      },
+      {
+        'id': 2,
+        'name': '45',
+      },
+      {
+        'id': 3,
+        'name': '78',
+      },
+    ],
+    '/api/formats/grooved_disc/disc_material': [
+      {
+        'id': 1,
+        'name': 'Shellac/78',
+      },
+      {
+        'id': 2,
+        'name': 'Lacquer',
+      },
+      {
+        'id': 3,
+        'name': 'Vinyl',
+      },
+      {
+        'id': 4,
+        'name': 'Edison Diamond',
+      },
+    ],
+    '/api/formats/grooved_disc/playback_direction': [
+      {
+        'id': 1,
+        'name': 'In to Out',
+      },
+      {
+        'id': 2,
+        'name': 'Out to In',
+      },
+    ],
+    '/api/formats/open_reel/base': [],
+    '/api/formats/open_reel/reel_diameter': [],
+    '/api/formats/open_reel/sub_types': [],
+    '/api/formats/open_reel/reel_speed': [],
+    '/api/formats/open_reel/generation': [],
+    '/api/formats/open_reel/reel_thickness': [],
+    '/api/formats/open_reel/reel_width': [],
+    '/api/formats/open_reel/track_configuration': [],
+    '/api/formats/open_reel/wind': [],
+    '/api/formats/film/film_base': [],
+    '/api/formats/film/film_speed': [],
+    '/api/formats/film/image_type': [],
+    '/api/formats/film/color': [],
+    '/api/formats/film/wind': [],
+    '/api/formats/film/film_emulsion': [],
+    '/api/formats/film/film_gauge': [],
+    '/api/formats/film/soundtrack': [],
+    '/api/formats/audio_cassette/generation': [],
+    '/api/formats/audio_cassette/subtype': [],
+    '/api/formats/optical/optical_types': [],
+    '/api/formats/video_cassette/generations': [],
+    '/api/formats/video_cassette/cassette_types': [],
+    '/api/formats/grooved_disc/disc_diameter': [
+      {
+        'id': 1,
+        'name': '7',
+      },
+      {
+        'id': 2,
+        'name': '8',
+      },
+      {
+        'id': 3,
+        'name': '10',
+      },
+      {
+        'id': 4,
+        'name': '12',
+      },
+      {
+        'id': 5,
+        'name': '16',
+      },
+    ],
+  };
+  beforeEach(() => {
+    axios.get = jest.fn((url) => {
+      return Promise.resolve({data: mockEnums[url]});
+    });
+  });
+  describe('items', () => {
+    const cases = [
+      [
+        {
+          format_details: {
+            date_of_cassette: null,
+            duration: null,
+            title_of_cassette: 'foo',
+            generation: null,
+            cassette_type: null,
+            label: null,
+          },
+          format: {
+            id: 9,
+            name: 'video cassette',
+          },
+          format_id: 9,
+        },
+        'foo',
+      ],
+      [
+        {
+          format_details: {
+            title_of_item: 'foo',
+            date_of_item: null,
+            duration: null,
+            label: null,
+            type: null,
+          },
+          format: {
+            id: 8,
+            name: 'optical',
+          },
+          format_id: 8,
+        },
+        'foo',
+      ],
+      [
+        {
+          format_details: {
+            cassette_title: 'foo',
+            cassette_type: null,
+            date_of_cassette: null,
+            generation: null,
+            side_a_duration: null,
+            side_a_label: null,
+            side_b_duration: null,
+            side_b_label: null,
+          },
+          format: {
+            id: 7,
+            name: 'audio cassette',
+          },
+          format_id: 7,
+        },
+        'foo',
+      ],
+      [
+        {
+          format_details: {
+            ad_strip_test: null,
+            ad_test_date: null,
+            ad_test_level: null,
+            can_label: 'foo',
+            date_of_film: null,
+            duration: null,
+            film_title: null,
+            leader_label: null,
+            edge_code_date: null,
+            film_length: null,
+            film_shrinkage: null,
+            film_gauge: null,
+            film_base: null,
+            film_emulsion: null,
+            film_image_type: null,
+            film_speed: null,
+            soundtrack: null,
+            wind: null,
+            color: null,
+          },
+          format: {
+            id: 6,
+            name: 'film',
+          },
+          format_id: 6,
+        },
+        'foo',
+      ],
+      [
+        {
+          format_details: {
+            title_of_reel: 'foo',
+            track_count: 1,
+            base: null,
+            date_of_reel: '2/20/1986',
+            duration: '00:01:24',
+            format_subtype: null,
+            generation: null,
+            reel_brand: null,
+            reel_diameter: null,
+            reel_speed: null,
+            reel_thickness: null,
+            reel_type: null,
+            reel_width: null,
+            track_configuration: null,
+            wind: null,
+          },
+          format: {
+            id: 4,
+            name: 'open reel',
+          },
+          format_id: 4,
+        },
+        'foo',
+      ],
+      [
+        {
+          format_details: {
+            title_of_album: '',
+            title_of_disc: 'foo',
+            disc_base: null,
+            date_of_disc: null,
+            disc_diameter: null,
+            playback_direction: null,
+            disc_material: null,
+            playback_speed: null,
+            side_a_label: null,
+            side_a_duration: null,
+            side_b_label: null,
+            side_b_duration: null,
+          },
+          format: {
+            id: 5,
+            name: 'grooved disc',
+          },
+          format_id: 5,
+        },
+        'foo',
+      ],
+    ];
+    test.each(cases)('edit %p', async (metadata, expectedValue) => {
+      render(
+          <FormatDetails apiData={metadata} apiUrl='/foo'/>,
+      );
+      expect(
+          screen.getByDisplayValue(expectedValue),
+      ).toHaveAttribute('readonly');
+      await waitFor(() => {
+        fireEvent.click(screen.getByText('Edit'));
+        return waitForElementToBeRemoved(() => screen.getByRole('progressbar'));
+      });
+      expect(
+          screen.getByDisplayValue(expectedValue),
+      ).not.toHaveAttribute('readonly');
+    });
   });
 });
 
-afterEach(cleanup);
-
 describe('FormatDetails', ()=>{
-  it('displays text "loading" while fetching data', async ()=>{
-    const {getByText} = await waitFor(()=>{
-      return render(<FormatDetails apiUrl='/foo'/>);
-    });
-    const element = await waitFor(()=>getByText('Loading...'));
-    expect(element).toBeTruthy();
-  });
-
-  it('Removes text "Loading" after data has been fetched', async ()=>{
-    axios.get.mockResolvedValueOnce({data: {item: mockResponseAudioCassette}});
-    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
-    await waitForElementToBeRemoved(()=>getByText('Loading...'));
-  });
-
-  it('data is loaded into the document', async ()=> {
-    axios.get.mockResolvedValueOnce({data: {item: mockResponseAudioCassette}});
-    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
-    await waitForElementToBeRemoved(() => getByText('Loading...'));
-    expect(getByText('my cassette title')).toBeInTheDocument();
-  });
-  it('test unsupported format', async ()=>{
-    axios.get.mockResolvedValueOnce(
-        {
-          data: {
-            item: {
-              files: [],
-              format: {
-                id: -1,
-                name: 'some new format',
-              },
-              format_details: {
-                foo: 'Foo',
-              },
-              format_id: -1,
-              inspection_date: null,
-              item_id: 1,
-              name: 'some new format item',
-              notes: [],
-              obj_sequence: null,
-              parent_object_id: 1,
-              transfer_date: null,
-            },
-          },
-        },
+  it('data is loaded into the document', ()=> {
+    const {getByDisplayValue} = render(
+        <FormatDetails apiData={mockResponseAudioCassette} apiUrl='/foo'/>,
     );
-    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
-    await waitForElementToBeRemoved(() => getByText('Loading...'));
+    expect(getByDisplayValue('my cassette title')).toBeInTheDocument();
+  });
+  it('test unsupported format', ()=>{
+    const mockData = {
+      files: [],
+      format: {
+        id: -1,
+        name: 'some new format',
+      },
+      format_details: {
+        foo: 'Foo',
+      },
+      format_id: -1,
+      inspection_date: null,
+      item_id: 1,
+      name: 'some new format item',
+      notes: [],
+      obj_sequence: null,
+      parent_object_id: 1,
+      transfer_date: null,
+    };
+    const {getByText} =
+      render(<FormatDetails apiData={mockData} apiUrl='/foo'/>);
+
     expect(getByText('Foo')).toBeInTheDocument();
   });
   it.each([
@@ -292,6 +544,10 @@ describe('FormatDetails', ()=>{
           },
           reel_brand: 'some brand',
           reel_speed: {
+            'id': 1,
+            'name': 'baz',
+          },
+          reel_diameter: {
             'id': 1,
             'name': 'baz',
           },
@@ -641,7 +897,7 @@ describe('FormatDetails', ()=>{
           date_of_disc: '5/16/2022',
           disc_base: null,
           disc_diameter: null,
-          disc_direction: null,
+          playback_direction: null,
           disc_material: null,
           playback_speed: null,
           side_a_duration: '00:12:21',
@@ -674,7 +930,7 @@ describe('FormatDetails', ()=>{
           date_of_disc: null,
           disc_base: null,
           disc_diameter: null,
-          disc_direction: null,
+          playback_direction: null,
           disc_material: null,
           playback_speed: null,
           side_a_duration: null,
@@ -713,7 +969,7 @@ describe('FormatDetails', ()=>{
             'id': 1,
             'name': 'bar',
           },
-          disc_direction: {
+          playback_direction: {
             'id': 1,
             'name': 'baz',
           },
@@ -825,11 +1081,7 @@ describe('FormatDetails', ()=>{
       'Title of item',
     ],
   ])('Test format %p', async (name, data, expectedString)=>{
-    axios.get.mockResolvedValueOnce(
-        {data: {item: data}},
-    );
-    const {getByText} = render(<FormatDetails apiUrl='/foo'/>);
-    await waitForElementToBeRemoved(() => getByText('Loading...'));
+    const {getByText} = render(<FormatDetails apiData={data} apiUrl='/foo'/>);
     await (()=>{
       expect(getByText(expectedString)).toBeInTheDocument();
     });

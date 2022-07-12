@@ -91,6 +91,7 @@ def test_project_update(app):
         assert updated_project["status"] == "Complete"
 
 
+@pytest.mark.filterwarnings("ignore:Unknown format type items. Not updating")
 def test_item_update(app):
 
     with app.test_client() as server:

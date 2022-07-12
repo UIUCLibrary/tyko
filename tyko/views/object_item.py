@@ -22,7 +22,7 @@ class ObjectItemNotesAPI(views.MethodView):
 
 
 class ObjectItemAPI(views.MethodView):
-    def __init__(self, provider) -> None:
+    def __init__(self, provider: data_provider.DataProvider) -> None:
 
         self._provider = provider
 
@@ -40,11 +40,14 @@ class ObjectItemAPI(views.MethodView):
                 404)
         request_data = request.get_json()
         try:
+            data = request_data.copy()
+            data.pop('transfer_date', None)
+            data.pop('inspection_date', None)
             new_item_data = {
-                "name": request_data["name"],
-                "format_id": request_data["format_id"],
-                "files": request_data.get("files", [])
-
+                "name": data.pop("name"),
+                "format_id": data.pop("format_id"),
+                "files": data.pop("files", []),
+                "format_details": data
             }
         except KeyError as error:
             traceback.print_exc(file=sys.stderr)
@@ -55,18 +58,16 @@ class ObjectItemAPI(views.MethodView):
         connectors = {
             "audio cassette": data_provider.formats.AudioCassetteDataConnector,
             'cassette tape': data_provider.formats.AudioCassetteDataConnector,
-
+            "film": data_provider.formats.FilmDataConnector,
+            'grooved disc': data_provider.formats.GroovedDiscDataConnector,
+            'open reel': data_provider.formats.OpenReelDataConnector,
+            'optical': data_provider.formats.OpticalDataConnector,
+            "video cassette": data_provider.formats.VideoCassetteDataConnector
         }
         connector_class = connectors.get(format_type['name'])
         if connector_class is not None:
             connector = connector_class(self._provider.db_session_maker)
-            new_data = {
-                "name": request_data['name'],
-                "format_id": int(request_data['format_id']),
-                "format_details": request_data.get('format_details', {}),
-                'inspectionDate': request_data.get('inspection_date')
-            }
-            new_item = connector.create(**new_data, object_id=object_id)
+            new_item = connector.create(**request_data, object_id=object_id)
         else:
             data_connector = \
                 data_provider.ObjectDataConnector(
@@ -164,7 +165,7 @@ class ObjectItemAPI(views.MethodView):
                                id=file_entry['id']
                                ),
                 "frontend": url_for(
-                    "page_file_details",
+                    "site.page_file_details",
                     item_id=item_id,
                     object_id=object_id,
                     project_id=project_id,
@@ -201,6 +202,7 @@ class ItemAPI(views.MethodView):
         if "obj_sequence" in json_request:
             obj_sequence = json_request.get("obj_sequence")
             new_item["obj_sequence"] = int(obj_sequence)
+        new_item['format_details'] = json_request.get('format_details', {})
         return new_item
 
     def put(self, item_id):

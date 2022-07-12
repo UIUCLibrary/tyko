@@ -27,10 +27,10 @@ import Items, {
 } from '../tyko/static/js/reactComponents/Items';
 import React from 'react';
 
-jest.mock('vanillajs-datepicker', ()=>{});
+jest.mock('vanillajs-datepicker', ()=> {});
 
 describe('Items', ()=>{
-  const onRemoval = (url: string) =>{
+  const onRemoval = (url: string) => {
 
   };
   test('include name', ()=>{
@@ -294,7 +294,7 @@ describe('ObjectItemsApp', ()=>{
           newItemSubmitUrl='/submitme'
         />);
     await waitFor(async ()=> {
-      return await waitForElementToBeRemoved(()=>getByText('loading...'));
+      return await waitForElementToBeRemoved(()=>getByText('Loading...'));
     });
     await waitFor(()=> getByText('Format'));
     await waitFor(()=>{
@@ -324,7 +324,7 @@ describe('ObjectItemsApp', ()=>{
     });
 
     await waitFor(()=> {
-      return waitForElementToBeRemoved(()=>getByText('Loading ...'));
+      return waitForElementToBeRemoved(()=>getByText('Loading...'));
     });
 
     await waitFor(()=> getByText('Format'));
@@ -802,7 +802,7 @@ describe('Optical only data', ()=>{
 describe('video cassette only data', ()=>{
   beforeEach(()=>{
     axios.get = jest.fn((url: string): Promise<any> => {
-      if (url === '/api/formats/video_cassette/cassette_type') {
+      if (url === '/api/formats/video_cassette/cassette_types') {
         return Promise.resolve(
             {
               data: [

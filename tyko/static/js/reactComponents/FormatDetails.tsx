@@ -1,64 +1,61 @@
-import {useState, useEffect, FC, Fragment, ReactElement} from 'react';
-import axios, {AxiosError} from 'axios';
+import Form from 'react-bootstrap/Form';
+import Table from 'react-bootstrap/Table';
+import {LoadingPercent} from './Common';
+import React, {
+  useState,
+  useEffect,
+  FC,
+  Fragment,
+  ReactElement,
+  useReducer, useRef,
+} from 'react';
+import axios, {AxiosResponse} from 'axios';
+import {IItemMetadata} from './ItemApp';
+import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
+import {Button, ButtonGroup} from 'react-bootstrap';
 interface EnumMetadata {
-    id: number
-    name: string
+  id: number
+  name: string
 }
+
 interface Element {
   key: string,
   value: string | number | boolean | EnumMetadata
 }
 
-interface FormatApiData{
-    format: EnumMetadata
-    elements: Element[]
-}
-interface ApiData{
-    item:{
-        format: EnumMetadata,
-        format_details: {
-            [key: string]: string
-        }
-    }
-}
-/**
- * Get api data for format.
- * @param {url} url of api
- * @return {unknown[]}
- */
-const useFormatDetailsApi = (url: string) => {
-  const [data, setData] = useState<FormatApiData | null>(null);
-  const [error, setError] = useState<Error|AxiosError| null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  useEffect(()=>{
-    setLoading(true);
-    const fetchData = async () => {
-      const dataValue: ApiData = (await axios.get(url)).data as ApiData;
-      const elements: Element[] = [];
-      const formatDetails = dataValue.item['format_details'];
-      Object.keys(formatDetails).forEach((objectKey) => {
-        elements.push({
-          key: objectKey,
-          value: formatDetails[objectKey],
-        });
-      });
-      setData({
-        format: dataValue.item.format,
-        elements: elements,
-      });
-      setLoading(false);
-    };
-
-    fetchData()
-        .then(()=>setLoading(false))
-        .catch((e: AxiosError | Error)=> {
-          setError(e);
-        });
-  }, [url]);
-
-  return [data, error, loading];
+const createEnumField = (
+    name: string,
+    current: EnumMetadata,
+    all: ApiEnum[] | null,
+    editMode: boolean,
+)=>{
+  if (editMode) {
+    return (
+      <Form.Select
+        name={name}
+        defaultValue={current ? current.id : ''}
+      >
+        <option key={-1} value=''/>
+        {all ? createEnumOptions(all) :(<></>)}
+      </Form.Select>
+    );
+  }
+  return (
+    <Form.Control
+      size={'sm'}
+      readOnly={!editMode}
+      plaintext={!editMode}
+      defaultValue={current ? current.name : ''}
+    />
+  );
 };
+
+const createEnumOptions = (enumList: EnumMetadata[])=>{
+  return enumList.map((item) => {
+    return (<option key={item.id} value={item.id}>{item.name}</option>);
+  });
+};
+
 
 /**
  * Format a row of a key value pair
@@ -66,349 +63,1120 @@ const useFormatDetailsApi = (url: string) => {
  * @constructor
  */
 const FormatDetail:
-  FC<{
-    label: string,
-    children?: string | JSX.Element | JSX.Element[]
-}> = ({label, children}) =>{
-  return (
-    <tr>
-      <th scope="row">{label}</th>
-      <td>
-        <div className="container-sm">
-          {children}
-        </div>
-      </td>
-    </tr>
+    FC<{
+      label: string,
+      children?: string | JSX.Element | JSX.Element[]
+    }> = ({label, children}) => {
+      return (
+        <tr>
+          <th style={{width: '25%'}} scope="row">{label}</th>
+          <td>
+            <div className="container-sm">
+              {children}
+            </div>
+          </td>
+        </tr>
+      );
+    };
+
+const OpenReel: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['bases', '/api/formats/open_reel/base'],
+        ['reel_diameters', '/api/formats/open_reel/reel_diameter'],
+        ['sub_types', '/api/formats/open_reel/sub_types'],
+        ['generations', '/api/formats/open_reel/generation'],
+        ['reel_thicknesses', '/api/formats/open_reel/reel_thickness'],
+        ['reel_speeds', '/api/formats/open_reel/reel_speed'],
+        ['reel_widths', '/api/formats/open_reel/reel_width'],
+        ['track_configurations', '/api/formats/open_reel/track_configuration'],
+        ['winds', '/api/formats/open_reel/wind'],
+      ]: null,
   );
-};
+  const [tapeBases, setTapeBases] = useState<ApiEnum[]|null>(null);
+  const [
+    formatSubtypes,
+    setFormatSubtypes,
+  ] = useState<ApiEnum[]|null>(null);
+  const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
+  const [reelDiameters, setReelDiameters] = useState<ApiEnum[]|null>(null);
+  const [reelSpeeds, setReelSpeeds] = useState<ApiEnum[]|null>(null);
+  const [reelThicknesses, setReelThicknesses] = useState<ApiEnum[]|null>(null);
+  const [reelWidths, setReelWidths] = useState<ApiEnum[]|null>(null);
+  const [
+    trackConfigurations,
+    setTrackConfigurations,
+  ] = useState<ApiEnum[]|null>(null);
+  const [winds, setWinds] = useState<ApiEnum[]|null>(null);
 
-const OpenReel: FC<{data: {[key: string]: Element }}> = ({data}) => {
-  const base = data['base'].value as EnumMetadata;
-  const dateOfReel = data['date_of_reel'].value as string;
-  const duration = data['duration'].value as string;
-  const title = data['title_of_reel'].value as string;
-  const formatSubtype = data['format_subtype'].value as EnumMetadata;
-  const generation = data['generation'].value as EnumMetadata;
-  const reelBrand = data['reel_brand'].value as string;
-  const reelDiameter = data['reel_size'].value as number;
-  const reelSpeed = data['reel_speed'].value as EnumMetadata;
-  const reelThickness = data['reel_thickness'].value as EnumMetadata;
-  const reelType = data['reel_type'].value as string;
-  const reelWidth = data['reel_width'].value as EnumMetadata;
-  const trackConfiguration = data['track_configuration'].value as EnumMetadata;
+  useEffect(()=>{
+    if (editMode) {
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setTapeBases(enums['bases']);
+          setReelDiameters(enums['reel_diameters']);
+          setFormatSubtypes(enums['sub_types']);
+          setReelSpeeds(enums['reel_speeds']);
+          setGenerations(enums['generations']);
+          setReelWidths(enums['reel_widths']);
+          setReelThicknesses(enums['reel_thicknesses']);
+          setTrackConfigurations(enums['track_configurations']);
+          setWinds(enums['winds']);
+        }
+      }
+    }
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
+  if (loading) {
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
+        </td>
+      </tr>
+    );
+  }
   const trackCount = data['track_count'].value as number;
-  const wind = data['wind'].value as EnumMetadata;
-
   return (
     <Fragment>
       <FormatDetail key='title' label="Title of Reel">
-        {title}
+        {
+          createTextField(
+              'title_of_reel',
+              data['title_of_reel'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='base' label="Base">
-        {base ? base.name : ''}
+        {
+          createEnumField(
+              'base_id',
+              data['base'].value as EnumMetadata,
+              tapeBases,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='dateOfReel' label="Date Of Reel">
-        {dateOfReel}
+        {
+          createDateField(
+              'date_of_reel',
+              data['date_of_reel'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
-      <FormatDetail key='duration' label="Duration">{duration}</FormatDetail>
+      <FormatDetail key='duration' label="Duration">
+        {
+          createTextField(
+              'duration',
+              data['duration'].value as string,
+              editMode,
+          )
+        }
+      </FormatDetail>
       <FormatDetail key='formatSubtype' label="Type">
-        {formatSubtype ? formatSubtype.name: ''}
+        {
+          createEnumField(
+              'format_subtype_id',
+              data['format_subtype'].value as EnumMetadata,
+              formatSubtypes,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        {generation ? generation.name: ''}
+        {
+          createEnumField(
+              'generation_id',
+              data['generation'].value as EnumMetadata,
+              generations,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelBrand' label="Brand of Reel">
-        {reelBrand}
+        {
+          createTextField('reel_brand',
+              data['reel_brand'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelDiameter' label="Diameter of Reel">
-        {reelDiameter ? reelDiameter.toString() : ''}
+        {
+          createEnumField(
+              'reel_diameter_id',
+              data['reel_diameter'].value as EnumMetadata,
+              reelDiameters,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelSpeed' label="Speed of Reel">
-        {reelSpeed ? reelSpeed.name: ''}
+        {
+          createEnumField(
+              'reel_speed_id',
+              data['reel_speed'].value as EnumMetadata,
+              reelSpeeds,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelThickness' label="Thickness of Reel">
-        {reelThickness ? reelThickness.name: ''}
+        {
+          createEnumField(
+              'reel_thickness_id',
+              data['reel_thickness'].value as EnumMetadata,
+              reelThicknesses,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelType' label="Type of Reel">
-        {reelType}
+        {
+          createTextField(
+              'reel_type',
+              data['reel_type'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='reelWidth' label="Width of Reel">
-        {reelWidth ? reelWidth.name: ''}
+        {
+          createEnumField(
+              'reel_width_id',
+              data['reel_width'].value as EnumMetadata,
+              reelWidths,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='trackConfiguration' label="Track Configuration">
-        {trackConfiguration ? trackConfiguration.name: ''}
+        {
+          createEnumField(
+              'track_configuration_id',
+              data['track_configuration'].value as EnumMetadata,
+              trackConfigurations,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='trackCount' label="Track Count">
-        {trackCount ? trackCount.toString(): ''}
+        {createNumberField(
+            'track_count',
+            trackCount ? trackCount: null,
+            editMode,
+            0,
+        )}
       </FormatDetail>
       <FormatDetail key='wind' label="Wind">
-        {wind ? wind.name: ''}
+        {
+          createEnumField(
+              'wind_id',
+              data['wind'].value as EnumMetadata,
+              winds,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
 };
 
-const GroovedDisc: FC<{data: {[key: string]: Element }}> = ({data}) => {
-  const discBase = data['disc_base'].value as EnumMetadata;
-  const dateOfDisc = data['date_of_disc'].value as string;
-  const discDiameter = data['disc_diameter'].value as EnumMetadata;
-  const discDirection = data['disc_direction'].value as EnumMetadata;
-  const discMaterial = data['disc_material'].value as EnumMetadata;
-  const playbackSpeed = data['playback_speed'].value as EnumMetadata;
-  const titleOfAlbum = data['title_of_album'].value as string;
-  const titleOfDisc = data['title_of_disc'].value as string;
-  const sideADuration = data['side_a_duration'].value as string;
-  const sideALabel = data['side_a_label'].value as string;
-  const sideBDuration = data['side_b_duration'].value as string;
-  const sideBLabel = data['side_b_label'].value as string;
+const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['disc_base', '/api/formats/grooved_disc/disc_base'],
+        ['disc_diameter', '/api/formats/grooved_disc/disc_diameter'],
+        ['playback_direction', '/api/formats/grooved_disc/playback_direction'],
+        ['disc_material', '/api/formats/grooved_disc/disc_material'],
+        ['playback_speed', '/api/formats/grooved_disc/playback_speed'],
+      ]: null,
+  );
 
+  const [discBases, setDiscBases] = useState<ApiEnum[]|null>(null);
+  const [discDiameters, setDiscDiameter] = useState<ApiEnum[]|null>(null);
+  const [
+    playbackDirections,
+    setPlaybackDirections,
+  ] = useState<ApiEnum[]|null>(null);
+  const [discMaterials, setDiscMaterials] = useState<ApiEnum[]|null>(null);
+  const [playbackSpeeds, setPlaybackSpeeds] = useState<ApiEnum[]|null>(null);
+  useEffect(()=>{
+    if (editMode) {
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setDiscBases(enums['disc_base']);
+          setDiscDiameter(enums['disc_diameter']);
+          setPlaybackDirections(enums['playback_direction']);
+          setDiscMaterials(enums['disc_material']);
+          setPlaybackSpeeds(enums['playback_speed']);
+        }
+      }
+    }
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
+  if (loading) {
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
+        </td>
+      </tr>
+    );
+  }
   return (
     <Fragment>
       <FormatDetail key='titleOfAlbum' label="Title of Album">
-        {titleOfAlbum}
+        {
+          createTextField(
+              'title_of_album',
+              data['title_of_album'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='titleOfDisc' label="Title of Disc">
-        {titleOfDisc}
+        {
+          createTextField(
+              'title_of_disc',
+              data['title_of_disc'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='discBase' label="Base">
-        {discBase ? discBase.name : ''}
+        {
+          createEnumField(
+              'disc_base_id',
+              data['disc_base'].value as EnumMetadata,
+              discBases,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='dateOfDisc' label="Date Of Disc">
-        {dateOfDisc}
+        {
+          createDateField(
+              'date_of_disc',
+              data['date_of_disc'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='discDiameter' label="Disc Diameter">
-        {discDiameter ? discDiameter.name : ''}
+        {
+          createEnumField(
+              'disc_diameter_id',
+              data['disc_diameter'].value as EnumMetadata,
+              discDiameters,
+              editMode,
+          )
+        }
       </FormatDetail>
-      <FormatDetail key='discDirection' label="Disc Direction">
-        {discDirection ? discDirection.name : ''}
+      <FormatDetail key='discDirection' label="Playback Direction">
+        {
+          createEnumField(
+              'playback_direction_id',
+              data['playback_direction'].value as EnumMetadata,
+              playbackDirections,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='discMaterial' label="Disc Material">
-        {discMaterial ? discMaterial.name : ''}
+        {
+          createEnumField(
+              'disc_material_id',
+              data['disc_material'].value as EnumMetadata,
+              discMaterials,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='playbackSpeed' label="Playback Speed">
-        {playbackSpeed ? playbackSpeed.name : ''}
+        {
+          createEnumField(
+              'playback_speed_id',
+              data['playback_speed'].value as EnumMetadata,
+              playbackSpeeds,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideALabel' label="Side A Label">
-        {sideALabel}
+        {
+          createTextField(
+              'side_a_label',
+              data['side_a_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideADuration' label="Side A Duration">
-        {sideADuration}
+        {
+          createTextField(
+              'side_a_duration',
+              data['side_a_duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideBLabel' label="Side B Label">
-        {sideBLabel}
+        {
+          createTextField(
+              'side_b_label',
+              data['side_b_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideBDuration' label="Side B Duration">
-        {sideBDuration}
+        {
+          createTextField(
+              'side_b_duration',
+              data['side_b_duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
 };
 
-const Film: FC<{data: {[key: string]: Element }}> = ({data}) => {
-  const adStripTest = data['ad_strip_test'].value;
-  const adTestDate = data['ad_test_date'].value as string;
-  const adTestLevel = data['ad_test_level'].value as string;
-  const canLabel = data['can_label'].value as string;
-  const dateOfFilm = data['date_of_film'].value as string;
-  const duration = data['duration'].value as string;
-  const filmTitle = data['film_title'].value as string;
-  const leaderLabel = data['leader_label'].value as string;
-  const edgeCodeDate = data['edge_code_date'].value as number;
-  const filmLength = data['film_length'].value as number;
-  const filmShrinkage = data['film_shrinkage'].value as number;
-  const color = data['color'].value as EnumMetadata;
-  const filmGauge = data['film_gauge'].value as EnumMetadata;
-  const filmBase = data['film_base'].value as EnumMetadata;
-  const filmEmulsion = data['film_emulsion'].value as EnumMetadata;
-  const filmImageType = data['film_image_type'].value as EnumMetadata;
-  const filmSpeed = data['film_speed'].value as EnumMetadata;
-  const soundtrack = data['soundtrack'].value as EnumMetadata;
-  const wind = data['wind'].value as EnumMetadata;
+const createNullField = (name: string) =>{
+  return <Form.Control name={name} value='' readOnly={true} plaintext={true}/>;
+};
 
-  let adStripTestDisplay: string;
-  switch (adStripTest) {
-    case false:
-      adStripTestDisplay = 'No';
-      break;
-    case true:
-      adStripTestDisplay = 'Yes';
-      break;
-    default:
-      adStripTestDisplay = '';
+const createNumberField = (
+    name: string,
+    current: number | null,
+    editMode: boolean,
+    minimum: number | null = null,
+    maximum: number | null = null,
+)=>{
+  return (
+    <Form.Control
+      name={name}
+      type='number'
+      min={minimum === null ? undefined: minimum}
+      max={maximum === null ? undefined: maximum}
+      readOnly={!editMode}
+      plaintext={!editMode}
+      defaultValue={current ? current: undefined}/>
+  );
+};
+const createTextField = (name: string, current: string, editMode: boolean)=>{
+  return (
+    <Form.Control
+      name={name}
+      readOnly={!editMode}
+      plaintext={!editMode}
+      defaultValue={current}/>
+  );
+};
+
+const createDateField = (
+    name: string,
+    current: string | null,
+    dateFormat: string,
+    editMode: boolean,
+)=>{
+  if (editMode) {
+    return (
+      <Form.Group>
+        <SelectDate
+          name={name}
+          dateFormat={dateFormat}
+          defaultValue={current ? current: ''}
+        />
+      </Form.Group>
+    );
   }
+  return (
+    <Form.Control
+      name={name}
+      readOnly={!editMode}
+      plaintext={!editMode}
+      defaultValue={current ? current: ''}/>
+  );
+};
+const Film: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['film_speeds', '/api/formats/film/film_speed'],
+        ['film_bases', '/api/formats/film/film_base'],
+        ['image_types', '/api/formats/film/image_type'],
+        ['soundtracks', '/api/formats/film/soundtrack'],
+        ['colors', '/api/formats/film/color'],
+        ['winds', '/api/formats/film/wind'],
+        ['film_emulsions', '/api/formats/film/film_emulsion'],
+        ['film_gauges', '/api/formats/film/film_gauge'],
+      ]: null,
+  );
+  const adStripTest = data['ad_strip_test'].value;
 
+  const [
+    adStripPerformed,
+    setAdStripPerformed,
+  ] = useReducer((state) => !state, adStripTest as boolean);
+
+  const [speeds, setSpeeds] = useState<ApiEnum[]|null>(null);
+  const [bases, setBases] = useState<ApiEnum[]|null>(null);
+  const [imageTypes, setImageTypes] = useState<ApiEnum[]|null>(null);
+  const [soundtracks, setSoundtracks] = useState<ApiEnum[]|null>(null);
+  const [filmGauges, setFilmGauges] = useState<ApiEnum[]|null>(null);
+  const [colors, setColors] = useState<ApiEnum[]|null>(null);
+  const [winds, setWinds] = useState<ApiEnum[]|null>(null);
+  const [emulsions, setEmulsions] = useState<ApiEnum[]|null>(null);
+
+  const adTestLevel = data['ad_test_level'].value as string;
+  const selectedAdStrip = useRef<HTMLInputElement>(null);
+
+  useEffect(()=>{
+    if (editMode) {
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setSpeeds(enums['film_speeds']);
+          setBases(enums['film_bases']);
+          setImageTypes(enums['image_types']);
+          setSoundtracks(enums['soundtracks']);
+          setColors(enums['colors']);
+          setWinds(enums['winds']);
+
+          const filmEmulsions = enums['film_emulsions'];
+          filmEmulsions.sort(sortNameAlpha);
+          setEmulsions(filmEmulsions);
+
+          setFilmGauges(enums['film_gauges']);
+        }
+      }
+    }
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
+  if (loading) {
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
+        </td>
+      </tr>
+    );
+  }
+  const adTestLevelValue = adTestLevel ? parseInt(adTestLevel): null;
   return (
     <Fragment>
       <FormatDetail key='dateOfFilm' label="Date Of Film">
-        {dateOfFilm}
+        {
+          createDateField(
+              'date_of_film',
+              data['date_of_film'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='adStripTest' label="AD Strip Test Performed">
-        {adStripTestDisplay}
+        <Form.Check
+          checked={adStripPerformed}
+          type="checkbox"
+          ref={selectedAdStrip}
+          onChange={setAdStripPerformed}
+          disabled={!editMode}
+        />
       </FormatDetail>
       <FormatDetail key='adTestDate' label="AD Test Date">
-        {adTestDate}
+        <fieldset disabled={!adStripPerformed}>
+          { adStripPerformed ?
+              createDateField(
+                  'ad_test_date',
+                  data['ad_test_date'].value as string,
+                  'm/dd/yyyy',
+                  editMode,
+              ): createNullField('adTestDate')
+          }
+        </fieldset>
       </FormatDetail>
       <FormatDetail key='adTestLevel' label="AD Test Level">
-        {adTestLevel}
+        <fieldset disabled={!adStripPerformed}>
+          { adStripPerformed ?
+              createNumberField(
+                  'ad_test_level',
+                  adTestLevelValue,
+                  editMode,
+                  0,
+              ): createNullField('adTestLevel')
+          }
+        </fieldset>
       </FormatDetail>
       <FormatDetail key='canLabel' label="Can Label">
-        {canLabel}
+        {
+          createTextField(
+              'can_label',
+              data['can_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='duration' label="Duration">
-        {duration}
+        {
+          createTextField(
+              'duration',
+              data['duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmTitle' label="Film Title">
-        {filmTitle}
+        {
+          createTextField(
+              'film_title',
+              data['film_title'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='leaderLabel' label="Leader Label">
-        {leaderLabel}
+        {
+          createTextField(
+              'leader_label',
+              data['leader_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='edgeCodeDate' label="Edge Code Date">
-        {edgeCodeDate ? edgeCodeDate.toString() : ''}
+        {
+          createNumberField(
+              'edge_code_date',
+              data['edge_code_date'].value as number,
+              editMode,
+              0,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmLength' label='Film Length'>
-        {filmLength ? filmLength.toString() : ''}
+        {
+          createNumberField(
+              'film_length',
+            data['film_length'].value as number,
+            editMode,
+            0,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmShrinkage' label='Film Shrinkage'>
-        {filmShrinkage ? filmShrinkage.toString() : ''}
+        {
+          createNumberField(
+              'film_shrinkage',
+            data['film_shrinkage'].value as number,
+            editMode,
+            0,
+            100,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='color' label='Color'>
-        {color ? color.name: ''}
+        {
+          createEnumField(
+              'film_color_id',
+              data['color'].value as EnumMetadata,
+              colors,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmBase' label='Film Base'>
-        {filmBase ? filmBase.name: ''}
+        {
+          createEnumField(
+              'film_base_id',
+              data['film_base'].value as EnumMetadata,
+              bases,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmEmulsion' label='Film Emulsion'>
-        {filmEmulsion ? filmEmulsion.name: ''}
+        {
+          createEnumField(
+              'film_emulsion_id',
+              data['film_emulsion'].value as EnumMetadata,
+              emulsions,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmImageType' label='Film Image Type'>
-        {filmImageType ? filmImageType.name: ''}
+        {
+          createEnumField(
+              'image_type_id',
+              data['film_image_type'].value as EnumMetadata,
+              imageTypes,
+              editMode,
+          )
+
+        }
       </FormatDetail>
       <FormatDetail key='filmSpeed' label='Film Speed'>
-        {filmSpeed ? filmSpeed.name: ''}
+        {
+          createEnumField(
+              'film_speed_id',
+              data['film_speed'].value as EnumMetadata,
+              speeds,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='filmGauge' label='Film Gauge'>
-        {filmGauge ? filmGauge.name: ''}
+        {
+          createEnumField(
+              'film_gauge_id',
+              data['film_gauge'].value as EnumMetadata,
+              filmGauges,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='soundtrack' label='Soundtrack'>
-        {soundtrack ? soundtrack.name: ''}
+        {
+          createEnumField(
+              'soundtrack_id',
+              data['soundtrack'].value as EnumMetadata,
+              soundtracks,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='wind' label='Wind'>
-        {wind ? wind.name : ''}
+        {
+          createEnumField(
+              'wind_id',
+              data['wind'].value as EnumMetadata,
+              winds,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
 };
+const checkCompletedEnumsLoaded = (
+    mappings: Array<[string, string]>| null,
+    values: {[key: string]:ApiEnum[]},
+) =>{
+  if (!mappings || !values) {
+    return 0;
+  }
+  let completed = 0;
+  mappings.forEach((enumSet) => {
+    const enumValue = enumSet[0];
+    if (values[enumValue]) {
+      completed = completed + 1;
+    }
+  });
+  return completed;
+};
 
-const Optical: FC<{data: {[key: string]: Element }}> = ({data}) => {
-  const titleOfItem = data['title_of_item'].value as string;
-  const dateOfItem = data['date_of_item'].value as string;
-  const duration = data['duration'].value as string;
-  const label = data['label'].value as string;
-  const type = data['type'].value as EnumMetadata;
+const appendExistingEnums = (
+    dataKey: string,
+    newEnums: ApiEnum[],
+    existingData: {[key: string]:ApiEnum[]},
+)=>{
+  const replacementData: { [key: string]: ApiEnum[] } = {};
+  replacementData[dataKey] = newEnums;
+  return {...existingData, ...replacementData};
+};
+
+const createNewEnumData = (dataKey: string, newEnums: ApiEnum[])=>{
+  const newData: { [key: string]: ApiEnum[] } = {};
+  newData[dataKey] = newEnums;
+  return newData;
+};
+
+const updateEnums = (
+    key: string,
+    data: ApiEnum[],
+    prevState: {[key: string]:ApiEnum[]} | null,
+) => {
+  return (prevState === null)?
+      createNewEnumData(key, data):
+      appendExistingEnums(key, data, prevState);
+};
+const useEnums = (mapping: Array<[string, string]>| null):
+    [number, { [key: string]: ApiEnum[]} | null, boolean] => {
+  const [loading, setLoading] = useState(false);
+  const [loadedEnums, setLoadedEnums] = useState(0);
+  const [enums, setEnums] = useState<{[key: string]:ApiEnum[]}| null>(null);
+  const handleUpdatingEnums = (res: AxiosResponse, key: string) =>{
+    const data = res.data as ApiEnum[];
+    setEnums((prevState)=>updateEnums(key, data, prevState));
+  };
+  const update = () =>{
+    if (!loading && mapping) {
+      mapping?.forEach(([key, url]) => {
+        setLoading(true);
+        axios.get(url)
+            .then((res)=>handleUpdatingEnums(res, key))
+            .catch(console.error);
+      });
+    }
+  };
+  useEffect(()=>{
+    update();
+  }, [mapping, loading, enums]);
+  useEffect(()=>{
+    if (enums) {
+      setLoadedEnums(checkCompletedEnumsLoaded(mapping, enums));
+    }
+  }, [enums, mapping]);
+  const percentDone = mapping ? (loadedEnums/mapping.length): 0;
+  return [percentDone, enums, loading];
+};
+
+const Optical: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
+  const [opticalTypes, setOpticalTypes] = useState<ApiEnum[]|null>(null);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['optical_types', '/api/formats/optical/optical_types'],
+      ]: null,
+  );
+  useEffect(()=>{
+    if (editMode) {
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setOpticalTypes(enums['optical_types']);
+        }
+      }
+    }
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
+  if (loading) {
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
+        </td>
+      </tr>
+    );
+  }
   return (
     <Fragment>
       <FormatDetail key="titleOfItem" label="Title Of Item">
-        {titleOfItem}
+        {
+          createTextField(
+              'title_of_item',
+              data['title_of_item'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
-      <FormatDetail key="dateOfItem" label="Date Of Item" >
-        {dateOfItem}
+      <FormatDetail key="dateOfItem" label="Date Of Item">
+        {
+          createDateField(
+              'date_of_item',
+              data['date_of_item'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="duration" label="Duration">
-        {duration}
+        {
+          createTextField(
+              'duration',
+              data['duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="label" label="Label">
-        {label}
+        {
+          createTextField(
+              'label',
+              data['label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="type" label="Type">
-        {type ? type.name : ''}
+        {
+          createEnumField(
+              'type_id',
+              data['type'].value as EnumMetadata,
+              opticalTypes,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
 };
 
-const VideoCassette: FC<{
-    data: {[key: string]: Element }
-}> = ({data}) => {
-  const dateOfCassette = data['date_of_cassette'].value as string;
-  const duration = data['duration'].value as string;
-  const label = data['label'].value as string;
-  const titleOfCassette = data['title_of_cassette'].value as string;
-  const generation = data['generation'].value as EnumMetadata;
-  const cassetteType = data['cassette_type'].value as EnumMetadata;
+const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['generations', '/api/formats/video_cassette/generations'],
+        ['subtypes', '/api/formats/video_cassette/cassette_types'],
+      ]: null,
+  );
+  const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
+  const [cassetteTypes, setCassetteTypes] = useState<ApiEnum[]|null>(null);
+
+  useEffect(()=>{
+    if (editMode) {
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setGenerations(enums['generations']);
+          setCassetteTypes(enums['subtypes']);
+        }
+      }
+    }
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
+  if (loading) {
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
+        </td>
+      </tr>
+    );
+  }
   return (
     <Fragment>
       <FormatDetail key="dateOfCassette" label="Date Of Cassette">
-        {dateOfCassette}
+        {
+          createDateField(
+              'date_of_cassette',
+              data['date_of_cassette'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="duration" label="Duration">
-        {duration}
+        {
+          createTextField(
+              'duration',
+            data['duration'].value as string,
+            editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="label" label="Label">
-        {label}
+        {
+          createTextField(
+              'label',
+              data['label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="titleOfCassette" label="Title Of Cassette">
-        {titleOfCassette}
+        {
+          createTextField(
+              'title_of_cassette',
+              data['title_of_cassette'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key="generation" label="Generation">
-        {generation ? generation.name : ''}
+        {
+          createEnumField(
+              'generation_id',
+              data['generation'].value as EnumMetadata,
+              generations,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='cassetteType' label="Type">
-        {cassetteType ? cassetteType.name : ''}
+        {
+          createEnumField(
+              'cassette_type_id',
+              data['cassette_type'].value as EnumMetadata,
+              cassetteTypes,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
 };
-const AudioCassette: FC<{
-    data: {[key: string]: Element }
-}> = ({data}) => {
-  const title = data['cassette_title'].value as string;
-  const cassetteType = data['cassette_type'].value as EnumMetadata;
-  const dateOfCassette = data['date_of_cassette'].value as string;
-  const generation = data['generation'].value as EnumMetadata;
-  const sideADuration = data['side_a_duration'].value as string;
-  const sideALabel = data['side_a_label'].value as string;
-  const sideBDuration = data['side_b_duration'].value as string;
-  const sideBLabel = data['side_b_label'].value as string;
 
+const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
+  const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['generations', '/api/formats/audio_cassette/generation'],
+        ['subtypes', '/api/formats/audio_cassette/subtype'],
+      ]: null,
+  );
+  const [generations, setGenerations] = useState<ApiEnum[]|null>(null);
+  const [subtypes, setSubTypes] = useState<ApiEnum[]|null>(null);
+  useEffect(()=>{
+    if (editMode) {
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setGenerations(enums['generations']);
+          setSubTypes(enums['subtypes']);
+        }
+      }
+    }
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
+  if (loading) {
+    return (
+      <tr>
+        <td rowSpan={2} style={{textAlign: 'center'}}>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
+        </td>
+      </tr>
+    );
+  }
   return (
     <Fragment>
       <FormatDetail key='cassetteTitle' label="Cassette Title">
-        {title}
+        {
+          createTextField(
+              'cassette_title',
+              data['cassette_title'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='cassetteType' label="Type">
-        {cassetteType ? cassetteType.name : ''}
+        {
+          createEnumField(
+              'cassette_type_id',
+              data['cassette_type'].value as EnumMetadata,
+              subtypes,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='dateOfCassette' label="Date of Cassette">
-        {dateOfCassette}
+        {
+          createDateField(
+              'date_of_cassette',
+              data['date_of_cassette'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='generation' label="Generation">
-        {generation ? generation.name : ''}
+        {
+          createEnumField(
+              'generation_id',
+              data['generation'].value as EnumMetadata,
+              generations,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideALabel' label="Side A Label">
-        {sideALabel}
+        {
+          createTextField(
+              'side_a_label',
+              data['side_a_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideADuration' label="Side A Duration">
-        {sideADuration}
+        {
+          createTextField(
+              'side_a_duration',
+              data['side_a_duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideBLabel' label="Side B Label">
-        {sideBLabel}
+        {
+          createTextField(
+              'side_b_label',
+              data['side_b_label'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
       <FormatDetail key='sideBDuration' label="Side B Duration">
-        {sideBDuration}
+        {
+          createTextField(
+              'side_b_duration',
+              data['side_b_duration'].value as string,
+              editMode,
+          )
+        }
       </FormatDetail>
     </Fragment>
   );
 };
-
+interface IFormatType{
+  data: { [key: string]: Element }
+  editMode: boolean
+}
 /**
  * Gget the table body
  * @param {FormatType} formatType - Format type
+ * @param {boolean} editMode - editMode
  * @param {Element[]} data - data
  * @return {Fragment}
  */
-function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
-  const types: {[key: number]: FC<{data: {[key: string]: Element }}>} = {
+function getTableBody(
+    formatType: FormatType,
+    editMode: boolean,
+    data: Element[],
+): JSX.Element {
+  const types: { [key: number]: FC<IFormatType> } = {
     4: OpenReel,
     5: GroovedDisc,
     6: Film,
@@ -420,23 +1188,25 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
   if (formatType.id in types) {
     const Type = types[formatType.id];
 
-    const sortedData: {[key: string]: Element } = {};
+    const sortedData: { [key: string]: Element } = {};
     for (const element of data) {
       sortedData[element.key] = element;
     }
-    return (<Type data={sortedData}/>);
+    return (
+      <Type data={sortedData} editMode={editMode}/>
+    );
   }
 
   const values: JSX.Element[] = data.map(
       (
           item: {
-              value?: string | number| boolean| EnumMetadata,
-              key: string
+            value?: string | number | boolean | EnumMetadata,
+            key: string
           },
           index: number,
       ) => {
         const children: ReactElement = <p>
-          {item.value ? item.value.toString(): ''}
+          {item.value ? item.value.toString() : ''}
         </p>;
         return (
           <FormatDetail key={index.toString()} label={item.key}>
@@ -447,10 +1217,18 @@ function getTableBody(formatType: FormatType, data: Element[]): JSX.Element {
   return (<Fragment>{values}</Fragment>);
 }
 
-interface FormatType{
-    id: number
-    name: string
+interface FormatType {
+  id: number
+  name: string
 }
+
+interface IData {
+  apiData: IItemMetadata
+  apiUrl: string
+  onUpdated: ()=>void
+}
+
+// function edited
 
 /**
  * Display format details
@@ -458,32 +1236,45 @@ interface FormatType{
  * @return {JSX.Element}
  * @constructor
  */
-export default function FormatDetails({apiUrl}: { apiUrl: string }) {
-  const [data, error, loading] = useFormatDetailsApi(apiUrl) as [
-      data: FormatApiData,
-      error: undefined,
-      loading: boolean
-  ];
-
-  if (loading) {
-    return (<p>Loading...</p>);
-  }
-  if (error) {
-    return (<p>Failed</p>);
-  }
-  if (data === null) {
-    return null;
-  }
-
-  const values = getTableBody(data.format, data.elements);
+export default function FormatDetails({apiData, apiUrl, onUpdated}:IData ) {
+  const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
+  const elements: Element[] = [];
+  const formatDetails = apiData['format_details'];
+  Object.keys(formatDetails).forEach((objectKey) => {
+    elements.push({
+      key: objectKey,
+      value: formatDetails[objectKey],
+    });
+  });
+  const values = getTableBody(apiData.format, editMode, elements);
+  const handleUpdate = (event: React.SyntheticEvent)=> {
+    event.preventDefault();
+    const formData = new FormData(event.target as HTMLFormElement);
+    const formProps = Object.fromEntries(formData);
+    axios.put(apiUrl, {'format_details': formProps}).then(()=>{
+      if (onUpdated) {
+        onUpdated();
+      }
+    }).catch(console.error);
+  };
   return (
-    <div>
-      <table className="table table-sm" data-testid='dummy'>
-        <tbody>
-          {values}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <Form onSubmit={handleUpdate}>
+        <Table data-testid='dummy'>
+          <tbody>
+            {values}
+          </tbody>
+        </Table>
+        <ButtonGroup hidden={!editMode}>
+          <Button variant={'outline-danger'} onClick={setEditMode}>
+            Cancel
+          </Button>
+          <Button type='submit' variant={'outline-primary'}>
+            Confirm
+          </Button>
+        </ButtonGroup>
+        <Button hidden={editMode} onClick={setEditMode}>Edit</Button>
+      </Form>
+    </>
   );
 }
-

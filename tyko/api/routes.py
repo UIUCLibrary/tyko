@@ -26,7 +26,7 @@ FORMAT_ENUM_ROUTES = [
         "VideoCassetteGenerations"
     ),
     (
-        "/formats/video_cassette/cassette_type",
+        "/formats/video_cassette/cassette_types",
         'video_cassette_cassette_type',
         "VideoCassetteType"
     ),
@@ -446,7 +446,8 @@ def add_item():
 
 
 @api.route(
-    "project/<int:project_id>/object/<int:object_id>/item/<int:item_id>/notes",
+    "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>/"
+    "notes",
     methods=["POST"]
 )
 def project_object_item_add_note(project_id, object_id, item_id):

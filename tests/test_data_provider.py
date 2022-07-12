@@ -4,7 +4,7 @@ from sqlalchemy.orm.session import Session
 
 import tyko.data_provider.formats
 import pytest
-
+import tyko
 
 class TestOpticalDataConnector:
     @pytest.mark.parametrize(
@@ -54,3 +54,327 @@ class TestOpticalDataConnector:
                 Mock()
             ).create_new_format_item(Mock(spec=Session), data)
         assert getattr(new_item, output_key) == expected_value
+
+
+@pytest.mark.parametrize('data_changed, expected_values', [
+    (
+        {'date_of_cassette': '10/21/1990'},
+        {
+            'recording_date': datetime(1990, 10, 21, 0, 0),
+            'recording_date_precision': 3
+        }
+    ),
+    (
+        {'cassette_title': 'new title'},
+        {'title_of_cassette': 'new title'}
+    ),
+    (
+        {'generation_id': 1},
+        {'generation_id': 1}
+    ),
+    (
+        {'cassette_type_id': 1},
+        {'tape_subtype_id': 1}
+    ),
+    (
+        {'side_a_label': 'side a label'},
+        {'side_a_label': 'side a label'}
+    ),
+    (
+        {'side_a_duration': '00:01:02'},
+        {'side_a_duration': '00:01:02'}
+    ),
+    (
+        {'side_b_label': 'side b label'},
+        {'side_b_label': 'side b label'}
+    ),
+    (
+        {'side_b_duration': '00:01:02'},
+        {'side_b_duration': '00:01:02'}
+    ),
+])
+def test_update_cassette(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.AudioCassette)
+    tyko.data_provider.data_provider.update_cassette(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'date_of_reel': '10/21/1990'},
+            {
+                'date_of_reel': datetime(1990, 10, 21, 0, 0),
+            }
+        ),
+        (
+            {'title_of_reel': 'spam'},
+            {'title_of_reel': 'spam'}
+        ),
+        (
+            {'reel_brand': 'bacon'},
+            {'reel_brand': 'bacon'}
+        ),
+        (
+            {'base_id': 1},
+            {'base_id': 1},
+        ),
+        (
+            {'format_subtype_id': 1},
+            {'subtype_id': 1},
+        ),
+        (
+            {'generation_id': 1},
+            {'generation_id': 1},
+        ),
+        (
+            {'duration': '00:01:02'},
+            {'duration': '00:01:02'}
+        ),
+        (
+            {'reel_diameter_id': 1},
+            {'reel_diameter_id': 1},
+        ),
+        (
+            {'reel_speed_id': 1},
+            {'reel_speed_id': 1},
+        ),
+        (
+            {'reel_thickness_id': 1},
+            {'reel_thickness_id': 1},
+        ),
+        (
+            {'reel_width_id': 1},
+            {'reel_width_id': 1},
+        ),
+        (
+            {'track_configuration_id': 1},
+            {'track_configuration_id': 1},
+        ),
+        (
+            {'track_count': 2},
+            {'track_count': 2},
+        ),
+        (
+            {'wind_id': 1},
+            {'wind_id': 1},
+        ),
+        (
+            {'reel_type': 'plastic'},
+            {'reel_type': 'plastic'},
+        ),
+    ]
+)
+def test_update_open_reel(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.OpenReel)
+    tyko.data_provider.data_provider.update_open_reel(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'title_of_album': 'spam'},
+            {'title_of_album': 'spam'}
+        ),
+        (
+            {'title_of_disc': 'spam'},
+            {'title_of_disc': 'spam'}
+        ),
+        (
+            {'disc_base_id': 1},
+            {'disc_base_id': 1}
+        ),
+        (
+            {'disc_diameter_id': 1},
+            {'disc_diameter_id': 1}
+        ),
+        (
+            {'playback_direction_id': 1},
+            {'playback_direction_id': 1}
+        ),
+        (
+            {'disc_material_id': 1},
+            {'disc_material_id': 1}
+        ),
+        (
+            {'playback_speed_id': 1},
+            {'playback_speed_id': 1}
+        ),
+        (
+            {'side_a_label': 'side a label'},
+            {'side_a_label': 'side a label'}
+        ),
+        (
+            {'side_a_duration': '00:01:02'},
+            {'side_a_duration': '00:01:02'}
+        ),
+        (
+            {'side_b_label': 'side b label'},
+            {'side_b_label': 'side b label'}
+        ),
+        (
+            {'side_b_duration': '00:01:02'},
+            {'side_b_duration': '00:01:02'}
+        ),
+        (
+            {'date_of_disc': '10/21/1990'},
+            {
+                'date_of_disc': datetime(1990, 10, 21, 0, 0),
+            }
+        ),
+    ]
+)
+def test_update_groove_discs(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.GroovedDisc)
+    tyko.data_provider.data_provider.update_groove_discs(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'date_of_film': '10/21/1990'},
+            {'recording_date': datetime(1990, 10, 21, 0, 0)}
+        ),
+        (
+            {'can_label': 'spam'},
+            {'can_label': 'spam'}
+        ),
+        (
+            {'film_title': 'bacon'},
+            {'title_of_film': 'bacon'}
+        ),
+        (
+            {'leader_label': 'eggs'},
+            {'leader_label': 'eggs'}
+        ),
+        (
+            {'duration': '00:01:02'},
+            {'duration': '00:01:02'}
+        ),
+        (
+            {'edge_code_date': 1920},
+            {'edge_code_date': 1920}
+        ),
+        (
+            {'film_length': 500},
+            {'length': 500}
+        ),
+        (
+            {'film_shrinkage': 24},
+            {'film_shrinkage': 24}
+        ),
+        (
+            {'film_color_id': 1},
+            {'color_id': 1}
+        ),
+        (
+            {'film_base_id': 1},
+            {'film_base_id': 1}
+        ),
+        (
+            {'film_emulsion_id': 1},
+            {'emulsion_id': 1}
+        ),
+        (
+            {'image_type_id': 1},
+            {'image_type_id': 1}
+        ),
+        (
+            {'film_speed_id': 1},
+            {'film_speed_id': 1}
+        ),
+        (
+            {'film_gauge_id': 1},
+            {'film_gauge_id': 1}
+        ),
+        (
+            {'soundtrack_id': 1},
+            {'soundtrack_id': 1}
+        ),
+        (
+            {'wind_id': 1},
+            {'wind_id': 1}
+        ),
+    ])
+def test_update_film(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.Film)
+    tyko.data_provider.data_provider.update_film(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'date_of_item': '10/21/1990'},
+            {'date_of_item': datetime(1990, 10, 21, 0, 0)}
+        ),
+        (
+            {'title_of_item': 'spam'},
+            {'title_of_item': 'spam'}
+        ),
+        (
+            {'label': 'spam'},
+            {'label': 'spam'}
+        ),
+        (
+            {'duration': '00:01:02'},
+            {'duration': '00:01:02'}
+        ),
+        (
+            {'type_id': 1},
+            {'optical_type_id': 1}
+        ),
+    ])
+def test_update_optical(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.Optical)
+    tyko.data_provider.data_provider.update_optical(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'date_of_cassette': '10/21/1990'},
+            {'date_of_cassette': datetime(1990, 10, 21, 0, 0)}
+        ),
+        (
+            {'label': 'my label'},
+            {'label': 'my label'},
+        ),
+        (
+            {'duration': '00:01:02'},
+            {'duration': '00:01:02'}
+        ),
+        (
+            {'title_of_cassette': 'my title'},
+            {'title_of_cassette': 'my title'}
+        ),
+        (
+            {'generation_id': 1},
+            {'generation_id': 1}
+        ),
+        (
+            {'cassette_type_id': 1},
+            {'cassette_type_id': 1}
+        )
+])
+def test_update_video_cassette(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.VideoCassette)
+    tyko.data_provider.data_provider.update_video_cassette(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+

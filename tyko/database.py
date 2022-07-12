@@ -1,5 +1,8 @@
+"""Manage the database."""
+
 import sys
 import itertools
+import typing
 from typing import (
     Tuple,
     Any,
@@ -23,12 +26,16 @@ from tyko import schema
 from .schema import formats
 from .schema import notes
 from .schema import projects
+if typing.TypedDict:
+    from tyko.schema.avtables import AVTables
+    from tyko.schema.formats import AVFormat
 
 db = SQLAlchemy()
 TykoEnumData = TypedDict('TykoEnumData', {'name': str, 'id': int})
 
 
 def alembic_table_exists(engine) -> bool:
+    """Check for alembic table."""
     import packaging.version  # pylint: disable=import-outside-toplevel
     if packaging.version.parse(sqlalchemy.__version__) < \
             packaging.version.parse("1.4"):
@@ -36,18 +43,67 @@ def alembic_table_exists(engine) -> bool:
     return sqlalchemy.inspect(engine).has_table("alembic_version")
 
 
-def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
-    if not session.query(schema.Collection).filter_by(
+def _create_sample_object(session, collection, project):
+    object_title = "sample object"
+    if sample_object := session.query(
+            schema.CollectionObject
+    ).filter_by(name=object_title).first():
+        return sample_object
+    print("adding sample object")
+    new_collection_object = schema.CollectionObject(
+        name=object_title,
+        project=project,
+        collection=collection
+    )
+    session.add(new_collection_object)
+    return new_collection_object
+
+
+def _create_sample_item(session, parent_object: schema.CollectionObject):
+    item_title = "sample cassette"
+    if sample_cassette := session.query(
+            schema.Film
+    ).filter_by(name=item_title).first():
+        return sample_cassette
+    print("adding sample cassettee item")
+    new_cassette = schema.AudioCassette()
+    new_cassette.name = "sss"
+    parent_object.items.append(new_cassette)
+    session.add(new_cassette)
+    session.commit()
+    return new_cassette
+
+
+def _create_sample_project(session):
+    project_title = "sample project"
+    if sample_project := session.query(
+            schema.Project
+    ).filter_by(title=project_title).first():
+        return sample_project
+    print("adding sample project")
+    new_project = schema.Project(title=project_title)
+    session.add(new_project)
+    return new_project
+
+
+def _create_sample_collection(
+        session: sqlalchemy.orm.Session
+) -> schema.Collection:
+    sample_collection = session.query(schema.Collection).filter_by(
             collection_name='sample collection'
-    ).first():
-        print("Adding sample collection ")
-        new_collection = schema.Collection()
-        new_collection.collection_name = \
-            cast(
-                sqlalchemy.Column[sqlalchemy.Text],
-                "sample collection"
-            )
-        session.add(new_collection)
+    ).first()
+    if sample_collection:
+        return sample_collection
+
+    print("Adding sample collection ")
+    new_collection = schema.Collection()
+    new_collection.collection_name = \
+        cast(
+            sqlalchemy.Column[sqlalchemy.Text],
+            "sample collection"
+        )
+    session.add(new_collection)
+    return new_collection
 
 
 def _get_enum_tables(
@@ -94,12 +150,22 @@ def _get_enum_tables(
 def create_samples(engine: sqlalchemy.engine.Engine) -> None:
     session_maker = sessionmaker(bind=engine)
     session: sqlalchemy.orm.Session = session_maker()
-    _create_sample_collection(session)
+    sample_collection = _create_sample_collection(session)
+    sample_project = _create_sample_project(session)
+    _create_sample_object(
+        session,
+        collection=sample_collection,
+        project=sample_project)
+    # _create_sample_item(
+    #     session,
+    #     parent_object=sample_object)
+
     session.commit()
     session.close()
 
 
 def init_database(engine: sqlalchemy.engine.Engine) -> None:
+    """Initialize database."""
     # if engine.dialect.has_table(engine, "audio_video"):
     #     return
     print("Creating all tables")
@@ -187,6 +253,11 @@ def _iter_format_types_table(
 
 
 def validate_enumerated_tables(engine: sqlalchemy.engine.Engine) -> bool:
+    """Validate tables used for enumerated values.
+
+    Returns:
+        Returns true if valid, false it not valid
+    """
     session = sessionmaker(bind=engine)()
     valid = True
 
@@ -212,17 +283,17 @@ def validate_enumerated_tables(engine: sqlalchemy.engine.Engine) -> bool:
 
 def validate_enumerate_table_data(
         engine: sqlalchemy.engine.Engine,
-        sql_table_type: Type[tyko.schema.avtables.AVTables],
+        sql_table_type: Type[AVTables],
         expected_table: Mapping[
             str,
             Union[
                 Tuple[int, Any],
-                Tuple[int, Type[tyko.schema.formats.AVFormat]],
+                Tuple[int, Type[AVFormat]],
                 Tuple[int]
             ]
         ]
 ) -> bool:
-
+    """Validate enumerated table data."""
     session = sessionmaker(bind=engine)()
     valid = True
 
@@ -246,6 +317,7 @@ def validate_enumerate_table_data(
 
 
 def validate_tables(engine: sqlalchemy.engine.Engine) -> bool:
+    """Validate all required tables exist."""
     tables_to_discard = [
         "alembic_version"
     ]
