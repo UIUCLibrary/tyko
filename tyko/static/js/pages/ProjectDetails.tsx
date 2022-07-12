@@ -328,22 +328,23 @@ export default function ProjectDetails() {
   const {projectId} = useParams<string>();
   const [apiData, setApiData] = useState<IProjectApi | null>(null);
   const [loading, setLoading] = useState(false);
-  const fetchData = async (url: string) => {
-    setApiData(((await axios.get(url)).data as IProjectApi));
-  };
+
 
   const apiUrl = projectId? `/api/project/${projectId}` : '';
   const submitNewObjectUrl =
       projectId ? `/api/project/${projectId}/object` : '';
 
   useEffect(()=>{
+    const fetchData = async (url: string) => {
+      setApiData(((await axios.get(url)).data as IProjectApi));
+    };
     if (!loading) {
       if (projectId && !apiData) {
         setLoading(true);
         fetchData(apiUrl).then(()=>setLoading(false)).catch(console.log);
       }
     }
-  }, [loading, apiData, projectId]);
+  }, [loading, apiData, projectId, apiUrl]);
   if (loading) {
     return <LoadingIndeterminate/>;
   }

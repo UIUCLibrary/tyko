@@ -25,7 +25,23 @@ describe('ProjectDetails', () => {
               data: {
                 project: {
                   title: 'dummy',
-                  objects: [],
+                  objects: [
+                    {
+                      barcode: null,
+                      collection_id: 1,
+                      contact: null,
+                      items: [],
+                      name: 'sample object',
+                      notes: [],
+                      object_id: 1,
+                      originals_rec_date: null,
+                      originals_return_date: null,
+                      routes: {
+                        api: '/api/project/1/object/1',
+                        frontend: '/project/1/object/1',
+                      },
+                    },
+                  ],
                 },
               },
             },
