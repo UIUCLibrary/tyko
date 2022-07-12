@@ -344,7 +344,9 @@ export default function ProjectDetails() {
       }
     }
   }, [loading, apiData, projectId]);
-
+  if (loading) {
+    return <LoadingIndeterminate/>;
+  }
   let detailsPanel;
   let objectsPanel;
   let notesPanel;
