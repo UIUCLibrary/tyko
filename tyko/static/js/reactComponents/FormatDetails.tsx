@@ -785,83 +785,73 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
     </Fragment>
   );
 };
+const checkCompletedEnumsLoaded = (
+    mappings: Array<[string, string]>| null,
+    values: {[key: string]:ApiEnum[]},
+) =>{
+  if (!mappings || !values) {
+    return 0;
+  }
+  let completed = 0;
+  mappings.forEach((enumSet) => {
+    const enumValue = enumSet[0];
+    if (values[enumValue]) {
+      completed = completed + 1;
+    }
+  });
+  return completed;
+};
+
+const appendExistingEnums = (
+    dataKey: string,
+    newEnums: ApiEnum[],
+    existingData: {[key: string]:ApiEnum[]},
+)=>{
+  const replacementData: { [key: string]: ApiEnum[] } = {};
+  replacementData[dataKey] = newEnums;
+  return {...existingData, ...replacementData};
+};
+
+const createNewEnumData = (dataKey: string, newEnums: ApiEnum[])=>{
+  const newData: { [key: string]: ApiEnum[] } = {};
+  newData[dataKey] = newEnums;
+  return newData;
+};
+
+const updateEnums = (
+    key: string,
+    data: ApiEnum[],
+    prevState: {[key: string]:ApiEnum[]} | null,
+) => {
+  return (prevState === null)?
+      createNewEnumData(key, data):
+      appendExistingEnums(key, data, prevState);
+};
 const useEnums = (mapping: Array<[string, string]>| null):
     [number, { [key: string]: ApiEnum[]} | null, boolean] => {
   const [loading, setLoading] = useState(false);
   const [loadedEnums, setLoadedEnums] = useState(0);
   const [enums, setEnums] = useState<{[key: string]:ApiEnum[]}| null>(null);
-
-  useEffect(()=>{
-    const handleUpdatingEnums = (res: AxiosResponse, key: string) =>{
-      const appendExisting = (
-          dataKey: string,
-          newEnums: ApiEnum[],
-          existingData: {[key: string]:ApiEnum[]},
-      )=>{
-        const replacementData: { [key: string]: ApiEnum[] } = {};
-        replacementData[dataKey] = newEnums;
-        return {...existingData, ...replacementData};
-      };
-      const createNewData = (dataKey: string, newEnums: ApiEnum[])=>{
-        const newData: { [key: string]: ApiEnum[] } = {};
-        newData[dataKey] = newEnums;
-        return newData;
-      };
-
-      const data = res.data as ApiEnum[];
-      setEnums((prevState) => {
-        return (prevState === null)?
-          createNewData(key, data):
-          appendExisting(key, data, prevState);
-      });
-    };
-    if (mapping && !loading) {
-      mapping.forEach(([key, url]) => {
+  const handleUpdatingEnums = (res: AxiosResponse, key: string) =>{
+    const data = res.data as ApiEnum[];
+    setEnums((prevState)=>updateEnums(key, data, prevState));
+  };
+  const update = () =>{
+    if (!loading && mapping) {
+      mapping?.forEach(([key, url]) => {
         setLoading(true);
         axios.get(url)
             .then((res)=>handleUpdatingEnums(res, key))
             .catch(console.error);
       });
     }
+  };
+  useEffect(()=>{
+    update();
   }, [mapping, loading, enums]);
-
   useEffect(()=>{
-    if (mapping) {
-      if (loading) {
-        let loadedEverything = true;
-        mapping.every(
-            ([enumValue, _url]) => {
-              if (enums !== null) {
-                if ( (enumValue in enums) ) {
-                  return true;
-                }
-                loadedEverything = false;
-                return false;
-              }
-            },
-        );
-      }
-    }
-  }, [enums]);
-  useEffect(()=>{
-    const checkCompleted = (values: {[key: string]:ApiEnum[]}) =>{
-      if (!mapping) {
-        return 0;
-      }
-      let completed = 0;
-      if (!values) {
-        return 0;
-      }
-      mapping.forEach((enumSet) => {
-        const enumValue = enumSet[0];
-        if (values[enumValue]) {
-          completed = completed + 1;
-        }
-      });
-      return completed;
-    };
     if (enums) {
-      setLoadedEnums(checkCompleted(enums));
+      setLoadedEnums(checkCompletedEnumsLoaded(mapping, enums));
     }
   }, [enums]);
   const percentDone = mapping ? (loadedEnums/mapping.length): 0;
