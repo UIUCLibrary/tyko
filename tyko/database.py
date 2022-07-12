@@ -1,3 +1,5 @@
+"""Manage the database."""
+
 import sys
 import itertools
 from typing import (
@@ -29,6 +31,7 @@ TykoEnumData = TypedDict('TykoEnumData', {'name': str, 'id': int})
 
 
 def alembic_table_exists(engine) -> bool:
+    """Check for alembic table."""
     import packaging.version  # pylint: disable=import-outside-toplevel
     if packaging.version.parse(sqlalchemy.__version__) < \
             packaging.version.parse("1.4"):
@@ -100,6 +103,7 @@ def create_samples(engine: sqlalchemy.engine.Engine) -> None:
 
 
 def init_database(engine: sqlalchemy.engine.Engine) -> None:
+    """Initialize database."""
     # if engine.dialect.has_table(engine, "audio_video"):
     #     return
     print("Creating all tables")
@@ -187,6 +191,11 @@ def _iter_format_types_table(
 
 
 def validate_enumerated_tables(engine: sqlalchemy.engine.Engine) -> bool:
+    """Validate tables used for enumerated values.
+
+    Returns:
+        Returns true if valid, false it not valid
+    """
     session = sessionmaker(bind=engine)()
     valid = True
 
@@ -222,7 +231,7 @@ def validate_enumerate_table_data(
             ]
         ]
 ) -> bool:
-
+    """Validate enumerated table data."""
     session = sessionmaker(bind=engine)()
     valid = True
 
@@ -246,6 +255,7 @@ def validate_enumerate_table_data(
 
 
 def validate_tables(engine: sqlalchemy.engine.Engine) -> bool:
+    """Validate all requireed tables exist."""
     tables_to_discard = [
         "alembic_version"
     ]
