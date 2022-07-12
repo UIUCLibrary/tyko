@@ -58,6 +58,7 @@ def _create_sample_object(session, collection, project):
     session.add(new_collection_object)
     return new_collection_object
 
+
 def _create_sample_item(session, parent_object: schema.CollectionObject):
     item_title = "sample cassette"
     if sample_cassette := session.query(
@@ -85,7 +86,9 @@ def _create_sample_project(session):
     return new_project
 
 
-def _create_sample_collection(session: sqlalchemy.orm.Session) -> schema.Collection:
+def _create_sample_collection(
+        session: sqlalchemy.orm.Session
+) -> schema.Collection:
     sample_collection = session.query(schema.Collection).filter_by(
             collection_name='sample collection'
     ).first()
@@ -101,6 +104,7 @@ def _create_sample_collection(session: sqlalchemy.orm.Session) -> schema.Collect
         )
     session.add(new_collection)
     return new_collection
+
 
 def _get_enum_tables(
         session: sqlalchemy.orm.Session
@@ -142,12 +146,13 @@ def _get_enum_tables(
             ).filter_by(name=new_type_name).first() is None:
                 yield enum_table_class(name=new_type_name)
 
+
 def create_samples(engine: sqlalchemy.engine.Engine) -> None:
     session_maker = sessionmaker(bind=engine)
     session: sqlalchemy.orm.Session = session_maker()
     sample_collection = _create_sample_collection(session)
     sample_project = _create_sample_project(session)
-    sample_object = _create_sample_object(
+    _create_sample_object(
         session,
         collection=sample_collection,
         project=sample_project)
@@ -232,6 +237,7 @@ def _iter_starting_project_status(
                 project_status_table
         ).filter_by(name=status).first() is None:
             yield project_status_table(name=status)
+
 
 def _iter_format_types_table(
         session: sqlalchemy.orm.Session
