@@ -15,7 +15,7 @@ import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import {ApiEnum, SelectDate, sortNameAlpha} from '../reactComponents/Items';
+import {SelectDate} from '../reactComponents/Items';
 
 const updateData = async (url: string, key: string, value: string) => {
   const data: {[key: string]: string} = {};
