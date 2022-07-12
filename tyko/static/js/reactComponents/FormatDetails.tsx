@@ -130,7 +130,7 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
         }
       }
     }
-  }, [enums, percentEnumsLoaded, editMode]);
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
   useEffect(()=>{
     setLoading(enumsLoading);
   }, [enumsLoading]);
@@ -790,22 +790,6 @@ const useEnums = (mapping: Array<[string, string]>| null):
   const [loadedEnums, setLoadedEnums] = useState(0);
   const [enums, setEnums] = useState<{[key: string]:ApiEnum[]}| null>(null);
 
-  const checkCompleted = (values: {[key: string]:ApiEnum[]}) =>{
-    if (!mapping) {
-      return 0;
-    }
-    let completed = 0;
-    if (!values) {
-      return 0;
-    }
-    mapping.forEach(([enumValue, _url]) => {
-      if (values[enumValue]) {
-        completed = completed + 1;
-      }
-    });
-    return completed;
-  };
-
   useEffect(()=>{
     if (mapping) {
       if (!enums) {
@@ -852,6 +836,22 @@ const useEnums = (mapping: Array<[string, string]>| null):
     }
   }, [enums]);
   useEffect(()=>{
+    const checkCompleted = (values: {[key: string]:ApiEnum[]}) =>{
+      if (!mapping) {
+        return 0;
+      }
+      let completed = 0;
+      if (!values) {
+        return 0;
+      }
+      mapping.forEach((enumSet) => {
+        const enumValue = enumSet[0];
+        if (values[enumValue]) {
+          completed = completed + 1;
+        }
+      });
+      return completed;
+    };
     if (enums) {
       setLoadedEnums(checkCompleted(enums));
     }
@@ -880,7 +880,7 @@ const Optical: FC<IFormatType> = ({data, editMode}) => {
         }
       }
     }
-  }, [enums, percentEnumsLoaded, editMode]);
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
   useEffect(()=>{
     setLoading(enumsLoading);
   }, [enumsLoading]);
@@ -970,7 +970,7 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
         }
       }
     }
-  }, [enums, percentEnumsLoaded, editMode]);
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
   useEffect(()=>{
     setLoading(enumsLoading);
   }, [enumsLoading]);
@@ -1069,7 +1069,7 @@ const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
         }
       }
     }
-  }, [enums, percentEnumsLoaded, editMode]);
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
   useEffect(()=>{
     setLoading(enumsLoading);
   }, [enumsLoading]);
