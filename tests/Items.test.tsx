@@ -802,7 +802,7 @@ describe('Optical only data', ()=>{
 describe('video cassette only data', ()=>{
   beforeEach(()=>{
     axios.get = jest.fn((url: string): Promise<any> => {
-      if (url === '/api/formats/video_cassette/cassette_type') {
+      if (url === '/api/formats/video_cassette/cassette_types') {
         return Promise.resolve(
             {
               data: [
