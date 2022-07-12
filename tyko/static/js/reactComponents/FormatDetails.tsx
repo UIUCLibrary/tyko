@@ -80,7 +80,20 @@ const FormatDetail:
     };
 
 const OpenReel: FC<IFormatType> = ({data, editMode}) => {
-  const [loadedEnums, setLoadedEnums] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
+      editMode ? [
+        ['bases', '/api/formats/open_reel/base'],
+        ['reel_diameters', '/api/formats/open_reel/reel_diameter'],
+        ['sub_types', '/api/formats/open_reel/sub_types'],
+        ['generations', '/api/formats/open_reel/generation'],
+        ['reel_thicknesses', '/api/formats/open_reel/reel_thickness'],
+        ['reel_speeds', '/api/formats/open_reel/reel_speed'],
+        ['reel_widths', '/api/formats/open_reel/reel_width'],
+        ['track_configurations', '/api/formats/open_reel/track_configuration'],
+        ['winds', '/api/formats/open_reel/wind'],
+      ]: null,
+  );
   const [tapeBases, setTapeBases] = useState<ApiEnum[]|null>(null);
   const [
     formatSubtypes,
@@ -97,136 +110,40 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
   ] = useState<ApiEnum[]|null>(null);
   const [winds, setWinds] = useState<ApiEnum[]|null>(null);
 
-  const trackCount = data['track_count'].value as number;
-
-  const [loading, setLoading] = useState(false);
-
-  const enumValues = [
-    tapeBases,
-    formatSubtypes,
-    generations,
-    reelSpeeds,
-    reelThicknesses,
-    reelWidths,
-    trackConfigurations,
-    reelDiameters,
-    winds,
-  ];
-
   useEffect(()=>{
     if (editMode) {
-      let completed = 0;
-      enumValues.forEach((enumValue) => {
-        if (enumValue) {
-          completed = completed + 1;
-        }
-      });
-      setLoadedEnums(completed);
-
-      if (!loading) {
-        if (!tapeBases) {
-          setLoading(true);
-          axios.get('/api/formats/open_reel/base')
-              .then((res)=> {
-                setTapeBases((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!reelDiameters) {
-          setLoading(true);
-          axios.get('/api/formats/open_reel/reel_diameter')
-              .then((res)=> {
-                setReelDiameters((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!formatSubtypes) {
-          setLoading(true);
-          axios.get('/api/formats/open_reel/sub_types')
-              .then((res)=> {
-                setFormatSubtypes((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!reelSpeeds) {
-          setLoading(true);
-          axios.get('/api/formats/open_reel/reel_speed')
-              .then((res)=> {
-                setReelSpeeds((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!generations) {
-          setLoading(true);
-          axios.get('/api/formats/open_reel/generation')
-              .then((res)=> {
-                setGenerations((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!reelThicknesses) {
-          setLoading(true);
-          axios.get('/api/formats/open_reel/reel_thickness')
-              .then((res)=> {
-                setReelThicknesses((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!reelWidths) {
-          setLoading(true);
-          axios.get('/api/formats/open_reel/reel_width')
-              .then((res)=> {
-                setReelWidths((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-        if (!trackConfigurations) {
-          setLoading(true);
-          axios.get('/api/formats/open_reel/track_configuration')
-              .then((res)=> {
-                setTrackConfigurations(
-                    (res.data as ApiEnum[]).sort(sortNameAlpha),
-                );
-              }).catch(console.error);
-        }
-        if (!winds) {
-          setLoading(true);
-          axios.get('/api/formats/open_reel/wind')
-              .then((res)=> {
-                setWinds((res.data as ApiEnum[]).sort(sortNameAlpha));
-              }).catch(console.error);
-        }
-      } else {
-        if (
-          tapeBases &&
-          formatSubtypes &&
-          generations &&
-          reelSpeeds &&
-          reelThicknesses &&
-          reelWidths &&
-          reelDiameters &&
-          winds &&
-          trackConfigurations
-        ) {
-          setLoading(false);
+      if (enumsLoading) {
+        setLoading(true);
+      }
+      if (percentEnumsLoaded === 1) {
+        setLoading(false);
+        if (enums) {
+          setTapeBases(enums['bases']);
+          setReelDiameters(enums['reel_diameters']);
+          setFormatSubtypes(enums['sub_types']);
+          setReelSpeeds(enums['reel_speeds']);
+          setGenerations(enums['generations']);
+          setReelWidths(enums['reel_widths']);
+          setReelThicknesses(enums['reel_thicknesses']);
+          setTrackConfigurations(enums['track_configurations']);
+          setWinds(enums['winds']);
         }
       }
     }
-  }, [
-    editMode,
-    tapeBases,
-    formatSubtypes,
-    generations,
-    reelSpeeds,
-    reelThicknesses,
-    reelWidths,
-    winds,
-    trackConfigurations,
-  ]);
+  }, [enums, percentEnumsLoaded, editMode]);
+  useEffect(()=>{
+    setLoading(enumsLoading);
+  }, [enumsLoading]);
   if (loading) {
-    const percentEnumsLoaded =
-        Math.round((loadedEnums / enumValues.length) * 100);
     return (
       <tr>
         <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded}/>
+          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
         </td>
       </tr>
     );
   }
+  const trackCount = data['track_count'].value as number;
   return (
     <Fragment>
       <FormatDetail key='title' label="Title of Reel">
@@ -388,7 +305,6 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
       ]: null,
   );
 
-  // const [loadedEnums, setLoadedEnums] = useState(0);
   const [discBases, setDiscBases] = useState<ApiEnum[]|null>(null);
   const [discDiameters, setDiscDiameter] = useState<ApiEnum[]|null>(null);
   const [
