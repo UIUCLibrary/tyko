@@ -86,6 +86,25 @@ def strip_empty_strings(data):
     return data
 
 
+def update_optical(
+        item: formats.Optical,
+        changed_data: Dict[str, Optional[Union[str, bool, int]]]):
+    if date_of_item := changed_data.pop('date_of_item', None):
+        item.date_of_item = utils.create_precision_datetime(date_of_item)
+
+    if title_of_item := changed_data.pop('title_of_item', None):
+        item.title_of_item = title_of_item
+
+    if duration := changed_data.pop('duration', None):
+        item.duration = duration
+
+    if label := changed_data.pop('label', None):
+        item.label = label
+
+    if type_id := changed_data.pop('type_id', None):
+        item.optical_type_id = int(type_id)
+
+
 def update_open_reel(
         item: formats.OpenReel,
         changed_data: Dict[str, Optional[Union[str, bool, int]]]):
@@ -325,7 +344,8 @@ def update_format_specific_details(
         "audio_cassettes": update_cassette,
         "films": update_film,
         "grooved_discs": update_groove_discs,
-        "open_reels": update_open_reel
+        "open_reels": update_open_reel,
+        "optical": update_optical
     }
     update_format = update_formats.get(format_type)
     if update_format is not None:

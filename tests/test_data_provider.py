@@ -304,10 +304,40 @@ def test_update_groove_discs(data_changed, expected_values):
             {'wind_id': 1}
         ),
     ])
-
 def test_update_film(data_changed, expected_values):
     item = Mock(spec=tyko.data_provider.formats.formats.Film)
     tyko.data_provider.data_provider.update_film(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'date_of_item': '10/21/1990'},
+            {'date_of_item': datetime(1990, 10, 21, 0, 0)}
+        ),
+        (
+            {'title_of_item': 'spam'},
+            {'title_of_item': 'spam'}
+        ),
+        (
+            {'label': 'spam'},
+            {'label': 'spam'}
+        ),
+        (
+            {'duration': '00:01:02'},
+            {'duration': '00:01:02'}
+        ),
+        (
+            {'type_id': 1},
+            {'optical_type_id': 1}
+        ),
+    ])
+def test_update_optical(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.Optical)
+    tyko.data_provider.data_provider.update_optical(item, data_changed)
     assert all(
         getattr(item, key) == value for key, value in expected_values.items()
     ), f"expected {expected_values} to be in {item.__dict__}"

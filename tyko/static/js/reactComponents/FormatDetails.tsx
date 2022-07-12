@@ -931,7 +931,7 @@ const Optical: FC<IFormatType> = ({data, editMode}) => {
       <FormatDetail key="type" label="Type">
         {
           createEnumField(
-              'type',
+              'type_id',
               data['type'].value as EnumMetadata,
               opticalTypes,
               editMode,
