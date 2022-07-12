@@ -39,18 +39,64 @@ def alembic_table_exists(engine) -> bool:
     return sqlalchemy.inspect(engine).has_table("alembic_version")
 
 
-def _create_sample_collection(session: sqlalchemy.orm.Session) -> None:
-    if not session.query(schema.Collection).filter_by(
+def _create_sample_object(session, collection, project):
+    object_title = "sample object"
+    if sample_object := session.query(
+            schema.CollectionObject
+    ).filter_by(name=object_title).first():
+        return sample_object
+    print("adding sample object")
+    new_collection_object = schema.CollectionObject(
+        name=object_title,
+        project=project,
+        collection=collection
+    )
+    session.add(new_collection_object)
+    return new_collection_object
+
+def _create_sample_item(session, parent_object: schema.CollectionObject):
+    item_title = "sample cassette"
+    if sample_cassette := session.query(
+            schema.Film
+    ).filter_by(name=item_title).first():
+        return sample_cassette
+    print("adding sample cassettee item")
+    new_cassette = schema.AudioCassette()
+    new_cassette.name = "sss"
+    parent_object.items.append(new_cassette)
+    session.add(new_cassette)
+    session.commit()
+    return new_cassette
+
+
+def _create_sample_project(session):
+    project_title = "sample project"
+    if sample_project := session.query(
+            schema.Project
+    ).filter_by(title=project_title).first():
+        return sample_project
+    print("adding sample project")
+    new_project = schema.Project(title=project_title)
+    session.add(new_project)
+    return new_project
+
+
+def _create_sample_collection(session: sqlalchemy.orm.Session) -> schema.Collection:
+    sample_collection = session.query(schema.Collection).filter_by(
             collection_name='sample collection'
-    ).first():
-        print("Adding sample collection ")
-        new_collection = schema.Collection()
-        new_collection.collection_name = \
-            cast(
-                sqlalchemy.Column[sqlalchemy.Text],
-                "sample collection"
-            )
-        session.add(new_collection)
+    ).first()
+    if sample_collection:
+        return sample_collection
+
+    print("Adding sample collection ")
+    new_collection = schema.Collection()
+    new_collection.collection_name = \
+        cast(
+            sqlalchemy.Column[sqlalchemy.Text],
+            "sample collection"
+        )
+    session.add(new_collection)
+    return new_collection
 
 
 def _get_enum_tables(
@@ -97,7 +143,16 @@ def _get_enum_tables(
 def create_samples(engine: sqlalchemy.engine.Engine) -> None:
     session_maker = sessionmaker(bind=engine)
     session: sqlalchemy.orm.Session = session_maker()
-    _create_sample_collection(session)
+    sample_collection = _create_sample_collection(session)
+    sample_project = _create_sample_project(session)
+    sample_object = _create_sample_object(
+        session,
+        collection=sample_collection,
+        project=sample_project)
+    # _create_sample_item(
+    #     session,
+    #     parent_object=sample_object)
+
     session.commit()
     session.close()
 
