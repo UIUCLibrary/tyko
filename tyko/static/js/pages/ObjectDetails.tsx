@@ -150,7 +150,7 @@ export default function ObjectDetails() {
         fetchData(apiUrl).then(()=>setLoading(false)).catch(console.log);
       }
     }
-  }, [loading, apiData, projectId]);
+  }, [loading, apiData, projectId, apiUrl]);
   if (loading) {
     return <LoadingIndeterminate/>;
   }
