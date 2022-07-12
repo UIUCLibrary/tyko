@@ -2,6 +2,7 @@
 
 import sys
 import itertools
+import typing
 from typing import (
     Tuple,
     Any,
@@ -25,6 +26,9 @@ from tyko import schema
 from .schema import formats
 from .schema import notes
 from .schema import projects
+if typing.TypedDict:
+    from tyko.schema.avtables import AVTables
+    from tyko.schema.formats import AVFormat
 
 db = SQLAlchemy()
 TykoEnumData = TypedDict('TykoEnumData', {'name': str, 'id': int})
@@ -313,12 +317,12 @@ def validate_enumerated_tables(engine: sqlalchemy.engine.Engine) -> bool:
 
 def validate_enumerate_table_data(
         engine: sqlalchemy.engine.Engine,
-        sql_table_type: Type[tyko.schema.avtables.AVTables],
+        sql_table_type: Type[AVTables],
         expected_table: Mapping[
             str,
             Union[
                 Tuple[int, Any],
-                Tuple[int, Type[tyko.schema.formats.AVFormat]],
+                Tuple[int, Type[AVFormat]],
                 Tuple[int]
             ]
         ]
