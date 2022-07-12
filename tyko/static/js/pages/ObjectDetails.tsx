@@ -151,7 +151,9 @@ export default function ObjectDetails() {
       }
     }
   }, [loading, apiData, projectId]);
-
+  if (loading) {
+    return <LoadingIndeterminate/>;
+  }
   let detailsPanel;
   let notesPanel;
   let itemsPanel;
