@@ -4,7 +4,7 @@ from sqlalchemy.orm.session import Session
 
 import tyko.data_provider.formats
 import pytest
-
+import tyko
 
 class TestOpticalDataConnector:
     @pytest.mark.parametrize(
@@ -54,3 +54,48 @@ class TestOpticalDataConnector:
                 Mock()
             ).create_new_format_item(Mock(spec=Session), data)
         assert getattr(new_item, output_key) == expected_value
+
+
+@pytest.mark.parametrize('data_changed, expected_values', [
+    (
+        {'date_of_cassette': '10/21/1990'},
+        {
+            'recording_date': datetime(1990, 10, 21, 0, 0),
+            'recording_date_precision': 3
+        }
+    ),
+    (
+        {'cassette_title': 'new title'},
+        {'title_of_cassette': 'new title'}
+    ),
+    (
+        {'generation_id': 1},
+        {'generation_id': 1}
+    ),
+    (
+        {'cassette_type_id': 1},
+        {'tape_subtype_id': 1}
+    ),
+    (
+        {'side_a_label': 'side a label'},
+        {'side_a_label': 'side a label'}
+    ),
+    (
+        {'side_a_duration': '00:01:02'},
+        {'side_a_duration': '00:01:02'}
+    ),
+    (
+        {'side_b_label': 'side b label'},
+        {'side_b_label': 'side b label'}
+    ),
+    (
+        {'side_b_duration': '00:01:02'},
+        {'side_b_duration': '00:01:02'}
+    ),
+])
+def test_update_cassette(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.AudioCassette)
+    tyko.data_provider.data_provider.update_cassette(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
