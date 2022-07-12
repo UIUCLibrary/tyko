@@ -813,9 +813,9 @@ const useEnums = (mapping: Array<[string, string]>| null):
                   const data = res.data as ApiEnum[];
                   setEnums((prevState) => {
                     if (prevState !== null) {
-                      const newData: { [key: string]: ApiEnum[] } = {};
-                      newData[key] = data;
-                      return {...prevState, ...newData};
+                      const replacementData: { [key: string]: ApiEnum[] } = {};
+                      replacementData[key] = data;
+                      return {...prevState, ...replacementData};
                     }
                     const newData: { [key: string]: ApiEnum[] } = {};
                     newData[key] = data;
