@@ -9,7 +9,7 @@ import React, {
   ReactElement,
   useReducer, useRef,
 } from 'react';
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 import {IItemMetadata} from './ItemApp';
 import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
 import {Button, ButtonGroup} from 'react-bootstrap';
@@ -792,29 +792,36 @@ const useEnums = (mapping: Array<[string, string]>| null):
   const [enums, setEnums] = useState<{[key: string]:ApiEnum[]}| null>(null);
 
   useEffect(()=>{
-    if (mapping) {
-      if (!enums) {
-        if (!loading) {
-          mapping.forEach(([key, url]) => {
-            setLoading(true);
-            axios.get(url)
-                .then((res) => {
-                  const data = res.data as ApiEnum[];
-                  setEnums((prevState) => {
-                    if (prevState !== null) {
-                      const replacementData: { [key: string]: ApiEnum[] } = {};
-                      replacementData[key] = data;
-                      return {...prevState, ...replacementData};
-                    }
-                    const newData: { [key: string]: ApiEnum[] } = {};
-                    newData[key] = data;
-                    return newData;
-                  });
-                })
-                .catch(console.error);
-          });
-        }
-      }
+    const handleUpdatingEnums = (res: AxiosResponse, key: string) =>{
+      const appendExisting = (
+          dataKey: string,
+          newEnums: ApiEnum[],
+          existingData: {[key: string]:ApiEnum[]},
+      )=>{
+        const replacementData: { [key: string]: ApiEnum[] } = {};
+        replacementData[dataKey] = newEnums;
+        return {...existingData, ...replacementData};
+      };
+      const createNewData = (dataKey: string, newEnums: ApiEnum[])=>{
+        const newData: { [key: string]: ApiEnum[] } = {};
+        newData[dataKey] = newEnums;
+        return newData;
+      };
+
+      const data = res.data as ApiEnum[];
+      setEnums((prevState) => {
+        return (prevState === null)?
+          createNewData(key, data):
+          appendExisting(key, data, prevState);
+      });
+    };
+    if (mapping && !loading) {
+      mapping.forEach(([key, url]) => {
+        setLoading(true);
+        axios.get(url)
+            .then((res)=>handleUpdatingEnums(res, key))
+            .catch(console.error);
+      });
     }
   }, [mapping, loading, enums]);
 
