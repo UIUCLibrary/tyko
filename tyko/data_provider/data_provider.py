@@ -265,7 +265,7 @@ def update_cassette(
         item: formats.AudioCassette,
         changed_data: Dict[str, Optional[Union[str, bool, int]]]):
 
-    if data_of_cassette := changed_data.pop('date_of_cassette'):
+    if data_of_cassette := changed_data.pop('date_of_cassette', None):
         precision = utils.identify_precision(data_of_cassette)
         item.recording_date = \
             utils.create_precision_datetime(data_of_cassette, precision)
