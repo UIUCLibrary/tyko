@@ -142,46 +142,6 @@ def _get_enum_tables(
             ).filter_by(name=new_type_name).first() is None:
                 yield enum_table_class(name=new_type_name)
 
-
-def _populate_enum_tables(session: sqlalchemy.orm.Session) -> None:
-    enum_table_classes: List[Type[formats.EnumTable]] = [
-        formats.OpenReelSubType,
-        formats.OpenReelReelWidth,
-        formats.OpenReelReelDiameter,
-        formats.OpenReelReelThickness,
-        formats.OpenReelBase,
-        formats.OpenReelReelWind,
-        formats.OpenReelSpeed,
-        formats.OpenReelTrackConfiguration,
-        formats.OpenReelGeneration,
-        formats.OpticalType,
-        formats.VideoCassetteType,
-        formats.VideoCassetteGenerations,
-        formats.GroovedDiscDiscDiameter,
-        formats.GroovedDiscDiscMaterial,
-        formats.GroovedDiscPlaybackDirection,
-        formats.GroovedDiscDiscBase,
-        formats.GroovedDiscPlaybackSpeed,
-        formats.FilmFilmSpeed,
-        formats.FilmFilmGauge,
-        formats.FilmFilmBase,
-        formats.FilmSoundtrack,
-        formats.FilmColor,
-        formats.FilmImageType,
-        formats.FilmWind,
-        formats.FilmEmulsion,
-        formats.AudioCassetteSubtype,
-        formats.AudioCassetteGeneration
-
-    ]
-    for enum_table_class in enum_table_classes:
-        for new_type_name in enum_table_class.default_values:
-            if session.query(
-                enum_table_class
-            ).filter_by(name=new_type_name).first() is None:
-                yield enum_table_class(name=new_type_name)
-
-
 def create_samples(engine: sqlalchemy.engine.Engine) -> None:
     session_maker = sessionmaker(bind=engine)
     session: sqlalchemy.orm.Session = session_maker()
