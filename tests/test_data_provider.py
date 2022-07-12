@@ -174,6 +174,7 @@ def test_update_open_reel(data_changed, expected_values):
         getattr(item, key) == value for key, value in expected_values.items()
     ), f"expected {expected_values} to be in {item.__dict__}"
 
+
 @pytest.mark.parametrize(
     'data_changed, expected_values', [
         (
@@ -231,6 +232,82 @@ def test_update_open_reel(data_changed, expected_values):
 def test_update_groove_discs(data_changed, expected_values):
     item = Mock(spec=tyko.data_provider.formats.formats.GroovedDisc)
     tyko.data_provider.data_provider.update_groove_discs(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'date_of_film': '10/21/1990'},
+            {'recording_date': datetime(1990, 10, 21, 0, 0)}
+        ),
+        (
+            {'can_label': 'spam'},
+            {'can_label': 'spam'}
+        ),
+        (
+            {'film_title': 'bacon'},
+            {'title_of_film': 'bacon'}
+        ),
+        (
+            {'leader_label': 'eggs'},
+            {'leader_label': 'eggs'}
+        ),
+        (
+            {'duration': '00:01:02'},
+            {'duration': '00:01:02'}
+        ),
+        (
+            {'edge_code_date': 1920},
+            {'edge_code_date': 1920}
+        ),
+        (
+            {'film_length': 500},
+            {'length': 500}
+        ),
+        (
+            {'film_shrinkage': 24},
+            {'film_shrinkage': 24}
+        ),
+        (
+            {'film_color_id': 1},
+            {'color_id': 1}
+        ),
+        (
+            {'film_base_id': 1},
+            {'film_base_id': 1}
+        ),
+        (
+            {'film_emulsion_id': 1},
+            {'emulsion_id': 1}
+        ),
+        (
+            {'image_type_id': 1},
+            {'image_type_id': 1}
+        ),
+        (
+            {'film_speed_id': 1},
+            {'film_speed_id': 1}
+        ),
+        (
+            {'film_gauge_id': 1},
+            {'film_gauge_id': 1}
+        ),
+        (
+            {'soundtrack_id': 1},
+            {'soundtrack_id': 1}
+        ),
+        (
+            {'wind_id': 1},
+            {'wind_id': 1}
+        ),
+    ])
+
+def test_update_film(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.Film)
+    tyko.data_provider.data_provider.update_film(item, data_changed)
     assert all(
         getattr(item, key) == value for key, value in expected_values.items()
     ), f"expected {expected_values} to be in {item.__dict__}"
