@@ -329,7 +329,7 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
         }
       }
     }
-  }, [enums, percentEnumsLoaded, editMode]);
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
   useEffect(()=>{
     setLoading(enumsLoading);
   }, [enumsLoading]);
@@ -575,7 +575,7 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
         }
       }
     }
-  }, [enums, percentEnumsLoaded, editMode]);
+  }, [enums, percentEnumsLoaded, editMode, enumsLoading]);
   useEffect(()=>{
     setLoading(enumsLoading);
   }, [enumsLoading]);
@@ -853,7 +853,7 @@ const useEnums = (mapping: Array<[string, string]>| null):
     if (enums) {
       setLoadedEnums(checkCompletedEnumsLoaded(mapping, enums));
     }
-  }, [enums]);
+  }, [enums, mapping]);
   const percentDone = mapping ? (loadedEnums/mapping.length): 0;
   return [percentDone, enums, loading];
 };
