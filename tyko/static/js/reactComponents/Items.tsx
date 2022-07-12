@@ -1454,7 +1454,7 @@ export const VideoOnlyData: FC = ()=>{
   },
   [generations, videoTypes]);
   useEffect(()=>{
-    axios.get('/api/formats/video_cassette/cassette_type')
+    axios.get('/api/formats/video_cassette/cassette_types')
         .then((res)=> {
           setVideoTypes((res.data as ApiEnum[]).sort(sortNameAlpha));
         }).catch(console.error);

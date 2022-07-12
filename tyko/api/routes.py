@@ -26,7 +26,7 @@ FORMAT_ENUM_ROUTES = [
         "VideoCassetteGenerations"
     ),
     (
-        "/formats/video_cassette/cassette_type",
+        "/formats/video_cassette/cassette_types",
         'video_cassette_cassette_type',
         "VideoCassetteType"
     ),

@@ -566,7 +566,11 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
           setSoundtracks(enums['soundtracks']);
           setColors(enums['colors']);
           setWinds(enums['winds']);
-          setEmulsions(enums['film_emulsions']);
+
+          const filmEmulsions = enums['film_emulsions'];
+          filmEmulsions.sort(sortNameAlpha);
+          setEmulsions(filmEmulsions);
+
           setFilmGauges(enums['film_gauges']);
         }
       }
