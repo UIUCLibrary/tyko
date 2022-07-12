@@ -1031,7 +1031,7 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
       <FormatDetail key='cassetteType' label="Type">
         {
           createEnumField(
-              'cassette_type',
+              'cassette_type_id',
               data['cassette_type'].value as EnumMetadata,
               cassetteTypes,
               editMode,

@@ -343,3 +343,38 @@ def test_update_optical(data_changed, expected_values):
     ), f"expected {expected_values} to be in {item.__dict__}"
 
 
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'date_of_cassette': '10/21/1990'},
+            {'date_of_cassette': datetime(1990, 10, 21, 0, 0)}
+        ),
+        (
+            {'label': 'my label'},
+            {'label': 'my label'},
+        ),
+        (
+            {'duration': '00:01:02'},
+            {'duration': '00:01:02'}
+        ),
+        (
+            {'title_of_cassette': 'my title'},
+            {'title_of_cassette': 'my title'}
+        ),
+        (
+            {'generation_id': 1},
+            {'generation_id': 1}
+        ),
+        (
+            {'cassette_type_id': 1},
+            {'cassette_type_id': 1}
+        )
+])
+def test_update_video_cassette(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.VideoCassette)
+    tyko.data_provider.data_provider.update_video_cassette(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
+
