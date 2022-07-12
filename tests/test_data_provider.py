@@ -174,4 +174,65 @@ def test_update_open_reel(data_changed, expected_values):
         getattr(item, key) == value for key, value in expected_values.items()
     ), f"expected {expected_values} to be in {item.__dict__}"
 
+@pytest.mark.parametrize(
+    'data_changed, expected_values', [
+        (
+            {'title_of_album': 'spam'},
+            {'title_of_album': 'spam'}
+        ),
+        (
+            {'title_of_disc': 'spam'},
+            {'title_of_disc': 'spam'}
+        ),
+        (
+            {'disc_base_id': 1},
+            {'disc_base_id': 1}
+        ),
+        (
+            {'disc_diameter_id': 1},
+            {'disc_diameter_id': 1}
+        ),
+        (
+            {'playback_direction_id': 1},
+            {'playback_direction_id': 1}
+        ),
+        (
+            {'disc_material_id': 1},
+            {'disc_material_id': 1}
+        ),
+        (
+            {'playback_speed_id': 1},
+            {'playback_speed_id': 1}
+        ),
+        (
+            {'side_a_label': 'side a label'},
+            {'side_a_label': 'side a label'}
+        ),
+        (
+            {'side_a_duration': '00:01:02'},
+            {'side_a_duration': '00:01:02'}
+        ),
+        (
+            {'side_b_label': 'side b label'},
+            {'side_b_label': 'side b label'}
+        ),
+        (
+            {'side_b_duration': '00:01:02'},
+            {'side_b_duration': '00:01:02'}
+        ),
+        (
+            {'date_of_disc': '10/21/1990'},
+            {
+                'date_of_disc': datetime(1990, 10, 21, 0, 0),
+            }
+        ),
+    ]
+)
+def test_update_groove_discs(data_changed, expected_values):
+    item = Mock(spec=tyko.data_provider.formats.formats.GroovedDisc)
+    tyko.data_provider.data_provider.update_groove_discs(item, data_changed)
+    assert all(
+        getattr(item, key) == value for key, value in expected_values.items()
+    ), f"expected {expected_values} to be in {item.__dict__}"
+
 
