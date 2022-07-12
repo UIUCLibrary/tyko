@@ -36,7 +36,7 @@ export default function ItemDetails() {
         fetchData(apiUrl).then(()=>setLoading(false)).catch(console.log);
       }
     }
-  }, [loading, apiData, projectId]);
+  }, [loading, apiData, projectId, apiUrl]);
 
   let detailsPanel;
   let formatDetailsPanel;
