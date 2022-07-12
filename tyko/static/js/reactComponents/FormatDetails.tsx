@@ -588,6 +588,7 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
       </tr>
     );
   }
+  const adTestLevelValue = adTestLevel ? parseInt(adTestLevel): null;
   return (
     <Fragment>
       <FormatDetail key='dateOfFilm' label="Date Of Film">
@@ -626,9 +627,9 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
           { adStripPerformed ?
               createNumberField(
                   'ad_test_level',
-                adTestLevel ? parseInt(adTestLevel): null,
-                editMode,
-                0,
+                  adTestLevelValue,
+                  editMode,
+                  0,
               ): createNullField('adTestLevel')
           }
         </fieldset>
