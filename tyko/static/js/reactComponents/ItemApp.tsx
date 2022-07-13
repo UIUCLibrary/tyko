@@ -157,6 +157,13 @@ export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
     const formatName = apiData ? apiData.format.name : null;
     const objectSequence = apiData ? apiData.obj_sequence : null;
     const barcode = apiData ? apiData.barcode : null;
+
+    const handleUpdate = ()=>{
+      if (onUpdated) {
+        onUpdated();
+      }
+    };
+
     const tableBody = <>
       <tr>
         <th style={{width: '25%'}}>Name</th>
@@ -165,11 +172,7 @@ export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
             display={objectName}
             onSubmit={(value)=> {
               updateData(apiUrl, 'name', value)
-                  .then(()=> {
-                    if (onUpdated) {
-                      onUpdated();
-                    }
-                  } )
+                  .then(handleUpdate)
                   .catch(console.error);
             }}
           />
@@ -184,11 +187,7 @@ export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
             inputProps={{min: 1}}
             onSubmit={(value)=> {
               updateData(apiUrl, 'obj_sequence', value)
-                  .then(()=> {
-                    if (onUpdated) {
-                      onUpdated();
-                    }
-                  } )
+                  .then(handleUpdate)
                   .catch(console.error);
             }}
           />
@@ -206,11 +205,7 @@ export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
             display={barcode}
             onSubmit={(value)=> {
               updateData(apiUrl, 'barcode', value)
-                  .then(()=> {
-                    if (onUpdated) {
-                      onUpdated();
-                    }
-                  } )
+                  .then(handleUpdate)
                   .catch(console.error);
             }}
           />
