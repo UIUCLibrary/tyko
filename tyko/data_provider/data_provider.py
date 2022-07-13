@@ -18,7 +18,7 @@ from sqlalchemy import true, orm
 import sqlalchemy.exc
 import tyko
 from tyko import schema, utils, database
-from tyko.exceptions import DataError
+from tyko.exceptions import DataError, NotValidRequest
 
 from tyko.schema import NoteTypes, Note, formats, CollectionItem, \
     InstantiationFile, Project, ProjectStatus, CollectionObject, Collection, \
@@ -459,7 +459,10 @@ class ItemDataConnector(AbsNotesConnector):
                 all_collection_item = self._serialize(all_collection_item)
 
             if id is not None:
-                return all_collection_item[0]
+                try:
+                    return all_collection_item[0]
+                except IndexError as error:
+                    raise NotValidRequest(f"No object with id {id}") from error
 
             return all_collection_item
         finally:

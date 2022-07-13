@@ -10,7 +10,7 @@ import tyko.data_provider
 from tyko.site import site
 from tyko.api import api
 from .database import init_database, create_samples, db
-from .exceptions import NoTable
+from .exceptions import NoTable, NotValidRequest
 from .schema import ALEMBIC_VERSION
 
 
@@ -46,6 +46,7 @@ def create_app() -> Flask:
     app.register_blueprint(api)
 
     app.register_error_handler(DataError, handle_error)
+    app.register_error_handler(NotValidRequest, handle_invalid_request)
     #
     # app.logger.info("Configuring database")
     db.init_app(app)
@@ -77,6 +78,10 @@ def main() -> None:
     if my_app is not None:
         # Run as a local program and not for production
         my_app.run()
+
+
+def handle_invalid_request(error) -> Response:
+    return make_response(f"{error.message}: {error.args[0]}", 404)
 
 
 def handle_error(error) -> Response:

@@ -25,3 +25,7 @@ class NoTable(DataError):
 
     def __init__(self, *args, message="missing table", **kwargs):
         super().__init__(*args, message=message, **kwargs)
+
+
+class NotValidRequest(DataError):
+    pass
