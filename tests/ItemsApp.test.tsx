@@ -7,7 +7,7 @@ import axios from 'axios';
 import '@testing-library/jest-dom';
 import {
   fireEvent,
-  render,
+  render, screen,
   waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react';
@@ -22,6 +22,7 @@ import React from 'react';
 describe('ItemDetails', ()=>{
   const dummyData = {
     name: 'dummy',
+    barcode: null,
     files: [],
     obj_sequence: 1,
     format: {
@@ -104,7 +105,27 @@ describe('ItemDetails', ()=>{
     });
   });
 });
-
+describe('barcode field', ()=>{
+  test('editable', ()=>{
+    const dummyData = {
+      name: 'sample',
+      barcode: '123',
+      format: {
+        name: 'foo',
+        id: 1,
+      },
+    };
+    render(
+        <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
+    );
+    const barcodeField = screen.getByLabelText('Barcode');
+    expect(barcodeField).toHaveAttribute('readonly', '');
+    const barcodeEditButton = screen.getByTestId('edit-button-barcode');
+    fireEvent.click(barcodeEditButton);
+    expect(barcodeField).not.toHaveAttribute('readonly');
+    expect(barcodeField).toBeInTheDocument();
+  });
+});
 describe('EditableField', ()=>{
   test('display', ()=>{
     const {getByDisplayValue} = render(<EditableField display="Dummy"/>);

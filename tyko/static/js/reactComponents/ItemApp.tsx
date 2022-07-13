@@ -13,6 +13,7 @@ import {Button, Form} from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
 
 interface IEditableField{
+  id?: string
   display: string | number | null
   type?: string
   inputProps?: { [key: string]: string | number| boolean }
@@ -21,7 +22,7 @@ interface IEditableField{
 
 
 export const EditableField:FC<IEditableField> = (
-    {display, type, inputProps, onSubmit},
+    {display, type, inputProps, onSubmit, id},
 )=>{
   const [buttons, setButtons] = useState<JSX.Element|null>(null);
   const inputDisplay = useRef<HTMLInputElement>(null);
@@ -54,7 +55,7 @@ export const EditableField:FC<IEditableField> = (
               variant="outline-primary"
               size="sm"
               onClick={handleAccept}
-              data-testid={`confirm-button-${display ? display: ''}`}
+              data-testid={`confirm-button-${id ? id: ''}`}
             >
               Confirm
             </Button>
@@ -68,8 +69,9 @@ export const EditableField:FC<IEditableField> = (
             <Button
               variant="secondary"
               size="sm"
+              role='edit'
               onClick={setEditMode}
-              data-testid={`edit-button-${display ? display : ''}`}
+              data-testid={`edit-button${id ? '-'+id : ''}`}
             >
               Edit
             </Button>
@@ -88,6 +90,7 @@ export const EditableField:FC<IEditableField> = (
     <InputGroup onBlur={clickOutsideWidget}>
       <Form.Control
         ref={inputDisplay}
+        id={id}
         size={'sm'}
         defaultValue={display as string}
         type={type? type: 'string'} readOnly={!editMode}
@@ -194,9 +197,12 @@ export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
       <tr>
       </tr>
       <tr>
-        <th style={{width: '25%'}}>Barcode</th>
+        <th style={{width: '25%'}}>
+          <Form.Label htmlFor='barcode'>Barcode</Form.Label>
+        </th>
         <td>
           <EditableField
+            id='barcode'
             display={barcode}
             onSubmit={(value)=> {
               updateData(apiUrl, 'barcode', value)
