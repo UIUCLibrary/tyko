@@ -7,6 +7,8 @@ import tyko.data_provider.formats
 from tyko import data_provider
 from tyko.schema import objects, formats
 import tyko
+from tyko.exceptions import NotValidRequest
+
 
 class TestOpticalDataConnector:
     @pytest.mark.parametrize(
@@ -381,6 +383,87 @@ def test_update_video_cassette(data_changed, expected_values):
 
 
 class TestItemDataConnector:
+    def test_invalid_request_raises(self):
+        def query(*args):
+            if args[0] == objects.CollectionObject:
+                mock_object = Mock()
+                return Mock(
+                        spec=Query,
+                        name='Query',
+                        filter=Mock(
+                            name='filter',
+                            return_value=Mock(
+                                all=Mock(
+                                    name='all',
+                                    return_value=[mock_object]
+                                )
+                            )
+                        )
+                    )
+            if args[0] == formats.FormatTypes:
+                mock_format = Mock()
+                return Mock(
+                    spec=Query,
+                    name='Query',
+                    filter=Mock(
+                        name='filter',
+                        return_value=Mock(
+                            one=Mock(
+                                name='one',
+                                return_value=mock_format
+                            ),
+                            all=Mock(
+                                name='one',
+                                return_value=[mock_format]
+                            ),
+                        )
+                    )
+                )
+            if args[0] in [
+                formats.Film,
+                formats.AudioCassette,
+                formats.AudioVideo,
+                formats.GroovedDisc,
+                formats.OpenReel,
+                formats.VideoCassette,
+                formats.CollectionItem,
+                formats.AVFormat,
+            ]:
+                mock_format = Mock(spec=args[0])
+                return Mock(
+                    spec=Query,
+                    name='Query',
+                    all=Mock(
+                        name='all',
+                        return_value=['mock_format']
+                    ),
+                    filter=Mock(
+                        name='filter',
+                        return_value=Mock(
+                            one=Mock(
+                                name='one',
+                                return_value=mock_format
+                            ),
+                            all=Mock(
+                                name='one',
+                                return_value=[]
+                            ),
+                        )
+                    )
+                )
+            else:
+                print('d')
+        session = Mock(
+            name='session',
+            spec=Session,
+            query=query
+        )
+        mock_sessionmaker = Mock(spec=sessionmaker, return_value=session)
+        with pytest.raises(NotValidRequest):
+            connector = data_provider.ItemDataConnector(mock_sessionmaker)
+            connector.get(id=1)
+            # connector.get(id=1, serialize=True)
+
     def test_create_with_barcode(self):
         mock_object = Mock(spec=objects.CollectionObject)
 
