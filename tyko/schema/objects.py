@@ -38,7 +38,7 @@ class CollectionObject(AVTables):
         autoincrement=True)
 
     name = db.Column("name", db.Text)
-    barcode = db.Column("barcode", db.Text)
+
     collection_id = \
         db.Column(db.Integer, db.ForeignKey("collection.collection_id"))
 
@@ -62,7 +62,7 @@ class CollectionObject(AVTables):
 
         data: Dict[str, SerializedData] = {"object_id": self.id,
                                            "name": self.name,
-                                           "barcode": self.barcode,
+                                           # "barcode": self.barcode,
                                            "items": self.get_items(recurse)}
 
         if recurse is True:

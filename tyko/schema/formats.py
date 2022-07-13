@@ -62,6 +62,7 @@ class AVFormat(AVTables, abc.ABC):
     format_type = relationship("FormatTypes", foreign_keys=[format_type_id])
     files = relationship("InstantiationFile", backref="file_source")
     treatment = relationship("Treatment", backref="treatment_id")
+    barcode = db.Column("barcode", db.Text)
 
     def _iter_files(self, recurse=False):
         for file_ in self.files:
@@ -88,7 +89,8 @@ class AVFormat(AVTables, abc.ABC):
             "files": list(self._iter_files(recurse)),
             "parent_object_id": self.object_id,
             "obj_sequence": self.obj_sequence,
-            "notes": [note.serialize() for note in self._iter_notes()]
+            "notes": [note.serialize() for note in self._iter_notes()],
+            "barcode": self.barcode,
         }
 
         try:

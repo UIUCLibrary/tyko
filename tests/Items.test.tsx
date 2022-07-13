@@ -10,6 +10,7 @@ import {
   render,
   waitFor,
   fireEvent,
+  screen,
   getByRole,
   waitForElementToBeRemoved, getByLabelText,
 } from '@testing-library/react';
@@ -307,6 +308,63 @@ describe('ObjectItemsApp', ()=>{
     });
     await waitFor(()=>{
       expect(axios.post).toBeCalled();
+    });
+  });
+  test('add item with barcode', async ()=>{
+    axios.post = jest.fn((url: string): Promise<any> => {
+      return Promise.resolve({data: []});
+    });
+    render(
+        <ObjectItemsApp
+          apiUrl='/api'
+          objectId={1}
+          projectId={2}
+          newItemSubmitUrl='/submitme'
+        />);
+    await waitFor(async ()=> {
+      return await waitForElementToBeRemoved(
+          ()=>screen.getByText('Loading...')
+      );
+    });
+    await waitFor(()=> screen.getByText('Format'));
+    await waitFor(()=>{
+      fireEvent.click(screen.getByTestId('addButton'));
+    });
+    const form = screen.getByTitle('newItem');
+    await waitFor(async ()=> {
+      await userEvent.selectOptions(screen.getByLabelText('Format'), '2');
+      fireEvent.change(
+          screen.getByLabelText('Barcode'),
+          {
+            target: {
+              value: '12345',
+            },
+          }
+      );
+      fireEvent.submit(form);
+    });
+    await waitFor(()=>{
+      expect(axios.post).toHaveBeenCalledWith(
+          '/submitme',
+          {
+            'cassetteTitle': '',
+            'cassetteTypeId': '',
+            'inspectionDate': '',
+            'generationId': '',
+            'transferDate': '',
+            'dateOfCassette': '',
+            'cassetteSideALabel': '',
+            'cassetteSideADuration': '',
+            'cassetteSideBLabel': '',
+            'cassetteSideBDuration': '',
+            'format_id': '2',
+            'itemBarcode': '12345',
+            'name': '',
+          }, {
+            'headers': {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
     });
   });
   test('delete item', async ()=>{

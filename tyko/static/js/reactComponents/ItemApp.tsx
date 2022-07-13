@@ -127,6 +127,7 @@ export interface IItemMetadata {
   item_id: number,
   name: string
   notes: INote[ ],
+  barcode: string,
   obj_sequence: number,
   parent_object_id: number,
   transfer_date?: string
@@ -152,6 +153,7 @@ export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
     const objectName = apiData ? apiData.name : null;
     const formatName = apiData ? apiData.format.name : null;
     const objectSequence = apiData ? apiData.obj_sequence : null;
+    const barcode = apiData ? apiData.barcode : null;
     const tableBody = <>
       <tr>
         <th style={{width: '25%'}}>Name</th>
@@ -179,6 +181,25 @@ export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
             inputProps={{min: 1}}
             onSubmit={(value)=> {
               updateData(apiUrl, 'obj_sequence', value)
+                  .then(()=> {
+                    if (onUpdated) {
+                      onUpdated();
+                    }
+                  } )
+                  .catch(console.error);
+            }}
+          />
+        </td>
+      </tr>
+      <tr>
+      </tr>
+      <tr>
+        <th style={{width: '25%'}}>Barcode</th>
+        <td>
+          <EditableField
+            display={barcode}
+            onSubmit={(value)=> {
+              updateData(apiUrl, 'barcode', value)
                   .then(()=> {
                     if (onUpdated) {
                       onUpdated();

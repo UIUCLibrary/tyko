@@ -1662,6 +1662,14 @@ const FormBody:FC<IFormBody> = (
         </Form.Group>
       </Form.Group>
       <FormatSpecificFields type={selectedFormat}/>
+      <Form.Group className="mb-3 row">
+        <Form.Label className="col-sm-2 col-form-label" htmlFor='itemBarcode'>
+          Barcode
+        </Form.Label>
+        <Form.Group className="col-sm-10">
+          <Form.Control id="itemBarcode" name="itemBarcode"/>
+        </Form.Group>
+      </Form.Group>
     </Modal.Body>
   );
 };
