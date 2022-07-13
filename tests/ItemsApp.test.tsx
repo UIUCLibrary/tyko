@@ -124,12 +124,17 @@ describe('barcode field', ()=>{
     const barcodeEditButton = screen.getByTestId('edit-button-barcode');
     fireEvent.click(barcodeEditButton);
     expect(barcodeField).not.toHaveAttribute('readonly');
-
   });
-  test('submits', ()=>{
+  test('submits', async ()=>{
     const mockedAxios = axios as jest.Mocked<typeof axios>;
+    const onUpdated = jest.fn();
+
     render(
-        <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
+        <ItemDetails
+          apiData={dummyData}
+          apiUrl='/api/dummy'
+          onUpdated={onUpdated}
+        />,
     );
     const barcodeField = screen.getByLabelText('Barcode');
     fireEvent.click(screen.getByTestId('edit-button-barcode'));
@@ -140,6 +145,10 @@ describe('barcode field', ()=>{
         expect.stringMatching('/api/dummy'),
         expect.objectContaining({'barcode': '1234'}),
     );
+    await waitFor(()=>{
+      expect(onUpdated).toHaveBeenCalled();
+    });
+    // expect(onUpdated.mock.calls.length).toBeGreaterThan(0)
   });
 });
 describe('EditableField', ()=>{
