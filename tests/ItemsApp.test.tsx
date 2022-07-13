@@ -18,6 +18,7 @@ import {
 } from '../tyko/static/js/reactComponents/ItemApp';
 
 import React from 'react';
+jest.mock('axios');
 
 describe('ItemDetails', ()=>{
   const dummyData = {
@@ -106,15 +107,15 @@ describe('ItemDetails', ()=>{
   });
 });
 describe('barcode field', ()=>{
+  const dummyData = {
+    name: 'sample',
+    barcode: '123',
+    format: {
+      name: 'foo',
+      id: 1,
+    },
+  };
   test('editable', ()=>{
-    const dummyData = {
-      name: 'sample',
-      barcode: '123',
-      format: {
-        name: 'foo',
-        id: 1,
-      },
-    };
     render(
         <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
     );
@@ -123,7 +124,22 @@ describe('barcode field', ()=>{
     const barcodeEditButton = screen.getByTestId('edit-button-barcode');
     fireEvent.click(barcodeEditButton);
     expect(barcodeField).not.toHaveAttribute('readonly');
+
+  });
+  test('submits', ()=>{
+    const mockedAxios = axios as jest.Mocked<typeof axios>;
+    render(
+        <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
+    );
+    const barcodeField = screen.getByLabelText('Barcode');
+    fireEvent.click(screen.getByTestId('edit-button-barcode'));
+    fireEvent.change(barcodeField, {target: {value: '1234'}});
+    fireEvent.click(screen.getByTestId('confirm-button-barcode'));
     expect(barcodeField).toBeInTheDocument();
+    expect(mockedAxios.put).toBeCalledWith(
+        expect.stringMatching('/api/dummy'),
+        expect.objectContaining({'barcode': '1234'}),
+    );
   });
 });
 describe('EditableField', ()=>{
