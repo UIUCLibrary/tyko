@@ -12,7 +12,7 @@
   "scripts": {
     "start": "react-app-rewired start",
     "test": "jest",
-    "lint": "eslint  ./tyko/static/js/*.mjs ./tyko/static/js/*.js ./tyko/static/js/reactComponents/*.tsx ",
+    "lint": "eslint-output",
     "eslint-output": "eslint-output",
     "build": "webpack --progress",
     "jsdocs": "jsdoc -c docs/jsdocs_config.json -d build/jsdocs"
