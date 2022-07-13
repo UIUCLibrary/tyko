@@ -25,7 +25,6 @@ const updateData = async (url: string, key: string, value: string) => {
 
 
 interface IObject {
-  barcode: string|null
   collection_id: number
   name: string
   routes: {
@@ -116,14 +115,6 @@ export const NewObjectModal: FC<NewObjectModalProps> = (
               </option>
               {collectionsOptions}
             </Form.Select>
-          </Form.Group>
-        </Form.Group>
-        <Form.Group className="mb-3 row">
-          <Form.Label className="col-sm-2 col-form-label">
-            Barcode
-          </Form.Label>
-          <Form.Group className="col-sm-10">
-            <Form.Control name="objectBarcode"/>
           </Form.Group>
         </Form.Group>
         <Form.Group className="mb-3 row">

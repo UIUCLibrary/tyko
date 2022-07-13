@@ -39,7 +39,6 @@
                     {% endcall %}
                 {% endwith %}
             </tr>
-            <tr>{{metadata_text_edit_widget("Barcode", object['barcode'], 'barcode', api_path)}}</tr>
             <tr>{{metadata_date_edit_widget("Originals Received Date", object['originals_rec_date'], "originals_rec_date", api_path)}}</tr>
             <tr>{{metadata_date_edit_widget("Originals Returned Date", object['originals_return_date'], "originals_return_date", api_path)}}</tr>
         {% endcall %}

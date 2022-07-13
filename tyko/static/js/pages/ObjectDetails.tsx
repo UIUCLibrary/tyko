@@ -22,7 +22,6 @@ interface IItem {
 }
 
 interface IObjectApi {
-  barcode: string,
   collection_id: number,
   contact: string,
   items: IItem[]

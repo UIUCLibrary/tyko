@@ -155,7 +155,7 @@ def add_new_object(dummy_database, create_new_object):
 
 
 @given(
-    parsers.parse("a new object for the collection with a barcode"),
+    parsers.parse("a new object for the collection"),
     target_fixture="create_new_object"
 )
 def create_new_object(dummy_database, new_collection, new_project):
@@ -164,7 +164,6 @@ def create_new_object(dummy_database, new_collection, new_project):
         name=SAMPLE_OBJECT_NAME,
         collection=new_collection,
         project=new_project,
-        barcode=SAMPLE_BAR_CODE,
         originals_rec_date=SAMPLE_DATE,
         originals_return_date=SAMPLE_DATE,
     )
@@ -266,11 +265,11 @@ def add_item(dummy_database, new_item):
     return dummy_database
 
 
-@then("the new object record contains the correct barcode")
-def object_has_correct_barcode(dummy_database):
-    new_added_object = dummy_database.query(
-        schema.CollectionObject).first()
-    assert new_added_object.barcode == SAMPLE_BAR_CODE
+# @then("the new object record contains the correct barcode")
+# def object_has_correct_barcode(dummy_database):
+#     new_added_object = dummy_database.query(
+#         schema.CollectionObject).first()
+#     assert new_added_object.barcode == SAMPLE_BAR_CODE
 
 
 @scenario("database.feature", "Create a new inspection note for item")

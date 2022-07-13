@@ -7,7 +7,7 @@ import axios from 'axios';
 import '@testing-library/jest-dom';
 import {
   fireEvent,
-  render,
+  render, screen,
   waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react';
@@ -18,19 +18,21 @@ import {
 } from '../tyko/static/js/reactComponents/ItemApp';
 
 import React from 'react';
+jest.mock('axios');
 
 describe('ItemDetails', ()=>{
   const dummyData = {
-    name: 'dummy',
     files: [],
-    obj_sequence: 1,
     format: {
       name: 'foo',
       id: 1,
     },
-    item_id: 1,
-    format_id: 1,
     format_details: {},
+    format_id: 1,
+    name: 'dummy',
+    barcode: null,
+    obj_sequence: 1,
+    item_id: 1,
     notes: [],
     parent_object_id: 1,
   };
@@ -104,7 +106,58 @@ describe('ItemDetails', ()=>{
     });
   });
 });
+describe('barcode field', ()=>{
+  const dummyData = {
+    name: 'sample',
+    barcode: '123',
+    format: {
+      name: 'foo',
+      id: 1,
+    },
+    files: [],
+    format_details: {},
+    format_id: 1,
+    item_id: 1,
+    notes: [],
+    obj_sequence: 1,
+    parent_object_id: 1,
+  };
+  test('editable', ()=>{
+    render(
+        <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
+    );
+    const barcodeField = screen.getByLabelText('Barcode');
+    expect(barcodeField).toHaveAttribute('readonly', '');
+    const barcodeEditButton = screen.getByTestId('edit-button-barcode');
+    fireEvent.click(barcodeEditButton);
+    expect(barcodeField).not.toHaveAttribute('readonly');
+  });
+  test('submits', async ()=>{
+    const mockedAxios = axios as jest.Mocked<typeof axios>;
+    const onUpdated = jest.fn();
 
+    render(
+        <ItemDetails
+          apiData={dummyData}
+          apiUrl='/api/dummy'
+          onUpdated={onUpdated}
+        />,
+    );
+    const barcodeField = screen.getByLabelText('Barcode');
+    fireEvent.click(screen.getByTestId('edit-button-barcode'));
+    fireEvent.change(barcodeField, {target: {value: '1234'}});
+    fireEvent.click(screen.getByTestId('confirm-button-barcode'));
+    expect(barcodeField).toBeInTheDocument();
+    expect(mockedAxios.put).toBeCalledWith(
+        expect.stringMatching('/api/dummy'),
+        expect.objectContaining({'barcode': '1234'}),
+    );
+    await waitFor(()=>{
+      expect(onUpdated).toHaveBeenCalled();
+    });
+    // expect(onUpdated.mock.calls.length).toBeGreaterThan(0)
+  });
+});
 describe('EditableField', ()=>{
   test('display', ()=>{
     const {getByDisplayValue} = render(<EditableField display="Dummy"/>);

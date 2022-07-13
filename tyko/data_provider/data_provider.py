@@ -18,7 +18,7 @@ from sqlalchemy import true, orm
 import sqlalchemy.exc
 import tyko
 from tyko import schema, utils, database
-from tyko.exceptions import DataError
+from tyko.exceptions import DataError, NotValidRequest
 
 from tyko.schema import NoteTypes, Note, formats, CollectionItem, \
     InstantiationFile, Project, ProjectStatus, CollectionObject, Collection, \
@@ -459,7 +459,10 @@ class ItemDataConnector(AbsNotesConnector):
                 all_collection_item = self._serialize(all_collection_item)
 
             if id is not None:
-                return all_collection_item[0]
+                try:
+                    return all_collection_item[0]
+                except IndexError as error:
+                    raise NotValidRequest(f"No object with id {id}") from error
 
             return all_collection_item
         finally:
@@ -511,6 +514,7 @@ class ItemDataConnector(AbsNotesConnector):
             transfer_date = format_data.pop('transfer_date', None)
             inspection_date = format_data.pop('inspection_date', None)
             parent_object_id = format_data.pop('object_id', None)
+            item_barcode = format_data.pop('itemBarcode', None)
             format_data.pop('medusa_uuid', None)
 
             new_item = self.create_new_format_item(session, format_data)
@@ -526,6 +530,9 @@ class ItemDataConnector(AbsNotesConnector):
                     utils.create_precision_datetime(
                         inspection_date
                     )
+            if item_barcode:
+                new_item.barcode = item_barcode
+
             for instance_file in files:
                 new_file = InstantiationFile(file_name=instance_file['name'])
 
@@ -539,7 +546,7 @@ class ItemDataConnector(AbsNotesConnector):
 
     def update(self, id, changed_data):
         updated_item = None
-        item = self.get_item(id)
+        item: CollectionItem = self.get_item(id)
         session = self.session_maker()
         if item:
             if "name" in changed_data:
@@ -553,7 +560,8 @@ class ItemDataConnector(AbsNotesConnector):
                     format_type=item.type,
                     changed_data=changed_data['format_details'],
                     session=session, item=item)
-
+            if 'barcode' in changed_data:
+                item.barcode = changed_data['barcode']
             try:
                 session.add(item)
                 session.commit()
