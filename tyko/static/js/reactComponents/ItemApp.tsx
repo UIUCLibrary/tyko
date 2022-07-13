@@ -78,7 +78,7 @@ export const EditableField:FC<IEditableField> = (
           </>,
       );
     }
-  }, [editMode, display, handleAccept, handleCancel]);
+  }, [editMode, display, handleAccept, handleCancel, id]);
   const clickOutsideWidget = (event: FocusEvent)=>{
     if (editMode) {
       if (!event.currentTarget.contains(event.relatedTarget)) {
