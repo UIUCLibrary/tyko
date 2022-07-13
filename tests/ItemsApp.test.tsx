@@ -22,17 +22,17 @@ jest.mock('axios');
 
 describe('ItemDetails', ()=>{
   const dummyData = {
-    name: 'dummy',
-    barcode: null,
     files: [],
-    obj_sequence: 1,
     format: {
       name: 'foo',
       id: 1,
     },
-    item_id: 1,
-    format_id: 1,
     format_details: {},
+    format_id: 1,
+    name: 'dummy',
+    barcode: null,
+    obj_sequence: 1,
+    item_id: 1,
     notes: [],
     parent_object_id: 1,
   };
@@ -114,6 +114,13 @@ describe('barcode field', ()=>{
       name: 'foo',
       id: 1,
     },
+    files: [],
+    format_details: {},
+    format_id: 1,
+    item_id: 1,
+    notes: [],
+    obj_sequence: 1,
+    parent_object_id: 1,
   };
   test('editable', ()=>{
     render(

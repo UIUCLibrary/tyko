@@ -130,7 +130,7 @@ export interface IItemMetadata {
   item_id: number,
   name: string
   notes: INote[ ],
-  barcode: string,
+  barcode: string | null,
   obj_sequence: number,
   parent_object_id: number,
   transfer_date?: string
