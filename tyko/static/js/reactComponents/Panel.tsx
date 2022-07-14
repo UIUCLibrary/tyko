@@ -24,3 +24,32 @@ export default function Panel({title, children}: IPanel) {
     </Container>
   );
 }
+
+/**
+ * Inactive div for panel
+ * @constructor
+ */
+export function InactiveCover(
+    {children}: {children: JSX.Element | JSX.Element[] | string },
+) {
+  return (
+    <div
+      style={
+        {
+          background: 'lightgray',
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          zIndex: 0,
+          opacity: '75%',
+        }
+      }
+    >
+      <div style={{top: '50%', left: '50%', position: 'absolute'}}>
+        {children}
+      </div>
+    </div>
+  );
+}

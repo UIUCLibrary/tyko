@@ -231,7 +231,7 @@ def _iter_starting_project_status(
         session: sqlalchemy.orm.Session,
         project_status_table: Type[projects.ProjectStatus]
 ) -> Iterable[projects.ProjectStatus]:
-    statuses = ['In progress', "Complete", "No work done"]
+    statuses = ['In Progress', "Complete", "No Work Done"]
     for status in statuses:
         if session.query(
                 project_status_table
