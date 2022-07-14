@@ -29,11 +29,6 @@ interface IProjectDetails {
   apiUrl: string
   onUpdated: ()=>void
 }
-const updateData = async (url: string, key: string, value: string) => {
-  const data: {[key: string]: string} = {};
-  data[key] = value;
-  return axios.put(url, data);
-};
 
 interface IProjectDetailsRow {
   label: string,

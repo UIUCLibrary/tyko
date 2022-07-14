@@ -74,6 +74,6 @@ describe('ProjectDetails', () => {
     await waitFor(async ()=> {
       return await waitForElementToBeRemoved(screen.getByText('Loading...'));
     });
-    expect(screen.getByDisplayValue('dummy')).toBeInTheDocument();
+    expect(screen.getByText('dummy')).toBeInTheDocument();
   });
 });

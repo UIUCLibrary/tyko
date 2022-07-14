@@ -124,7 +124,7 @@ def test_create(test_app):
             {
                 "title": "dummy title",
                 "project_code": "sample project code",
-                "status": "No work done",
+                "status": "No Work Done",
                 "specs": "asdfadsf"
             }
         ),
@@ -142,7 +142,7 @@ test_data_read = [
         "project", {
             "title": "dummy title",
             "project_code": "sample project code",
-            "status": "No work done"
+            "status": "No Work Done"
         }
      ),
     (
@@ -298,7 +298,7 @@ def test_project_status_by_name_valid():
     project_provider = data_provider.ProjectDataConnector(dummy_session)
 
     status = project_provider.get_project_status_by_name(
-                "In progress", create_if_not_exists=False)
+                "In Progress", create_if_not_exists=False)
     assert status is not None
 
 

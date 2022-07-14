@@ -13,6 +13,7 @@ import {ItemDetails} from './reactComponents/ItemApp';
 import axios from 'axios';
 import Panel from './reactComponents/Panel';
 import {LoadingIndeterminate} from './reactComponents/Common';
+import {ProjectDetailDetails} from './reactComponents/ProjectDetails';
 
 
 import('bootstrap');
@@ -117,6 +118,26 @@ function loadReactComponents() {
     root.render(<Items apiUrl={objectItems.dataset.tykoApiUrl}/>);
   }
 
+  const projectDetailsComponent = document.getElementById('projectDetailsDetails');
+  if (projectDetailsComponent) {
+    const root = createRoot((projectDetailsComponent))
+    root.render(
+        <Panel title='Details'>
+            Loading...
+        </Panel>,
+    );
+    axios.get(projectDetailsComponent.dataset.tykoApiUrl)
+      .then((resp)=> {
+          root.render(
+              <Panel title='Details'>
+                <ProjectDetailDetails
+                    apiData={resp.data}
+                    apiUrl={projectDetailsComponent.dataset.tykoApiUrl}
+                    onUpdated={()=> {location.reload();}}/>
+              </Panel>
+          );
+        });
+  }
   const formatDetailsComponent = document.getElementById('formatDetails');
   if (formatDetailsComponent) {
     const root = createRoot(formatDetailsComponent);
