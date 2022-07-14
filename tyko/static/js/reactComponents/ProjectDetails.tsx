@@ -27,7 +27,7 @@ export interface IProjectApi {
 interface IProjectDetails {
   apiData: IProjectApi
   apiUrl: string
-  onUpdated: ()=>void
+  onUpdated?: ()=>void
 }
 
 interface IProjectDetailsRow {
