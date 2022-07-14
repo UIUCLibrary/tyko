@@ -8,12 +8,13 @@ import {
   render,
   waitFor,
   screen,
-  waitForElementToBeRemoved,
+  waitForElementToBeRemoved, fireEvent,
 } from '@testing-library/react';
 import {Route, Routes, MemoryRouter} from 'react-router-dom';
 
 
 import ProjectDetails from '../tyko/static/js/pages/ProjectDetails';
+import {ProjectDetailDetails} from '../tyko/static/js/reactComponents/ProjectDetails';
 jest.mock('vanillajs-datepicker', ()=>{});
 
 describe('ProjectDetails', () => {
@@ -74,6 +75,41 @@ describe('ProjectDetails', () => {
     await waitFor(async ()=> {
       return await waitForElementToBeRemoved(screen.getByText('Loading...'));
     });
-    expect(screen.getByDisplayValue('dummy')).toBeInTheDocument();
+    expect(screen.getByText('dummy')).toBeInTheDocument();
+  });
+});
+
+describe('ProjectDetailDetails', ()=>{
+  jest.mock('axios');
+  test('onUpdated called', async () => {
+    axios.put = jest.fn((url: string): Promise<any> => {
+      return Promise.resolve();
+    });
+    const onUpdated = jest.fn();
+    const dummyData = {
+      project: {
+        current_location: 'somewhere',
+        notes: [],
+        objects: [],
+        project_code: 'project code',
+        project_id: 1,
+        status: 'Complete',
+        title: 'foo',
+      },
+    };
+    render(
+        <ProjectDetailDetails
+          apiData={dummyData}
+          apiUrl={'/api/dummy'}
+          onUpdated={onUpdated}/>,
+    );
+    fireEvent.click(screen.getByText('Edit'));
+    fireEvent.click(screen.getByText('Confirm'));
+    await waitFor(async ()=> {
+      return await waitForElementToBeRemoved(screen.getByText('Loading...'));
+    });
+    await waitFor(()=>{
+      expect(onUpdated).toHaveBeenCalled();
+    });
   });
 });

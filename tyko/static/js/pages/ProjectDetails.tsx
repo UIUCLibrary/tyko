@@ -10,39 +10,15 @@ import {
   Row,
 } from 'react-bootstrap';
 import React, {useEffect, useState, FC, useRef} from 'react';
-import {EditableField} from '../reactComponents/ItemApp';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import {SelectDate} from '../reactComponents/Items';
-
-const updateData = async (url: string, key: string, value: string) => {
-  const data: {[key: string]: string} = {};
-  data[key] = value;
-  return axios.put(url, data);
-};
-
-
-interface IObject {
-  collection_id: number
-  name: string
-  routes: {
-    api: string
-    frontend: string
-  }
-}
-interface IProjectApi {
-  project: {
-    current_location: string,
-    notes: any[],
-    objects: IObject[],
-    project_code: string,
-    project_id: number,
-    status: string,
-    title: string
-  }
-}
+import {
+  ProjectDetailDetails,
+  IProjectApi,
+} from '../reactComponents/ProjectDetails';
 
 interface ICollection {
         collection_id: number
@@ -52,7 +28,6 @@ interface ICollectionsApi {
   collections: ICollection[];
 
 }
-
 export const NewObjectModal: FC<NewObjectModalProps> = (
     {show, onAccepted, onClosed},
 )=>{
@@ -100,9 +75,14 @@ export const NewObjectModal: FC<NewObjectModalProps> = (
     form = (
       <>
         <Form.Group className="mb-3 row">
-          <Form.Label className="col-sm-2 col-form-label">Name</Form.Label>
+          <Form.Label
+            htmlFor='projectName'
+            className="col-sm-2 col-form-label"
+          >
+            Name
+          </Form.Label>
           <Form.Group className="col-sm-10">
-            <Form.Control name="name" required/>
+            <Form.Control id='projectName' name="name" required/>
           </Form.Group>
         </Form.Group>
         <Form.Group className="mb-3 row">
@@ -117,6 +97,7 @@ export const NewObjectModal: FC<NewObjectModalProps> = (
             </Form.Select>
           </Form.Group>
         </Form.Group>
+
         <Form.Group className="mb-3 row">
           <Form.Label className="col-sm-2 col-form-label">
                 Originals Received
@@ -167,85 +148,12 @@ export const NewObjectModal: FC<NewObjectModalProps> = (
   );
 };
 
-interface IProjectDetails {
-  apiData: IProjectApi
-  apiUrl: string
-  onUpdated: ()=>void
-}
+
 interface IProjectObjectDetails {
   apiData: IProjectApi
   submitUrl: string
   onUpdated: ()=>void
 }
-
-const ProjectDetailDetails: FC<IProjectDetails> = (
-    {apiData, apiUrl, onUpdated},
-) => {
-  return (
-    <Form.Group className="mb-3 row">
-      <Row>
-        <Col sm={2}>
-          <Form.Label>Title</Form.Label>
-        </Col>
-        <Col>
-          <EditableField
-            display={apiData.project.title}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'title', value)
-                  .then(()=> onUpdated())
-                  .catch(console.error);
-            }}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm={2}>
-          <Form.Label>Project Code</Form.Label>
-        </Col>
-        <Col>
-          <EditableField
-            display={apiData.project.project_code}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'project_code', value)
-                  .then(()=> onUpdated())
-                  .catch(console.error);
-            }}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm={2}>
-          <Form.Label>Status</Form.Label>
-        </Col>
-        <Col>
-          <EditableField
-            display={apiData.project.status}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'status', value)
-                  .then(()=> onUpdated())
-                  .catch(console.error);
-            }}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm={2}>
-          <Form.Label>Current Location</Form.Label>
-        </Col>
-        <Col>
-          <EditableField
-            display={apiData?.project.current_location}
-            onSubmit={(value) => {
-              updateData(apiUrl, 'current_location', value)
-                  .then(()=> onUpdated())
-                  .catch(console.error);
-            }}
-          />
-        </Col>
-      </Row>
-    </Form.Group>
-  );
-};
 
 interface NewObjectModalProps{
   show: boolean,

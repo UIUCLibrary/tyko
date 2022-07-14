@@ -15,7 +15,7 @@ def test_project_create_and_delete(app):
                     "title": "my dumb project",
                     "project_code": "my dumb project code",
                     "current_location": "old location",
-                    "status": "No work done"
+                    "status": "No Work Done"
                 }
             ),
             content_type='application/json'
@@ -39,7 +39,7 @@ def test_project_posting(app):
                     "title": "my dumb project",
                     "project_code": "my dumb project code",
                     "current_location": "old location",
-                    "status": "No work done"
+                    "status": "No Work Done"
                 }
             ),
             content_type='application/json'
@@ -58,7 +58,7 @@ def test_project_update(app):
                     "title": "my dumb project",
                     "project_code": "my dumb project code",
                     "current_location": "old location",
-                    "status": "No work done"
+                    "status": "No Work Done"
                 }
             ),
             content_type='application/json'
