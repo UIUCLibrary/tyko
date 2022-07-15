@@ -1,4 +1,3 @@
-import Table from 'react-bootstrap/Table';
 import {EditSwitchFormField} from './Common';
 import React, {
   Dispatch,
@@ -12,7 +11,7 @@ import React, {
 import Button from 'react-bootstrap/Button';
 import {ButtonGroup, Form} from 'react-bootstrap';
 import {SelectDate} from './Items';
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 export interface IItem {
   name: string,
   routes: {
@@ -28,43 +27,9 @@ export interface IVendorJobData {
   apiUrl?: string
   onAccessibleChange? : (busy: boolean)=>void
   onUpdated? : ()=>void
+  onError? : (error: Error| AxiosError)=>void
 }
 
-export const VendorTable: React.FC<IVendorJobData> = (data) =>{
-  const vendoData: IVendorJobData = data ? data : {
-    vendorName: 'foo',
-    deliverableReceivedDate: '12/11/2009',
-    originalsReceivedDate: '12/12/2009',
-  };
-  return (
-    <Table>
-      <thead>
-        <th>Vendor Name</th>
-        <th>Deliverables Received Date</th>
-        <th>Originals Received Date</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{vendoData.vendorName}</td>
-          <td>
-            {
-              vendoData.deliverableReceivedDate ?
-                  vendoData.deliverableReceivedDate :
-                  ''
-            }
-          </td>
-          <td>
-            {
-              vendoData.originalsReceivedDate ?
-                  vendoData.originalsReceivedDate :
-                  ''
-            }
-          </td>
-        </tr>
-      </tbody>
-    </Table>
-  );
-};
 interface IEditControl {
   editMode: boolean
   setEditMode: Dispatch<SetStateAction<boolean>>
@@ -103,6 +68,7 @@ export const VendorDataEdit: FC<IVendorJobData> = (
       apiUrl,
       onAccessibleChange,
       onUpdated,
+      onError,
     },
 ) =>{
   const [accessible, setAccessible] = useState(true);
@@ -129,13 +95,16 @@ export const VendorDataEdit: FC<IVendorJobData> = (
     const formProps = Object.fromEntries(formData);
     if (apiUrl) {
       setAccessible(false);
-      axios.put(apiUrl, formProps).then(()=>{
-        if (onUpdated) {
-          onUpdated();
-        }
-      }).catch(console.error).finally(()=> {
-        setAccessible(true);
-      });
+      axios.put(apiUrl, formProps)
+          .then(()=>{
+            if (onUpdated) {
+              onUpdated();
+            }
+          })
+          .catch(onError?onError:console.error)
+          .finally(()=> {
+            setAccessible(true);
+          });
     }
   };
   return (
