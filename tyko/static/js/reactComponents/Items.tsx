@@ -216,10 +216,18 @@ interface ISelectDate{
   defaultValue?: string
   placeholder?: string,
   disabled?: boolean
+  editorId?: string
 }
 
 export const SelectDate: FC<ISelectDate> = (
-    {dateFormat, name, placeholder, disabled, defaultValue},
+    {
+      dateFormat,
+      name,
+      placeholder,
+      disabled,
+      defaultValue,
+      editorId,
+    },
 ) =>{
   const inputText = useRef<HTMLInputElement>(null);
   return (
@@ -227,6 +235,7 @@ export const SelectDate: FC<ISelectDate> = (
       <Form.Control
         type="text"
         name={name}
+        id={editorId}
         defaultValue={defaultValue}
         placeholder={placeholder}
         ref={inputText}

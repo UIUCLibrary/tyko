@@ -114,27 +114,34 @@ export const VendorDataEdit: FC<IVendorJobData> = (
           label='Vendor Name'
           editMode={editMode}
           display={vendorName}>
-          <Form.Control defaultValue={vendorName}/>
+          <Form.Control
+            name='vendorName'
+            defaultValue={vendorName}
+          />
         </EditSwitchFormField>
         <EditSwitchFormField
           label='Deliverables Received Date'
+          editorId='deliverableReceivedDate'
           editMode={editMode}
           display={deliverableReceivedDate}
         >
           <SelectDate
-            name={'name'}
-            dateFormat={'m/d/yyyy'}
+            name='deliverableReceivedDate'
+            editorId='deliverableReceivedDate'
+            dateFormat='m/d/yyyy'
             defaultValue={deliverableReceivedDate}
           />
         </EditSwitchFormField>
         <EditSwitchFormField
           label='Originals Received Date'
           editMode={editMode}
-          display={originalsReceivedDate}
+          editorId='originalsReceivedDate'
+          display='{originalsReceivedDate}'
         >
           <SelectDate
-            name={'name'}
-            dateFormat={'m/d/yyyy'}
+            name='originalsReceivedDate'
+            dateFormat='m/d/yyyy'
+            editorId='originalsReceivedDate'
             defaultValue={originalsReceivedDate}
           />
         </EditSwitchFormField>

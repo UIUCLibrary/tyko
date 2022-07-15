@@ -36,9 +36,10 @@ export const EditSwitchFormField: FC<IEditData> = (
     {label, editMode, display, children, editorId},
 ) => {
   const generatedId = useId();
+  const formId = editorId ? editorId : generatedId;
   const labelElement = (
     <Form.Label column='sm'
-      htmlFor={editorId ? editorId : generatedId}
+      htmlFor={formId}
     >
       {label}
     </Form.Label>
@@ -47,7 +48,7 @@ export const EditSwitchFormField: FC<IEditData> = (
     return (
       <Form.Group className="mb-3 row">
         {labelElement}
-        <Form.Text id={editorId ? editorId : generatedId}
+        <Form.Text id={formId}
           className='col-sm-8'>
           {display}
         </Form.Text>

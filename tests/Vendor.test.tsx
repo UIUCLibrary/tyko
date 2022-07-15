@@ -16,10 +16,48 @@ import {VendorDataEdit} from '../tyko/static/js/reactComponents/Vendor';
 jest.mock('vanillajs-datepicker', ()=>{});
 
 jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-mockedAxios.put.mockResolvedValue({data: 'ok'})
+
 describe('VendorDataEdit', ()=>{
+  const mockedAxios = axios as jest.Mocked<typeof axios>;
+  test('put', async ()=> {
+    const onUpdate = jest.fn();
+    mockedAxios.put.mockResolvedValue({data: 'ok'});
+    render(
+        <VendorDataEdit
+          vendorName='Bob'
+          apiUrl='/api/dummy'
+          onUpdated={onUpdate}
+        />,
+    );
+    await waitFor(()=> {
+      fireEvent.click(screen.getByText('Edit'));
+    });
+    fireEvent.change(
+        screen.getByLabelText('Originals Received Date'),
+        {
+          target: {
+            value: '4/22/1999',
+          },
+        },
+    );
+
+    await waitFor(()=> {
+      fireEvent.click(screen.getByText('Confirm'));
+    });
+    await waitFor(()=>{
+      expect(mockedAxios.put).toBeCalledWith(
+          expect.stringMatching('/api/dummy'),
+          expect.objectContaining(
+              {
+                'vendorName': 'Bob',
+                'originalsReceivedDate': '4/22/1999',
+              },
+          ),
+      );
+    });
+  });
   test('calls onUpdate', async ()=>{
+    mockedAxios.put.mockResolvedValue({data: 'ok'});
     const onUpdate = jest.fn();
     render(
         <VendorDataEdit
