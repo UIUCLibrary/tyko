@@ -91,6 +91,72 @@ def test_project_update(app):
         assert updated_project["status"] == "Complete"
 
 
+def test_item_update_vendor_info(app):
+    with app.test_client() as server:
+        server.get('/')
+        project_id = server.post(
+            url_for("api.add_project"),
+            content_type='application/json',
+            data=json.dumps({
+                "title": 'Spam Project'
+            })
+        ).get_json()["id"]
+        new_object_id = server.post(
+            url_for("api.project_add_object", project_id=project_id),
+            data=json.dumps(
+                {
+                    "name": "My dummy object",
+                    "barcode": "12345",
+                }
+            ),
+            content_type='application/json'
+        ).get_json()['object']["object_id"]
+        item_id = server.post(
+            url_for(
+                "api.object_item",
+                project_id=project_id,
+                object_id=new_object_id
+            )
+            ,
+            data=json.dumps(
+                {
+                    "name": "My dummy item",
+                    "files": [
+                        {
+                            "name": "dummy.wav",
+                        }
+                    ],
+                    "format_id": 4
+                }
+            ),
+            content_type='application/json').get_json()['item']['item_id']
+        item_api_url = url_for("api.object_item",
+                               project_id=project_id,
+                               object_id=new_object_id,
+                               item_id=item_id
+                               )
+        resp = server.put(
+            item_api_url,
+            data=json.dumps(
+                {
+                    'originalsReceivedDate': '4/22/1999'
+                }
+            ),
+            content_type='application/json'
+        )
+        assert resp.status_code == 200
+        resp = server.get(
+            item_api_url,
+            content_type='application/json'
+        )
+        item = resp.get_json()
+        assert item["name"] == "My dummy item"
+        assert item["originalsReceivedDate"] == '4/22/1999'
+        assert resp.status_code == 200
+
+        # todo: check deliverableReceivedDate as well
+
+
 @pytest.mark.filterwarnings("ignore:Unknown format type items. Not updating")
 def test_item_update(app):
 
