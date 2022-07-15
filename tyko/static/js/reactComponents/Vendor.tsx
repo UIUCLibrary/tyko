@@ -136,7 +136,7 @@ export const VendorDataEdit: FC<IVendorJobData> = (
           label='Originals Received Date'
           editMode={editMode}
           editorId='originalsReceivedDate'
-          display='{originalsReceivedDate}'
+          display={originalsReceivedDate}
         >
           <SelectDate
             name='originalsReceivedDate'

@@ -85,14 +85,6 @@ export default function ItemDetails() {
     deliverableReceivedDate: '12/11/2009',
     originalsReceivedDate: '12/12/2009',
   };
-  const handleBusy = (isBusy: boolean) =>{
-    setBusy(isBusy);
-    if (isBusy) {
-      console.log('yup');
-    } else {
-      console.log('nope');
-    }
-  };
   const blocker = busy ?
       (
         <InactiveCover><LoadingIndeterminate/></InactiveCover>
@@ -119,7 +111,7 @@ export default function ItemDetails() {
                 deliverableReceivedDate={vendorData.deliverableReceivedDate}
                 originalsReceivedDate={vendorData.originalsReceivedDate}
                 apiUrl={apiUrl}
-                onAccessibleChange={handleBusy}
+                onAccessibleChange={setBusy}
               />
             </Panel>
           </Row>
