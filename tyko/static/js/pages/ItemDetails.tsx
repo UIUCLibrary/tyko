@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Col, Row} from 'react-bootstrap';
-import Panel from '../reactComponents/Panel';
+import Panel, {InactiveCover} from '../reactComponents/Panel';
 import {
   ItemDetails as ItemDetailsDetails,
   IItemMetadata,
@@ -9,7 +9,7 @@ import FormatDetails from '../reactComponents/FormatDetails';
 import {useParams} from 'react-router-dom';
 import axios from 'axios';
 import {LoadingIndeterminate} from '../reactComponents/Common';
-
+import {IVendorJobData, VendorDataEdit} from '../reactComponents/Vendor';
 /**
  * d
  * @constructor
@@ -21,6 +21,7 @@ export default function ItemDetails() {
 
   const [apiData, setApiData] = useState<IItemMetadata | null>(null);
   const [loading, setLoading] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const fetchData = async (url: string) => {
     setApiData(((await axios.get(url)).data as IItemMetadata));
@@ -78,6 +79,25 @@ export default function ItemDetails() {
     filesPanel = <>do stuff here</>;
     notesPanel = <>do stuff here</>;
   }
+
+  const vendorData: IVendorJobData = {
+    vendorName: 'foo',
+    deliverableReceivedDate: '12/11/2009',
+    originalsReceivedDate: '12/12/2009',
+  };
+  const handleBusy = (isBusy: boolean) =>{
+    setBusy(isBusy);
+    if (isBusy) {
+      console.log('yup');
+    } else {
+      console.log('nope');
+    }
+  };
+  const blocker = busy ?
+      (
+        <InactiveCover><LoadingIndeterminate/></InactiveCover>
+      ) :
+      <></>;
   return (
     <div>
       <h1>Item Details</h1>
@@ -89,6 +109,18 @@ export default function ItemDetails() {
             </Panel>
             <Panel title="Format Details">
               {formatDetailsPanel}
+            </Panel>
+          </Row>
+          <Row>
+            <Panel title='Vendor'>
+              {blocker}
+              <VendorDataEdit
+                vendorName={vendorData.vendorName}
+                deliverableReceivedDate={vendorData.deliverableReceivedDate}
+                originalsReceivedDate={vendorData.originalsReceivedDate}
+                apiUrl={apiUrl}
+                onAccessibleChange={handleBusy}
+              />
             </Panel>
           </Row>
         </Col>
