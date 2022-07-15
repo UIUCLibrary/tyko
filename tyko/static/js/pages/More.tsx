@@ -12,7 +12,6 @@ export default function More() {
         <li><Link to="/collections">Collections</Link></li>
         <li><Link to="/formats">Formats</Link></li>
         <li><Link to="/projects">Projects</Link></li>
-        <li><Link to="/vendors">Vendors</Link></li>
       </ul>
     </Panel>
     <Panel title="Forms">
