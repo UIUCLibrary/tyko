@@ -1,6 +1,6 @@
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
-import {LoadingPercent} from './Common';
+import {EditSwitchFormField, LoadingPercent} from './Common';
 import React, {
   useState,
   useEffect,
@@ -23,6 +23,20 @@ interface Element {
   value: string | number | boolean | EnumMetadata
 }
 
+const createEnumField2 = (
+    name: string,
+    current: EnumMetadata,
+    all: ApiEnum[] | null,
+)=>{
+  return (
+    <>
+      <Form.Select name={name} defaultValue={current ? current.id : ''}>
+        <option key={-1} value=''/>
+        {all ? createEnumOptions(all) :(<></>)}
+      </Form.Select>
+    </>
+  );
+};
 const createEnumField = (
     name: string,
     current: EnumMetadata,
@@ -519,6 +533,23 @@ const createDateField = (
       defaultValue={current ? current: ''}/>
   );
 };
+
+const createDateField2 = (
+    name: string,
+    current: string | null,
+    dateFormat: string,
+)=>{
+  return (
+    <Form.Group>
+      <SelectDate
+        name={name}
+        dateFormat={dateFormat}
+        defaultValue={current ? current: ''}
+      />
+    </Form.Group>
+  );
+};
+
 const Film: FC<IFormatType> = ({data, editMode}) => {
   const [loading, setLoading] = useState(false);
   const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
@@ -985,11 +1016,10 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
     <Fragment>
       <FormatDetail key="dateOfCassette" label="Date Of Cassette">
         {
-          createDateField(
+          createDateField2(
               'date_of_cassette',
               data['date_of_cassette'].value as string,
               'm/dd/yyyy',
-              editMode,
           )
         }
       </FormatDetail>
@@ -1080,6 +1110,97 @@ const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
       </tr>
     );
   }
+  const cassetteType =
+      data['cassette_type'].value ?
+          (data['cassette_type'].value as EnumMetadata).name :
+          '';
+
+  return (
+    <div>
+      <EditSwitchFormField
+        label='Cassette Title'
+        editMode={editMode}
+        display={data['cassette_title'].value as string}>
+        <Form.Control
+          name='cassette_title'
+          defaultValue={data['cassette_title'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Type'
+        editMode={editMode}
+        display={cassetteType}>
+        {
+          createEnumField2(
+              'cassette_type_id',
+              data['cassette_type'].value as EnumMetadata,
+              subtypes,
+          )
+        }
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Date of Cassette'
+        editMode={editMode}
+        display={data['date_of_cassette'].value as string}>
+        {
+          createDateField(
+              'date_of_cassette',
+              data['date_of_cassette'].value as string,
+              'm/dd/yyyy',
+              editMode,
+          )
+        }
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Generation'
+        editMode={editMode}
+        display={cassetteType}>
+        {
+          createEnumField2(
+              'generation_id',
+              data['generation'].value as EnumMetadata,
+              generations,
+          )
+        }
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side A Label'
+        editMode={editMode}
+        display={data['side_a_label'].value as string}>
+        <Form.Control
+          name='side_a_label'
+          defaultValue={data['side_a_label'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side A Duration'
+        editMode={editMode}
+        display={data['side_a_duration'].value as string}>
+        <Form.Control
+          name='side_a_duration'
+          defaultValue={data['side_a_duration'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side B Label'
+        editMode={editMode}
+        display={data['side_b_label'].value as string}>
+        <Form.Control
+          name='side_b_label'
+          defaultValue={data['side_b_label'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side B Duration'
+        editMode={editMode}
+        display={data['side_b_duration'].value as string}>
+        <Form.Control
+          name='side_b_duration'
+          defaultValue={data['side_b_duration'].value as string}
+        />
+      </EditSwitchFormField>
+    </div>
+  );
   return (
     <Fragment>
       <FormatDetail key='cassetteTitle' label="Cassette Title">
