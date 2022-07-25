@@ -1,6 +1,8 @@
 import json
+from typing import Dict
+
 import pytest
-from flask import url_for
+from flask import url_for, Flask
 
 from tyko.schema.formats import format_types
 
@@ -91,9 +93,50 @@ def test_project_update(app):
         assert updated_project["status"] == "Complete"
 
 
-def test_item_update_vendor_info(app):
+@pytest.mark.parametrize(
+    'vendor_info,key,expected_value',
+    [
+        (
+            {
+                'originalsReceivedDate': '4/22/1999'
+            },
+            'originals_received_date',
+            '4/22/1999'
+        ),
+        (
+            {
+                'deliverableReceivedDate': '5/11/1996'
+            },
+            'deliverable_received_date',
+            '5/11/1996'
+        ),
+        (
+            {
+                'deliverableReceivedDate': '5/11/1996',
+                'originalsReceivedDate': '4/22/1999'
+            },
+            'deliverable_received_date',
+            '5/11/1996'
+        ),
+        (
+            {
+                'deliverableReceivedDate': '5/11/1996',
+                'originalsReceivedDate': '4/22/1999'
+            },
+            'originals_received_date',
+            '4/22/1999'
+        ),
+    ]
+)
+def test_item_update_vendor_info(
+        app: Flask,
+        vendor_info: Dict[str, str],
+        key: str,
+        expected_value: str
+):
     with app.test_client() as server:
         server.get('/')
+
         project_id = server.post(
             url_for("api.add_project"),
             content_type='application/json',
@@ -101,6 +144,7 @@ def test_item_update_vendor_info(app):
                 "title": 'Spam Project'
             })
         ).get_json()["id"]
+
         new_object_id = server.post(
             url_for("api.project_add_object", project_id=project_id),
             data=json.dumps(
@@ -111,6 +155,7 @@ def test_item_update_vendor_info(app):
             ),
             content_type='application/json'
         ).get_json()['object']["object_id"]
+
         item_id = server.post(
             url_for(
                 "api.object_item",
@@ -135,26 +180,25 @@ def test_item_update_vendor_info(app):
                                object_id=new_object_id,
                                item_id=item_id
                                )
-        resp = server.put(
-            item_api_url,
-            data=json.dumps(
-                {
-                    'originalsReceivedDate': '4/22/1999'
-                }
-            ),
-            content_type='application/json'
-        )
-        assert resp.status_code == 200
-        resp = server.get(
-            item_api_url,
-            content_type='application/json'
-        )
-        item = resp.get_json()
-        assert item["name"] == "My dummy item"
-        assert item["originalsReceivedDate"] == '4/22/1999'
-        assert resp.status_code == 200
 
-        # todo: check deliverableReceivedDate as well
+        put_response = server.put(
+            item_api_url,
+            data=json.dumps(vendor_info),
+            content_type='application/json'
+        )
+
+        assert \
+            put_response.status_code == 200, \
+            put_response.data.decode(put_response.charset)
+
+        put_response = server.get(
+            item_api_url,
+            content_type='application/json'
+        )
+        item = put_response.get_json()
+        assert item["name"] == "My dummy item"
+        assert item[key] == expected_value
+        assert put_response.status_code == 200
 
 
 @pytest.mark.filterwarnings("ignore:Unknown format type items. Not updating")

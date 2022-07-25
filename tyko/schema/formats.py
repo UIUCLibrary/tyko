@@ -63,6 +63,8 @@ class AVFormat(AVTables, abc.ABC):
     files = relationship("InstantiationFile", backref="file_source")
     treatment = relationship("Treatment", backref="treatment_id")
     barcode = db.Column("barcode", db.Text)
+    deliverable_received_date = db.Column("deliverable_received_date", db.Date)
+    originals_received_date = db.Column("originals_received_date", db.Date)
 
     def _iter_files(self, recurse=False):
         for file_ in self.files:
@@ -106,6 +108,16 @@ class AVFormat(AVTables, abc.ABC):
             utils.serialize_precision_datetime(
                 self.inspection_date
             ) if self.inspection_date is not None else None
+
+        data["deliverable_received_date"] = \
+            utils.serialize_precision_datetime(
+                self.deliverable_received_date
+            ) if self.deliverable_received_date is not None else None
+
+        data["originals_received_date"] = \
+            utils.serialize_precision_datetime(
+                self.originals_received_date
+            ) if self.originals_received_date is not None else None
 
         data['transfer_date'] = \
             utils.serialize_precision_datetime(

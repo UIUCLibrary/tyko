@@ -549,19 +549,46 @@ class ItemDataConnector(AbsNotesConnector):
         item: CollectionItem = self.get_item(id)
         session = self.session_maker()
         if item:
-            if "name" in changed_data:
-                item.name = changed_data['name']
+            copy_of_changed_data = changed_data.copy()
+            if name := copy_of_changed_data.pop('name', None):
+                item.name = name
 
-            if "obj_sequence" in changed_data:
-                item.obj_sequence = int(changed_data["obj_sequence"])
+            if obj_sequence := copy_of_changed_data.pop('obj_sequence', None):
+                item.obj_sequence = int(obj_sequence)
 
-            if "format_details" in changed_data:
+            if format_details := copy_of_changed_data.pop(
+                    'format_details',
+                    None
+            ):
                 update_format_specific_details(
                     format_type=item.type,
-                    changed_data=changed_data['format_details'],
+                    changed_data=format_details,
                     session=session, item=item)
-            if 'barcode' in changed_data:
-                item.barcode = changed_data['barcode']
+
+            if barcode := copy_of_changed_data.pop('barcode', None):
+                item.barcode = barcode
+
+            if deliverable_received_date := copy_of_changed_data.pop(
+                    'deliverableReceivedDate',
+                    None
+            ):
+                item.deliverable_received_date = \
+                    utils.create_precision_datetime(deliverable_received_date)
+
+            if originals_received_date := copy_of_changed_data.pop(
+                    'originalsReceivedDate',
+                    None
+            ):
+                item.originals_received_date = \
+                    utils.create_precision_datetime(originals_received_date)
+
+            unparsed_keys = copy_of_changed_data.keys()
+            if len(unparsed_keys) > 0:
+                unexpected_keys = ", ".join(unparsed_keys)
+                raise DataError(
+                    message=f"Invalid Key(s): {unexpected_keys}"
+                )
+
             try:
                 session.add(item)
                 session.commit()
