@@ -1,5 +1,6 @@
-import {Form, ProgressBar, Spinner} from 'react-bootstrap';
-import React, {FC, useId} from 'react';
+import {ButtonGroup, Form, ProgressBar, Spinner} from 'react-bootstrap';
+import React, {Dispatch, FC, SetStateAction, useId} from 'react';
+import Button from 'react-bootstrap/Button';
 
 export const LoadingIndeterminate = () => {
   return (
@@ -23,6 +24,39 @@ export const LoadingPercent : FC<{percentLoaded?: number}>= (
     />
   );
 };
+
+
+interface IEditControl {
+  editMode: boolean
+  setEditMode: Dispatch<SetStateAction<boolean>>
+  onConfirm?: ()=>void
+}
+export const EditControl: FC<IEditControl> = (
+    {editMode, setEditMode, onConfirm},
+) =>{
+  const handleConfirm = ()=>{
+    if (onConfirm) {
+      onConfirm();
+    }
+  };
+  const handleEditModeChange = ()=>{
+    setEditMode(!editMode);
+  };
+  return (
+    <>
+      <ButtonGroup hidden={!editMode}>
+        <Button variant={'outline-danger'} onClick={handleEditModeChange}>
+          Cancel
+        </Button>
+        <Button onClick={handleConfirm} variant={'outline-primary'}>
+          Confirm
+        </Button>
+      </ButtonGroup>
+      <Button hidden={editMode} onClick={handleEditModeChange}>Edit</Button>
+    </>
+  );
+};
+
 
 interface IEditData {
   label: string,

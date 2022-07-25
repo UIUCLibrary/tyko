@@ -1,6 +1,6 @@
 import React, {
   FC,
-  FocusEvent, useCallback,
+  FocusEvent, FormEvent, useCallback,
   useEffect,
   useReducer,
   useRef,
@@ -8,9 +8,10 @@ import React, {
 } from 'react';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import {Button, Form} from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
+import {EditSwitchFormField, EditControl} from './Common';
 
 interface IEditableField{
   id?: string
@@ -145,6 +146,109 @@ const updateData = async (url: string, key: string, value: string) => {
   const data: {[key: string]: string} = {};
   data[key] = value;
   return axios.put(url, data);
+};
+interface IItemDetails {
+  objectName: string,
+  formatName: string,
+  objectSequence: number,
+  barcode?: string,
+  apiUrl?: string
+  onAccessibleChange? : (busy: boolean)=>void
+  onUpdated? : ()=>void
+  onError? : (error: Error| AxiosError)=>void
+}
+export const ItemDetails2: FC<IItemDetails> = (
+    {
+      objectName,
+      formatName,
+      objectSequence,
+      barcode,
+      apiUrl,
+      onAccessibleChange,
+      onUpdated,
+      onError,
+    },
+) =>{
+  const [accessible, setAccessible] = useState(true);
+  const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
+  const form = useRef<HTMLFormElement>(null);
+  const handleConfirm = ()=>{
+    form.current?.dispatchEvent(
+        new Event(
+            'submit', {
+              cancelable: true,
+              bubbles: true,
+            }),
+    );
+  };
+  useEffect(()=>{
+    if (onAccessibleChange) {
+      onAccessibleChange(!accessible);
+    }
+  }, [accessible, onAccessibleChange]);
+  const handleSubmit = (event: FormEvent)=>{
+    event.preventDefault();
+    const formData = new FormData(event.target as HTMLFormElement);
+    const formProps = Object.fromEntries(formData);
+    if (apiUrl) {
+      setAccessible(false);
+      axios.put(apiUrl, formProps)
+          .then(()=>{
+            if (onUpdated) {
+              onUpdated();
+            }
+          })
+          .catch(onError?onError:console.error)
+          .finally(()=> {
+            setEditMode();
+            setAccessible(true);
+          });
+    }
+  };
+  return (
+    <>
+      <Form ref={form} onSubmit={handleSubmit}>
+        <EditSwitchFormField
+          label='Name'
+          editMode={editMode}
+          display={objectName}>
+          <Form.Control
+            name='name'
+            defaultValue={objectName}
+          />
+        </EditSwitchFormField>
+        <EditSwitchFormField
+          label='Object Sequence'
+          editMode={editMode}
+          display={objectSequence ? objectSequence.toString() : null}>
+          <Form.Control
+            name='obj_sequence'
+            type='number'
+            defaultValue={objectSequence}
+          />
+        </EditSwitchFormField>
+        <EditSwitchFormField
+          label='Barcode'
+          editMode={editMode}
+          display={barcode}>
+          <Form.Control
+            name='barcode'
+            defaultValue={barcode}
+          />
+        </EditSwitchFormField>
+        <EditSwitchFormField
+          label='Format Type'
+          editMode={false}
+          display={formatName}>
+        </EditSwitchFormField>
+        <EditControl
+          editMode={editMode}
+          setEditMode={setEditMode}
+          onConfirm={handleConfirm}
+        />
+      </Form>
+    </>
+  );
 };
 interface IData {
   apiData: IItemMetadata

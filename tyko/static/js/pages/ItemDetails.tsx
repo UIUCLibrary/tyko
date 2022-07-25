@@ -2,8 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Col, Row} from 'react-bootstrap';
 import Panel, {InactiveCover} from '../reactComponents/Panel';
 import {
-  ItemDetails as ItemDetailsDetails,
-  IItemMetadata,
+  IItemMetadata, ItemDetails2,
 } from '../reactComponents/ItemApp';
 import FormatDetails from '../reactComponents/FormatDetails';
 import {useParams} from 'react-router-dom';
@@ -68,10 +67,14 @@ export default function ItemDetails() {
       </div>
     </>;
   } else {
-    detailsPanel = <ItemDetailsDetails
-      apiData={apiData}
+    detailsPanel = <ItemDetails2
+      objectName={apiData.name}
+      formatName={apiData.format.name}
+      barcode={apiData.barcode ? apiData.barcode: undefined}
+      objectSequence={apiData.obj_sequence}
       apiUrl={apiUrl}
-      onUpdated={()=>setApiData(null)}/>;
+      onUpdated={()=>setApiData(null)}
+    />;
     formatDetailsPanel = <FormatDetails
       apiData={apiData}
       apiUrl={apiUrl}

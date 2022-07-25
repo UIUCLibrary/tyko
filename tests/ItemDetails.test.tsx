@@ -78,7 +78,7 @@ describe('ItemDetails', () => {
         </MemoryRouter>,
     );
     const item = await waitFor(async () => {
-      return screen.getByDisplayValue('dummy');
+      return screen.getByText('dummy');
     });
     expect(item).toBeInTheDocument();
   });

@@ -1,15 +1,12 @@
-import {EditSwitchFormField} from './Common';
+import {EditSwitchFormField, EditControl} from './Common';
 import React, {
-  Dispatch,
   FC, FormEvent,
-  SetStateAction,
   useReducer,
   useRef,
   useState,
   useEffect,
 } from 'react';
-import Button from 'react-bootstrap/Button';
-import {ButtonGroup, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
 import {SelectDate} from './Items';
 import axios, {AxiosError} from 'axios';
 export interface IItem {
@@ -29,36 +26,6 @@ export interface IVendorJobData {
   onUpdated? : ()=>void
   onError? : (error: Error| AxiosError)=>void
 }
-
-interface IEditControl {
-  editMode: boolean
-  setEditMode: Dispatch<SetStateAction<boolean>>
-  onConfirm?: ()=>void
-}
-const EditControl: FC<IEditControl> = ({editMode, setEditMode, onConfirm}) =>{
-  const handleConfirm = ()=>{
-    if (onConfirm) {
-      onConfirm();
-    }
-  };
-  const handleEditModeChange = ()=>{
-    setEditMode(!editMode);
-  };
-  return (
-    <>
-      <ButtonGroup hidden={!editMode}>
-        <Button variant={'outline-danger'} onClick={handleEditModeChange}>
-          Cancel
-        </Button>
-        {/* <Button type='submit' variant={'outline-primary'}>*/}
-        <Button onClick={handleConfirm} variant={'outline-primary'}>
-          Confirm
-        </Button>
-      </ButtonGroup>
-      <Button hidden={editMode} onClick={handleEditModeChange}>Edit</Button>
-    </>
-  );
-};
 
 export const VendorDataEdit: FC<IVendorJobData> = (
     {
