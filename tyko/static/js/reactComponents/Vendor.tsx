@@ -20,7 +20,7 @@ export interface IItem {
   }
 }
 export interface IVendorJobData {
-  vendorName: string,
+  vendorName?: string,
   deliverableReceivedDate?: string,
   originalsReceivedDate?: string,
   items?: IItem[]
@@ -103,6 +103,7 @@ export const VendorDataEdit: FC<IVendorJobData> = (
           })
           .catch(onError?onError:console.error)
           .finally(()=> {
+            setEditMode();
             setAccessible(true);
           });
     }
@@ -115,7 +116,7 @@ export const VendorDataEdit: FC<IVendorJobData> = (
           editMode={editMode}
           display={vendorName}>
           <Form.Control
-            name='vendorName'
+            name='vendor_name'
             defaultValue={vendorName}
           />
         </EditSwitchFormField>
@@ -126,7 +127,7 @@ export const VendorDataEdit: FC<IVendorJobData> = (
           display={deliverableReceivedDate}
         >
           <SelectDate
-            name='deliverableReceivedDate'
+            name='deliverable_received_date'
             editorId='deliverableReceivedDate'
             dateFormat='m/d/yyyy'
             defaultValue={deliverableReceivedDate}
@@ -139,7 +140,7 @@ export const VendorDataEdit: FC<IVendorJobData> = (
           display={originalsReceivedDate}
         >
           <SelectDate
-            name='originalsReceivedDate'
+            name='originals_received_date'
             dateFormat='m/d/yyyy'
             editorId='originalsReceivedDate'
             defaultValue={originalsReceivedDate}

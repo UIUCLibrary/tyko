@@ -98,33 +98,42 @@ def test_project_update(app):
     [
         (
             {
-                'originalsReceivedDate': '4/22/1999'
+                'originals_received_date': '4/22/1999'
             },
             'originals_received_date',
             '4/22/1999'
         ),
         (
             {
-                'deliverableReceivedDate': '5/11/1996'
+                'deliverable_received_date': '5/11/1996'
             },
             'deliverable_received_date',
             '5/11/1996'
         ),
         (
             {
-                'deliverableReceivedDate': '5/11/1996',
-                'originalsReceivedDate': '4/22/1999'
+                'deliverable_received_date': '5/11/1996',
+                'originals_received_date': '4/22/1999'
             },
             'deliverable_received_date',
             '5/11/1996'
         ),
         (
             {
-                'deliverableReceivedDate': '5/11/1996',
-                'originalsReceivedDate': '4/22/1999'
+                'deliverable_received_date': '5/11/1996',
+                'originals_received_date': '4/22/1999'
             },
             'originals_received_date',
             '4/22/1999'
+        ),
+        (
+            {
+                'vendor_name': "Bob's copy shop",
+                'deliverable_received_date': '5/11/1996',
+                'originals_received_date': '4/22/1999'
+            },
+            'vendor_name',
+            "Bob's copy shop"
         ),
     ]
 )
@@ -197,7 +206,7 @@ def test_item_update_vendor_info(
         )
         item = put_response.get_json()
         assert item["name"] == "My dummy item"
-        assert item[key] == expected_value
+        assert item['vendor'][key] == expected_value
         assert put_response.status_code == 200
 
 

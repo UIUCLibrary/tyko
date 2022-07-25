@@ -9,7 +9,7 @@ import FormatDetails from '../reactComponents/FormatDetails';
 import {useParams} from 'react-router-dom';
 import axios from 'axios';
 import {LoadingIndeterminate} from '../reactComponents/Common';
-import {IVendorJobData, VendorDataEdit} from '../reactComponents/Vendor';
+import {VendorDataEdit} from '../reactComponents/Vendor';
 /**
  * d
  * @constructor
@@ -79,12 +79,34 @@ export default function ItemDetails() {
     filesPanel = <>do stuff here</>;
     notesPanel = <>do stuff here</>;
   }
+  const vendorInfo = apiData?.vendor ?
+      apiData.vendor :
+      {
+        'vendor_name': null,
+        'deliverable_received_date': null,
+        'originals_received_date': null,
+      };
+  const vendorPanel = <VendorDataEdit
+    vendorName={
+      vendorInfo['vendor_name'] ?
+          vendorInfo['vendor_name'] : undefined
+    }
+    deliverableReceivedDate={
+      vendorInfo['deliverable_received_date'] ?
+          vendorInfo['deliverable_received_date'] : undefined
+    }
+    originalsReceivedDate={
+      vendorInfo['originals_received_date'] ?
+          vendorInfo['originals_received_date'] : undefined
+    }
+    apiUrl={apiUrl}
+    onAccessibleChange={setBusy}
+    onUpdated={()=> {
+      setBusy(false);
+      setApiData(null);
+    }}
+  />;
 
-  const vendorData: IVendorJobData = {
-    vendorName: 'foo',
-    deliverableReceivedDate: '12/11/2009',
-    originalsReceivedDate: '12/12/2009',
-  };
   const blocker = busy ?
       (
         <InactiveCover><LoadingIndeterminate/></InactiveCover>
@@ -106,13 +128,7 @@ export default function ItemDetails() {
           <Row>
             <Panel title='Vendor'>
               {blocker}
-              <VendorDataEdit
-                vendorName={vendorData.vendorName}
-                deliverableReceivedDate={vendorData.deliverableReceivedDate}
-                originalsReceivedDate={vendorData.originalsReceivedDate}
-                apiUrl={apiUrl}
-                onAccessibleChange={setBusy}
-              />
+              {vendorPanel}
             </Panel>
           </Row>
         </Col>

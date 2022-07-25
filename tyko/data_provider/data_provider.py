@@ -568,19 +568,7 @@ class ItemDataConnector(AbsNotesConnector):
             if barcode := copy_of_changed_data.pop('barcode', None):
                 item.barcode = barcode
 
-            if deliverable_received_date := copy_of_changed_data.pop(
-                    'deliverableReceivedDate',
-                    None
-            ):
-                item.deliverable_received_date = \
-                    utils.create_precision_datetime(deliverable_received_date)
-
-            if originals_received_date := copy_of_changed_data.pop(
-                    'originalsReceivedDate',
-                    None
-            ):
-                item.originals_received_date = \
-                    utils.create_precision_datetime(originals_received_date)
+            self._update_vendor_info(copy_of_changed_data, item)
 
             unparsed_keys = copy_of_changed_data.keys()
             if len(unparsed_keys) > 0:
@@ -596,6 +584,34 @@ class ItemDataConnector(AbsNotesConnector):
             finally:
                 session.close()
         return updated_item
+
+    @staticmethod
+    def _update_vendor_info(changed_data: Dict[str, str], item):
+        """Updates vendor info from changed data.
+
+        Notes:
+            This function removes items from changed_data as it updates.
+        Args:
+            changed_data:
+            item:
+
+        Returns:
+
+        """
+        if vendor_name := changed_data.pop("vendor_name", None):
+            item.vendor_name = vendor_name
+        if deliverable_received_date := changed_data.pop(
+                'deliverable_received_date',
+                None
+        ):
+            item.deliverable_received_date = \
+                utils.create_precision_datetime(deliverable_received_date)
+        if originals_received_date := changed_data.pop(
+                'originals_received_date',
+                None
+        ):
+            item.originals_received_date = \
+                utils.create_precision_datetime(originals_received_date)
 
     @staticmethod
     def update_cassette_tape(session, format_details, item):

@@ -49,8 +49,8 @@ describe('VendorDataEdit', ()=>{
           expect.stringMatching('/api/dummy'),
           expect.objectContaining(
               {
-                'vendorName': 'Bob',
-                'originalsReceivedDate': '4/22/1999',
+                'vendor_name': 'Bob',
+                'originals_received_date': '4/22/1999',
               },
           ),
       );
