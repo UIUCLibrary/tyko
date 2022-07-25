@@ -8,6 +8,7 @@ import {configureNoteEditor, RemoveConfirm} from './editors.mjs';
 import * as tyko from './tyko.mjs';
 import AboutApp from './reactComponents/AboutApp';
 import FormatDetails from './reactComponents/FormatDetails';
+import {VendorDataEdit} from './reactComponents/Vendor'
 import Items, {NewItemButton, ObjectItemsApp} from './reactComponents/Items';
 import {ItemDetails} from './reactComponents/ItemApp';
 import axios from 'axios';
@@ -138,6 +139,40 @@ function loadReactComponents() {
           );
         });
   }
+  const itemVendorDetailsComponent = document.getElementById('itemVendorDetails');
+  if (itemVendorDetailsComponent) {
+    const root = createRoot(itemVendorDetailsComponent);
+    root.render(
+        <Panel title='Vendor'>
+            Loading...
+        </Panel>,
+    );
+    axios.get(itemVendorDetailsComponent.dataset.tykoApiUrl).then((resp)=>{
+      const vendorData = resp.data.item.vendor
+      root.render(
+        <Panel title='Vendor'>
+          <VendorDataEdit
+               vendorName={
+                  vendorData['vendor_name'] ?
+                      vendorData['vendor_name'] : undefined
+                }
+                deliverableReceivedDate={
+                  vendorData['deliverable_received_date'] ?
+                      vendorData['deliverable_received_date'] : undefined
+                }
+                originalsReceivedDate={
+                  vendorData['originals_received_date'] ?
+                      vendorData['originals_received_date'] : undefined
+                }
+               apiUrl={itemVendorDetailsComponent.dataset.tykoApiUrl}
+               onUpdated={()=> {location.reload();}}
+          />
+        </Panel>,
+    );
+      console.log(resp.data.item.vendor);
+      console.log(resp.data);
+    });
+  }
   const formatDetailsComponent = document.getElementById('formatDetails');
   if (formatDetailsComponent) {
     const root = createRoot(formatDetailsComponent);
@@ -164,9 +199,9 @@ function loadReactComponents() {
     const root = createRoot(itemDetails);
     root.render(
         <Panel title='Details'>
-          <p style={{textAlign: 'center'}}>
+          {/*<p style={{textAlign: 'center'}}>*/}
             <LoadingIndeterminate/>;
-          </p>
+          {/*</p>*/}
         </Panel>);
     axios.get(formatDetailsComponent.dataset.tykoApiUrl).then((resp)=>{
       root.render(

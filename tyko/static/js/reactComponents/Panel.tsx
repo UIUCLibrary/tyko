@@ -30,7 +30,7 @@ export default function Panel({title, children}: IPanel) {
  * @constructor
  */
 export function InactiveCover(
-    {children}: {children: JSX.Element | JSX.Element[] | string },
+    {children}: {children ?: JSX.Element | JSX.Element[] | string},
 ) {
   return (
     <div

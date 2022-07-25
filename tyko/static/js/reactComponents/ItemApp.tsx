@@ -125,6 +125,11 @@ export interface IItemMetadata {
     name: string
     },
   format_details: {[key: string]: string}
+  vendor?: {
+    vendor_name: string
+    deliverable_received_date: string | null
+    originals_received_date: string | null
+  },
   format_id: number,
   inspection_date?: string,
   item_id: number,

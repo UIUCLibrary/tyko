@@ -1,8 +1,9 @@
-import React, {FC, useId, useReducer, useState} from 'react';
+import React, {FC, useReducer, useState} from 'react';
 import {Button, ButtonGroup, Form} from 'react-bootstrap';
 import axios from 'axios';
-import {LoadingIndeterminate} from './Common';
+import {EditSwitchFormField, LoadingIndeterminate} from './Common';
 import {InactiveCover} from './Panel';
+
 interface IObject {
   barcode: string|null
   collection_id: number
@@ -29,45 +30,6 @@ interface IProjectDetails {
   apiUrl: string
   onUpdated?: ()=>void
 }
-
-interface IProjectDetailsRow {
-  label: string,
-  display: string | null
-  editMode: boolean
-  editorId?: string
-  children?: string | JSX.Element | JSX.Element[]
-}
-const ProjectDetailsRow:FC<IProjectDetailsRow> = (
-    {label, editMode, display, children, editorId},
-)=>{
-  const generatedId = useId();
-  const labelElement = (
-    <Form.Label
-      htmlFor={editorId ? editorId : generatedId}
-      className="col-sm-4 col-form-label"
-    >
-      {label}
-    </Form.Label>
-  );
-  if (!editMode) {
-    return (
-      <Form.Group className="mb-3 row">
-        {labelElement}
-        <Form.Text id={editorId ? editorId : generatedId} className='col-sm-8'>
-          {display}
-        </Form.Text>
-      </Form.Group>
-    );
-  }
-  return (
-    <Form.Group className="mb-3 row">
-      {labelElement}
-      <Form.Group className="col-sm-8">
-        {children}
-      </Form.Group>
-    </Form.Group>
-  );
-};
 
 export const ProjectDetailDetails: FC<IProjectDetails> = (
     {apiData, apiUrl, onUpdated},
@@ -96,7 +58,7 @@ export const ProjectDetailDetails: FC<IProjectDetails> = (
       <Form onSubmit={handleUpdate}>
         <div>
           <Form.Group className="mb-3 row">
-            <ProjectDetailsRow
+            <EditSwitchFormField
               label='Title'
               editorId='titleField'
               display={apiData.project.title}
@@ -107,8 +69,8 @@ export const ProjectDetailDetails: FC<IProjectDetails> = (
                 name='title'
                 defaultValue={apiData.project.title}
               />
-            </ProjectDetailsRow>
-            <ProjectDetailsRow
+            </EditSwitchFormField>
+            <EditSwitchFormField
               label='Project Code'
               editorId='projectCodeField'
               display={apiData.project.project_code}
@@ -119,8 +81,8 @@ export const ProjectDetailDetails: FC<IProjectDetails> = (
                 name='project_code'
                 defaultValue={apiData.project.project_code}
               />
-            </ProjectDetailsRow>
-            <ProjectDetailsRow
+            </EditSwitchFormField>
+            <EditSwitchFormField
               label='Status'
               editorId='currentStatusField'
               display={apiData.project.status}
@@ -135,8 +97,8 @@ export const ProjectDetailDetails: FC<IProjectDetails> = (
                 <option value='In Progress'>In Progress</option>
                 <option value='Complete'>Complete</option>
               </Form.Select>
-            </ProjectDetailsRow>
-            <ProjectDetailsRow
+            </EditSwitchFormField>
+            <EditSwitchFormField
               label='Current Location'
               editorId='currentLocationField'
               display={apiData.project.current_location}
@@ -146,7 +108,7 @@ export const ProjectDetailDetails: FC<IProjectDetails> = (
                 name='current_location'
                 defaultValue={apiData.project.current_location}
               />
-            </ProjectDetailsRow>
+            </EditSwitchFormField>
           </Form.Group>
         </div>
         <ButtonGroup hidden={!editMode}>

@@ -7,6 +7,9 @@
 {% block main_details %}
     <div id="itemDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
     <div id="formatDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
+    <div id="itemVendorDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
+
+{#    TODO: Make vendor details show here#}
 {% endblock %}
 
 {% macro casstte_display(data) %}
