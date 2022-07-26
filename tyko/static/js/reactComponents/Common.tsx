@@ -60,8 +60,8 @@ export const EditControl: FC<IEditControl> = (
 
 interface IEditData {
   label: string,
-  display: string | null | undefined
-  editMode: boolean
+  display: string | null | undefined,
+  editMode: boolean,
   editorId?: string
   children?: string | JSX.Element | JSX.Element[]
 }
@@ -82,7 +82,7 @@ export const EditSwitchFormField: FC<IEditData> = (
     return (
       <Form.Group className="mb-3 row">
         {labelElement}
-        <Form.Text id={formId}
+        <Form.Text as={'span'} id={formId} aria-label={label}
           className='col-sm-8'>
           {display}
         </Form.Text>
