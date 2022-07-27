@@ -4,8 +4,6 @@ import React, {
   useState,
   useEffect,
   FC,
-  Fragment,
-  ReactElement,
   useReducer, useRef,
 } from 'react';
 import axios, {AxiosResponse} from 'axios';
@@ -43,23 +41,6 @@ const createEnumOptions = (enumList: EnumMetadata[])=>{
   });
 };
 
-
-/**
- * Format a row of a key value pair
- * @param {value} value of pair
- * @constructor
- */
-const FormatDetail:
-    FC<{
-      label: string,
-      children?: string | JSX.Element | JSX.Element[]
-    }> = ({label, children}) => {
-      return (
-        <div className="container-sm">
-          {children}
-        </div>
-      );
-    };
 
 const OpenReel: FC<IFormatType> = ({data, editMode}) => {
   const [loading, setLoading] = useState(false);
@@ -1352,24 +1333,16 @@ function getTableBody(
     );
   }
 
-  const values: JSX.Element[] = data.map(
+  const items = data.map(
       (
           item: {
-            value?: string | number | boolean | EnumMetadata,
-            key: string
-          },
-          index: number,
+          value?: string | number | boolean | EnumMetadata,
+          key: string
+        },
       ) => {
-        const children: ReactElement = <p>
-          {item.value ? item.value.toString() : ''}
-        </p>;
-        return (
-          <FormatDetail key={index.toString()} label={item.key}>
-            {children}
-          </FormatDetail>
-        );
+        return <p key={item.key}>{item.value ? item.value.toString() : ''}</p>;
       });
-  return (<Fragment>{values}</Fragment>);
+  return <>{items}</>;
 }
 
 interface FormatType {
