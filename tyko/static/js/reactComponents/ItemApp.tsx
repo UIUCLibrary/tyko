@@ -11,7 +11,12 @@ import Table from 'react-bootstrap/Table';
 import axios, {AxiosError} from 'axios';
 import {Button, Form} from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
-import {EditSwitchFormField, EditControl, submitEvent} from './Common';
+import {
+  EditSwitchFormField,
+  EditControl,
+  submitEvent,
+  submitFormUpdates
+} from './Common';
 
 interface IEditableField{
   id?: string
@@ -184,11 +189,9 @@ export const ItemDetails2: FC<IItemDetails> = (
   }, [accessible, onAccessibleChange]);
   const handleSubmit = (event: FormEvent)=>{
     event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    const formProps = Object.fromEntries(formData);
     if (apiUrl) {
       setAccessible(false);
-      axios.put(apiUrl, formProps)
+      submitFormUpdates(apiUrl, new FormData(event.target as HTMLFormElement))
           .then(()=>{
             if (onUpdated) {
               onUpdated();

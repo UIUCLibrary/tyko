@@ -1,6 +1,7 @@
 import {ButtonGroup, Form, ProgressBar, Spinner} from 'react-bootstrap';
 import React, {Dispatch, FC, SetStateAction, useId} from 'react';
 import Button from 'react-bootstrap/Button';
+import axios, {AxiosResponse} from 'axios';
 
 export const LoadingIndeterminate = () => {
   return (
@@ -107,4 +108,13 @@ export const submitEvent = (target: EventTarget)=>{
             bubbles: true,
           }),
   );
+};
+
+
+export const submitFormUpdates = (
+    apiUrl: string,
+    formData: FormData,
+): Promise<AxiosResponse> =>{
+  const formProps = Object.fromEntries(formData);
+  return axios.put(apiUrl, formProps);
 };

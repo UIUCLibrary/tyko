@@ -1,4 +1,10 @@
-import {EditSwitchFormField, EditControl, submitEvent} from './Common';
+import {
+  EditSwitchFormField,
+  EditControl,
+  submitEvent,
+  submitFormUpdates,
+} from './Common';
+
 import React, {
   FC, FormEvent,
   useReducer,
@@ -8,7 +14,7 @@ import React, {
 } from 'react';
 import {Form} from 'react-bootstrap';
 import {SelectDate} from './Items';
-import axios, {AxiosError} from 'axios';
+import {AxiosError} from 'axios';
 export interface IItem {
   name: string,
   routes: {
@@ -54,11 +60,9 @@ export const VendorDataEdit: FC<IVendorJobData> = (
 
   const handleSubmit = (event: FormEvent)=>{
     event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    const formProps = Object.fromEntries(formData);
     if (apiUrl) {
       setAccessible(false);
-      axios.put(apiUrl, formProps)
+      submitFormUpdates(apiUrl, new FormData(event.target as HTMLFormElement))
           .then(()=>{
             if (onUpdated) {
               onUpdated();
@@ -119,3 +123,4 @@ export const VendorDataEdit: FC<IVendorJobData> = (
     </>
   );
 };
+
