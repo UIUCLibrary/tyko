@@ -7,10 +7,8 @@ import React, {
   useState,
 } from 'react';
 import InputGroup from 'react-bootstrap/InputGroup';
-import Table from 'react-bootstrap/Table';
-import axios, {AxiosError} from 'axios';
+import {AxiosError} from 'axios';
 import {Button, Form} from 'react-bootstrap';
-import Alert from 'react-bootstrap/Alert';
 import {
   EditSwitchFormField,
   EditControl,
@@ -147,11 +145,6 @@ export interface IItemMetadata {
   transfer_date?: string
 }
 
-const updateData = async (url: string, key: string, value: string) => {
-  const data: {[key: string]: string} = {};
-  data[key] = value;
-  return axios.put(url, data);
-};
 interface IItemDetails {
   objectName: string,
   formatName: string,
@@ -162,7 +155,7 @@ interface IItemDetails {
   onUpdated? : ()=>void
   onError? : (error: Error| AxiosError)=>void
 }
-export const ItemDetails2: FC<IItemDetails> = (
+export const ItemDetails: FC<IItemDetails> = (
     {
       objectName,
       formatName,
@@ -229,10 +222,12 @@ export const ItemDetails2: FC<IItemDetails> = (
         <EditSwitchFormField
           label='Barcode'
           editMode={editMode}
+          editorId='barcode'
           display={barcode}>
           <Form.Control
             name='barcode'
             defaultValue={barcode}
+            id='barcode'
           />
         </EditSwitchFormField>
         <EditSwitchFormField
@@ -249,111 +244,3 @@ export const ItemDetails2: FC<IItemDetails> = (
     </>
   );
 };
-interface IData {
-  apiData: IItemMetadata
-  apiUrl: string
-  onUpdated?: ()=>void
-}
-
-/**
- * d
- * @constructor
- */
-export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
-  try {
-    const objectName = apiData ? apiData.name : null;
-    const formatName = apiData ? apiData.format.name : null;
-    const objectSequence = apiData ? apiData.obj_sequence : null;
-    const barcode = apiData ? apiData.barcode : null;
-
-    const handleUpdate = ()=>{
-      if (onUpdated) {
-        onUpdated();
-      }
-    };
-
-    const tableBody = <>
-      <tr>
-        <th style={{width: '25%'}}>Name</th>
-        <td>
-          <EditableField
-            display={objectName}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'name', value)
-                  .then(handleUpdate)
-                  .catch(console.error);
-            }}
-          />
-        </td>
-      </tr>
-      <tr>
-        <th style={{width: '25%'}}>Object Sequence</th>
-        <td>
-          <EditableField
-            display={objectSequence}
-            type='number'
-            inputProps={{min: 1}}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'obj_sequence', value)
-                  .then(handleUpdate)
-                  .catch(console.error);
-            }}
-          />
-        </td>
-      </tr>
-      <tr>
-      </tr>
-      <tr>
-        <th style={{width: '25%'}}>
-          <Form.Label htmlFor='barcode'>Barcode</Form.Label>
-        </th>
-        <td>
-          <EditableField
-            id='barcode'
-            display={barcode}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'barcode', value)
-                  .then(handleUpdate)
-                  .catch(console.error);
-            }}
-          />
-        </td>
-      </tr>
-      <tr>
-      </tr>
-      <tr>
-        <th style={{width: '25%'}}>Format Type</th>
-        <td>
-          <Form.Control value={formatName ? formatName : ''} readOnly/>
-        </td>
-      </tr>
-    </>;
-    const table = <>
-      <Table>
-        <thead hidden>
-          <tr>
-            <th scope="col">Type</th>
-            <th scope="col">Content</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableBody}
-        </tbody>
-      </Table>
-    </>;
-    return (<>{table}</>);
-  } catch (errorThrown) {
-    let message = '';
-
-    if (errorThrown instanceof Error) {
-      message = errorThrown.message;
-      console.error(errorThrown.stack);
-    }
-    return (
-      <Alert variant="danger">
-        <h4>Failed to load the data</h4>
-        <pre id="errorDetails">{message}</pre>
-      </Alert>
-    );
-  }
-}

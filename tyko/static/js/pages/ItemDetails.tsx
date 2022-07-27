@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Col, Row} from 'react-bootstrap';
 import Panel, {InactiveCover} from '../reactComponents/Panel';
 import {
-  IItemMetadata, ItemDetails2,
+  IItemMetadata, ItemDetails as ItemDetailsComponent,
 } from '../reactComponents/ItemApp';
 import FormatDetails from '../reactComponents/FormatDetails';
 import {useParams} from 'react-router-dom';
@@ -10,7 +10,7 @@ import axios from 'axios';
 import {LoadingIndeterminate} from '../reactComponents/Common';
 import {VendorDataEdit} from '../reactComponents/Vendor';
 /**
- * d
+ * Item details
  * @constructor
  */
 export default function ItemDetails() {
@@ -67,7 +67,7 @@ export default function ItemDetails() {
       </div>
     </>;
   } else {
-    detailsPanel = <ItemDetails2
+    detailsPanel = <ItemDetailsComponent
       objectName={apiData.name}
       formatName={apiData.format.name}
       barcode={apiData.barcode ? apiData.barcode: undefined}

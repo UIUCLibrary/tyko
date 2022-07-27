@@ -9,33 +9,17 @@ import {
   fireEvent,
   render, screen,
   waitFor,
-  waitForElementToBeRemoved,
 } from '@testing-library/react';
 
 import {
   ItemDetails,
-  EditableField, IItemMetadata,
+  EditableField,
 } from '../tyko/static/js/reactComponents/ItemApp';
 
 import React from 'react';
 jest.mock('axios');
 
 describe('ItemDetails', ()=>{
-  const dummyData = {
-    files: [],
-    format: {
-      name: 'foo',
-      id: 1,
-    },
-    format_details: {},
-    format_id: 1,
-    name: 'dummy',
-    barcode: null,
-    obj_sequence: 1,
-    item_id: 1,
-    notes: [],
-    parent_object_id: 1,
-  };
   beforeEach(()=>{
     axios.get = jest.fn((url: string): Promise<any> => {
       if (url === '/api/dummy') {
@@ -71,38 +55,25 @@ describe('ItemDetails', ()=>{
   });
   test('has Object Sequence', ()=>{
     const {getByText} = render(
-        <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
+        <ItemDetails
+          objectName='dummy'
+          objectSequence={1}
+          formatName='grooved disc'
+          apiUrl="/api/dummy"/>,
     );
     expect(getByText('Object Sequence')).toBeInTheDocument();
   });
   test('has a name', async ()=>{
-    const {getByText} = render(
-        <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
+    render(
+        <ItemDetails
+          objectName='dummy'
+          objectSequence={1}
+          formatName='grooved disc'
+          apiUrl="/api/dummy"/>,
     );
 
     await waitFor(()=> {
-      expect(getByText('Name')).toBeInTheDocument();
-    });
-  });
-
-  describe('invalid', ()=>{
-    test('error message on bad parsing', async ()=>{
-      const consoleErrorMock = jest.spyOn(
-          global.console,
-          'error',
-      ).mockImplementation();
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const badData: IItemMetadata = {'gabage': '1212'};
-      const {getByText} = render(
-          <ItemDetails apiData={badData} apiUrl="/api/bad"/>,
-      );
-      await waitFor(()=> {
-        expect(getByText('Failed to load the data')).toBeInTheDocument();
-      });
-
-      consoleErrorMock.mockRestore();
+      expect(screen.getByLabelText('Name')).toBeInTheDocument();
     });
   });
 });
@@ -124,30 +95,40 @@ describe('barcode field', ()=>{
   };
   test('editable', ()=>{
     render(
-        <ItemDetails apiData={dummyData} apiUrl="/api/dummy"/>,
+        <ItemDetails
+          objectName='sample'
+          barcode='123'
+          objectSequence={1}
+          formatName='foo'
+          apiUrl="/api/dummy"/>,
     );
-    const barcodeField = screen.getByLabelText('Barcode');
-    expect(barcodeField).toHaveAttribute('readonly', '');
-    const barcodeEditButton = screen.getByTestId('edit-button-barcode');
-    fireEvent.click(barcodeEditButton);
-    expect(barcodeField).not.toHaveAttribute('readonly');
+    expect(screen.getByLabelText('Barcode').nodeName).not.toBe('INPUT');
+    fireEvent.click(screen.getByText('Edit'));
+    expect(screen.getByLabelText('Barcode').nodeName).toBe('INPUT');
   });
   test('submits', async ()=>{
     const mockedAxios = axios as jest.Mocked<typeof axios>;
+    mockedAxios.put.mockResolvedValue({data: []});
     const onUpdated = jest.fn();
 
     render(
         <ItemDetails
-          apiData={dummyData}
-          apiUrl='/api/dummy'
+          objectName='sample'
+          barcode='123'
+          objectSequence={1}
+          formatName='foo'
           onUpdated={onUpdated}
-        />,
+          apiUrl="/api/dummy"/>,
     );
-    const barcodeField = screen.getByLabelText('Barcode');
-    fireEvent.click(screen.getByTestId('edit-button-barcode'));
-    fireEvent.change(barcodeField, {target: {value: '1234'}});
-    fireEvent.click(screen.getByTestId('confirm-button-barcode'));
-    expect(barcodeField).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Edit'));
+    fireEvent.change(
+        screen.getByLabelText('Barcode'),
+        {
+          target: {value: '1234'},
+        },
+    );
+    fireEvent.click(screen.getByText('Confirm'), {target: {value: '1234'}});
+    expect(screen.getByLabelText('Barcode')).toBeInTheDocument();
     expect(mockedAxios.put).toBeCalledWith(
         expect.stringMatching('/api/dummy'),
         expect.objectContaining({'barcode': '1234'}),
@@ -155,7 +136,6 @@ describe('barcode field', ()=>{
     await waitFor(()=>{
       expect(onUpdated).toHaveBeenCalled();
     });
-    // expect(onUpdated.mock.calls.length).toBeGreaterThan(0)
   });
 });
 describe('EditableField', ()=>{
