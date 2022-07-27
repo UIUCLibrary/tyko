@@ -10,7 +10,7 @@ import AboutApp from './reactComponents/AboutApp';
 import FormatDetails from './reactComponents/FormatDetails';
 import {VendorDataEdit} from './reactComponents/Vendor'
 import Items, {NewItemButton, ObjectItemsApp} from './reactComponents/Items';
-import {ItemDetails2} from './reactComponents/ItemApp';
+import {ItemDetails} from './reactComponents/ItemApp';
 import axios from 'axios';
 import Panel from './reactComponents/Panel';
 import {LoadingIndeterminate} from './reactComponents/Common';
@@ -209,7 +209,7 @@ function loadReactComponents() {
             <FormatDetails
               apiData={resp.data.item}
               apiUrl={formatDetailsComponent.dataset.tykoApiUrl}
-              onUpdated={location.reload}
+              onUpdated={()=> {location.reload();}}
             />
           </Panel>,
       );
@@ -227,7 +227,7 @@ function loadReactComponents() {
       const itemData = resp.data.item
       root.render(
           <Panel title='Details'>
-            <ItemDetails2
+            <ItemDetails
                 objectName={itemData.name}
                 formatName={itemData.format.name}
                 objectSequence={itemData.obj_sequence}
