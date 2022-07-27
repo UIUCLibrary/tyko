@@ -1,17 +1,20 @@
-import {EditSwitchFormField} from './Common';
+import {
+  EditSwitchFormField,
+  EditControl,
+  submitEvent,
+  submitFormUpdates,
+} from './Common';
+
 import React, {
-  Dispatch,
   FC, FormEvent,
-  SetStateAction,
   useReducer,
   useRef,
   useState,
   useEffect,
 } from 'react';
-import Button from 'react-bootstrap/Button';
-import {ButtonGroup, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
 import {SelectDate} from './Items';
-import axios, {AxiosError} from 'axios';
+import {AxiosError} from 'axios';
 export interface IItem {
   name: string,
   routes: {
@@ -30,36 +33,6 @@ export interface IVendorJobData {
   onError? : (error: Error| AxiosError)=>void
 }
 
-interface IEditControl {
-  editMode: boolean
-  setEditMode: Dispatch<SetStateAction<boolean>>
-  onConfirm?: ()=>void
-}
-const EditControl: FC<IEditControl> = ({editMode, setEditMode, onConfirm}) =>{
-  const handleConfirm = ()=>{
-    if (onConfirm) {
-      onConfirm();
-    }
-  };
-  const handleEditModeChange = ()=>{
-    setEditMode(!editMode);
-  };
-  return (
-    <>
-      <ButtonGroup hidden={!editMode}>
-        <Button variant={'outline-danger'} onClick={handleEditModeChange}>
-          Cancel
-        </Button>
-        {/* <Button type='submit' variant={'outline-primary'}>*/}
-        <Button onClick={handleConfirm} variant={'outline-primary'}>
-          Confirm
-        </Button>
-      </ButtonGroup>
-      <Button hidden={editMode} onClick={handleEditModeChange}>Edit</Button>
-    </>
-  );
-};
-
 export const VendorDataEdit: FC<IVendorJobData> = (
     {
       vendorName,
@@ -75,13 +48,9 @@ export const VendorDataEdit: FC<IVendorJobData> = (
   const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
   const form = useRef<HTMLFormElement>(null);
   const handleConfirm = ()=>{
-    form.current?.dispatchEvent(
-        new Event(
-            'submit', {
-              cancelable: true,
-              bubbles: true,
-            }),
-    );
+    if (form.current) {
+      submitEvent(form.current);
+    }
   };
   useEffect(()=>{
     if (onAccessibleChange) {
@@ -91,11 +60,9 @@ export const VendorDataEdit: FC<IVendorJobData> = (
 
   const handleSubmit = (event: FormEvent)=>{
     event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    const formProps = Object.fromEntries(formData);
     if (apiUrl) {
       setAccessible(false);
-      axios.put(apiUrl, formProps)
+      submitFormUpdates(apiUrl, new FormData(event.target as HTMLFormElement))
           .then(()=>{
             if (onUpdated) {
               onUpdated();
@@ -156,3 +123,4 @@ export const VendorDataEdit: FC<IVendorJobData> = (
     </>
   );
 };
+

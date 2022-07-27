@@ -255,12 +255,15 @@ class UpdateFilm:
     @staticmethod
     def update_ad_test(item, changed_data):
 
+        ad_test = changed_data.pop('ad_test_performed', False)
+        item.ad_test = ad_test == "on"
         if data_of_ad_test := changed_data.pop('ad_test_date', None):
             item.ad_test_date = \
                 utils.create_precision_datetime(data_of_ad_test)
+        else:
+            item.ad_test_date = None
 
-        if data_of_ad_level := changed_data.pop('ad_test_level', None):
-            item.ad_test_level = data_of_ad_level
+        item.ad_test_level = changed_data.pop('ad_test_level', None)
 
     @staticmethod
     def update(item, changed_data):
@@ -1193,17 +1196,23 @@ class ObjectDataConnector(AbsNotesConnector):
                 collection_object.collection = collection
 
             if 'originals_rec_date' in changed_data:
-                collection_object.originals_rec_date = \
-                    datetime.strptime(
-                        changed_data['originals_rec_date'],
-                        DATE_FORMAT
-                    )
+                if changed_data['originals_rec_date'] is None:
+                    collection_object.originals_rec_date = None
+                else:
+                    collection_object.originals_rec_date = \
+                        datetime.strptime(
+                            changed_data['originals_rec_date'],
+                            "%m/%d/%Y"
+                        )
             if 'originals_return_date' in changed_data:
-                collection_object.originals_return_date = \
-                    datetime.strptime(
-                        changed_data['originals_return_date'],
-                        DATE_FORMAT
-                    )
+                if changed_data['originals_return_date'] is None:
+                    collection_object.originals_return_date = None
+                else:
+                    collection_object.originals_return_date = \
+                        datetime.strptime(
+                            changed_data['originals_return_date'],
+                            "%m/%d/%Y"
+                        )
 
             session.add(collection_object)
             session.commit()

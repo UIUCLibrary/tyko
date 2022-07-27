@@ -527,12 +527,13 @@ class ObjectFrontend(ProjectComponentDetailFrontend):
             )
         else:
             api_route = url_for('api.object', object_id=entity_id)
-
         return self.render_page(
             template="object_details.html",
             edit=False,
             show_sidebar=True,
             fields=fields,
+            project_id=selected_object['parent_project_id'],
+            object_id=entity_id,
             formats=self._data_provider.get_formats(serialize=True),
             api_path=api_route,
             valid_note_types=valid_note_types,

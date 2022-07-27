@@ -8,7 +8,6 @@ import {
   render,
   waitFor,
   screen,
-  waitForElementToBeRemoved,
 } from '@testing-library/react';
 import {Route, Routes, MemoryRouter} from 'react-router-dom';
 
@@ -78,7 +77,7 @@ describe('ItemDetails', () => {
         </MemoryRouter>,
     );
     const item = await waitFor(async () => {
-      return screen.getByDisplayValue('dummy');
+      return screen.getByText('dummy');
     });
     expect(item).toBeInTheDocument();
   });

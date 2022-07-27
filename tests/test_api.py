@@ -379,8 +379,8 @@ def test_object_update(app):
                     "name": "My dummy object",
                     "barcode": "12345",
                     "collection_id": collection_one_id,
-                    "originals_rec_date": "2010-2-4",
-                    "originals_return_date": "2012-2-4"
+                    "originals_rec_date": "2/4/2010",
+                    "originals_return_date": "2/4/2012"
                 }
             ),
             content_type='application/json'
@@ -395,8 +395,8 @@ def test_object_update(app):
                 "name": "changed_dummy object",
                 "barcode": "54321",
                 "collection_id": collection_two_id,
-                "originals_rec_date": "2010-01-04",
-                "originals_return_date": "2012-05-04"
+                "originals_rec_date": "4/1/2010",
+                "originals_return_date": "4/5/2012"
             }),
             content_type='application/json'
 
@@ -415,8 +415,8 @@ def test_object_update(app):
         get_object = edited_data["object"]
         assert get_object["name"] == "changed_dummy object"
         assert get_object["name"] == "changed_dummy object"
-        assert get_object["originals_rec_date"] == "2010-01-04"
-        assert get_object["originals_return_date"] == "2012-05-04"
+        assert get_object["originals_rec_date"] == "4/1/2010"
+        assert get_object["originals_return_date"] == "4/5/2012"
         assert get_object["collection_id"] == collection_two_id
 
 

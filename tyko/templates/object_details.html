@@ -15,33 +15,11 @@
 
 {% block main_details %}
     {% call card("Details", 'my-1 h-100') %}
-        {% call metadata_table() %}
-            <tr>{{metadata_text_edit_widget("Name", object['name'], 'name', api_path)}}</tr>
-            <tr>
-                {% with %}
-                    {%  call metadata_select_dynamic_edit_widget("Collection", object['collection_name'], callback_name="callback", field_key="collection_id", update_api_path=api_path) %}
-                            function callback(options){
-                                requests.get("{{url_for('api.collections')}}")
-                                    .then((result)=>{
-                                        let collections = [];
-                                        JSON.parse(result)['collections'].forEach((collection)=>{
-                                            options.push(
-                                                {
-                                                    value: collection['collection_id'],
-                                                    text: collection['collection_name']
-                                                }
-                                            )
-                                        });
-                                    }).catch((reason) => {
-                                     throw  "Failed to get collections data"
-                                    });
-                                }
-                    {% endcall %}
-                {% endwith %}
-            </tr>
-            <tr>{{metadata_date_edit_widget("Originals Received Date", object['originals_rec_date'], "originals_rec_date", api_path)}}</tr>
-            <tr>{{metadata_date_edit_widget("Originals Returned Date", object['originals_return_date'], "originals_return_date", api_path)}}</tr>
-        {% endcall %}
+        <div
+            id="objectDetails"
+            data-object-id="{{ object_id }}"
+            data-tyko-api-url="{{ url_for("api.project_object", project_id=project_id, object_id=object_id) }}"
+        ></div>
     {% endcall %}
 
 {% endblock %}

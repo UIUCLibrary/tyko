@@ -10,11 +10,12 @@ import AboutApp from './reactComponents/AboutApp';
 import FormatDetails from './reactComponents/FormatDetails';
 import {VendorDataEdit} from './reactComponents/Vendor'
 import Items, {NewItemButton, ObjectItemsApp} from './reactComponents/Items';
-import {ItemDetails} from './reactComponents/ItemApp';
+import {ItemDetails2} from './reactComponents/ItemApp';
 import axios from 'axios';
 import Panel from './reactComponents/Panel';
 import {LoadingIndeterminate} from './reactComponents/Common';
 import {ProjectDetailDetails} from './reactComponents/ProjectDetails';
+import {ObjectDetails} from './reactComponents/ObjectDetails';
 
 
 import('bootstrap');
@@ -111,11 +112,34 @@ function loadReactComponents() {
     );
   }
 
+  const objectDetails = document.getElementById('objectDetails');
+  if (objectDetails) {
+    const root = createRoot(objectDetails);
+    root.render(
+        <Panel title='Details'>
+            Loading...
+        </Panel>,
+    );
+    axios.get(objectDetails.dataset.tykoApiUrl).then(
+        (data) =>{
+          root.render(
+              <ObjectDetails
+                  name={data.data.name}
+                  collectionId={data.data.collection_id}
+                  originalsReceivedDate={data.data.originals_rec_date}
+                  originalsReturnedDate={data.data.originals_return_date}
+                  apiUrl={`/api/object/${objectDetails.dataset.objectId}`}
+                  onUpdated={()=> {location.reload();}}
+              />
+          );
+        }
+    )
+  }
   const objectItems = document.getElementById('objectItem');
 
   if (objectItems) {
-    const root = createRoot(objectItems);
 
+    const root = createRoot(objectItems);
     root.render(<Items apiUrl={objectItems.dataset.tykoApiUrl}/>);
   }
 
@@ -169,8 +193,6 @@ function loadReactComponents() {
           />
         </Panel>,
     );
-      console.log(resp.data.item.vendor);
-      console.log(resp.data);
     });
   }
   const formatDetailsComponent = document.getElementById('formatDetails');
@@ -199,17 +221,18 @@ function loadReactComponents() {
     const root = createRoot(itemDetails);
     root.render(
         <Panel title='Details'>
-          {/*<p style={{textAlign: 'center'}}>*/}
-            <LoadingIndeterminate/>;
-          {/*</p>*/}
+          <LoadingIndeterminate/>;
         </Panel>);
     axios.get(formatDetailsComponent.dataset.tykoApiUrl).then((resp)=>{
+      const itemData = resp.data.item
       root.render(
           <Panel title='Details'>
-            <ItemDetails
-              apiData={resp.data.item}
-              apiUrl={formatDetailsComponent.dataset.tykoApiUrl}
-              onUpdated={location.reload}
+            <ItemDetails2
+                objectName={itemData.name}
+                formatName={itemData.format.name}
+                objectSequence={itemData.obj_sequence}
+                apiUrl={formatDetailsComponent.dataset.tykoApiUrl}
+                onUpdated={()=> {location.reload();}}
             />
           </Panel>,
       );

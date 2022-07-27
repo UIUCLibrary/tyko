@@ -1,12 +1,9 @@
 import Form from 'react-bootstrap/Form';
-import Table from 'react-bootstrap/Table';
-import {LoadingPercent} from './Common';
+import {EditSwitchFormField, LoadingPercent} from './Common';
 import React, {
   useState,
   useEffect,
   FC,
-  Fragment,
-  ReactElement,
   useReducer, useRef,
 } from 'react';
 import axios, {AxiosResponse} from 'axios';
@@ -27,26 +24,14 @@ const createEnumField = (
     name: string,
     current: EnumMetadata,
     all: ApiEnum[] | null,
-    editMode: boolean,
 )=>{
-  if (editMode) {
-    return (
-      <Form.Select
-        name={name}
-        defaultValue={current ? current.id : ''}
-      >
+  return (
+    <>
+      <Form.Select name={name} defaultValue={current ? current.id : ''}>
         <option key={-1} value=''/>
         {all ? createEnumOptions(all) :(<></>)}
       </Form.Select>
-    );
-  }
-  return (
-    <Form.Control
-      size={'sm'}
-      readOnly={!editMode}
-      plaintext={!editMode}
-      defaultValue={current ? current.name : ''}
-    />
+    </>
   );
 };
 
@@ -56,28 +41,6 @@ const createEnumOptions = (enumList: EnumMetadata[])=>{
   });
 };
 
-
-/**
- * Format a row of a key value pair
- * @param {value} value of pair
- * @constructor
- */
-const FormatDetail:
-    FC<{
-      label: string,
-      children?: string | JSX.Element | JSX.Element[]
-    }> = ({label, children}) => {
-      return (
-        <tr>
-          <th style={{width: '25%'}} scope="row">{label}</th>
-          <td>
-            <div className="container-sm">
-              {children}
-            </div>
-          </td>
-        </tr>
-      );
-    };
 
 const OpenReel: FC<IFormatType> = ({data, editMode}) => {
   const [loading, setLoading] = useState(false);
@@ -135,161 +98,206 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
-  const trackCount = data['track_count'].value as number;
   return (
-    <Fragment>
-      <FormatDetail key='title' label="Title of Reel">
+    <div>
+      <EditSwitchFormField
+        label='Title of Reel'
+        editMode={editMode}
+        display={data['title_of_reel'].value as string}>
         {
           createTextField(
               'title_of_reel',
-              data['title_of_reel'].value as string,
-              editMode,
+                data['title_of_reel'].value as string,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='base' label="Base">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Base'
+        editMode={editMode}
+        display={
+        data['base'].value ?
+            (data['base'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'base_id',
               data['base'].value as EnumMetadata,
               tapeBases,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='dateOfReel' label="Date Of Reel">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Date Of Reel'
+        editMode={editMode}
+        display={data['date_of_reel'].value as string}>
         {
           createDateField(
               'date_of_reel',
-              data['date_of_reel'].value as string,
-              'm/dd/yyyy',
-              editMode,
+                data['date_of_reel'].value as string,
+                'm/dd/yyyy',
           )
         }
-      </FormatDetail>
-      <FormatDetail key='duration' label="Duration">
-        {
-          createTextField(
-              'duration',
-              data['duration'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='formatSubtype' label="Type">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Duration'
+        editMode={editMode}
+        display={data['duration'].value as string}>
+        {createTextField('duration', data['duration'].value as string)}
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Type'
+        editMode={editMode}
+        display={
+        data['format_subtype'].value ?
+            (data['format_subtype'].value as EnumMetadata).name : ''}
+      >
         {
           createEnumField(
               'format_subtype_id',
               data['format_subtype'].value as EnumMetadata,
               formatSubtypes,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='generation' label="Generation">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Generation'
+        editMode={editMode}
+        display={
+        data['generation'].value ?
+            (data['generation'].value as EnumMetadata).name : ''}
+      >
         {
           createEnumField(
               'generation_id',
               data['generation'].value as EnumMetadata,
               generations,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='reelBrand' label="Brand of Reel">
-        {
-          createTextField('reel_brand',
-              data['reel_brand'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='reelDiameter' label="Diameter of Reel">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Brand of Reel'
+        editMode={editMode}
+        display={data['reel_brand'].value as string}>
+        {createTextField('reel_brand', data['reel_brand'].value as string)}
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Diameter of Reel'
+        editMode={editMode}
+        display={
+        data['reel_diameter'].value ?
+            (data['reel_diameter'].value as EnumMetadata).name : ''}
+      >
         {
           createEnumField(
               'reel_diameter_id',
               data['reel_diameter'].value as EnumMetadata,
               reelDiameters,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='reelSpeed' label="Speed of Reel">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Speed of Reel'
+        editMode={editMode}
+        display={
+        data['reel_speed'].value ?
+            (data['reel_speed'].value as EnumMetadata).name : ''}
+      >
         {
           createEnumField(
               'reel_speed_id',
               data['reel_speed'].value as EnumMetadata,
               reelSpeeds,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='reelThickness' label="Thickness of Reel">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Thickness of Reel'
+        editMode={editMode}
+        display={
+        data['reel_thickness'].value ?
+            (data['reel_thickness'].value as EnumMetadata).name : ''}
+      >
         {
           createEnumField(
               'reel_thickness_id',
               data['reel_thickness'].value as EnumMetadata,
               reelThicknesses,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='reelType' label="Type of Reel">
-        {
-          createTextField(
-              'reel_type',
-              data['reel_type'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='reelWidth' label="Width of Reel">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Type of Reel'
+        editMode={editMode}
+        display={data['reel_type'].value as string}>
+        {createTextField('reel_type', data['reel_type'].value as string)}
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Width of Reel'
+        editMode={editMode}
+        display={
+        data['reel_width'].value ?
+            (data['reel_width'].value as EnumMetadata).name : ''}
+      >
         {
           createEnumField(
               'reel_width_id',
               data['reel_width'].value as EnumMetadata,
               reelWidths,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='trackConfiguration' label="Track Configuration">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Track Configuration'
+        editMode={editMode}
+        display={
+        data['track_configuration'].value ?
+            (data['track_configuration'].value as EnumMetadata).name : ''}
+      >
         {
           createEnumField(
               'track_configuration_id',
               data['track_configuration'].value as EnumMetadata,
               trackConfigurations,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='trackCount' label="Track Count">
-        {createNumberField(
-            'track_count',
-            trackCount ? trackCount: null,
-            editMode,
-            0,
-        )}
-      </FormatDetail>
-      <FormatDetail key='wind' label="Wind">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Track Count'
+        editMode={editMode}
+        display={
+        data['track_count'].value ?
+            data['track_count'].value.toString() : ''
+        }
+      >
+        {
+          createNumberField(
+              'track_count',
+              data['track_count'] ?
+                  data['track_count'].value as number :
+                  null,
+              0,
+          )
+        }
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Wind'
+        editMode={editMode}
+        display={
+        data['wind'].value ?
+            (data['wind'].value as EnumMetadata).name : ''}
+      >
         {
           createEnumField(
               'wind_id',
               data['wind'].value as EnumMetadata,
               winds,
-              editMode,
           )
         }
-      </FormatDetail>
-    </Fragment>
+      </EditSwitchFormField>
+    </div>
   );
 };
 
@@ -334,142 +342,174 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
   return (
-    <Fragment>
-      <FormatDetail key='titleOfAlbum' label="Title of Album">
+    <div>
+      <EditSwitchFormField
+        label='Title of Album'
+        editMode={editMode}
+        display={data['title_of_album'].value as string}>
         {
           createTextField(
               'title_of_album',
               data['title_of_album'].value as string,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='titleOfDisc' label="Title of Disc">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Title of Disc'
+        editMode={editMode}
+        display={data['title_of_disc'].value as string}>
         {
           createTextField(
               'title_of_disc',
               data['title_of_disc'].value as string,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='discBase' label="Base">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Base'
+        editMode={editMode}
+        display={
+        data['disc_base'].value ?
+            (data['disc_base'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'disc_base_id',
               data['disc_base'].value as EnumMetadata,
               discBases,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='dateOfDisc' label="Date Of Disc">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Date Of Disc'
+        editMode={editMode}
+        display={data['date_of_disc'].value as string}>
         {
           createDateField(
               'date_of_disc',
-              data['date_of_disc'].value as string,
-              'm/dd/yyyy',
-              editMode,
+                data['date_of_disc'].value as string,
+                'm/dd/yyyy',
           )
         }
-      </FormatDetail>
-      <FormatDetail key='discDiameter' label="Disc Diameter">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Disc Diameter'
+        editMode={editMode}
+        display={
+        data['disc_diameter'].value ?
+            (data['disc_diameter'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'disc_diameter_id',
               data['disc_diameter'].value as EnumMetadata,
               discDiameters,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='discDirection' label="Playback Direction">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Playback Direction'
+        editMode={editMode}
+        display={
+        data['playback_direction'].value ?
+            (data['playback_direction'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'playback_direction_id',
               data['playback_direction'].value as EnumMetadata,
               playbackDirections,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='discMaterial' label="Disc Material">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Disc Material'
+        editMode={editMode}
+        display={
+        data['disc_material'].value ?
+            (data['disc_material'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'disc_material_id',
               data['disc_material'].value as EnumMetadata,
               discMaterials,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='playbackSpeed' label="Playback Speed">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Playback Speed'
+        editMode={editMode}
+        display={
+        data['playback_speed'].value ?
+            (data['playback_speed'].value as EnumMetadata).name : ''}
+      >
         {
           createEnumField(
               'playback_speed_id',
               data['playback_speed'].value as EnumMetadata,
               playbackSpeeds,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='sideALabel' label="Side A Label">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side A Label'
+        editMode={editMode}
+        display={data['side_a_label'].value as string}>
         {
           createTextField(
               'side_a_label',
               data['side_a_label'].value as string,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='sideADuration' label="Side A Duration">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side A Duration'
+        editMode={editMode}
+        display={data['side_a_duration'].value as string}>
         {
           createTextField(
               'side_a_duration',
               data['side_a_duration'].value as string,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='sideBLabel' label="Side B Label">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side B Label'
+        editMode={editMode}
+        display={data['side_b_label'].value as string}>
         {
           createTextField(
               'side_b_label',
               data['side_b_label'].value as string,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='sideBDuration' label="Side B Duration">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side B Duration'
+        editMode={editMode}
+        display={data['side_b_duration'].value as string}>
         {
           createTextField(
               'side_b_duration',
               data['side_b_duration'].value as string,
-              editMode,
           )
         }
-      </FormatDetail>
-    </Fragment>
+      </EditSwitchFormField>
+    </div>
   );
-};
-
-const createNullField = (name: string) =>{
-  return <Form.Control name={name} value='' readOnly={true} plaintext={true}/>;
 };
 
 const createNumberField = (
     name: string,
     current: number | null,
-    editMode: boolean,
     minimum: number | null = null,
     maximum: number | null = null,
 )=>{
@@ -479,46 +519,34 @@ const createNumberField = (
       type='number'
       min={minimum === null ? undefined: minimum}
       max={maximum === null ? undefined: maximum}
-      readOnly={!editMode}
-      plaintext={!editMode}
       defaultValue={current ? current: undefined}/>
   );
 };
-const createTextField = (name: string, current: string, editMode: boolean)=>{
+const createTextField = (name: string, current: string)=>{
   return (
     <Form.Control
       name={name}
-      readOnly={!editMode}
-      plaintext={!editMode}
       defaultValue={current}/>
   );
 };
+
 
 const createDateField = (
     name: string,
     current: string | null,
     dateFormat: string,
-    editMode: boolean,
 )=>{
-  if (editMode) {
-    return (
-      <Form.Group>
-        <SelectDate
-          name={name}
-          dateFormat={dateFormat}
-          defaultValue={current ? current: ''}
-        />
-      </Form.Group>
-    );
-  }
   return (
-    <Form.Control
-      name={name}
-      readOnly={!editMode}
-      plaintext={!editMode}
-      defaultValue={current ? current: ''}/>
+    <Form.Group>
+      <SelectDate
+        name={name}
+        dateFormat={dateFormat}
+        defaultValue={current ? current: ''}
+      />
+    </Form.Group>
   );
 };
+
 const Film: FC<IFormatType> = ({data, editMode}) => {
   const [loading, setLoading] = useState(false);
   const [percentEnumsLoaded, enums, enumsLoading] = useEnums(
@@ -549,8 +577,16 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
   const [winds, setWinds] = useState<ApiEnum[]|null>(null);
   const [emulsions, setEmulsions] = useState<ApiEnum[]|null>(null);
 
+  const [adTestDate, setAdTestDate] = useState<string|null>(null);
+
   const adTestLevel = data['ad_test_level'].value as string;
   const selectedAdStrip = useRef<HTMLInputElement>(null);
+
+  useEffect(()=>{
+    const value = adStripPerformed ?
+          data['ad_test_date'].value as string : '';
+    setAdTestDate(value);
+  }, [data, adStripPerformed]);
 
   useEffect(()=>{
     if (editMode) {
@@ -580,209 +616,292 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
   const adTestLevelValue = adTestLevel ? parseInt(adTestLevel): null;
+  const checkbox = '\u2713';
   return (
-    <Fragment>
-      <FormatDetail key='dateOfFilm' label="Date Of Film">
+    <div>
+      <EditSwitchFormField
+        label='Date Of Film'
+        editMode={editMode}
+        display={data['date_of_film'].value as string}>
         {
           createDateField(
               'date_of_film',
-              data['date_of_film'].value as string,
-              'm/dd/yyyy',
-              editMode,
+                data['date_of_film'].value as string,
+                'm/dd/yyyy',
           )
         }
-      </FormatDetail>
-      <FormatDetail key='adStripTest' label="AD Strip Test Performed">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='AD Strip Test Performed'
+        editMode={editMode}
+        display={adStripPerformed ? checkbox: ''}>
         <Form.Check
           checked={adStripPerformed}
+          name='ad_test_performed'
           type="checkbox"
           ref={selectedAdStrip}
           onChange={setAdStripPerformed}
-          disabled={!editMode}
         />
-      </FormatDetail>
-      <FormatDetail key='adTestDate' label="AD Test Date">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='AD Test Date'
+        editMode={editMode}
+        display={
+        data['ad_test_date'].value ?
+            data['ad_test_date'].value.toString() : ''
+        }
+      >
         <fieldset disabled={!adStripPerformed}>
-          { adStripPerformed ?
-              createDateField(
-                  'ad_test_date',
-                  data['ad_test_date'].value as string,
-                  'm/dd/yyyy',
-                  editMode,
-              ): createNullField('adTestDate')
+          {
+            createDateField(
+                'ad_test_date',
+                adTestDate,
+                'm/dd/yyyy',
+            )
           }
         </fieldset>
-      </FormatDetail>
-      <FormatDetail key='adTestLevel' label="AD Test Level">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='AD Test Level'
+        editMode={editMode}
+        display={
+        data['ad_test_level'].value ?
+            data['ad_test_level'].value.toString() : ''
+        }
+      >
         <fieldset disabled={!adStripPerformed}>
-          { adStripPerformed ?
-              createNumberField(
-                  'ad_test_level',
-                  adTestLevelValue,
-                  editMode,
-                  0,
-              ): createNullField('adTestLevel')
+          {
+            createNumberField(
+                'ad_test_level',
+                adTestLevelValue,
+                0,
+            )
           }
         </fieldset>
-      </FormatDetail>
-      <FormatDetail key='canLabel' label="Can Label">
-        {
-          createTextField(
-              'can_label',
-              data['can_label'].value as string,
-              editMode,
-          )
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Can Label'
+        editMode={editMode}
+        display={data['can_label'].value as string}>
+        <Form.Control
+          name='can_label'
+          defaultValue={data['can_label'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Duration'
+        editMode={editMode}
+        display={data['duration'].value as string}>
+        <Form.Control
+          name='duration'
+          defaultValue={data['duration'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Film Title'
+        editMode={editMode}
+        display={data['film_title'].value as string}>
+        <Form.Control
+          name='film_title'
+          defaultValue={data['film_title'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Leader Label'
+        editMode={editMode}
+        display={data['leader_label'].value as string}>
+        <Form.Control
+          name='leader_label'
+          defaultValue={data['leader_label'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Film Length'
+        editMode={editMode}
+        display={
+        data['film_length'].value ?
+            `${data['film_length'].value.toString()} ft` : ''
         }
-      </FormatDetail>
-      <FormatDetail key='duration' label="Duration">
-        {
-          createTextField(
-              'duration',
-              data['duration'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='filmTitle' label="Film Title">
-        {
-          createTextField(
-              'film_title',
-              data['film_title'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='leaderLabel' label="Leader Label">
-        {
-          createTextField(
-              'leader_label',
-              data['leader_label'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='edgeCodeDate' label="Edge Code Date">
-        {
-          createNumberField(
-              'edge_code_date',
-              data['edge_code_date'].value as number,
-              editMode,
-              0,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='filmLength' label='Film Length'>
+      >
         {
           createNumberField(
               'film_length',
-            data['film_length'].value as number,
-            editMode,
-            0,
+              data['film_length'] ?
+                  data['film_length'].value as number :
+                  null,
+              0,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='filmShrinkage' label='Film Shrinkage'>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Edge Code Date'
+        editMode={editMode}
+        display={
+        data['edge_code_date'].value ?
+            data['edge_code_date'].value.toString() : ''
+        }
+      >
+        {
+          createNumberField(
+              'edge_code_date',
+              data['edge_code_date'] ?
+                  data['edge_code_date'].value as number :
+                  null,
+              0,
+          )
+        }
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Film Shrinkage'
+        editMode={editMode}
+        display={
+        data['film_shrinkage'].value ?
+            `${data['film_shrinkage'].value.toString()}%` : ''
+        }
+      >
         {
           createNumberField(
               'film_shrinkage',
-            data['film_shrinkage'].value as number,
-            editMode,
-            0,
-            100,
+              data['film_shrinkage'] ?
+                  data['film_shrinkage'].value as number :
+                  null,
+              0,
+              100,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='color' label='Color'>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Color'
+        editMode={editMode}
+        display={
+        data['color'].value ?
+            (data['color'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'film_color_id',
               data['color'].value as EnumMetadata,
               colors,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='filmBase' label='Film Base'>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Film Base'
+        editMode={editMode}
+        display={
+        data['film_base'].value ?
+            (data['film_base'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'film_base_id',
               data['film_base'].value as EnumMetadata,
               bases,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='filmEmulsion' label='Film Emulsion'>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Film Emulsion'
+        editMode={editMode}
+        display={
+        data['film_emulsion'].value ?
+            (data['film_emulsion'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'film_emulsion_id',
               data['film_emulsion'].value as EnumMetadata,
               emulsions,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='filmImageType' label='Film Image Type'>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Film Image Type'
+        editMode={editMode}
+        display={
+        data['film_image_type'].value ?
+            (data['film_image_type'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'image_type_id',
               data['film_image_type'].value as EnumMetadata,
               imageTypes,
-              editMode,
           )
-
         }
-      </FormatDetail>
-      <FormatDetail key='filmSpeed' label='Film Speed'>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Film Speed'
+        editMode={editMode}
+        display={
+        data['film_speed'].value ?
+            (data['film_speed'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'film_speed_id',
               data['film_speed'].value as EnumMetadata,
               speeds,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='filmGauge' label='Film Gauge'>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Film Gauge'
+        editMode={editMode}
+        display={
+        data['film_gauge'].value ?
+            (data['film_gauge'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'film_gauge_id',
               data['film_gauge'].value as EnumMetadata,
               filmGauges,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='soundtrack' label='Soundtrack'>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Soundtrack'
+        editMode={editMode}
+        display={
+        data['soundtrack'].value ?
+            (data['soundtrack'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'soundtrack_id',
               data['soundtrack'].value as EnumMetadata,
               soundtracks,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='wind' label='Wind'>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Wind'
+        editMode={editMode}
+        display={
+        data['wind'].value ?
+            (data['wind'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'wind_id',
               data['wind'].value as EnumMetadata,
               winds,
-              editMode,
           )
         }
-      </FormatDetail>
-    </Fragment>
+      </EditSwitchFormField>
+    </div>
   );
 };
 const checkCompletedEnumsLoaded = (
@@ -883,64 +1002,66 @@ const Optical: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
   return (
-    <Fragment>
-      <FormatDetail key="titleOfItem" label="Title Of Item">
-        {
-          createTextField(
-              'title_of_item',
-              data['title_of_item'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key="dateOfItem" label="Date Of Item">
+    <div>
+      <EditSwitchFormField
+        label='Title Of Item'
+        editMode={editMode}
+        display={data['title_of_item'].value as string}>
+        <Form.Control
+          name='title_of_item'
+          defaultValue={data['title_of_item'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Date Of Item'
+        editMode={editMode}
+        display={data['date_of_item'].value as string}>
         {
           createDateField(
               'date_of_item',
-              data['date_of_item'].value as string,
-              'm/dd/yyyy',
-              editMode,
+                data['date_of_item'].value as string,
+                'm/dd/yyyy',
           )
         }
-      </FormatDetail>
-      <FormatDetail key="duration" label="Duration">
-        {
-          createTextField(
-              'duration',
-              data['duration'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key="label" label="Label">
-        {
-          createTextField(
-              'label',
-              data['label'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key="type" label="Type">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Duration'
+        editMode={editMode}
+        display={data['duration'].value as string}>
+        <Form.Control
+          name='duration'
+          defaultValue={data['duration'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Label'
+        editMode={editMode}
+        display={data['label'].value as string}>
+        <Form.Control
+          name='label'
+          defaultValue={data['label'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Type'
+        editMode={editMode}
+        display={
+        data['type'].value ?
+            (data['type'].value as EnumMetadata).name :
+            ''}
+      >
         {
           createEnumField(
               'type_id',
               data['type'].value as EnumMetadata,
               opticalTypes,
-              editMode,
           )
         }
-      </FormatDetail>
-    </Fragment>
+      </EditSwitchFormField>
+    </div>
   );
 };
 
@@ -974,73 +1095,77 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
   }, [enumsLoading]);
   if (loading) {
     return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
+      <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
     );
   }
+  const dateOfCassette = data['date_of_cassette'].value as string;
+  const duration = data['duration'].value as string;
+  const label = data['label'].value as string;
+  const titleOfCassette = data['title_of_cassette'].value as string;
   return (
-    <Fragment>
-      <FormatDetail key="dateOfCassette" label="Date Of Cassette">
+    <div>
+      <EditSwitchFormField
+        label='Date Of Cassette'
+        editMode={editMode}
+        display={dateOfCassette}>
         {
           createDateField(
               'date_of_cassette',
-              data['date_of_cassette'].value as string,
+              dateOfCassette,
               'm/dd/yyyy',
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key="duration" label="Duration">
-        {
-          createTextField(
-              'duration',
-            data['duration'].value as string,
-            editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key="label" label="Label">
-        {
-          createTextField(
-              'label',
-              data['label'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key="titleOfCassette" label="Title Of Cassette">
-        {
-          createTextField(
-              'title_of_cassette',
-              data['title_of_cassette'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key="generation" label="Generation">
+      </EditSwitchFormField>
+      <EditSwitchFormField label='Duration'
+        editMode={editMode}
+        display={duration}>
+        <Form.Control name='duration' defaultValue={duration}/>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Label'
+        editMode={editMode}
+        display={label}>
+        <Form.Control name='label' defaultValue={label}/>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Title Of Cassette'
+        editMode={editMode}
+        display={titleOfCassette}>
+        <Form.Control name='title_of_cassette' defaultValue={titleOfCassette}/>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Generation'
+        editMode={editMode}
+        display={
+          data['generation'].value ?
+            (data['generation'].value as EnumMetadata).name :
+              ''}
+      >
         {
           createEnumField(
               'generation_id',
               data['generation'].value as EnumMetadata,
               generations,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='cassetteType' label="Type">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Type'
+        editMode={editMode}
+        display={
+          data['cassette_type'].value ?
+            (data['cassette_type'].value as EnumMetadata).name :
+              ''}
+      >
         {
           createEnumField(
               'cassette_type_id',
               data['cassette_type'].value as EnumMetadata,
               cassetteTypes,
-              editMode,
           )
         }
-      </FormatDetail>
-    </Fragment>
+      </EditSwitchFormField>
+    </div>
   );
 };
 
@@ -1072,92 +1197,97 @@ const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
+  const cassetteType =
+      data['cassette_type'].value ?
+          (data['cassette_type'].value as EnumMetadata).name :
+          '';
+
   return (
-    <Fragment>
-      <FormatDetail key='cassetteTitle' label="Cassette Title">
-        {
-          createTextField(
-              'cassette_title',
-              data['cassette_title'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='cassetteType' label="Type">
+    <div>
+      <EditSwitchFormField
+        label='Cassette Title'
+        editMode={editMode}
+        display={data['cassette_title'].value as string}>
+        <Form.Control
+          name='cassette_title'
+          defaultValue={data['cassette_title'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Type'
+        editMode={editMode}
+        display={cassetteType}>
         {
           createEnumField(
               'cassette_type_id',
               data['cassette_type'].value as EnumMetadata,
               subtypes,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='dateOfCassette' label="Date of Cassette">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Date of Cassette'
+        editMode={editMode}
+        display={data['date_of_cassette'].value as string}>
         {
           createDateField(
               'date_of_cassette',
               data['date_of_cassette'].value as string,
               'm/dd/yyyy',
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='generation' label="Generation">
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Generation'
+        editMode={editMode}
+        display={cassetteType}>
         {
           createEnumField(
               'generation_id',
               data['generation'].value as EnumMetadata,
               generations,
-              editMode,
           )
         }
-      </FormatDetail>
-      <FormatDetail key='sideALabel' label="Side A Label">
-        {
-          createTextField(
-              'side_a_label',
-              data['side_a_label'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='sideADuration' label="Side A Duration">
-        {
-          createTextField(
-              'side_a_duration',
-              data['side_a_duration'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='sideBLabel' label="Side B Label">
-        {
-          createTextField(
-              'side_b_label',
-              data['side_b_label'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-      <FormatDetail key='sideBDuration' label="Side B Duration">
-        {
-          createTextField(
-              'side_b_duration',
-              data['side_b_duration'].value as string,
-              editMode,
-          )
-        }
-      </FormatDetail>
-    </Fragment>
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side A Label'
+        editMode={editMode}
+        display={data['side_a_label'].value as string}>
+        <Form.Control
+          name='side_a_label'
+          defaultValue={data['side_a_label'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side A Duration'
+        editMode={editMode}
+        display={data['side_a_duration'].value as string}>
+        <Form.Control
+          name='side_a_duration'
+          defaultValue={data['side_a_duration'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side B Label'
+        editMode={editMode}
+        display={data['side_b_label'].value as string}>
+        <Form.Control
+          name='side_b_label'
+          defaultValue={data['side_b_label'].value as string}
+        />
+      </EditSwitchFormField>
+      <EditSwitchFormField
+        label='Side B Duration'
+        editMode={editMode}
+        display={data['side_b_duration'].value as string}>
+        <Form.Control
+          name='side_b_duration'
+          defaultValue={data['side_b_duration'].value as string}
+        />
+      </EditSwitchFormField>
+    </div>
   );
 };
 interface IFormatType{
@@ -1197,24 +1327,16 @@ function getTableBody(
     );
   }
 
-  const values: JSX.Element[] = data.map(
+  const items = data.map(
       (
           item: {
-            value?: string | number | boolean | EnumMetadata,
-            key: string
-          },
-          index: number,
+          value?: string | number | boolean | EnumMetadata,
+          key: string
+        },
       ) => {
-        const children: ReactElement = <p>
-          {item.value ? item.value.toString() : ''}
-        </p>;
-        return (
-          <FormatDetail key={index.toString()} label={item.key}>
-            {children}
-          </FormatDetail>
-        );
+        return <p key={item.key}>{item.value ? item.value.toString() : ''}</p>;
       });
-  return (<Fragment>{values}</Fragment>);
+  return <>{items}</>;
 }
 
 interface FormatType {
@@ -1260,11 +1382,7 @@ export default function FormatDetails({apiData, apiUrl, onUpdated}:IData ) {
   return (
     <>
       <Form onSubmit={handleUpdate}>
-        <Table data-testid='dummy'>
-          <tbody>
-            {values}
-          </tbody>
-        </Table>
+        {values}
         <ButtonGroup hidden={!editMode}>
           <Button variant={'outline-danger'} onClick={setEditMode}>
             Cancel

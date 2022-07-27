@@ -184,10 +184,13 @@ class ObjectMiddlewareEntity(AbsMiddlewareEntity):
         if "originals_rec_date" in json_request:
             new_object['originals_rec_date'] = json_request[
                 'originals_rec_date']
+            if new_object['originals_rec_date'].strip() == '':
+                new_object['originals_rec_date'] = None
         if 'originals_return_date' in json_request:
             new_object['originals_return_date'] = json_request[
                 'originals_return_date']
-
+            if new_object['originals_return_date'].strip() == '':
+                new_object['originals_return_date'] = None
         return new_object
 
     def create(self, data=None):

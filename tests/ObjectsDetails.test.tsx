@@ -39,6 +39,18 @@ describe('ObjectDetails', () => {
           ],
         });
       }
+      if (url === '/api/collection') {
+        return Promise.resolve({
+          data: {
+            collections: [
+              {
+                collection_id: 1,
+                collection_name: 'sample collection',
+              },
+            ],
+          },
+        });
+      }
       if (url === '/api/dummy') {
         return Promise.resolve(
             {
@@ -87,8 +99,11 @@ describe('ObjectDetails', () => {
         </MemoryRouter>,
     );
     await waitFor(async ()=> {
-      return await waitForElementToBeRemoved(screen.getByText('Loading...'));
+      await waitForElementToBeRemoved(screen.getByText('Loading...'));
+      return await waitForElementToBeRemoved(
+          screen.getByText('Loading collection data')
+      );
     });
-    expect(screen.getByDisplayValue('bar')).toBeInTheDocument();
+    expect(screen.getByText('bar')).toBeInTheDocument();
   });
 });
