@@ -1,6 +1,8 @@
 import json
+from typing import Dict
+
 import pytest
-from flask import url_for
+from flask import url_for, Flask
 
 from tyko.schema.formats import format_types
 
@@ -89,6 +91,123 @@ def test_project_update(app):
 
         assert updated_project["current_location"] == "new location"
         assert updated_project["status"] == "Complete"
+
+
+@pytest.mark.parametrize(
+    'vendor_info,key,expected_value',
+    [
+        (
+            {
+                'originals_received_date': '4/22/1999'
+            },
+            'originals_received_date',
+            '4/22/1999'
+        ),
+        (
+            {
+                'deliverable_received_date': '5/11/1996'
+            },
+            'deliverable_received_date',
+            '5/11/1996'
+        ),
+        (
+            {
+                'deliverable_received_date': '5/11/1996',
+                'originals_received_date': '4/22/1999'
+            },
+            'deliverable_received_date',
+            '5/11/1996'
+        ),
+        (
+            {
+                'deliverable_received_date': '5/11/1996',
+                'originals_received_date': '4/22/1999'
+            },
+            'originals_received_date',
+            '4/22/1999'
+        ),
+        (
+            {
+                'vendor_name': "Bob's copy shop",
+                'deliverable_received_date': '5/11/1996',
+                'originals_received_date': '4/22/1999'
+            },
+            'vendor_name',
+            "Bob's copy shop"
+        ),
+    ]
+)
+def test_item_update_vendor_info(
+        app: Flask,
+        vendor_info: Dict[str, str],
+        key: str,
+        expected_value: str
+):
+    with app.test_client() as server:
+        server.get('/')
+
+        project_id = server.post(
+            url_for("api.add_project"),
+            content_type='application/json',
+            data=json.dumps({
+                "title": 'Spam Project'
+            })
+        ).get_json()["id"]
+
+        new_object_id = server.post(
+            url_for("api.project_add_object", project_id=project_id),
+            data=json.dumps(
+                {
+                    "name": "My dummy object",
+                    "barcode": "12345",
+                }
+            ),
+            content_type='application/json'
+        ).get_json()['object']["object_id"]
+
+        item_id = server.post(
+            url_for(
+                "api.object_item",
+                project_id=project_id,
+                object_id=new_object_id
+            )
+            ,
+            data=json.dumps(
+                {
+                    "name": "My dummy item",
+                    "files": [
+                        {
+                            "name": "dummy.wav",
+                        }
+                    ],
+                    "format_id": 4
+                }
+            ),
+            content_type='application/json').get_json()['item']['item_id']
+        item_api_url = url_for("api.object_item",
+                               project_id=project_id,
+                               object_id=new_object_id,
+                               item_id=item_id
+                               )
+
+        put_response = server.put(
+            item_api_url,
+            data=json.dumps(vendor_info),
+            content_type='application/json'
+        )
+
+        assert \
+            put_response.status_code == 200, \
+            put_response.data.decode(put_response.charset)
+
+        put_response = server.get(
+            item_api_url,
+            content_type='application/json'
+        )
+        item = put_response.get_json()
+        assert item["name"] == "My dummy item"
+        assert item['vendor'][key] == expected_value
+        assert put_response.status_code == 200
 
 
 @pytest.mark.filterwarnings("ignore:Unknown format type items. Not updating")
@@ -260,8 +379,8 @@ def test_object_update(app):
                     "name": "My dummy object",
                     "barcode": "12345",
                     "collection_id": collection_one_id,
-                    "originals_rec_date": "2010-2-4",
-                    "originals_return_date": "2012-2-4"
+                    "originals_rec_date": "2/4/2010",
+                    "originals_return_date": "2/4/2012"
                 }
             ),
             content_type='application/json'
@@ -276,8 +395,8 @@ def test_object_update(app):
                 "name": "changed_dummy object",
                 "barcode": "54321",
                 "collection_id": collection_two_id,
-                "originals_rec_date": "2010-01-04",
-                "originals_return_date": "2012-05-04"
+                "originals_rec_date": "4/1/2010",
+                "originals_return_date": "4/5/2012"
             }),
             content_type='application/json'
 
@@ -296,8 +415,8 @@ def test_object_update(app):
         get_object = edited_data["object"]
         assert get_object["name"] == "changed_dummy object"
         assert get_object["name"] == "changed_dummy object"
-        assert get_object["originals_rec_date"] == "2010-01-04"
-        assert get_object["originals_return_date"] == "2012-05-04"
+        assert get_object["originals_rec_date"] == "4/1/2010"
+        assert get_object["originals_return_date"] == "4/5/2012"
         assert get_object["collection_id"] == collection_two_id
 
 

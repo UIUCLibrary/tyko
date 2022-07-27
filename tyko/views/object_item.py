@@ -1,6 +1,6 @@
 import sys
 import traceback
-from typing import Dict, Any
+from typing import Dict
 
 from flask import views, make_response, jsonify, request, url_for
 
@@ -189,32 +189,10 @@ class ItemAPI(views.MethodView):
         self._data_connector = \
             data_provider.ItemDataConnector(provider.db_session_maker)
 
-    @classmethod
-    def create_changed_data(cls, json_request) -> Dict[str, Any]:
-
-        new_item = {}
-        for field in cls.WRITABLE_FIELDS:
-            if field == "obj_sequence":
-                continue
-            if field in json_request:
-                new_item[field] = json_request.get(field)
-
-        if "obj_sequence" in json_request:
-            obj_sequence = json_request.get("obj_sequence")
-            new_item["obj_sequence"] = int(obj_sequence)
-        new_item['format_details'] = json_request.get('format_details', {})
-        return new_item
-
     def put(self, item_id):
-        json_request = request.json
-        try:
-            new_item = self.create_changed_data(json_request)
-
-        except ValueError as reason:
-            return make_response(f"Cannot update item. Reason: {reason}", 400)
-
         replacement_item = self._data_connector.update(
-            item_id, changed_data=new_item
+            int(item_id),
+            request.json
         )
         if not replacement_item:
             return make_response("", 204)

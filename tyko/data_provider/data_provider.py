@@ -255,12 +255,15 @@ class UpdateFilm:
     @staticmethod
     def update_ad_test(item, changed_data):
 
+        ad_test = changed_data.pop('ad_test_performed', False)
+        item.ad_test = ad_test == "on"
         if data_of_ad_test := changed_data.pop('ad_test_date', None):
             item.ad_test_date = \
                 utils.create_precision_datetime(data_of_ad_test)
+        else:
+            item.ad_test_date = None
 
-        if data_of_ad_level := changed_data.pop('ad_test_level', None):
-            item.ad_test_level = data_of_ad_level
+        item.ad_test_level = changed_data.pop('ad_test_level', None)
 
     @staticmethod
     def update(item, changed_data):
@@ -549,19 +552,34 @@ class ItemDataConnector(AbsNotesConnector):
         item: CollectionItem = self.get_item(id)
         session = self.session_maker()
         if item:
-            if "name" in changed_data:
-                item.name = changed_data['name']
+            copy_of_changed_data = changed_data.copy()
+            if name := copy_of_changed_data.pop('name', None):
+                item.name = name
 
-            if "obj_sequence" in changed_data:
-                item.obj_sequence = int(changed_data["obj_sequence"])
+            if obj_sequence := copy_of_changed_data.pop('obj_sequence', None):
+                item.obj_sequence = int(obj_sequence)
 
-            if "format_details" in changed_data:
+            if format_details := copy_of_changed_data.pop(
+                    'format_details',
+                    None
+            ):
                 update_format_specific_details(
                     format_type=item.type,
-                    changed_data=changed_data['format_details'],
+                    changed_data=format_details,
                     session=session, item=item)
-            if 'barcode' in changed_data:
-                item.barcode = changed_data['barcode']
+
+            if barcode := copy_of_changed_data.pop('barcode', None):
+                item.barcode = barcode
+
+            self._update_vendor_info(copy_of_changed_data, item)
+
+            unparsed_keys = copy_of_changed_data.keys()
+            if len(unparsed_keys) > 0:
+                unexpected_keys = ", ".join(unparsed_keys)
+                raise DataError(
+                    message=f"Invalid Key(s): {unexpected_keys}"
+                )
+
             try:
                 session.add(item)
                 session.commit()
@@ -569,6 +587,34 @@ class ItemDataConnector(AbsNotesConnector):
             finally:
                 session.close()
         return updated_item
+
+    @staticmethod
+    def _update_vendor_info(changed_data: Dict[str, str], item):
+        """Updates vendor info from changed data.
+
+        Notes:
+            This function removes items from changed_data as it updates.
+        Args:
+            changed_data:
+            item:
+
+        Returns:
+
+        """
+        if vendor_name := changed_data.pop("vendor_name", None):
+            item.vendor_name = vendor_name
+        if deliverable_received_date := changed_data.pop(
+                'deliverable_received_date',
+                None
+        ):
+            item.deliverable_received_date = \
+                utils.create_precision_datetime(deliverable_received_date)
+        if originals_received_date := changed_data.pop(
+                'originals_received_date',
+                None
+        ):
+            item.originals_received_date = \
+                utils.create_precision_datetime(originals_received_date)
 
     @staticmethod
     def update_cassette_tape(session, format_details, item):
@@ -1150,17 +1196,23 @@ class ObjectDataConnector(AbsNotesConnector):
                 collection_object.collection = collection
 
             if 'originals_rec_date' in changed_data:
-                collection_object.originals_rec_date = \
-                    datetime.strptime(
-                        changed_data['originals_rec_date'],
-                        DATE_FORMAT
-                    )
+                if changed_data['originals_rec_date'] is None:
+                    collection_object.originals_rec_date = None
+                else:
+                    collection_object.originals_rec_date = \
+                        datetime.strptime(
+                            changed_data['originals_rec_date'],
+                            "%m/%d/%Y"
+                        )
             if 'originals_return_date' in changed_data:
-                collection_object.originals_return_date = \
-                    datetime.strptime(
-                        changed_data['originals_return_date'],
-                        DATE_FORMAT
-                    )
+                if changed_data['originals_return_date'] is None:
+                    collection_object.originals_return_date = None
+                else:
+                    collection_object.originals_return_date = \
+                        datetime.strptime(
+                            changed_data['originals_return_date'],
+                            "%m/%d/%Y"
+                        )
 
             session.add(collection_object)
             session.commit()

@@ -1,12 +1,19 @@
-import {ButtonGroup, Col, Container, Form, Row} from 'react-bootstrap';
+import {ButtonGroup, Col, Container, Row} from 'react-bootstrap';
 import Panel from '../reactComponents/Panel';
-import React, {FC, useEffect, useState} from 'react';
+import React, {
+  FC,
+  useEffect,
+  useState,
+} from 'react';
 import {Link, useParams} from 'react-router-dom';
-import axios from 'axios';
-import {EditableField} from '../reactComponents/ItemApp';
+import axios, {AxiosError} from 'axios';
 import Table from 'react-bootstrap/Table';
 import {NewItemButton} from '../reactComponents/Items';
 import {LoadingIndeterminate} from '../reactComponents/Common';
+
+import {
+  ObjectDetails as ObjectDetailsDetails,
+} from '../reactComponents/ObjectDetails';
 
 interface IItem {
   format: {
@@ -41,15 +48,8 @@ interface IDetails {
   apiData: IObjectApi
   apiUrl: string
   onUpdated: ()=>void
-
+  onError? : (error: Error| AxiosError)=>void
 }
-
-const updateData = async (url: string, key: string, value: string) => {
-  const data: {[key: string]: string} = {};
-  data[key] = value;
-  return axios.put(url, data);
-};
-
 
 const ObjectItems: FC<IDetails> = (
     {apiData, apiUrl, onUpdated},
@@ -97,30 +97,157 @@ const ObjectItems: FC<IDetails> = (
     </>
   );
 };
-const ObjectDetailsDetails: FC<IDetails> = (
-    {apiData, apiUrl, onUpdated},
-) =>{
-  // to do: finish ObjectDetailsDetails
-  return (
-    <Form.Group className="mb-3 row">
-      <Row>
-        <Col sm={2}>
-          <Form.Label>Name</Form.Label>
-        </Col>
-        <Col>
-          <EditableField
-            display={apiData.name}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'name', value)
-                  .then(()=> onUpdated())
-                  .catch(console.error);
-            }}
-          />
-        </Col>
-      </Row>
-    </Form.Group>
-  );
-};
+// const ObjectDetailsDetails: FC<IDetails2> = (
+//     {
+//       name,
+//       collectionId,
+//       originalsReceivedDate,
+//       originalsReturnedDate,
+//       apiUrl,
+//       onUpdated,
+//       onError,
+//     },
+// ) =>{
+//   const [loading, setLoading] = useState(false);
+//   const [accessible, setAccessible] = useState(true);
+//   const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
+//   const [
+//     collectionData,
+//     setCollectionData,
+//   ] = useState<ICollectionAPI[] | null>(null);
+//
+//   const form = useRef<HTMLFormElement>(null);
+//   const fetchCollections = async (url: string) =>{
+//     return (
+//         (await axios.get(url)).data as {collections: ICollectionAPI[]}
+//     ).collections;
+//   };
+//   const handleConfirm = ()=>{
+//     if (form.current) {
+//       submitEvent(form.current);
+//     }
+//   };
+//   useEffect(()=> {
+//     if (!loading) {
+//       if (!collectionData) {
+//         setLoading(true);
+//         fetchCollections('/api/collection').then(
+//             (data) => {
+//               setCollectionData(data);
+//             },
+//         ).catch(console.log).finally(
+//             ()=> {
+//               setLoading(false);
+//             },
+//         );
+//       }
+//     }
+//   }, [collectionData, loading]);
+//   if (loading || !collectionData) {
+//     return <LoadingIndeterminate
+//       message='Loading collection data'
+//     />;
+//   }
+//   const handleSubmit = (event: FormEvent)=>{
+//     event.preventDefault();
+//     if (apiUrl) {
+//       setAccessible(false);
+//       submitFormUpdates(
+//           apiUrl,
+//           new FormData(event.target as HTMLFormElement),
+//       )
+//           .then(()=>{
+//             if (onUpdated) {
+//               onUpdated();
+//             }
+//           })
+//           .catch(onError?onError:console.error)
+//           .finally(()=> {
+//             setEditMode();
+//             setAccessible(true);
+//           });
+//     }
+//   };
+//   // to do: finish ObjectDetailsDetails
+//   let currentCollection: ICollectionAPI = {
+//     collection_name: '',
+//     collection_id: null,
+//   };
+//   const collectionOptions = collectionData.map((collection)=>{
+//     return (
+//       <option
+//         key={collection.collection_id}
+//         value={collection.collection_id ? collection.collection_id: ''}
+//       >
+//         {collection.collection_name}
+//       </option>
+//     );
+//   });
+//   for (const collection of collectionData) {
+//     if (collection.collection_id === null) {
+//       continue;
+//     }
+//     if (collection.collection_id === collectionId) {
+//       currentCollection = collection;
+//       break;
+//     }
+//   }
+//   return (
+//     <>
+//       <Form ref={form} onSubmit={handleSubmit}>
+//         <EditSwitchFormField
+//           label='Name'
+//           editMode={editMode}
+//           display={name}>
+//           <Form.Control
+//             name='name'
+//             defaultValue={name}
+//           />
+//         </EditSwitchFormField>
+//         <EditSwitchFormField
+//           label='Collection'
+//           editMode={editMode}
+//           display={currentCollection.collection_name}>
+//           <Form.Select
+//             name='collection_id'
+//             defaultValue={
+//               currentCollection.collection_id ?
+//                   currentCollection.collection_id :
+//                   ''
+//             }>
+//             <option key={-1} value=''/>
+//             {collectionOptions}
+//           </Form.Select>
+//         </EditSwitchFormField>
+//         <EditSwitchFormField
+//           label='Originals Received Date'
+//           editMode={editMode}
+//           display={originalsReceivedDate}>
+//           <SelectDate
+//             name='originals_rec_date'
+//             dateFormat='m/dd/yyyy'
+//             defaultValue={originalsReceivedDate}
+//           />
+//         </EditSwitchFormField>
+//         <EditSwitchFormField
+//           label='Originals Returned Date'
+//           editMode={editMode}
+//           display={originalsReturnedDate}>
+//           <SelectDate
+//             name='originals_return_date'
+//             dateFormat='m/dd/yyyy'
+//             defaultValue={originalsReturnedDate}
+//           />
+//         </EditSwitchFormField>
+//         <EditControl
+//           editMode={editMode}
+//           setEditMode={setEditMode}
+//           onConfirm={handleConfirm}
+//         />
+//       </Form>
+//     </>
+//   );
+// };
 
 /**
  * d
@@ -130,23 +257,26 @@ export default function ObjectDetails() {
   const {projectId} = useParams<string>();
   const {objectId} = useParams<string>();
   const [apiData, setApiData] = useState<IObjectApi | null>(null);
+  // const [
+  //   collectionData,
+  //   setCollectionData,
+  // ] = useState<ICollectionAPI[] | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchData = async (url: string) => {
+  const fetchApiData = async (url: string) => {
     setApiData(((await axios.get(url)).data as IObjectApi));
   };
-
   const newItemApiUrl = (projectId && objectId) ?
       `/api/project/${projectId}/object/${objectId}/item`: '';
 
   const apiUrl = (projectId && objectId) ?
     `/api/project/${projectId}/object/${objectId}` : '';
-
+  const updateObjectUrl = objectId ? `/api/object/${objectId}` : '';
   useEffect(()=>{
     if (!loading) {
       if (projectId && !apiData) {
         setLoading(true);
-        fetchData(apiUrl).then(()=>setLoading(false)).catch(console.log);
+        fetchApiData(apiUrl).then(()=>setLoading(false)).catch(console.log);
       }
     }
   }, [loading, apiData, projectId, apiUrl]);
@@ -162,8 +292,11 @@ export default function ObjectDetails() {
     notesPanel = <LoadingIndeterminate/>;
   } else {
     detailsPanel = <ObjectDetailsDetails
-      apiData={apiData}
-      apiUrl={apiUrl}
+      name={apiData.name}
+      collectionId={apiData.collection_id}
+      originalsReceivedDate={apiData.originals_rec_date}
+      originalsReturnedDate={apiData.originals_return_date}
+      apiUrl={updateObjectUrl}
       onUpdated={()=>setApiData(null)}/>;
     itemsPanel = <ObjectItems
       apiData={apiData}

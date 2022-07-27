@@ -1,16 +1,20 @@
 import React, {
   FC,
-  FocusEvent, useCallback,
+  FocusEvent, FormEvent, useCallback,
   useEffect,
   useReducer,
   useRef,
   useState,
 } from 'react';
 import InputGroup from 'react-bootstrap/InputGroup';
-import Table from 'react-bootstrap/Table';
-import axios from 'axios';
+import {AxiosError} from 'axios';
 import {Button, Form} from 'react-bootstrap';
-import Alert from 'react-bootstrap/Alert';
+import {
+  EditSwitchFormField,
+  EditControl,
+  submitEvent,
+  submitFormUpdates,
+} from './Common';
 
 interface IEditableField{
   id?: string
@@ -125,6 +129,11 @@ export interface IItemMetadata {
     name: string
     },
   format_details: {[key: string]: string}
+  vendor?: {
+    vendor_name: string
+    deliverable_received_date: string | null
+    originals_received_date: string | null
+  },
   format_id: number,
   inspection_date?: string,
   item_id: number,
@@ -136,116 +145,102 @@ export interface IItemMetadata {
   transfer_date?: string
 }
 
-const updateData = async (url: string, key: string, value: string) => {
-  const data: {[key: string]: string} = {};
-  data[key] = value;
-  return axios.put(url, data);
-};
-interface IData {
-  apiData: IItemMetadata
-  apiUrl: string
-  onUpdated?: ()=>void
+interface IItemDetails {
+  objectName: string,
+  formatName: string,
+  objectSequence: number,
+  barcode?: string,
+  apiUrl?: string
+  onAccessibleChange? : (busy: boolean)=>void
+  onUpdated? : ()=>void
+  onError? : (error: Error| AxiosError)=>void
 }
-
-/**
- * d
- * @constructor
- */
-export function ItemDetails({apiData, apiUrl, onUpdated}: IData) {
-  try {
-    const objectName = apiData ? apiData.name : null;
-    const formatName = apiData ? apiData.format.name : null;
-    const objectSequence = apiData ? apiData.obj_sequence : null;
-    const barcode = apiData ? apiData.barcode : null;
-
-    const handleUpdate = ()=>{
-      if (onUpdated) {
-        onUpdated();
-      }
-    };
-
-    const tableBody = <>
-      <tr>
-        <th style={{width: '25%'}}>Name</th>
-        <td>
-          <EditableField
-            display={objectName}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'name', value)
-                  .then(handleUpdate)
-                  .catch(console.error);
-            }}
-          />
-        </td>
-      </tr>
-      <tr>
-        <th style={{width: '25%'}}>Object Sequence</th>
-        <td>
-          <EditableField
-            display={objectSequence}
-            type='number'
-            inputProps={{min: 1}}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'obj_sequence', value)
-                  .then(handleUpdate)
-                  .catch(console.error);
-            }}
-          />
-        </td>
-      </tr>
-      <tr>
-      </tr>
-      <tr>
-        <th style={{width: '25%'}}>
-          <Form.Label htmlFor='barcode'>Barcode</Form.Label>
-        </th>
-        <td>
-          <EditableField
-            id='barcode'
-            display={barcode}
-            onSubmit={(value)=> {
-              updateData(apiUrl, 'barcode', value)
-                  .then(handleUpdate)
-                  .catch(console.error);
-            }}
-          />
-        </td>
-      </tr>
-      <tr>
-      </tr>
-      <tr>
-        <th style={{width: '25%'}}>Format Type</th>
-        <td>
-          <Form.Control value={formatName ? formatName : ''} readOnly/>
-        </td>
-      </tr>
-    </>;
-    const table = <>
-      <Table>
-        <thead hidden>
-          <tr>
-            <th scope="col">Type</th>
-            <th scope="col">Content</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableBody}
-        </tbody>
-      </Table>
-    </>;
-    return (<>{table}</>);
-  } catch (errorThrown) {
-    let message = '';
-
-    if (errorThrown instanceof Error) {
-      message = errorThrown.message;
-      console.error(errorThrown.stack);
+export const ItemDetails: FC<IItemDetails> = (
+    {
+      objectName,
+      formatName,
+      objectSequence,
+      barcode,
+      apiUrl,
+      onAccessibleChange,
+      onUpdated,
+      onError,
+    },
+) =>{
+  const [accessible, setAccessible] = useState(true);
+  const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
+  const form = useRef<HTMLFormElement>(null);
+  const handleConfirm = ()=>{
+    if (form.current) {
+      submitEvent(form.current);
     }
-    return (
-      <Alert variant="danger">
-        <h4>Failed to load the data</h4>
-        <pre id="errorDetails">{message}</pre>
-      </Alert>
-    );
-  }
-}
+  };
+  const handleSubmit = (event: FormEvent)=>{
+    event.preventDefault();
+    if (apiUrl) {
+      setAccessible(false);
+      submitFormUpdates(apiUrl, new FormData(event.target as HTMLFormElement))
+          .then(()=>{
+            if (onUpdated) {
+              onUpdated();
+            }
+          })
+          .catch(onError?onError:console.error)
+          .finally(()=> {
+            setEditMode();
+            setAccessible(true);
+          });
+    }
+  };
+  useEffect(()=>{
+    if (onAccessibleChange) {
+      onAccessibleChange(!accessible);
+    }
+  }, [accessible, onAccessibleChange]);
+  return (
+    <>
+      <Form ref={form} onSubmit={handleSubmit}>
+        <EditSwitchFormField
+          label='Name'
+          editMode={editMode}
+          display={objectName}>
+          <Form.Control
+            name='name'
+            defaultValue={objectName}
+          />
+        </EditSwitchFormField>
+        <EditSwitchFormField
+          label='Object Sequence'
+          editMode={editMode}
+          display={objectSequence ? objectSequence.toString() : null}>
+          <Form.Control
+            name='obj_sequence'
+            type='number'
+            defaultValue={objectSequence}
+          />
+        </EditSwitchFormField>
+        <EditSwitchFormField
+          label='Barcode'
+          editMode={editMode}
+          editorId='barcode'
+          display={barcode}>
+          <Form.Control
+            name='barcode'
+            defaultValue={barcode}
+            id='barcode'
+          />
+        </EditSwitchFormField>
+        <EditSwitchFormField
+          label='Format Type'
+          editMode={false}
+          display={formatName}>
+        </EditSwitchFormField>
+        <EditControl
+          editMode={editMode}
+          setEditMode={setEditMode}
+          onConfirm={handleConfirm}
+        />
+      </Form>
+    </>
+  );
+};

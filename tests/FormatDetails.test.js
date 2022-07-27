@@ -7,7 +7,6 @@ import '@testing-library/jest-dom';
 
 import {
   fireEvent,
-  getByDisplayValue,
   render,
   screen,
   waitFor,
@@ -181,6 +180,7 @@ describe('FormatDetails', ()=> {
           },
           format_id: 9,
         },
+        'Title Of Cassette',
         'foo',
       ],
       [
@@ -198,6 +198,7 @@ describe('FormatDetails', ()=> {
           },
           format_id: 8,
         },
+        'Title Of Item',
         'foo',
       ],
       [
@@ -218,6 +219,7 @@ describe('FormatDetails', ()=> {
           },
           format_id: 7,
         },
+        'Cassette Title',
         'foo',
       ],
       [
@@ -249,6 +251,7 @@ describe('FormatDetails', ()=> {
           },
           format_id: 6,
         },
+        'Can Label',
         'foo',
       ],
       [
@@ -276,6 +279,7 @@ describe('FormatDetails', ()=> {
           },
           format_id: 4,
         },
+        'Title of Reel',
         'foo',
       ],
       [
@@ -300,33 +304,34 @@ describe('FormatDetails', ()=> {
           },
           format_id: 5,
         },
+        'Title of Disc',
         'foo',
       ],
     ];
-    test.each(cases)('edit %p', async (metadata, expectedValue) => {
+    test.each(cases)('edit %p', async (metadata, label, expectedValue) => {
       render(
           <FormatDetails apiData={metadata} apiUrl='/foo'/>,
       );
       expect(
-          screen.getByDisplayValue(expectedValue),
-      ).toHaveAttribute('readonly');
+          screen.getByLabelText(label).nodeName,
+      ).not.toBe('INPUT');
       await waitFor(() => {
         fireEvent.click(screen.getByText('Edit'));
         return waitForElementToBeRemoved(() => screen.getByRole('progressbar'));
       });
       expect(
-          screen.getByDisplayValue(expectedValue),
-      ).not.toHaveAttribute('readonly');
+          screen.getByDisplayValue(expectedValue).nodeName,
+      ).toBe('INPUT');
     });
   });
 });
 
 describe('FormatDetails', ()=>{
   it('data is loaded into the document', ()=> {
-    const {getByDisplayValue} = render(
+    render(
         <FormatDetails apiData={mockResponseAudioCassette} apiUrl='/foo'/>,
     );
-    expect(getByDisplayValue('my cassette title')).toBeInTheDocument();
+    expect(screen.getByText('my cassette title')).toBeInTheDocument();
   });
   it('test unsupported format', ()=>{
     const mockData = {

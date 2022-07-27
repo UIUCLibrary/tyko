@@ -1,17 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {Col, Row} from 'react-bootstrap';
-import Panel from '../reactComponents/Panel';
+import Panel, {InactiveCover} from '../reactComponents/Panel';
 import {
-  ItemDetails as ItemDetailsDetails,
-  IItemMetadata,
+  IItemMetadata, ItemDetails as ItemDetailsComponent,
 } from '../reactComponents/ItemApp';
 import FormatDetails from '../reactComponents/FormatDetails';
 import {useParams} from 'react-router-dom';
 import axios from 'axios';
 import {LoadingIndeterminate} from '../reactComponents/Common';
-
+import {VendorDataEdit} from '../reactComponents/Vendor';
 /**
- * d
+ * Item details
  * @constructor
  */
 export default function ItemDetails() {
@@ -21,6 +20,7 @@ export default function ItemDetails() {
 
   const [apiData, setApiData] = useState<IItemMetadata | null>(null);
   const [loading, setLoading] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const fetchData = async (url: string) => {
     setApiData(((await axios.get(url)).data as IItemMetadata));
@@ -67,10 +67,14 @@ export default function ItemDetails() {
       </div>
     </>;
   } else {
-    detailsPanel = <ItemDetailsDetails
-      apiData={apiData}
+    detailsPanel = <ItemDetailsComponent
+      objectName={apiData.name}
+      formatName={apiData.format.name}
+      barcode={apiData.barcode ? apiData.barcode: undefined}
+      objectSequence={apiData.obj_sequence}
       apiUrl={apiUrl}
-      onUpdated={()=>setApiData(null)}/>;
+      onUpdated={()=>setApiData(null)}
+    />;
     formatDetailsPanel = <FormatDetails
       apiData={apiData}
       apiUrl={apiUrl}
@@ -78,6 +82,39 @@ export default function ItemDetails() {
     filesPanel = <>do stuff here</>;
     notesPanel = <>do stuff here</>;
   }
+  const vendorInfo = apiData?.vendor ?
+      apiData.vendor :
+      {
+        'vendor_name': null,
+        'deliverable_received_date': null,
+        'originals_received_date': null,
+      };
+  const vendorPanel = <VendorDataEdit
+    vendorName={
+      vendorInfo['vendor_name'] ?
+          vendorInfo['vendor_name'] : undefined
+    }
+    deliverableReceivedDate={
+      vendorInfo['deliverable_received_date'] ?
+          vendorInfo['deliverable_received_date'] : undefined
+    }
+    originalsReceivedDate={
+      vendorInfo['originals_received_date'] ?
+          vendorInfo['originals_received_date'] : undefined
+    }
+    apiUrl={apiUrl}
+    onAccessibleChange={setBusy}
+    onUpdated={()=> {
+      setBusy(false);
+      setApiData(null);
+    }}
+  />;
+
+  const blocker = busy ?
+      (
+        <InactiveCover><LoadingIndeterminate/></InactiveCover>
+      ) :
+      <></>;
   return (
     <div>
       <h1>Item Details</h1>
@@ -89,6 +126,12 @@ export default function ItemDetails() {
             </Panel>
             <Panel title="Format Details">
               {formatDetailsPanel}
+            </Panel>
+          </Row>
+          <Row>
+            <Panel title='Vendor'>
+              {blocker}
+              {vendorPanel}
             </Panel>
           </Row>
         </Col>

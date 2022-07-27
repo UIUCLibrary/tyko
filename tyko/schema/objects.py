@@ -3,6 +3,7 @@ from typing import Dict, Optional, List, TYPE_CHECKING, Union, Mapping
 import sqlalchemy as db
 from sqlalchemy.orm import relationship, backref
 
+from tyko import utils
 from tyko.schema.avtables import AVTables, SerializedData
 
 if TYPE_CHECKING:
@@ -91,13 +92,19 @@ class CollectionObject(AVTables):
             else:
                 data["parent_project_id"] = None
 
-        data["originals_rec_date"] = \
-            self.serialize_date(self.originals_rec_date)
-
-        data["originals_return_date"] = \
-            self.serialize_date(self.originals_return_date)
+        data = {**data, **self._serialize_dates()}
 
         return data
+
+    def _serialize_dates(self):
+        return {
+            "originals_rec_date": utils.serialize_precision_datetime(
+                self.originals_rec_date
+            ) if self.originals_rec_date is not None else None,
+            'originals_return_date': utils.serialize_precision_datetime(
+                self.originals_return_date
+            ) if self.originals_return_date is not None else None
+        }
 
     def get_collection(self, recurse: bool) -> Optional[Union[dict, int]]:
         if self.collection is not None:
