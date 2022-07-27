@@ -92,17 +92,19 @@ class CollectionObject(AVTables):
             else:
                 data["parent_project_id"] = None
 
-        data["originals_rec_date"] = \
-            utils.serialize_precision_datetime(
-                self.originals_rec_date
-            ) if self.originals_rec_date is not None else None
-
-        data["originals_return_date"] = \
-            utils.serialize_precision_datetime(
-                self.originals_return_date
-            ) if self.originals_return_date is not None else None
+        data = {**data, **self._serialize_dates()}
 
         return data
+
+    def _serialize_dates(self):
+        return {
+            "originals_rec_date": utils.serialize_precision_datetime(
+                self.originals_rec_date
+            ) if self.originals_rec_date is not None else None,
+            'originals_return_date': utils.serialize_precision_datetime(
+                self.originals_return_date
+            ) if self.originals_return_date is not None else None
+        }
 
     def get_collection(self, recurse: bool) -> Optional[Union[dict, int]]:
         if self.collection is not None:
