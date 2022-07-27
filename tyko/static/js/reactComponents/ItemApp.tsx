@@ -15,7 +15,7 @@ import {
   EditSwitchFormField,
   EditControl,
   submitEvent,
-  submitFormUpdates
+  submitFormUpdates,
 } from './Common';
 
 interface IEditableField{
@@ -182,11 +182,6 @@ export const ItemDetails2: FC<IItemDetails> = (
       submitEvent(form.current);
     }
   };
-  useEffect(()=>{
-    if (onAccessibleChange) {
-      onAccessibleChange(!accessible);
-    }
-  }, [accessible, onAccessibleChange]);
   const handleSubmit = (event: FormEvent)=>{
     event.preventDefault();
     if (apiUrl) {
@@ -204,6 +199,11 @@ export const ItemDetails2: FC<IItemDetails> = (
           });
     }
   };
+  useEffect(()=>{
+    if (onAccessibleChange) {
+      onAccessibleChange(!accessible);
+    }
+  }, [accessible, onAccessibleChange]);
   return (
     <>
       <Form ref={form} onSubmit={handleSubmit}>
