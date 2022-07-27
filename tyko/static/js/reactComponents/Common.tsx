@@ -98,3 +98,13 @@ export const EditSwitchFormField: FC<IEditData> = (
     </Form.Group>
   );
 };
+
+export const submitEvent = (target: EventTarget)=>{
+  target.dispatchEvent(
+      new Event(
+          'submit', {
+            cancelable: true,
+            bubbles: true,
+          }),
+  );
+};

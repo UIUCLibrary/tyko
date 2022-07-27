@@ -1,4 +1,4 @@
-import {EditSwitchFormField, EditControl} from './Common';
+import {EditSwitchFormField, EditControl, submitEvent} from './Common';
 import React, {
   FC, FormEvent,
   useReducer,
@@ -42,13 +42,9 @@ export const VendorDataEdit: FC<IVendorJobData> = (
   const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
   const form = useRef<HTMLFormElement>(null);
   const handleConfirm = ()=>{
-    form.current?.dispatchEvent(
-        new Event(
-            'submit', {
-              cancelable: true,
-              bubbles: true,
-            }),
-    );
+    if (form.current) {
+      submitEvent(form.current);
+    }
   };
   useEffect(()=>{
     if (onAccessibleChange) {

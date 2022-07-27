@@ -11,7 +11,7 @@ import Table from 'react-bootstrap/Table';
 import axios, {AxiosError} from 'axios';
 import {Button, Form} from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
-import {EditSwitchFormField, EditControl} from './Common';
+import {EditSwitchFormField, EditControl, submitEvent} from './Common';
 
 interface IEditableField{
   id?: string
@@ -173,13 +173,9 @@ export const ItemDetails2: FC<IItemDetails> = (
   const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
   const form = useRef<HTMLFormElement>(null);
   const handleConfirm = ()=>{
-    form.current?.dispatchEvent(
-        new Event(
-            'submit', {
-              cancelable: true,
-              bubbles: true,
-            }),
-    );
+    if (form.current) {
+      submitEvent(form.current);
+    }
   };
   useEffect(()=>{
     if (onAccessibleChange) {
