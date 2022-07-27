@@ -55,14 +55,9 @@ const FormatDetail:
       children?: string | JSX.Element | JSX.Element[]
     }> = ({label, children}) => {
       return (
-        <tr>
-          <th style={{width: '25%'}} scope="row">{label}</th>
-          <td>
-            <div className="container-sm">
-              {children}
-            </div>
-          </td>
-        </tr>
+        <div className="container-sm">
+          {children}
+        </div>
       );
     };
 
@@ -122,13 +117,7 @@ const OpenReel: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
   return (
     <div>
@@ -372,13 +361,7 @@ const GroovedDisc: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
   return (
     <div>
@@ -652,13 +635,7 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
   const adTestLevelValue = adTestLevel ? parseInt(adTestLevel): null;
 
@@ -1044,13 +1021,7 @@ const Optical: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
   return (
     <div>
@@ -1143,11 +1114,7 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
   }, [enumsLoading]);
   if (loading) {
     return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
+      <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
     );
   }
   return (
@@ -1255,13 +1222,7 @@ const AudioCassette: FC<IFormatType> = ({data, editMode}) => {
     setLoading(enumsLoading);
   }, [enumsLoading]);
   if (loading) {
-    return (
-      <tr>
-        <td rowSpan={2} style={{textAlign: 'center'}}>
-          <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
-        </td>
-      </tr>
-    );
+    return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
   const cassetteType =
       data['cassette_type'].value ?
