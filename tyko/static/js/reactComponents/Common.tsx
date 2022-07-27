@@ -3,11 +3,13 @@ import React, {Dispatch, FC, SetStateAction, useId} from 'react';
 import Button from 'react-bootstrap/Button';
 import axios, {AxiosResponse} from 'axios';
 
-export const LoadingIndeterminate = () => {
+export const LoadingIndeterminate = ({message}: {message?: string}) => {
   return (
     <div style={{textAlign: 'center'}}>
       <Spinner animation="border" role="status">
-        <span className="visually-hidden">Loading...</span>
+        <span className="visually-hidden">
+          {message ? message :'Loading...'}
+        </span>
       </Spinner>
     </div>
   );

@@ -231,7 +231,11 @@ export const SelectDate: FC<ISelectDate> = (
 ) => {
   const inputText = useRef<HTMLInputElement>(null);
   if (inputText.current) {
-    inputText.current.value = defaultValue ? defaultValue : '';
+    if (defaultValue) {
+      inputText.current.value = defaultValue;
+    } else {
+      inputText.current.value = '';
+    }
   }
   return (
     <Form.Group className="input-group">

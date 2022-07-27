@@ -1196,17 +1196,23 @@ class ObjectDataConnector(AbsNotesConnector):
                 collection_object.collection = collection
 
             if 'originals_rec_date' in changed_data:
-                collection_object.originals_rec_date = \
-                    datetime.strptime(
-                        changed_data['originals_rec_date'],
-                        DATE_FORMAT
-                    )
+                if changed_data['originals_rec_date'] is None:
+                    collection_object.originals_rec_date = None
+                else:
+                    collection_object.originals_rec_date = \
+                        datetime.strptime(
+                            changed_data['originals_rec_date'],
+                            "%m/%d/%Y"
+                        )
             if 'originals_return_date' in changed_data:
-                collection_object.originals_return_date = \
-                    datetime.strptime(
-                        changed_data['originals_return_date'],
-                        DATE_FORMAT
-                    )
+                if changed_data['originals_return_date'] is None:
+                    collection_object.originals_return_date = None
+                else:
+                    collection_object.originals_return_date = \
+                        datetime.strptime(
+                            changed_data['originals_return_date'],
+                            "%m/%d/%Y"
+                        )
 
             session.add(collection_object)
             session.commit()
