@@ -102,7 +102,6 @@ export const ObjectDetails: FC<IDetails2> = (
           });
     }
   };
-  // to do: finish ObjectDetailsDetails
   let currentCollection: ICollectionAPI = {
     collection_name: '',
     collection_id: null,

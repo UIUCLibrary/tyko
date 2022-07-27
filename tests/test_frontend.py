@@ -14,60 +14,6 @@ def test_view_web_object_empty(app):
         assert resulting_webpage.status_code != 200
 
 
-def test_view_web_object(app):
-    with app.test_client() as server:
-        server.get('/')
-        project_id = server.post(
-            url_for("api.add_project"),
-            data=json.dumps(
-                {
-                    "title": "my dumb project",
-                }
-            ),
-            content_type='application/json'
-        ).get_json()['id']
-
-        collection_id = server.post(
-            url_for("api.add_collection"),
-            data=json.dumps(
-                {
-                    "collection_name": "my dumb collection",
-                }
-            ),
-            content_type='application/json'
-        ).get_json()['id']
-
-        object_id = server.post(
-            url_for("api.project_add_object", project_id=project_id),
-            data=json.dumps(
-                {
-                    "name": "my stupid object",
-                    "collection_id": collection_id
-                }
-            ),
-            content_type='application/json'
-        ).get_json()['object']['object_id']
-        resulting_webpage_from_project_object = server.get(
-            url_for(
-                "site.page_project_object_details",
-                project_id=project_id,
-                object_id=object_id
-            )
-        )
-        assert resulting_webpage_from_project_object.status_code == 200
-        data = str(
-            resulting_webpage_from_project_object.data, encoding="utf-8")
-        assert "my stupid object" in data
-
-        resulting_webpage_from_on_own = server.get(
-            url_for(
-                "site.page_object_details",
-                object_id=object_id
-            )
-        )
-        assert resulting_webpage_from_on_own.status_code == 200
-
-
 def test_view_web_project_details(app):
     with app.test_client() as server:
         server.get("/")
