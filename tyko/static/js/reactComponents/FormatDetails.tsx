@@ -619,7 +619,7 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
     return <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>;
   }
   const adTestLevelValue = adTestLevel ? parseInt(adTestLevel): null;
-
+  const checkbox = '\u2713';
   return (
     <div>
       <EditSwitchFormField
@@ -637,7 +637,7 @@ const Film: FC<IFormatType> = ({data, editMode}) => {
       <EditSwitchFormField
         label='AD Strip Test Performed'
         editMode={editMode}
-        display={adStripPerformed ? '\u2713': ''}>
+        display={adStripPerformed ? checkbox: ''}>
         <Form.Check
           checked={adStripPerformed}
           name='ad_test_performed'
@@ -1098,46 +1098,40 @@ const VideoCassette: FC<IFormatType> = ({data, editMode}) => {
       <LoadingPercent percentLoaded={percentEnumsLoaded * 100}/>
     );
   }
+  const dateOfCassette = data['date_of_cassette'].value as string;
+  const duration = data['duration'].value as string;
+  const label = data['label'].value as string;
+  const titleOfCassette = data['title_of_cassette'].value as string;
   return (
     <div>
       <EditSwitchFormField
         label='Date Of Cassette'
         editMode={editMode}
-        display={data['date_of_cassette'].value as string}>
+        display={dateOfCassette}>
         {
           createDateField(
               'date_of_cassette',
-                data['date_of_cassette'].value as string,
-                'm/dd/yyyy',
+              dateOfCassette,
+              'm/dd/yyyy',
           )
         }
       </EditSwitchFormField>
-      <EditSwitchFormField
-        label='Duration'
+      <EditSwitchFormField label='Duration'
         editMode={editMode}
-        display={data['duration'].value as string}>
-        <Form.Control
-          name='duration'
-          defaultValue={data['duration'].value as string}
-        />
+        display={duration}>
+        <Form.Control name='duration' defaultValue={duration}/>
       </EditSwitchFormField>
       <EditSwitchFormField
         label='Label'
         editMode={editMode}
-        display={data['label'].value as string}>
-        <Form.Control
-          name='label'
-          defaultValue={data['label'].value as string}
-        />
+        display={label}>
+        <Form.Control name='label' defaultValue={label}/>
       </EditSwitchFormField>
       <EditSwitchFormField
         label='Title Of Cassette'
         editMode={editMode}
-        display={data['title_of_cassette'].value as string}>
-        <Form.Control
-          name='title_of_cassette'
-          defaultValue={data['title_of_cassette'].value as string}
-        />
+        display={titleOfCassette}>
+        <Form.Control name='title_of_cassette' defaultValue={titleOfCassette}/>
       </EditSwitchFormField>
       <EditSwitchFormField
         label='Generation'
