@@ -110,12 +110,11 @@ pipeline {
                     parallel{
                         stage('Javascript Docs'){
                             steps{
-                                sh 'npm run jsdocs -- --verbose --pedantic'
-//                                 sh 'npm install'
-//                                 sh '''
-//                                     npm run jsdocs -- --verbose --pedantic
-//                                     if [ -d "build/jsdocs" ]; then echo 'found jsdocs'; else exit 1; fi
-//                                     '''
+                                sh 'npm install'
+                                sh '''
+                                    npm run jsdocs -- --verbose --pedantic --explain
+                                    if [ -d "build/jsdocs" ]; then echo 'found jsdocs'; else exit 1; fi
+                                    '''
 
                             }
                             post{
