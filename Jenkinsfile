@@ -105,7 +105,11 @@ pipeline {
                     parallel{
                         stage('Javascript Docs'){
                             steps{
-                                sh 'npm run jsdocs -- --verbose'
+                                sh '''
+                                    npm run jsdocs -- --verbose
+                                    if [ -d "build" ]; then echo 'yes'; else echo 'no'; fi
+                                    '''
+
                             }
                             post{
                                 success{
