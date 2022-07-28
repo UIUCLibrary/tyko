@@ -113,6 +113,7 @@ pipeline {
                             }
                             steps{
                                 sh '''
+                                    npm run install
                                     npm run jsdocs -- --verbose --pedantic --debug
                                     if [ -d "build/jsdocs" ]; then echo 'found jsdocs'; else exit 1; fi
                                     '''
