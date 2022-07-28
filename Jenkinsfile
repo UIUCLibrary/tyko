@@ -94,16 +94,16 @@ pipeline {
     }
     stages {
         stage('Documentation'){
-            agent {
-              dockerfile {
-                filename 'CI/docker/jenkins/Dockerfile'
-                label "linux && docker && x86"
-              }
-            }
             stages{
                 stage('Making Docs'){
                     parallel{
                         stage('Javascript Docs'){
+                            agent {
+                              dockerfile {
+                                filename 'CI/docker/jenkins/Dockerfile'
+                                label "linux && docker && x86"
+                              }
+                            }
                             steps{
                                 sh '''
                                     npm run jsdocs -- --verbose --pedantic --debug
@@ -129,6 +129,12 @@ pipeline {
                             }
                         }
                         stage('Python Docs'){
+                            agent {
+                              dockerfile {
+                                filename 'CI/docker/jenkins/Dockerfile'
+                                label "linux && docker && x86"
+                              }
+                            }
                             steps{
                                 sh(
                                     label: 'Running Sphinx',
@@ -137,29 +143,29 @@ pipeline {
                                                '''
                                 )
                             }
+                            post{
+                                always {
+                                    recordIssues(tools: [sphinxBuild(name: 'Sphinx Documentation Build', pattern: 'logs/build_sphinx.log')])
+                                    archiveArtifacts artifacts: 'logs/build_sphinx.log'
+                                    zip archive: true, dir: 'build/docs/html', glob: '', zipFile: "dist/${props.Name}-${props.Version}.doc.zip"
+                                    stash includes: 'dist/*.doc.zip,build/docs/html/**', name: 'DOCS_ARCHIVE'
+                                }
+                                success{
+                                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'build/docs/html', reportFiles: 'index.html', reportName: 'Documentation', reportTitles: ''])
+                                }
+                                cleanup{
+                                    cleanWs(
+                                        deleteDirs: true,
+                                        patterns: [
+                                            [pattern: 'build/', type: 'INCLUDE'],
+                                            [pattern: 'logs/', type: 'INCLUDE'],
+                                            [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                                        ]
+                                    )
+                                }
+                            }
                         }
                     }
-                }
-            }
-            post{
-                always {
-                    recordIssues(tools: [sphinxBuild(name: 'Sphinx Documentation Build', pattern: 'logs/build_sphinx.log')])
-                    archiveArtifacts artifacts: 'logs/build_sphinx.log'
-                    zip archive: true, dir: 'build/docs/html', glob: '', zipFile: "dist/${props.Name}-${props.Version}.doc.zip"
-                    stash includes: 'dist/*.doc.zip,build/docs/html/**', name: 'DOCS_ARCHIVE'
-                }
-                success{
-                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'build/docs/html', reportFiles: 'index.html', reportName: 'Documentation', reportTitles: ''])
-                }
-                cleanup{
-                    cleanWs(
-                        deleteDirs: true,
-                        patterns: [
-                            [pattern: 'build/', type: 'INCLUDE'],
-                            [pattern: 'logs/', type: 'INCLUDE'],
-                            [pattern: '**/__pycache__/', type: 'INCLUDE'],
-                        ]
-                    )
                 }
             }
         }
