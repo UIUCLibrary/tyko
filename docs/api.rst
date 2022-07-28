@@ -10,12 +10,3 @@ Backend (Python)
 
 .. automodule:: tyko.exceptions
     :members:
-
-Frontend (Javascript)
-=====================
-
-.. js:autoclass:: ./item_details.NoteEditor
-    :members:
-
-.. js:autofunction:: ./api.addItem
-.. js:autofunction:: ./utils.parseUpdateRequestData
