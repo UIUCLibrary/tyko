@@ -98,11 +98,16 @@ pipeline {
                 stage('Making Docs'){
                     parallel{
                         stage('Javascript Docs'){
+//                             agent {
+//                               dockerfile {
+//                                 filename 'CI/docker/jenkins/Dockerfile'
+//                                 label "linux && docker && x86"
+//                               }
+//                             }
                             agent {
-                              dockerfile {
-                                filename 'CI/docker/jenkins/Dockerfile'
-                                label "linux && docker && x86"
-                              }
+                                docker {
+                                    image 'node'
+                                }
                             }
                             steps{
                                 sh '''
