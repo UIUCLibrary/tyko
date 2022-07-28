@@ -119,6 +119,9 @@ pipeline {
                                         reportTitles: ''
                                         ])
                                 }
+                                cleanup{
+                                    sh 'ls -la'
+                                }
                             }
                         }
                         stage('Python Docs'){
