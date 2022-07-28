@@ -107,6 +107,8 @@ pipeline {
                             agent {
                                 docker {
                                     image 'node'
+                                    label 'linux && docker'
+
                                 }
                             }
                             steps{
