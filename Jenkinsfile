@@ -107,7 +107,7 @@ pipeline {
                             steps{
                                 sh '''
                                     npm run jsdocs -- --verbose
-                                    if [ -d "build" ]; then echo 'yes'; else echo 'no'; fi
+                                    if [ -d "build/jsdocs" ]; then echo 'found jsdocs'; else exit 1; fi
                                     '''
 
                             }
