@@ -2,7 +2,10 @@
     "plugins": [],
     "recurseDepth": 10,
     "source": {
-        "include": ["tyko/static/js/"],
+        "include": [
+            "tyko/static/js/",
+            "tyko/static/js/reactComponents/"
+        ],
         "includePattern": ".+\\.(m?js(doc|x)?)$",
         "excludePattern": "(^|\\/|\\\\)_"
     },

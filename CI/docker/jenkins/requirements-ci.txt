@@ -10,7 +10,6 @@ pylint
 pydocstyle
 types-Flask
 sphinx
-sphinx-js
 paramiko
 build
 sqlalchemy[mypy]

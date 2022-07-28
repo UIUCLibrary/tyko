@@ -226,7 +226,7 @@ def test_item_update(app):
                             "name": "dummy.txt",
                         }
                     ],
-                    "format_id": 2,
+                    "format_id": 4,
                 }
             ),
             content_type='application/json'
@@ -802,7 +802,7 @@ def test_add_and_delete_item_to_object(server_with_object):
                         "name": "dummy.wav",
                     }
                 ],
-                "format_id": formats['audio']
+                "format_id": formats['open reel']
             }
         ),
         content_type='application/json')
@@ -814,7 +814,7 @@ def test_add_and_delete_item_to_object(server_with_object):
     assert new_item
     assert new_item['name'] == "My dummy item"
     assert new_item["files"][0]['name'] == "dummy.wav"
-    assert new_item['format']['name'] == "audio"
+    assert new_item['format']['name'] == "open reel"
 
     object_url = url_for(
         "api.object",
