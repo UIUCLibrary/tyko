@@ -101,6 +101,11 @@ pipeline {
               }
             }
             stages{
+                stage('Preparing environment'){
+                    steps{
+                        echo 'mkdir -p build'
+                    }
+                }
                 stage('Making Docs'){
                     parallel{
                         stage('Javascript Docs'){
