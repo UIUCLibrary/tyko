@@ -161,7 +161,7 @@ test_data_read = [
                     "name": "stupid.mov"
                 }
             ],
-            "format_id": 1
+            "format_id": 4
         }
     ),
     (
@@ -352,7 +352,7 @@ class TestItemDataConnector:
         return data_provider.ItemDataConnector(dummy_session)
 
     def test_get_note(self, item_provider):
-        new_item_data = item_provider.create(name="dummy", format_id=1)
+        new_item_data = item_provider.create(name="dummy", format_id=4)
 
         item_provider.add_note(
             item_id=new_item_data['item_id'],
@@ -366,7 +366,7 @@ class TestItemDataConnector:
         assert retrieved_note["text"] == "spam"
 
     def test_get_invalid_note(self, item_provider):
-        new_item_data = item_provider.create(name="dummy", format_id=1)
+        new_item_data = item_provider.create(name="dummy", format_id=4)
 
         with pytest.raises(ValueError):
             # No note with id 2
@@ -377,7 +377,7 @@ class TestItemDataConnector:
             data_provider.ProjectDataConnector(dummy_session)
 
         project_provider.create(title="dummyProject")
-        new_item_data = item_provider.create(name="dummy", format_id=1)
+        new_item_data = item_provider.create(name="dummy", format_id=4)
         object_provider = data_provider.ObjectDataConnector(dummy_session)
         object_id = object_provider.create(name="dummyobject")
         project_id = project_provider.create(title="dummy")

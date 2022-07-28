@@ -85,7 +85,7 @@ def test_view_web_file(app):
             new_item_url,
             data=json.dumps({
                 "name": "dummy object",
-                "format_id": 2
+                "format_id": 4
             }),
             content_type='application/json'
         ).data)['item']['item_id']

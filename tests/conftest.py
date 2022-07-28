@@ -186,7 +186,7 @@ def server_with_object_and_item():
             new_item_url,
             data=json.dumps({
                 "name": "dummy object",
-                "format_id": 2
+                "format_id": 4
             }),
             content_type='application/json'
         )

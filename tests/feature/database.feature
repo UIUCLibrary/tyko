@@ -69,7 +69,7 @@ Feature: database
     And a staff contact named Henry Borchers
     And a new Project
     And a new object for the collection
-    And a new audio video item is created by the staff
+    And a new film item is created by the staff
     When the item is added to the object
     Then the database has 1 Project records
     And the database has 1 Collection records
@@ -85,7 +85,7 @@ Feature: database
     And a staff contact named Henry Borchers
     And a new Project
     And a new object for the collection
-    And a new audio video item is created by the staff
+    And a new film item is created by the staff
     And a new Inspection note is created
     When the item is added to the object
     And the new note is added to the CollectionItem
@@ -100,7 +100,7 @@ Feature: database
     And a staff contact named Henry Borchers
     And a new Project
     And a new object for the collection
-    And a new audio video item is created by the staff
+    And a new film item is created by the staff
     And a new Inspection note is created
     When the item is added to the object
     And the new note is added to the Project
@@ -115,7 +115,7 @@ Feature: database
     And a staff contact named Henry Borchers
     And a new Project
     And a new object for the collection
-    And a new audio video item is created by the staff
+    And a new film item is created by the staff
     And a new Inspection note is created
     When the item is added to the object
     And the new note is added to the CollectionObject
@@ -130,7 +130,7 @@ Feature: database
     And a staff contact named Henry Borchers
     And a new Project
     And a new object for the collection
-    And a new audio video item is created by the staff
+    And a new film item is created by the staff
     And a new treatment record is created that needs "X, Y, Z treatment" and got "Y treatment only"
     When the new treatment record is added to the item
     And the item is added to the object
