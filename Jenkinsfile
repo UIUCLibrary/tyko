@@ -131,7 +131,6 @@ pipeline {
                                 }
                                 cleanup{
                                     sh 'ls -la'
-                                    sh 'ls -la docs/'
                                     sh 'ls -la tyko/static/'
                                 }
                             }
