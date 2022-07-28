@@ -111,6 +111,7 @@ pipeline {
                         stage('Javascript Docs'){
                             steps{
                                 sh '''
+                                    npm run jsdocs -- -v
                                     npm run jsdocs -- --verbose
                                     if [ -d "build/jsdocs" ]; then echo 'found jsdocs'; else exit 1; fi
                                     '''
