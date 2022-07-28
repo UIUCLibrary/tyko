@@ -94,27 +94,19 @@ pipeline {
     }
     stages {
         stage('Documentation'){
+            agent {
+              dockerfile {
+                filename 'CI/docker/jenkins/Dockerfile'
+                label "linux && docker && x86"
+              }
+            }
             stages{
                 stage('Making Docs'){
                     parallel{
                         stage('Javascript Docs'){
-//                             agent {
-//                               dockerfile {
-//                                 filename 'CI/docker/jenkins/Dockerfile'
-//                                 label "linux && docker && x86"
-//                               }
-//                             }
-                            agent {
-                                docker {
-                                    image 'node'
-                                    label 'linux && docker'
-
-                                }
-                            }
                             steps{
-                                sh 'npm install'
                                 sh '''
-                                    npm run jsdocs -- --verbose --pedantic --debug
+                                    npm run jsdocs -- --verbose --pedantic
                                     if [ -d "build/jsdocs" ]; then echo 'found jsdocs'; else exit 1; fi
                                     '''
 
@@ -131,18 +123,9 @@ pipeline {
                                         reportTitles: ''
                                         ])
                                 }
-                                failure{
-                                    sh 'ls -laR'
-                                }
                             }
                         }
                         stage('Python Docs'){
-                            agent {
-                              dockerfile {
-                                filename 'CI/docker/jenkins/Dockerfile'
-                                label "linux && docker && x86"
-                              }
-                            }
                             steps{
                                 sh(
                                     label: 'Running Sphinx',
@@ -151,29 +134,29 @@ pipeline {
                                                '''
                                 )
                             }
-                            post{
-                                always {
-                                    recordIssues(tools: [sphinxBuild(name: 'Sphinx Documentation Build', pattern: 'logs/build_sphinx.log')])
-                                    archiveArtifacts artifacts: 'logs/build_sphinx.log'
-                                    zip archive: true, dir: 'build/docs/html', glob: '', zipFile: "dist/${props.Name}-${props.Version}.doc.zip"
-                                    stash includes: 'dist/*.doc.zip,build/docs/html/**', name: 'DOCS_ARCHIVE'
-                                }
-                                success{
-                                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'build/docs/html', reportFiles: 'index.html', reportName: 'Documentation', reportTitles: ''])
-                                }
-                                cleanup{
-                                    cleanWs(
-                                        deleteDirs: true,
-                                        patterns: [
-                                            [pattern: 'build/', type: 'INCLUDE'],
-                                            [pattern: 'logs/', type: 'INCLUDE'],
-                                            [pattern: '**/__pycache__/', type: 'INCLUDE'],
-                                        ]
-                                    )
-                                }
-                            }
                         }
                     }
+                }
+            }
+            post{
+                always {
+                    recordIssues(tools: [sphinxBuild(name: 'Sphinx Documentation Build', pattern: 'logs/build_sphinx.log')])
+                    archiveArtifacts artifacts: 'logs/build_sphinx.log'
+                }
+                success{
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'build/docs/html', reportFiles: 'index.html', reportName: 'Documentation', reportTitles: ''])
+                    zip archive: true, dir: 'build/docs/html', glob: '', zipFile: "dist/${props.Name}-${props.Version}.doc.zip"
+                    stash includes: 'dist/*.doc.zip,build/docs/html/**', name: 'DOCS_ARCHIVE'
+                }
+                cleanup{
+                    cleanWs(
+                        deleteDirs: true,
+                        patterns: [
+                            [pattern: 'build/', type: 'INCLUDE'],
+                            [pattern: 'logs/', type: 'INCLUDE'],
+                            [pattern: '**/__pycache__/', type: 'INCLUDE'],
+                        ]
+                    )
                 }
             }
         }
