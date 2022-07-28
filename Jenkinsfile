@@ -129,7 +129,7 @@ pipeline {
                                         reportTitles: ''
                                         ])
                                 }
-                                cleanup{
+                                failure{
                                     sh 'ls -laR'
                                 }
                             }
