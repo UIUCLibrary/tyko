@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import Modal, {ModalProps} from 'react-bootstrap/Modal';
+import Modal from 'react-bootstrap/Modal';
 import {ButtonGroup, CloseButton, ListGroup} from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
@@ -34,24 +34,6 @@ enum TreatmentType {
 interface IModalAccepted {
   type: TreatmentType
   message?: string
-}
-interface NewTreatmentModalProps {
-  type?: TreatmentType,
-  defaultMessage?: string
-  show: boolean,
-  onAccepted?: (results: IModalAccepted)=>void,
-  onClosed?: ()=>void
-}
-interface IModalDialog extends ModalProps{
-  children?: string | JSX.Element | JSX.Element[]
-  title: string
-  onShow?: ()=>void
-  onClosed?: ()=>void
-  onHide?: ()=>void
-}
-// const TykoModalDialog = forwardRef<typeof Modal, IModalDialog>(
-interface RefObject {
-  handleClose: ()=>void;
 }
 
 interface ITreatmentDialog {
@@ -142,8 +124,14 @@ const TreatmentDialog = forwardRef(
         }
         handleClose();
       };
+      const validateContent = () =>{
+        if (saveButton.current && treatmentContent.current) {
+          saveButton.current.disabled =
+            treatmentContent.current.value.length == 0;
+        }
+      };
       return (
-        <Modal show={visible}>
+        <Modal show={visible} onShow={validateContent}>
           <Modal.Header>
             <Modal.Title>{title}</Modal.Title>
             <CloseButton
@@ -159,6 +147,7 @@ const TreatmentDialog = forwardRef(
                   ref={treatmentContent}
                   autoFocus={true}
                   as="textarea" rows={3}
+                  onChange={validateContent}
                   defaultValue={description ? description : undefined}
                 />
               </Form.Group>
@@ -182,41 +171,6 @@ const TreatmentDialog = forwardRef(
     });
 
 TreatmentDialog.displayName = 'TreatmentDialog';
-// const TykoModalDialog = forwardRef(
-//     (
-//         props: IModalDialog,
-//         ref: Ref<RefObject>) =>{
-//       useImperativeHandle(ref, () => ({
-//         handleClose() {
-//           handleClose();
-//         },
-//       }));
-//       const [isOpen, setIsOpen] = useState(props.show);
-//       const handleClose = () => {
-//         setIsOpen(false);
-//         if (props.onClosed) {
-//           props.onClosed();
-//         }
-//       };
-//       return (
-//         <Modal
-//           ref={ref}
-//           show={isOpen}
-//           backdrop={props.backdrop} size={props.size}
-//           onHide={handleClose}
-//         >
-//           <Modal.Header>
-//             <h5 className="modal-title" id="titleId">{props.title}</h5>
-//             <CloseButton
-//               aria-label="Close"
-//               onClick={handleClose}
-//             />
-//           </Modal.Header>
-//           {props.children}
-//         </Modal>
-//       );
-//     });
-// TykoModalDialog.displayName = 'TykoModalDialog';
 interface IConfirmDialog {
   children?: string | JSX.Element | JSX.Element[]
   title?: string
