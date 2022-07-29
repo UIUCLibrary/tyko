@@ -9,6 +9,7 @@ import {useParams} from 'react-router-dom';
 import axios from 'axios';
 import {LoadingIndeterminate} from '../reactComponents/Common';
 import {VendorDataEdit} from '../reactComponents/Vendor';
+import {Treatment} from '../reactComponents/Treatment';
 /**
  * Item details
  * @constructor
@@ -109,7 +110,6 @@ export default function ItemDetails() {
       setApiData(null);
     }}
   />;
-
   const blocker = busy ?
       (
         <InactiveCover><LoadingIndeterminate/></InactiveCover>
@@ -136,6 +136,12 @@ export default function ItemDetails() {
           </Row>
         </Col>
         <Col md={{span: 6}}>
+          <Row>
+            <Panel title='Treatment'>
+              {blocker}
+              {<Treatment/>}
+            </Panel>
+          </Row>
           <Row>
             <Panel title="Files">
               {filesPanel}
