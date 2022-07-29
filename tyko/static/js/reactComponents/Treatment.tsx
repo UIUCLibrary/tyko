@@ -1,10 +1,16 @@
 import React, {
-  FC, useEffect, useReducer, useRef, useState, forwardRef,
+  FC,
+  useReducer,
+  useRef,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  Ref,
 } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Modal, {ModalProps} from 'react-bootstrap/Modal';
-import {CloseButton, ListGroup} from 'react-bootstrap';
+import {ButtonGroup, CloseButton, ListGroup} from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 
@@ -41,192 +47,287 @@ interface IModalDialog extends ModalProps{
   title: string
   onShow?: ()=>void
   onClosed?: ()=>void
-  // onHide?: ()=>void
+  onHide?: ()=>void
 }
-const TykoModalDialog: FC<IModalDialog> = (
-    {children, title, show, backdrop, size, onClosed}: IModalDialog,
-) =>{
-  const [isOpen, setIsOpen] = useState(true);
-  const handleClose = () => {
-    setIsOpen(false);
-    if (onClosed) {
-      onClosed();
+// const TykoModalDialog = forwardRef<typeof Modal, IModalDialog>(
+interface RefObject {
+  handleClose: ()=>void;
+}
+
+interface ITreatmentDialog {
+  show?: boolean
+  title?: string
+  onAccepted?: (results: IModalAccepted)=>void
+  onCancel?: ()=>void
+}
+
+interface TreatmentDialogRef {
+  handleClose: ()=>void
+  setVisible: (visible: boolean)=>void
+  setTitle: (title: string)=>void
+  setType: (value: TreatmentType)=>void
+  setDescription: (text: string|null)=>void
+  setOnAccepted: (callback:(data: IModalAccepted)=> void)=>void,
+  setOnCancel: (callback:()=> void)=>void,
+}
+const TreatmentDialog = forwardRef(
+    (
+        props: ITreatmentDialog,
+        ref: Ref<TreatmentDialogRef> ) => {
+      const [title, setTitle] = useState(props.title);
+      const [description, setDescription] = useState<string|null>(null);
+      const [type, setType] = useState<TreatmentType>();
+
+      const [visible, setVisible] = useState<boolean|undefined>(props.show);
+      const [saveButtonActive, setSaveButtonActive] = useState(false);
+      const treatmentContent = useRef<HTMLTextAreaElement>(null);
+      const saveButton = useRef<HTMLButtonElement>(null);
+      const [
+        onAccepted,
+        setOnAccepted,
+      ] = useState<(results: IModalAccepted)=>void>(
+          props.onAccepted? props.onAccepted : ()=> undefined,
+      );
+      const [
+        onCancel,
+        setOnCancel,
+      ] = useState<()=>void>(props.onCancel ? props.onCancel: ()=> undefined);
+
+      useImperativeHandle(ref, () => ({
+        setOnAccepted: (callback) => {
+          setOnAccepted(()=>{
+            return callback;
+          });
+        },
+        setOnCancel: (callback) =>{
+          setOnCancel(()=>{
+            return callback;
+          });
+        },
+        setVisible(value) {
+          setVisible(value);
+        },
+        setType(value) {
+          setType(value);
+        },
+        handleClose() {
+          handleClose();
+        },
+        setDescription: (value) => {
+          setDescription(value);
+        },
+        setTitle: (value) => {
+          setTitle(value);
+        },
+      }));
+      const handleClose = () => {
+        setVisible(false);
+      };
+
+      const handleCanceled = () => {
+        if (onCancel) {
+          onCancel();
+        }
+        handleClose();
+      };
+
+      const handleAccepted = () => {
+        if (onAccepted) {
+          if (type) {
+            onAccepted({
+              type: type,
+              message: treatmentContent.current?.value,
+            });
+          }
+        }
+        handleClose();
+      };
+      return (
+        <Modal show={visible}>
+          <Modal.Header>
+            <Modal.Title>{title}</Modal.Title>
+            <CloseButton
+              aria-label="Close"
+              onClick={handleCanceled}
+            />
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group>
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  ref={treatmentContent}
+                  autoFocus={true}
+                  as="textarea" rows={3}
+                  defaultValue={description ? description : undefined}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCanceled}>
+              Cancel
+            </Button>
+            <Button
+              ref={saveButton}
+              disabled={saveButtonActive}
+              variant="primary"
+              onClick={handleAccepted}
+            >
+            Save
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      );
+    });
+
+TreatmentDialog.displayName = 'TreatmentDialog';
+// const TykoModalDialog = forwardRef(
+//     (
+//         props: IModalDialog,
+//         ref: Ref<RefObject>) =>{
+//       useImperativeHandle(ref, () => ({
+//         handleClose() {
+//           handleClose();
+//         },
+//       }));
+//       const [isOpen, setIsOpen] = useState(props.show);
+//       const handleClose = () => {
+//         setIsOpen(false);
+//         if (props.onClosed) {
+//           props.onClosed();
+//         }
+//       };
+//       return (
+//         <Modal
+//           ref={ref}
+//           show={isOpen}
+//           backdrop={props.backdrop} size={props.size}
+//           onHide={handleClose}
+//         >
+//           <Modal.Header>
+//             <h5 className="modal-title" id="titleId">{props.title}</h5>
+//             <CloseButton
+//               aria-label="Close"
+//               onClick={handleClose}
+//             />
+//           </Modal.Header>
+//           {props.children}
+//         </Modal>
+//       );
+//     });
+// TykoModalDialog.displayName = 'TykoModalDialog';
+interface IConfirmDialog {
+  children?: string | JSX.Element | JSX.Element[]
+  title?: string
+  show?: boolean
+  onConfirm?: ()=>void
+  onCancel?: ()=>void
+}
+interface RefConfirmDialog {
+  handleClose: ()=>void,
+  setTitle: (title: string)=>void,
+  setShow: (show: boolean)=>void,
+  setOnConfirm: (callback:()=> void)=>void,
+  setOnCancel: (callback:()=> void)=>void,
+}
+
+const ConfirmDialog = forwardRef((
+    props: IConfirmDialog,
+    ref: Ref<RefConfirmDialog>) =>{
+  const [title, setTitle] = useState<string|undefined>(props.title);
+  const [visible, setVisible] = useState<boolean|undefined>(props.show);
+  const [
+    onConfirm,
+    setOnConfirm,
+  ] = useState<()=>void>(props.onConfirm? props.onConfirm : ()=> undefined);
+  const [
+    onCancel,
+    setOnCancel,
+  ] = useState<()=>void>(props.onCancel ? props.onCancel: ()=> undefined);
+  useImperativeHandle(ref, () => ({
+    setTitle: (value) => {
+      setTitle(value);
+    },
+    setShow: (value) => {
+      setVisible(value);
+    },
+    handleClose: () => {
+      handleClose();
+    },
+    setOnConfirm: (callback) => {
+      setOnConfirm(()=>{
+        return callback;
+      });
+    },
+    setOnCancel: (callback) =>{
+      setOnCancel(()=>{
+        return callback;
+      });
+    },
+  }));
+  const handleClose = ()=>{
+    setVisible(false);
+  };
+  const handleCancel = ()=>{
+    if (onCancel) {
+      onCancel();
     }
+    handleClose();
+  };
+  const handleConfirm = ()=>{
+    if (onConfirm) {
+      onConfirm();
+    }
+    handleClose();
   };
   return (
-    <Modal
-      show={isOpen}
-      backdrop={backdrop} size={size}
-      onHide={handleClose}
-    >
+    <Modal show={visible}>
       <Modal.Header>
-        <h5 className="modal-title" id="titleId">{title}</h5>
+        <Modal.Title>{title}</Modal.Title>
         <CloseButton
           aria-label="Close"
           onClick={handleClose}
         />
       </Modal.Header>
-      {children}
+      <Modal.Body>{props.children}</Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
+        <Button variant="danger" onClick={handleConfirm}>Remove</Button>
+      </Modal.Footer>
     </Modal>
   );
-};
-export const NewTreatmentModal: FC<NewTreatmentModalProps> = (
-    {type, show, defaultMessage, onAccepted, onClosed},
-)=>{
-  const [isOpen, setIsOpen] = useState(true);
-  const treatmentContent = useRef<HTMLTextAreaElement>(null);
-  const saveButton = useRef<HTMLButtonElement>(null);
-  const [saveButtonActive, setSaveButtonActive] = useState(false);
-  useEffect(()=>{
-    setIsOpen(show);
-  }, [show],
-  );
-
-  const handleAccepted = () => {
-    if (onAccepted) {
-      if (type) {
-        onAccepted({
-          type: type,
-          message: treatmentContent.current?.value,
-        });
-      }
-    }
-    handleClose();
-  };
-  const handleClose = () => {
-    setIsOpen(false);
-    if (onClosed) {
-      onClosed();
-    }
-  };
-  const getTitle = (treatmentType: TreatmentType | undefined) =>{
-    switch (treatmentType) {
-      case TreatmentType.Needed:
-        return 'Treatment Needed';
-      case TreatmentType.Performed:
-        return 'Treatment Done';
-      default:
-        return 'Treatment';
-    }
-  };
-  const validateData = ()=>{
-    if (treatmentContent.current && saveButton.current) {
-      setSaveButtonActive(treatmentContent.current.value.length == 0);
-    }
-  };
-  const title = getTitle(type);
-  // return (
-  //   <>
-  //     <TykoModalDialog
-  //       onShow={validateData}
-  //       data-testid='treatmentModal'
-  //       show={isOpen}
-  //       onHide={handleClose}
-  //       backdrop="static"
-  //       size="lg"
-  //       title={title}
-  //     >
-  //       <Modal.Body>
-  //         <Form>
-  //           <Form.Group>
-  //             <Form.Label>Description</Form.Label>
-  //             <Form.Control
-  //               ref={treatmentContent}
-  //               autoFocus={true}
-  //               as="textarea" rows={3}
-  //               defaultValue={defaultMessage}
-  //               onChange={validateData}/>
-  //           </Form.Group>
-  //         </Form>
-  //       </Modal.Body>
-  //       <Modal.Footer>
-  //         <Button variant="secondary" onClick={handleClose}>
-  //           Close
-  //         </Button>
-  //         <Button
-  //           ref={saveButton}
-  //           variant="primary"
-  //           onClick={handleAccepted}
-  //           disabled={saveButtonActive}
-  //         >
-  //           Save
-  //         </Button>
-  //       </Modal.Footer>
-  //     </TykoModalDialog>
-  //   </>
-  // );
-  // --------------------------------------------------------------------------
-  return (
-    <>
-      <Modal
-        onShow={validateData}
-        data-testid='treatmentModal'
-        show={isOpen}
-        onHide={handleClose}
-        backdrop="static"
-        size="lg"
-      >
-        <Modal.Header>
-          <h5 className="modal-title" id="titleId">{title}</h5>
-          <CloseButton
-            aria-label="Close"
-            onClick={handleClose}
-          />
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                ref={treatmentContent}
-                autoFocus={true}
-                as="textarea" rows={3}
-                defaultValue={defaultMessage}
-                onChange={validateData}/>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button
-            ref={saveButton}
-            variant="primary"
-            onClick={handleAccepted}
-            disabled={saveButtonActive}
-          >
-            Save
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
-  );
-};
-export const Treatment = ()=>{
+});
+ConfirmDialog.displayName = 'ConfirmDialog';
+interface ITreatment {
+  apiUrl: string,
+  onUpdated?: ()=>void
+}
+export const Treatment = ({apiUrl, onUpdated}: ITreatment)=>{
   const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
   const [accessible, setAccessible] = useState(true);
   const [dialogShown, setDialogShown]= useState(false);
   const [dialogMessage, setDialogMessage]= useState<string | undefined>();
-  const [
-    dialogTreatmentType,
-    setDialogTreatmentType,
-  ] = useState<TreatmentType | undefined>();
-  const apiUrl = '/api/project/1/object/1/itemTreatment?item_id=1';
   const onError = ()=>{
     console.error('Error');
-  };
-  const onUpdated = ()=>{
-    console.log('updated');
   };
   const form = useRef<HTMLFormElement>(null);
 
   const handleNew = (type: TreatmentType) =>{
     console.log(`opening up new ${type}`);
-    setDialogTreatmentType(type);
-    setDialogMessage(undefined);
-    setDialogShown(true);
+    if (treatmentsDialog.current) {
+      treatmentsDialog.current.setTitle('Create new');
+      treatmentsDialog.current.setVisible(true);
+      treatmentsDialog.current.setDescription(null);
+      treatmentsDialog.current.setType(type);
+      treatmentsDialog.current.setOnAccepted((data)=> {
+        console.log(`calling post ${apiUrl} with ${JSON.stringify(data)}`);
+        if (onUpdated) {
+          onUpdated();
+        }
+      });
     // todo: Make this use a POST request
+    }
   };
 
   const handleRemoval = (id: number, type: TreatmentType) =>{
@@ -234,37 +335,44 @@ export const Treatment = ()=>{
       id: id,
       type: type,
     };
-    // todo: request are you sure
-    console.log(`calling delete ${apiUrl} with ${JSON.stringify(data)}`);
-  };
-  const handleEdit = (id: number, type: TreatmentType) =>{
-    console.log(`calling get ${apiUrl} on id ${id}`);
-    // todo: get data from api
-    // todo: Make this use a PUT request
-    setDialogTreatmentType(type);
-    setDialogMessage('To do: get data from api and place it here');
-    setDialogShown(true);
-  };
-  const handleAcceptedNew = (results: IModalAccepted) =>{
-    if (results.message) {
-      const data = {
-        type: results.type,
-        message: results.message,
-      };
-      console.log(`calling post ${apiUrl} with ${JSON.stringify(data)}`);
+    if (confirmDialog.current) {
+      confirmDialog.current.setTitle(`Remove ${id}`);
+      confirmDialog.current.setShow(true);
+      confirmDialog.current.setOnConfirm(()=> {
+        console.log(`calling delete ${apiUrl} with ${JSON.stringify(data)}`);
+        if (onUpdated) {
+          onUpdated();
+        }
+      });
     }
   };
-  const handleClosedNewDialogBox = ()=>{
-    setDialogShown(false);
+  const handleEdit = (id: number, type: TreatmentType) =>{
+    if (treatmentsDialog.current) {
+      console.log(`calling get ${apiUrl} on id ${id}`);
+      treatmentsDialog.current.setTitle(`Edit ${id}`);
+      treatmentsDialog.current.setVisible(true);
+      treatmentsDialog.current.setDescription('true');
+      treatmentsDialog.current.setType(type);
+      treatmentsDialog.current.setOnAccepted((data)=> {
+        console.log(`calling put ${apiUrl} with ${JSON.stringify(data)}`);
+      });
+    }
+    // todo: get data from api
+    // todo: Make this use a PUT request
   };
+  const confirmDialog = useRef<RefConfirmDialog>(null);
+  const treatmentsDialog = useRef<TreatmentDialogRef>(null);
   return (
     <>
-      <NewTreatmentModal
-        type={dialogTreatmentType}
-        show={dialogShown}
-        defaultMessage={dialogMessage}
-        onAccepted={handleAcceptedNew}
-        onClosed={handleClosedNewDialogBox}
+      <ConfirmDialog ref={confirmDialog}>Are you sure?</ConfirmDialog>
+      <TreatmentDialog
+        ref={treatmentsDialog}
+        onAccepted={(results)=> {
+          console.log(JSON.stringify(results));
+        }}
+        onCancel={()=> {
+          console.log('canceled');
+        }}
       />
       <Form ref={form}>
         <EditableListElement
@@ -359,7 +467,9 @@ const EditableListElement: FC<IEditableListElement> = (
               {elements.map(mapElements)}
             </ListGroup>
             <Form.Group>
-              <Button size={'sm'} onClick={handleNew}>Add</Button>
+              <ButtonGroup className={'float-end'}>
+                <Button size={'sm'} onClick={handleNew}>Add</Button>
+              </ButtonGroup>
             </Form.Group>
           </Form.Group>
         </Form.Group>

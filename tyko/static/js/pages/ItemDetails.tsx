@@ -139,7 +139,12 @@ export default function ItemDetails() {
           <Row>
             <Panel title='Treatment'>
               {blocker}
-              {<Treatment/>}
+              <Treatment
+                apiUrl='/api/project/1/object/1/itemTreatment?item_id=1'
+                onUpdated={()=>{
+                  console.log('updated');
+                }}
+              />
             </Panel>
           </Row>
           <Row>
