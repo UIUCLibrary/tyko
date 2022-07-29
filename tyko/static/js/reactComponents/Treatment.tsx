@@ -61,7 +61,6 @@ const TreatmentDialog = forwardRef(
       const [type, setType] = useState<TreatmentType>();
 
       const [visible, setVisible] = useState<boolean|undefined>(props.show);
-      const [saveButtonActive, setSaveButtonActive] = useState(false);
       const treatmentContent = useRef<HTMLTextAreaElement>(null);
       const saveButton = useRef<HTMLButtonElement>(null);
       const [
@@ -159,7 +158,6 @@ const TreatmentDialog = forwardRef(
             </Button>
             <Button
               ref={saveButton}
-              disabled={saveButtonActive}
               variant="primary"
               onClick={handleAccepted}
             >
