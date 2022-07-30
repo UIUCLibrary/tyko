@@ -1,6 +1,6 @@
 from typing import List, Iterable, TypedDict
 
-from flask import Blueprint, current_app, jsonify
+from flask import Blueprint, current_app, jsonify, request
 from werkzeug.routing import Rule
 
 from tyko import database, data_provider, middleware, utils
@@ -12,7 +12,11 @@ from tyko.views.files import ItemFilesAPI, FileNotesAPI, \
     FileAnnotationTypesAPI, \
     FileAnnotationsAPI
 
-from tyko.views.object_item import ItemAPI, ObjectItemAPI, ObjectItemNotesAPI
+from tyko.views.object_item import \
+    ItemAPI, \
+    ObjectItemAPI, \
+    ObjectItemNotesAPI,\
+    ObjectItemTreatmentAPI
 from tyko.views.project import ProjectAPI, ProjectNotesAPI
 from tyko.views.project_object import ProjectObjectAPI, ObjectApi, \
     ProjectObjectNotesAPI
@@ -465,7 +469,26 @@ def project_object_item_add_file(project_id, object_id, item_id):
     item_middleware = middleware.ItemMiddlewareEntity(data_prov)
     return item_middleware.add_file(project_id, object_id, item_id)
 
+@api.route(
+    "/project/<int:project_id>/object/<int:object_id>/itemTreatment",
+    methods=["GET", "PUT", "POST", "DELETE"]
+)
+def item_treatment(project_id, object_id):
+    item_id = request.args.get('item_id')
+    if not item_id:
+        raise AttributeError('no valid item')
+    item_id = int(item_id)
+    data_prov = data_provider.DataProvider(database.db.engine)
+    return ObjectItemTreatmentAPI.as_view(
+        "item_treatment",
+        provider=data_prov
+    )(
+        project_id=project_id,
+        object_id=object_id,
+        item_id=item_id,
+    )
 
+    return {}
 @api.route(
     "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>/"
     "notes/<int:note_id>",

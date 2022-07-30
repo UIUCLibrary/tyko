@@ -817,6 +817,10 @@ class ItemMiddlewareEntity(AbsMiddlewareEntity):
         )
 
 
+
+#     todo: add treatment
+
+
 class NotestMiddlewareEntity(AbsMiddlewareEntity):
     WRITABLE_FIELDS = [
         "text",

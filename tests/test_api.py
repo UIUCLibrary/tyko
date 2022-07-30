@@ -1363,3 +1363,107 @@ def test_api_get_application_data_has_version(app):
         server.get('/')
         response = server.get(url_for('api.get_application_data'))
         assert "version" in response.get_json()
+
+class TestItemTreatment:
+    @pytest.fixture()
+    def server(self, app):
+        with app.test_client() as app_server:
+            app_server.get('/')
+            yield app_server
+    @pytest.fixture()
+    def object_id(self, server, project_id):
+        return server.post(
+            url_for("api.project_add_object", project_id=project_id),
+            data=json.dumps(
+                {
+                    "name": "My dummy object",
+                    "barcode": "12345",
+                }
+            ),
+            content_type='application/json'
+        ).get_json()['object']["object_id"]
+    @pytest.fixture()
+    def item_id(self, server, object_id, project_id):
+        return  server.post(
+            url_for(
+                "api.object_item",
+                project_id=project_id,
+                object_id=object_id
+            )
+            ,
+            data=json.dumps(
+                {
+                    "name": "My dummy item",
+                    "files": [
+                        {
+                            "name": "dummy.wav",
+                        }
+                    ],
+                    "format_id": 4
+                }
+            ),
+            content_type='application/json').get_json()['item']['item_id']
+    @pytest.fixture()
+    def project_id(self, server):
+        return server.post(
+            url_for("api.add_project"),
+            content_type='application/json',
+            data=json.dumps({
+                "title": 'Spam Project'
+            })
+        ).get_json()["id"]
+    @pytest.fixture()
+    def item_api_url(self, server, project_id, object_id, item_id):
+        return url_for("api.object_item",
+                       project_id=project_id,
+                       object_id=object_id,
+                       item_id=item_id
+                       )
+
+    def test_endpoint_exists(self, server, item_api_url, project_id, object_id, item_id):
+        assert url_for(
+            "api.item_treatment",
+            project_id=project_id,
+            object_id=object_id,
+        )
+
+    def test_post_returns_id(self, server, item_api_url, project_id, object_id, item_id):
+        treatment_url = url_for(
+            "api.item_treatment",
+            project_id=project_id,
+            object_id=object_id,
+        )
+        response = server.post(
+            treatment_url,
+            query_string={'item_id': item_id},
+            data=json.dumps(
+                {
+                    "type": 'needed',
+                    'message': 'spam'
+                }
+            ),
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+        assert 'id' in response.get_json()
+
+    def test_post_adds_treatment(self, server, item_api_url, project_id, object_id, item_id):
+        treatment_url = url_for(
+            "api.item_treatment",
+            project_id=project_id,
+            object_id=object_id,
+        )
+        assert server.post(
+            treatment_url,
+            query_string={'item_id': item_id},
+            data=json.dumps(
+                {
+                    "type": 'needed',
+                    'message': 'spam'
+                }
+            ),
+            content_type='application/json'
+        ).status_code == 200
+        response = server.get(item_api_url).get_json()
+        assert len(response['treatment']) > 0
+

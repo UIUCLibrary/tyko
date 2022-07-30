@@ -23,7 +23,7 @@ from tyko.exceptions import DataError, NotValidRequest
 from tyko.schema import NoteTypes, Note, formats, CollectionItem, \
     InstantiationFile, Project, ProjectStatus, CollectionObject, Collection, \
     FileNotes, FileAnnotation, FileAnnotationType, CassetteType, \
-    CassetteTapeType
+    CassetteTapeType, Treatment
 from tyko.schema.formats import AVFormat
 
 DATE_FORMAT = '%Y-%m-%d'
@@ -392,7 +392,6 @@ class ItemDataConnector(AbsNotesConnector):
         res: List[schema.formats.AVFormat] = \
             list(session.query(schema.formats.Film).all()) + \
             list(session.query(schema.formats.AudioCassette).all()) + \
-            list(session.query(schema.formats.AudioVideo).all()) + \
             list(session.query(schema.formats.GroovedDisc).all()) + \
             list(session.query(schema.formats.OpenReel).all()) + \
             list(session.query(schema.formats.CollectionItem).all())
@@ -405,7 +404,6 @@ class ItemDataConnector(AbsNotesConnector):
     def _iterall(session: orm.Session) -> Iterator[schema.formats.AVFormat]:
         yield from session.query(schema.formats.Film).all()
         yield from session.query(schema.formats.AudioCassette).all()
-        yield from session.query(schema.formats.AudioVideo).all()
         yield from session.query(schema.formats.GroovedDisc).all()
         yield from session.query(schema.formats.OpenReel).all()
         yield from session.query(schema.formats.CollectionItem).all()
@@ -416,14 +414,10 @@ class ItemDataConnector(AbsNotesConnector):
             session: orm.Session,
             table_id: int
     ) -> List[schema.formats.AVFormat]:
-
         res = list(session.query(schema.formats.Film)
                    .filter(schema.formats.AVFormat.table_id == table_id)
                    .all()) + \
               list(session.query(schema.formats.AudioCassette)
-                   .filter(schema.formats.AVFormat.table_id == table_id)
-                   .all()) + \
-              list(session.query(schema.formats.AudioVideo)
                    .filter(schema.formats.AVFormat.table_id == table_id)
                    .all()) + \
               list(session.query(schema.formats.GroovedDisc)
@@ -770,6 +764,26 @@ class ItemDataConnector(AbsNotesConnector):
 
         session.add(new_file)
         return new_file
+
+    def add_treatment(self, item_id, data):
+        session = self.session_maker()
+        try:
+            new_treatment = Treatment()
+            # new_treatment.item_id = item_id
+            new_treatment.message = data.get('message')
+            new_treatment.treatment_type = data.get('type')
+            item = session.query(schema.formats.AVFormat) \
+                .filter(schema.formats.AVFormat.table_id == item_id) \
+                .one()
+            item.treatments.append(new_treatment)
+            session.commit()
+            return {
+                'id': new_treatment.id,
+                'type': new_treatment.treatment_type
+            }
+        finally:
+            session.close()
+#     todo: add_treatment
 
 
 class DataProvider:

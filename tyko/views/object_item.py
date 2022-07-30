@@ -109,7 +109,6 @@ class ObjectItemAPI(views.MethodView):
         i = connector.get(id=item_id, serialize=True)
         if i['parent_object_id'] != object_id:
             raise AttributeError("object id doesn't match item id")
-
         i['files'] = self._add_routes_to_files(
             files=i['files'],
             item_id=item_id,
@@ -239,3 +238,10 @@ class ItemAPI(views.MethodView):
         if res is True:
             return make_response("", 204)
         return make_response("", 404)
+class ObjectItemTreatmentAPI(views.MethodView):
+    def __init__(self, provider: data_provider.DataProvider) -> None:
+        self._provider = provider
+    def post(self, project_id, object_id, item_id):
+        data_connector = \
+            data_provider.ItemDataConnector(self._provider.db_session_maker)
+        return data_connector.add_treatment(item_id, data=request.get_json())

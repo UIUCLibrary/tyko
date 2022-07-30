@@ -61,12 +61,13 @@ class AVFormat(AVTables, abc.ABC):
 
     format_type = relationship("FormatTypes", foreign_keys=[format_type_id])
     files = relationship("InstantiationFile", backref="file_source")
-    treatment = relationship("Treatment", backref="treatment_id")
+    treatments = relationship("Treatment", backref="treatment_id")
     barcode = db.Column("barcode", db.Text)
 
     vendor_name = db.Column("vendor_name", db.Text)
     deliverable_received_date = db.Column("deliverable_received_date", db.Date)
     originals_received_date = db.Column("originals_received_date", db.Date)
+
 
     def _iter_files(self, recurse=False):
         for file_ in self.files:
@@ -79,6 +80,8 @@ class AVFormat(AVTables, abc.ABC):
                     "generation": file_.generation
                 }
 
+    def _iter_treatment(self):
+        yield from self.treatments
     def _iter_notes(self):
         yield from self.notes
 
@@ -109,7 +112,13 @@ class AVFormat(AVTables, abc.ABC):
             "obj_sequence": self.obj_sequence,
             "notes": [note.serialize() for note in self._iter_notes()],
             "barcode": self.barcode,
+            "treatment": [treatment.serialize() for treatment in self._iter_treatment()],
         }
+
+        # for treatment in self.treatments:
+        #     if treatment.treatment_type not in data['treatment']:
+        #         data['treatment'][treatment.treatment_type] = []
+        #     data['treatment'][treatment.treatment_type].append(treatment.message)
 
         try:
             data["format"] = self.format_type.serialize()
