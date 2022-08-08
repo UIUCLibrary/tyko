@@ -121,6 +121,12 @@ interface INote {
   text: string
 
 }
+interface ITreatment {
+  item_id: number
+  message: string,
+  treatment_id: number,
+  type: string
+}
 export interface IItemMetadata {
 
   files: IFile[],
@@ -143,6 +149,7 @@ export interface IItemMetadata {
   obj_sequence: number,
   parent_object_id: number,
   transfer_date?: string
+  treatment: ITreatment[]
 }
 
 interface IItemDetails {

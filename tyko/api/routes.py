@@ -489,7 +489,6 @@ def item_treatment(project_id, object_id):
         item_id=item_id,
     )
 
-    return {}
 
 
 @api.route(

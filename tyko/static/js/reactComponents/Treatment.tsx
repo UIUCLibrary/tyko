@@ -13,20 +13,8 @@ import Modal from 'react-bootstrap/Modal';
 import {ButtonGroup, CloseButton, ListGroup} from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-
-const treatmentsNeeded = [
-  {content: 'mold remediation', id: 1},
-  {content: 'dust remediation', id: 3},
-  {content: 'transfer', id: 5},
-  {content: 're-shell', id: 7},
-];
-const treatmentsDone = [
-  {content: 'mold remediation', id: 5},
-  {content: 'dust remediation', id: 30},
-  {content: 'transfer', id: 50},
-  {content: 're-shell', id: 76},
-  {content: 'other', id: 726},
-];
+import axios from 'axios';
+import {IItemMetadata} from '../reactComponents/ItemApp';
 enum TreatmentType {
   Needed = 'needed',
   Performed = 'done'
@@ -251,11 +239,32 @@ const ConfirmDialog = forwardRef((
   );
 });
 ConfirmDialog.displayName = 'ConfirmDialog';
+
+
+const parseTreatmentType = (
+    data: IItemMetadata,
+    type: TreatmentType,
+): IElement[] =>{
+  const items = [];
+  for (const treatment of data.treatment) {
+    if (treatment.type === type.toString()) {
+      items.push(
+          {
+            content: treatment.message,
+            id: treatment.treatment_id,
+          },
+      );
+    }
+  }
+  return items;
+};
+
 interface ITreatment {
   apiUrl: string,
+  apiData: IItemMetadata | null,
   onUpdated?: ()=>void
 }
-export const Treatment = ({apiUrl, onUpdated}: ITreatment)=>{
+export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
   const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
   const [accessible, setAccessible] = useState(true);
   const [dialogShown, setDialogShown]= useState(false);
@@ -266,19 +275,18 @@ export const Treatment = ({apiUrl, onUpdated}: ITreatment)=>{
   const form = useRef<HTMLFormElement>(null);
 
   const handleNew = (type: TreatmentType) =>{
-    console.log(`opening up new ${type}`);
     if (treatmentsDialog.current) {
       treatmentsDialog.current.setTitle('Create new');
       treatmentsDialog.current.setVisible(true);
       treatmentsDialog.current.setDescription(null);
       treatmentsDialog.current.setType(type);
       treatmentsDialog.current.setOnAccepted((data)=> {
-        console.log(`calling post ${apiUrl} with ${JSON.stringify(data)}`);
-        if (onUpdated) {
-          onUpdated();
-        }
+        axios.post(apiUrl, data).then(()=> {
+          if (onUpdated) {
+            onUpdated();
+          }
+        }).catch(console.error);
       });
-    // todo: Make this use a POST request
     }
   };
 
@@ -329,14 +337,18 @@ export const Treatment = ({apiUrl, onUpdated}: ITreatment)=>{
       <Form ref={form}>
         <EditableListElement
           label='Treatment Needed'
-          elements={treatmentsNeeded}
+          elements={
+            apiData ? parseTreatmentType(apiData, TreatmentType.Needed): []
+          }
           onAddElement={()=>handleNew(TreatmentType.Needed)}
           onEdit={(id)=> handleEdit(id, TreatmentType.Needed)}
           onRemove={(id)=> handleRemoval(id, TreatmentType.Needed)}
         />
         <EditableListElement
           label='Treatment Done'
-          elements={treatmentsDone}
+          elements={
+            apiData ? parseTreatmentType(apiData, TreatmentType.Performed): []
+          }
           onAddElement={()=>handleNew(TreatmentType.Performed)}
           onEdit={(id)=> handleEdit(id, TreatmentType.Performed)}
           onRemove={(id)=> handleRemoval(id, TreatmentType.Performed)}
