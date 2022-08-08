@@ -238,9 +238,12 @@ class ItemAPI(views.MethodView):
         if res is True:
             return make_response("", 204)
         return make_response("", 404)
+
+
 class ObjectItemTreatmentAPI(views.MethodView):
     def __init__(self, provider: data_provider.DataProvider) -> None:
         self._provider = provider
+
     def post(self, project_id, object_id, item_id):
         data_connector = \
             data_provider.ItemDataConnector(self._provider.db_session_maker)

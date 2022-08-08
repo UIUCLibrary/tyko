@@ -68,7 +68,6 @@ class AVFormat(AVTables, abc.ABC):
     deliverable_received_date = db.Column("deliverable_received_date", db.Date)
     originals_received_date = db.Column("originals_received_date", db.Date)
 
-
     def _iter_files(self, recurse=False):
         for file_ in self.files:
             if recurse is True:
@@ -82,6 +81,7 @@ class AVFormat(AVTables, abc.ABC):
 
     def _iter_treatment(self):
         yield from self.treatments
+
     def _iter_notes(self):
         yield from self.notes
 
@@ -112,7 +112,9 @@ class AVFormat(AVTables, abc.ABC):
             "obj_sequence": self.obj_sequence,
             "notes": [note.serialize() for note in self._iter_notes()],
             "barcode": self.barcode,
-            "treatment": [treatment.serialize() for treatment in self._iter_treatment()],
+            "treatment": [
+                treatment.serialize() for treatment in self._iter_treatment()
+            ],
         }
 
         # for treatment in self.treatments:

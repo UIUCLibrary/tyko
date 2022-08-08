@@ -469,6 +469,7 @@ def project_object_item_add_file(project_id, object_id, item_id):
     item_middleware = middleware.ItemMiddlewareEntity(data_prov)
     return item_middleware.add_file(project_id, object_id, item_id)
 
+
 @api.route(
     "/project/<int:project_id>/object/<int:object_id>/itemTreatment",
     methods=["GET", "PUT", "POST", "DELETE"]
@@ -489,6 +490,8 @@ def item_treatment(project_id, object_id):
     )
 
     return {}
+
+
 @api.route(
     "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>/"
     "notes/<int:note_id>",
