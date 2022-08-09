@@ -15,6 +15,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Alert from 'react-bootstrap/Alert';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import axios, {AxiosError, AxiosResponse} from 'axios';
+import {ConfirmDialog, RefConfirmDialog} from './Common';
 import {IItemMetadata} from '../reactComponents/ItemApp';
 enum TreatmentType {
   Needed = 'needed',
@@ -163,89 +164,6 @@ const TreatmentDialog = forwardRef(
     });
 
 TreatmentDialog.displayName = 'TreatmentDialog';
-interface IConfirmDialog {
-  children?: string | JSX.Element | JSX.Element[]
-  title?: string
-  show?: boolean
-  onConfirm?: ()=>void
-  onCancel?: ()=>void
-}
-interface RefConfirmDialog {
-  handleClose: ()=>void,
-  setTitle: (title: string)=>void,
-  setShow: (show: boolean)=>void,
-  setOnConfirm: (callback:()=> void)=>void,
-  setOnCancel: (callback:()=> void)=>void,
-}
-
-const ConfirmDialog = forwardRef((
-    props: IConfirmDialog,
-    ref: Ref<RefConfirmDialog>) =>{
-  const [title, setTitle] = useState<string|undefined>(props.title);
-  const [visible, setVisible] = useState<boolean|undefined>(props.show);
-  const [
-    onConfirm,
-    setOnConfirm,
-  ] = useState<()=>void>(props.onConfirm? props.onConfirm : ()=> undefined);
-  const [
-    onCancel,
-    setOnCancel,
-  ] = useState<()=>void>(props.onCancel ? props.onCancel: ()=> undefined);
-  useImperativeHandle(ref, () => ({
-    setTitle: (value) => {
-      setTitle(value);
-    },
-    setShow: (value) => {
-      setVisible(value);
-    },
-    handleClose: () => {
-      handleClose();
-    },
-    setOnConfirm: (callback) => {
-      setOnConfirm(()=>{
-        return callback;
-      });
-    },
-    setOnCancel: (callback) =>{
-      setOnCancel(()=>{
-        return callback;
-      });
-    },
-  }));
-  const handleClose = ()=>{
-    setVisible(false);
-  };
-  const handleCancel = ()=>{
-    if (onCancel) {
-      onCancel();
-    }
-    handleClose();
-  };
-  const handleConfirm = ()=>{
-    if (onConfirm) {
-      onConfirm();
-    }
-    handleClose();
-  };
-  return (
-    <Modal show={visible}>
-      <Modal.Header>
-        <Modal.Title>{title}</Modal.Title>
-        <CloseButton
-          aria-label="Close"
-          onClick={handleClose}
-        />
-      </Modal.Header>
-      <Modal.Body>{props.children}</Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
-        <Button variant="danger" onClick={handleConfirm}>Remove</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-});
-ConfirmDialog.displayName = 'ConfirmDialog';
-
 
 const parseTreatmentType = (
     data: IItemMetadata,
@@ -333,7 +251,11 @@ export const Treatment = (
       onAccessibleChange(!accessible);
     }
   }, [accessible, onAccessibleChange]);
-
+  const handleUpdate = () =>{
+    if (onUpdated) {
+      onUpdated();
+    }
+  };
   const handleNew = (type: TreatmentType) =>{
     if (treatmentsDialog.current) {
       treatmentsDialog.current.setTitle('Create new');
@@ -342,16 +264,15 @@ export const Treatment = (
       treatmentsDialog.current.setType(type);
       treatmentsDialog.current.setOnAccepted((data)=> {
         setAccessible(false);
-        axios.post(apiUrl, data).then(()=> {
-          if (onUpdated) {
-            onUpdated();
-          }
-        }).catch(onError).finally(()=>setAccessible(true));
+        axios.post(apiUrl, data)
+            .then(handleUpdate)
+            .catch(onError)
+            .finally(()=>setAccessible(true));
       });
     }
   };
 
-  const handleRemoval = (id: number, type: TreatmentType) =>{
+  const handleRemoval = (id: number, _type: TreatmentType) =>{
     const data = {
       id: id,
     };
@@ -360,11 +281,10 @@ export const Treatment = (
       confirmDialog.current.setShow(true);
       confirmDialog.current.setOnConfirm(()=> {
         setAccessible(false);
-        axios.delete(apiUrl, {data: data}).then(()=> {
-          if (onUpdated) {
-            onUpdated();
-          }
-        }).catch(onError).finally(()=>setAccessible(true));
+        axios.delete(apiUrl, {data: data})
+            .then(handleUpdate)
+            .catch(onError)
+            .finally(()=>setAccessible(true));
       });
     }
   };
@@ -385,11 +305,10 @@ export const Treatment = (
         treatmentsDialog.current.setOnAccepted((data)=> {
           const putUrl = `${apiUrl}&treatment_id=${id}`;
           setAccessible(false);
-          axios.put(putUrl, data).then(()=>{
-            if (onUpdated) {
-              onUpdated();
-            }
-          }).catch(onError).finally(()=>setAccessible(true));
+          axios.put(putUrl, data)
+              .then(handleUpdate)
+              .catch(onError)
+              .finally(()=>setAccessible(true));
         });
       }
     }).catch(onError);

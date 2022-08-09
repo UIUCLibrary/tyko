@@ -1,7 +1,23 @@
-import {ButtonGroup, Form, ProgressBar, Spinner} from 'react-bootstrap';
-import React, {Dispatch, FC, SetStateAction, useId} from 'react';
+import {
+  ButtonGroup,
+  CloseButton,
+  Form,
+  ProgressBar,
+  Spinner,
+} from 'react-bootstrap';
+import React, {
+  Dispatch,
+  FC,
+  forwardRef,
+  Ref,
+  SetStateAction,
+  useId,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import Button from 'react-bootstrap/Button';
 import axios, {AxiosResponse} from 'axios';
+import Modal from 'react-bootstrap/Modal';
 
 export const LoadingIndeterminate = ({message}: {message?: string}) => {
   return (
@@ -120,3 +136,87 @@ export const submitFormUpdates = (
   const formProps = Object.fromEntries(formData);
   return axios.put(apiUrl, formProps);
 };
+
+
+interface IConfirmDialog {
+  children?: string | JSX.Element | JSX.Element[]
+  title?: string
+  show?: boolean
+  onConfirm?: ()=>void
+  onCancel?: ()=>void
+}
+export interface RefConfirmDialog {
+  handleClose: ()=>void,
+  setTitle: (title: string)=>void,
+  setShow: (show: boolean)=>void,
+  setOnConfirm: (callback:()=> void)=>void,
+  setOnCancel: (callback:()=> void)=>void,
+}
+
+export const ConfirmDialog = forwardRef((
+    props: IConfirmDialog,
+    ref: Ref<RefConfirmDialog>) =>{
+  const [title, setTitle] = useState<string|undefined>(props.title);
+  const [visible, setVisible] = useState<boolean|undefined>(props.show);
+  const [
+    onConfirm,
+    setOnConfirm,
+  ] = useState<()=>void>(props.onConfirm? props.onConfirm : ()=> undefined);
+  const [
+    onCancel,
+    setOnCancel,
+  ] = useState<()=>void>(props.onCancel ? props.onCancel: ()=> undefined);
+  useImperativeHandle(ref, () => ({
+    setTitle: (value) => {
+      setTitle(value);
+    },
+    setShow: (value) => {
+      setVisible(value);
+    },
+    handleClose: () => {
+      handleClose();
+    },
+    setOnConfirm: (callback) => {
+      setOnConfirm(()=>{
+        return callback;
+      });
+    },
+    setOnCancel: (callback) =>{
+      setOnCancel(()=>{
+        return callback;
+      });
+    },
+  }));
+  const handleClose = ()=>{
+    setVisible(false);
+  };
+  const handleCancel = ()=>{
+    if (onCancel) {
+      onCancel();
+    }
+    handleClose();
+  };
+  const handleConfirm = ()=>{
+    if (onConfirm) {
+      onConfirm();
+    }
+    handleClose();
+  };
+  return (
+    <Modal show={visible}>
+      <Modal.Header>
+        <Modal.Title>{title}</Modal.Title>
+        <CloseButton
+          aria-label="Close"
+          onClick={handleClose}
+        />
+      </Modal.Header>
+      <Modal.Body>{props.children}</Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
+        <Button variant="danger" onClick={handleConfirm}>Remove</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+});
+ConfirmDialog.displayName = 'ConfirmDialog';
