@@ -242,24 +242,27 @@ function loadReactComponents() {
   const itemTreatmentDetails = document.getElementById('itemTreatmentDetails');
   if (itemTreatmentDetails) {
     const root = createRoot(itemTreatmentDetails);
-
     root.render(
-      <Panel title='Treatment'>
-        Loading...
-      </Panel>,
-    )
-    console.log(itemTreatmentDetails.dataset.tykoApiUrl)
+          <div className="card my-1">
+            <div id="TreatmentHeader"
+                 className="card-header">Treatment</div>
+            <div className="card-body">Loading ...</div>
+        </div>
+      );
     axios.get(itemTreatmentDetails.dataset.tykoApiUrl).then(
         (data) =>{
-          const treatmentData = data.data.item
           root.render(
-              <Panel title='Treatment'>
-                <Treatment
+              <div className="card my-1">
+                <div id="TreatmentHeader"
+                     className="card-header">Treatment</div>
+                <div className="card-body">
+                  <Treatment
                     apiUrl={itemTreatmentDetails.dataset.tykoApiTreatment}
-                    apiData={treatmentData}
+                    apiData={data.data.item}
                     onUpdated={()=> {location.reload();}}
                 />
-              </Panel>
+                </div>
+            </div>
           );
         }
     )

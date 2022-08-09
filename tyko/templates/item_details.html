@@ -76,6 +76,7 @@
     <div id="itemTreatmentDetails"
          data-tyko-api-treatment="{{ url_for('api.item_treatment', item_id=item['item_id'], object_id=object_id, project_id=project_id ) }}"
          data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
+
     {%  call widgets.card("Files", "my-1")  %}
         <div class="flex-column">
 
@@ -181,7 +182,7 @@
 {#        {{ newFileModal("fileModal", url_for('api.item_files', item_id=item['item_id'], object_id=object_id, project_id=project_id)) }}#}
     {% endcall %}
 
-    {% call widgets.card("Notes", "my-1")  %}
+    {% call widgets.card("Notes", "mb-1")  %}
         <div class="flex-column" id="noteCard">
             {{
                 notes_table2(
