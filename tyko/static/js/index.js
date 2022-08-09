@@ -257,6 +257,7 @@ function loadReactComponents() {
                 <Treatment
                     apiUrl={itemTreatmentDetails.dataset.tykoApiTreatment}
                     apiData={treatmentData}
+                    onUpdated={()=> {location.reload();}}
                 />
               </Panel>
           );
