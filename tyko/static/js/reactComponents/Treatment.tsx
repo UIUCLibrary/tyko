@@ -5,7 +5,7 @@ import React, {
   useState,
   forwardRef,
   useImperativeHandle,
-  Ref,
+  Ref, useEffect,
 } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -24,7 +24,7 @@ interface IModalAccepted {
   type: TreatmentType
   message?: string
 }
-interface ITreatment {
+export interface ITreatment {
   type: string
   message: string
   item_id: number
@@ -303,12 +303,20 @@ const AlertDismissible = forwardRef((
 });
 AlertDismissible.displayName = 'AlertDismissible';
 
-interface ITreatment {
+interface PropsTreatment {
   apiUrl: string,
   apiData: IItemMetadata | null,
   onUpdated?: ()=>void
+  onAccessibleChange? : (busy: boolean)=>void
 }
-export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
+export const Treatment = (
+    {
+      apiUrl,
+      onUpdated,
+      apiData,
+      onAccessibleChange,
+    }: PropsTreatment,
+)=>{
   const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
   const [accessible, setAccessible] = useState(true);
   const onError = (e: Error | AxiosError)=>{
@@ -320,6 +328,11 @@ export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
     console.error(e);
   };
   const form = useRef<HTMLFormElement>(null);
+  useEffect(()=>{
+    if (onAccessibleChange) {
+      onAccessibleChange(!accessible);
+    }
+  }, [accessible, onAccessibleChange]);
 
   const handleNew = (type: TreatmentType) =>{
     if (treatmentsDialog.current) {
@@ -328,11 +341,12 @@ export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
       treatmentsDialog.current.setDescription(null);
       treatmentsDialog.current.setType(type);
       treatmentsDialog.current.setOnAccepted((data)=> {
+        setAccessible(false);
         axios.post(apiUrl, data).then(()=> {
           if (onUpdated) {
             onUpdated();
           }
-        }).catch(onError);
+        }).catch(onError).finally(()=>setAccessible(true));
       });
     }
   };
@@ -345,11 +359,12 @@ export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
       confirmDialog.current.setTitle('Remove');
       confirmDialog.current.setShow(true);
       confirmDialog.current.setOnConfirm(()=> {
+        setAccessible(false);
         axios.delete(apiUrl, {data: data}).then(()=> {
           if (onUpdated) {
             onUpdated();
           }
-        }).catch(onError);
+        }).catch(onError).finally(()=>setAccessible(true));
       });
     }
   };
@@ -369,11 +384,12 @@ export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
         treatmentsDialog.current.setType(type);
         treatmentsDialog.current.setOnAccepted((data)=> {
           const putUrl = `${apiUrl}&treatment_id=${id}`;
+          setAccessible(false);
           axios.put(putUrl, data).then(()=>{
             if (onUpdated) {
               onUpdated();
             }
-          }).catch(onError);
+          }).catch(onError).finally(()=>setAccessible(true));
         });
       }
     }).catch(onError);

@@ -115,12 +115,7 @@ export default function ItemDetails() {
         <InactiveCover><LoadingIndeterminate/></InactiveCover>
       ) :
       <></>;
-  const treatmentsNeeded = [
-    {content: 'mold remediation', id: 1},
-    {content: 'dust remediation', id: 3},
-    {content: 'transfer', id: 5},
-    {content: 're-shell', id: 7},
-  ];
+
   return (
     <div>
       <h1>Item Details</h1>
@@ -148,6 +143,7 @@ export default function ItemDetails() {
               <Treatment
                 apiUrl='/api/project/1/object/1/itemTreatment?item_id=1'
                 apiData={apiData}
+                onAccessibleChange={setBusy}
                 onUpdated={()=>{
                   setApiData(null);
                 }}

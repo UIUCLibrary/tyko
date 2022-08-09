@@ -15,7 +15,7 @@ import {
   submitEvent,
   submitFormUpdates,
 } from './Common';
-
+import {ITreatment} from '../reactComponents/Treatment';
 interface IEditableField{
   id?: string
   display: string | number | null
@@ -120,12 +120,6 @@ interface INote {
   route: {[key: string]: string}
   text: string
 
-}
-interface ITreatment {
-  item_id: number
-  message: string,
-  treatment_id: number,
-  type: string
 }
 export interface IItemMetadata {
 
