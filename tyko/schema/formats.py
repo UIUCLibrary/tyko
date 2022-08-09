@@ -117,11 +117,6 @@ class AVFormat(AVTables, abc.ABC):
             ],
         }
 
-        # for treatment in self.treatments:
-        #     if treatment.treatment_type not in data['treatment']:
-        #         data['treatment'][treatment.treatment_type] = []
-        #     data['treatment'][treatment.treatment_type].append(treatment.message)
-
         try:
             data["format"] = self.format_type.serialize()
             data["format_id"] = self.format_type_id
