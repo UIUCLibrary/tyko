@@ -169,7 +169,7 @@ const parseTreatmentType = (
     data: IItemMetadata,
     type: TreatmentType,
 ): IElement[] =>{
-  const items = [];
+  const items: {content: string, id: number}[]= [];
   for (const treatment of data.treatment) {
     if (treatment.type === type.toString()) {
       items.push(
@@ -272,12 +272,12 @@ export const Treatment = (
     }
   };
 
-  const handleRemoval = (id: number, _type: TreatmentType) =>{
+  const handleRemoval = (id: number, type: TreatmentType) =>{
     const data = {
       id: id,
     };
     if (confirmDialog.current) {
-      confirmDialog.current.setTitle('Remove');
+      confirmDialog.current.setTitle(`Remove from ${type}`);
       confirmDialog.current.setShow(true);
       confirmDialog.current.setOnConfirm(()=> {
         setAccessible(false);
@@ -407,7 +407,7 @@ const EditableListElement: FC<IEditableListElement> = (
   };
   const mapElementsAsViewable = (element: IElement)=>{
     return (
-      <li>
+      <li key={element.id}>
         <Form.Text>{element.content}</Form.Text>
       </li>
     );
@@ -436,7 +436,7 @@ const EditableListElement: FC<IEditableListElement> = (
       </ListGroup.Item>
     );
   };
-  const list = editMode ? (
+  const content = editMode ? (
     <ListGroup variant={'flush'}>
       {elements.map(mapElementsAsEditable)}
     </ListGroup>
@@ -451,7 +451,7 @@ const EditableListElement: FC<IEditableListElement> = (
         <Form.Label column='sm'>{label}</Form.Label>
         <Form.Group className="col-sm-8">
           <Form.Group className="mb-3 row">
-            {list}
+            {content}
             <Form.Group>
               <ButtonGroup className={'float-end'} hidden={!editMode}>
                 <Button size={'sm'} onClick={handleNew}>Add</Button>

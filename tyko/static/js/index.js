@@ -16,7 +16,7 @@ import Panel from './reactComponents/Panel';
 import {LoadingIndeterminate} from './reactComponents/Common';
 import {ProjectDetailDetails} from './reactComponents/ProjectDetails';
 import {ObjectDetails} from './reactComponents/ObjectDetails';
-
+import {Treatment} from './reactComponents/Treatment';
 
 import('bootstrap');
 import('bootstrap-table');
@@ -216,6 +216,7 @@ function loadReactComponents() {
     });
   }
 
+
   const itemDetails = document.getElementById('itemDetails');
   if (itemDetails) {
     const root = createRoot(itemDetails);
@@ -237,6 +238,30 @@ function loadReactComponents() {
           </Panel>,
       );
     });
+  }
+  const itemTreatmentDetails = document.getElementById('itemTreatmentDetails');
+  if (itemTreatmentDetails) {
+    const root = createRoot(itemTreatmentDetails);
+
+    root.render(
+      <Panel title='Treatment'>
+        Loading...
+      </Panel>,
+    )
+    console.log(itemTreatmentDetails.dataset.tykoApiUrl)
+    axios.get(itemTreatmentDetails.dataset.tykoApiUrl).then(
+        (data) =>{
+          const treatmentData = data.data.item
+          root.render(
+              <Panel title='Treatment'>
+                <Treatment
+                    apiUrl={itemTreatmentDetails.dataset.tykoApiTreatment}
+                    apiData={treatmentData}
+                />
+              </Panel>
+          );
+        }
+    )
   }
 
   const aboutComponent = document.getElementById('aboutApp');

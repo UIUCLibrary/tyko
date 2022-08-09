@@ -115,7 +115,10 @@ export default function ItemDetails() {
         <InactiveCover><LoadingIndeterminate/></InactiveCover>
       ) :
       <></>;
-
+  const treatmentUrl = (itemId && projectId && objectId) ? (
+    `/api/project/${projectId}
+    /object/${objectId}/itemTreatment?item_id=${itemId}`
+  ) : '';
   return (
     <div>
       <h1>Item Details</h1>
@@ -141,7 +144,7 @@ export default function ItemDetails() {
             <Panel title='Treatment'>
               {blocker}
               <Treatment
-                apiUrl='/api/project/1/object/1/itemTreatment?item_id=1'
+                apiUrl={treatmentUrl}
                 apiData={apiData}
                 onAccessibleChange={setBusy}
                 onUpdated={()=>{
