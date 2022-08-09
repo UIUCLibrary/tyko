@@ -413,6 +413,7 @@ export const Treatment = (
       <Form ref={form}>
         <EditableListElement
           label='Treatment Needed'
+          editMode={editMode}
           elements={
             apiData ? parseTreatmentType(apiData, TreatmentType.Needed): []
           }
@@ -422,6 +423,7 @@ export const Treatment = (
         />
         <EditableListElement
           label='Treatment Done'
+          editMode={editMode}
           elements={
             apiData ? parseTreatmentType(apiData, TreatmentType.Performed): []
           }
@@ -429,6 +431,17 @@ export const Treatment = (
           onEdit={(id)=> handleEdit(id, TreatmentType.Performed)}
           onRemove={(id)=> handleRemoval(id, TreatmentType.Performed)}
         />
+        <ButtonGroup hidden={!editMode} className={'float-end'}>
+          <Button
+            variant={'outline-primary'}
+            onClick={setEditMode}
+          >
+            Done
+          </Button>
+        </ButtonGroup>
+        <ButtonGroup hidden={editMode} className={'float-end'}>
+          <Button hidden={editMode} onClick={setEditMode}>Edit</Button>
+        </ButtonGroup>
       </Form>
     </>
   );
@@ -441,6 +454,7 @@ interface IElement {
 interface IEditableListElement {
   label: string
   elements: IElement[]
+  editMode: boolean
   onRemove?: (id: number)=>void
   onEdit?: (id: number)=>void
   onAddElement?: ()=>void
@@ -453,6 +467,7 @@ const EditableListElement: FC<IEditableListElement> = (
       onAddElement,
       onRemove,
       onEdit,
+      editMode,
     },
 ) =>{
   const handleRemoval = (id: number) => {
@@ -471,43 +486,55 @@ const EditableListElement: FC<IEditableListElement> = (
       onAddElement();
     }
   };
-  const mapElements = (element: IElement)=>{
+  const mapElementsAsViewable = (element: IElement)=>{
+    return (
+      <li>
+        <Form.Text>{element.content}</Form.Text>
+      </li>
+    );
+  };
+  const mapElementsAsEditable = (element: IElement)=>{
+    const editButton = (
+      <DropdownButton title='' size='sm'>
+        <Dropdown.Item
+          size='sm'
+          onClick={()=>handleEdit(element.id)}
+        >Edit</Dropdown.Item>
+        <Dropdown.Item
+          size='sm'
+          onClick={()=>handleRemoval(element.id)}
+        >Remove</Dropdown.Item>
+      </DropdownButton>
+    );
+
     return (
       <ListGroup.Item
         key={element.id}
         className="d-flex justify-content-between align-items-start"
       >
-        <Form.Text>{element.content}</Form.Text>
-        <DropdownButton title='' size='sm'>
-          <Dropdown.Item
-            size='sm'
-            onClick={()=>handleEdit(element.id)}
-          >
-            Edit
-          </Dropdown.Item>
-          <Dropdown.Item
-            size='sm'
-            onClick={()=>handleRemoval(element.id)}
-          >
-            Remove
-          </Dropdown.Item>
-        </DropdownButton>
+        {element.content}
+        {editButton}
       </ListGroup.Item>
     );
   };
+  const list = editMode ? (
+    <ListGroup variant={'flush'}>
+      {elements.map(mapElementsAsEditable)}
+    </ListGroup>
+  ) : (
+      <ul>
+        {elements.map(mapElementsAsViewable)}
+      </ul>
+  );
   return (
     <>
       <Form.Group className="mb-2 row">
-        <Form.Label column='sm'>
-          {label}
-        </Form.Label>
+        <Form.Label column='sm'>{label}</Form.Label>
         <Form.Group className="col-sm-8">
           <Form.Group className="mb-3 row">
-            <ListGroup variant={'flush'}>
-              {elements.map(mapElements)}
-            </ListGroup>
+            {list}
             <Form.Group>
-              <ButtonGroup className={'float-end'}>
+              <ButtonGroup className={'float-end'} hidden={!editMode}>
                 <Button size={'sm'} onClick={handleNew}>Add</Button>
               </ButtonGroup>
             </Form.Group>
