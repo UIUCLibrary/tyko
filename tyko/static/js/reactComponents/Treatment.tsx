@@ -13,7 +13,7 @@ import Modal from 'react-bootstrap/Modal';
 import {ButtonGroup, CloseButton, ListGroup} from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import {IItemMetadata} from '../reactComponents/ItemApp';
 enum TreatmentType {
   Needed = 'needed',
@@ -267,10 +267,8 @@ interface ITreatment {
 export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
   const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
   const [accessible, setAccessible] = useState(true);
-  const [dialogShown, setDialogShown]= useState(false);
-  const [dialogMessage, setDialogMessage]= useState<string | undefined>();
-  const onError = ()=>{
-    console.error('Error');
+  const onError = (error: Error | AxiosError)=>{
+    console.error(error);
   };
   const form = useRef<HTMLFormElement>(null);
 
@@ -285,7 +283,7 @@ export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
           if (onUpdated) {
             onUpdated();
           }
-        }).catch(console.error);
+        }).catch(onError);
       });
     }
   };
@@ -293,16 +291,16 @@ export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
   const handleRemoval = (id: number, type: TreatmentType) =>{
     const data = {
       id: id,
-      type: type,
     };
     if (confirmDialog.current) {
-      confirmDialog.current.setTitle(`Remove ${id}`);
+      confirmDialog.current.setTitle('Remove');
       confirmDialog.current.setShow(true);
       confirmDialog.current.setOnConfirm(()=> {
-        console.log(`calling delete ${apiUrl} with ${JSON.stringify(data)}`);
-        if (onUpdated) {
-          onUpdated();
-        }
+        axios.delete(apiUrl, {data: data}).then(()=> {
+          if (onUpdated) {
+            onUpdated();
+          }
+        }).catch(onError);
       });
     }
   };

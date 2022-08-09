@@ -765,6 +765,34 @@ class ItemDataConnector(AbsNotesConnector):
         session.add(new_file)
         return new_file
 
+    def remove_treatment(self, item_id, data):
+        treatment_id = data.get('id')
+        if not treatment_id:
+            raise AttributeError('missing id')
+        session = self.session_maker()
+        try:
+            item = self._get_item(item_id, session)
+            if len(item.treatments) == 0:
+                raise DataError(f"Item with ID: {item_id} has no treatments")
+
+            # Find treatment that matches the treatment ID
+            for treatment in item.treatments:
+                if treatment.id == treatment_id:
+                    item.treatments.remove(treatment)
+                    session.delete(treatment)
+                    break
+            else:
+                raise DataError(
+                    message=f"Item id {item_id} contains no treatment with an"
+                            f" id {treatment_id}",
+                    status_code=404
+                )
+            session.commit()
+            return self._get_item(item_id, session).serialize()
+
+        finally:
+            session.close()
+
     def add_treatment(self, item_id, data):
         session = self.session_maker()
         try:

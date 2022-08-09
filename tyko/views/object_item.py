@@ -248,3 +248,8 @@ class ObjectItemTreatmentAPI(views.MethodView):
         data_connector = \
             data_provider.ItemDataConnector(self._provider.db_session_maker)
         return data_connector.add_treatment(item_id, data=request.get_json())
+
+    def delete(self, project_id, object_id, item_id):
+        data_connector = \
+            data_provider.ItemDataConnector(self._provider.db_session_maker)
+        return data_connector.remove_treatment(item_id, data=request.get_json())
