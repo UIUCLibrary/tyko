@@ -490,7 +490,6 @@ def item_treatment(project_id, object_id):
     )
 
 
-
 @api.route(
     "/project/<int:project_id>/object/<int:object_id>/item/<int:item_id>/"
     "notes/<int:note_id>",
