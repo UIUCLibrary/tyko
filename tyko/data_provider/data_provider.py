@@ -776,17 +776,9 @@ class ItemDataConnector(AbsNotesConnector):
                 raise DataError(f"Item with ID: {item_id} has no treatments")
 
             # Find treatment that matches the treatment ID
-            for treatment in item.treatments:
-                if treatment.id == treatment_id:
-                    item.treatments.remove(treatment)
-                    session.delete(treatment)
-                    break
-            else:
-                raise DataError(
-                    message=f"Item id {item_id} contains no treatment with an"
-                            f" id {treatment_id}",
-                    status_code=404
-                )
+            treatment = self._get_treatment_by_id(item, treatment_id)
+            item.treatments.remove(treatment)
+            session.delete(treatment)
             session.commit()
             return self._get_item(item_id, session).serialize()
 
@@ -797,7 +789,6 @@ class ItemDataConnector(AbsNotesConnector):
         session = self.session_maker()
         try:
             new_treatment = Treatment()
-            # new_treatment.item_id = item_id
             new_treatment.message = data.get('message')
             new_treatment.treatment_type = data.get('type')
             item = session.query(schema.formats.AVFormat) \
@@ -811,7 +802,58 @@ class ItemDataConnector(AbsNotesConnector):
             }
         finally:
             session.close()
-#     todo: add_treatment
+
+    @staticmethod
+    def _get_treatment_by_id(item: CollectionItem, treatment_id) -> Treatment:
+        for treatment in item.treatments:
+            if treatment.id == treatment_id:
+                return treatment
+
+        raise DataError(
+            message=f"Item id {item.table_id} contains no treatment with an"
+                    f" id {treatment_id}",
+            status_code=404
+        )
+
+    def update_treatment(self, item_id: int, treatment_id: int, data):
+        session = self.session_maker()
+        try:
+            item = self._get_item(item_id, session)
+            if len(item.treatments) == 0:
+                raise DataError(f"Item with ID: {item_id} has no treatments")
+
+            # Find treatment that matches the treatment ID
+            treatment = self._get_treatment_by_id(item, treatment_id)
+            if message := data.get('message', None):
+                treatment.message = message
+            session.commit()
+            return self._get_item(item_id, session).serialize()
+        finally:
+            session.close()
+
+    def get_treatment(self, item_id, data):
+        treatment_id = data.get("treatment_id")
+        if not treatment_id:
+            raise AttributeError('missing id')
+        treatment_id = int(treatment_id)
+        session = self.session_maker()
+        try:
+            new_treatment = Treatment()
+            new_treatment.message = data.get('message')
+            new_treatment.treatment_type = data.get('type')
+            item = session.query(schema.formats.AVFormat) \
+                .filter(schema.formats.AVFormat.table_id == item_id) \
+                .one()
+            for treatment in item.treatments:
+                if treatment.id == treatment_id:
+                    return treatment.serialize()
+            raise DataError(
+                message=f"Item id {item_id} contains no treatment with an"
+                        f" id {treatment_id}",
+                status_code=404
+            )
+        finally:
+            session.close()
 
 
 class DataProvider:

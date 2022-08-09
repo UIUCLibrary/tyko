@@ -1467,3 +1467,40 @@ class TestItemTreatment:
         response = server.get(item_api_url).get_json()
         assert len(response['treatment']) > 0
 
+    def test_put_edits_treatment(
+            self,
+            server,
+            item_api_url,
+            project_id,
+            object_id,
+            item_id
+    ):
+        treatment_url = url_for(
+            "api.item_treatment",
+            project_id=project_id,
+            object_id=object_id,
+        )
+        treatment_id = server.post(
+            treatment_url,
+            query_string={'item_id': item_id},
+            data=json.dumps(
+                {
+                    "type": 'needed',
+                    'message': 'spam'
+                }
+            ),
+            content_type='application/json'
+        ).get_json()['id']
+
+        server.put(
+            treatment_url,
+            query_string={'item_id': item_id, "treatment_id": treatment_id},
+            data=json.dumps(
+                {
+                    "message": "bacon"
+                },
+            ),
+            content_type='application/json'
+        )
+        response = server.get(item_api_url).get_json()
+        assert response['treatment'][0]['message'] == 'bacon'

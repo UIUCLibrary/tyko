@@ -12,8 +12,9 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import {ButtonGroup, CloseButton, ListGroup} from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
+import Alert from 'react-bootstrap/Alert';
 import DropdownButton from 'react-bootstrap/DropdownButton';
-import axios, {AxiosError} from 'axios';
+import axios, {AxiosError, AxiosResponse} from 'axios';
 import {IItemMetadata} from '../reactComponents/ItemApp';
 enum TreatmentType {
   Needed = 'needed',
@@ -23,7 +24,12 @@ interface IModalAccepted {
   type: TreatmentType
   message?: string
 }
-
+interface ITreatment {
+  type: string
+  message: string
+  item_id: number
+  treatment_id: number
+}
 interface ITreatmentDialog {
   show?: boolean
   title?: string
@@ -258,6 +264,44 @@ const parseTreatmentType = (
   }
   return items;
 };
+interface PropsAlertDismissible {
+  display?: boolean
+  title?: string
+  message?: string
+}
+interface RefAlertDismissible {
+  setTitle: (title: string)=>void,
+  setMessage: (message: string)=>void,
+  setShow: (show: boolean)=>void,
+}
+const AlertDismissible = forwardRef((
+    props: PropsAlertDismissible,
+    ref: Ref<RefAlertDismissible>) =>{
+  const [show, setShow] = useState(props.display);
+  const [title, setTitle] = useState<string|undefined>(props.title);
+  const [message, setMessage] = useState<string|undefined>(props.message);
+  useImperativeHandle(ref, () => ({
+    setTitle: (value) => {
+      setTitle(value);
+    },
+    setMessage: (value) => {
+      setMessage(value);
+    },
+    setShow: (value) => {
+      setShow(value);
+    },
+  }));
+  if (show) {
+    return (
+      <Alert variant="danger" onClose={() => setShow(false)} dismissible>
+        <Alert.Heading>{title}</Alert.Heading>
+        <p>{message}</p>
+      </Alert>
+    );
+  }
+  return <></>;
+});
+AlertDismissible.displayName = 'AlertDismissible';
 
 interface ITreatment {
   apiUrl: string,
@@ -267,8 +311,13 @@ interface ITreatment {
 export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
   const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
   const [accessible, setAccessible] = useState(true);
-  const onError = (error: Error | AxiosError)=>{
-    console.error(error);
+  const onError = (e: Error | AxiosError)=>{
+    if (errorMessageAlert.current) {
+      errorMessageAlert.current.setTitle(e.name);
+      errorMessageAlert.current.setMessage(e.message);
+      errorMessageAlert.current.setShow(true);
+    }
+    console.error(e);
   };
   const form = useRef<HTMLFormElement>(null);
 
@@ -305,23 +354,36 @@ export const Treatment = ({apiUrl, onUpdated, apiData}: ITreatment)=>{
     }
   };
   const handleEdit = (id: number, type: TreatmentType) =>{
-    if (treatmentsDialog.current) {
-      console.log(`calling get ${apiUrl} on id ${id}`);
-      treatmentsDialog.current.setTitle(`Edit ${id}`);
-      treatmentsDialog.current.setVisible(true);
-      treatmentsDialog.current.setDescription('true');
-      treatmentsDialog.current.setType(type);
-      treatmentsDialog.current.setOnAccepted((data)=> {
-        console.log(`calling put ${apiUrl} with ${JSON.stringify(data)}`);
-      });
-    }
-    // todo: get data from api
-    // todo: Make this use a PUT request
+    axios.get(
+        apiUrl,
+        {
+          params: {
+            treatment_id: id,
+          },
+        },
+    ).then((response: AxiosResponse<ITreatment>)=> {
+      if (treatmentsDialog.current) {
+        treatmentsDialog.current.setTitle(`Edit ${response.data.type}`);
+        treatmentsDialog.current.setVisible(true);
+        treatmentsDialog.current.setDescription(response.data.message);
+        treatmentsDialog.current.setType(type);
+        treatmentsDialog.current.setOnAccepted((data)=> {
+          const putUrl = `${apiUrl}&treatment_id=${id}`;
+          axios.put(putUrl, data).then(()=>{
+            if (onUpdated) {
+              onUpdated();
+            }
+          }).catch(onError);
+        });
+      }
+    }).catch(onError);
   };
   const confirmDialog = useRef<RefConfirmDialog>(null);
+  const errorMessageAlert = useRef<RefAlertDismissible>(null);
   const treatmentsDialog = useRef<TreatmentDialogRef>(null);
   return (
     <>
+      <AlertDismissible ref={errorMessageAlert}/>
       <ConfirmDialog ref={confirmDialog}>Are you sure?</ConfirmDialog>
       <TreatmentDialog
         ref={treatmentsDialog}

@@ -244,6 +244,26 @@ class ObjectItemTreatmentAPI(views.MethodView):
     def __init__(self, provider: data_provider.DataProvider) -> None:
         self._provider = provider
 
+    def put(self, project_id, object_id, item_id):
+        data_connector = \
+            data_provider.ItemDataConnector(self._provider.db_session_maker)
+        data = request.get_json()
+        if not (treatment_id := request.args.get("treatment_id")):
+            raise AttributeError('missing id')
+        return data_connector.update_treatment(
+                item_id,
+                int(treatment_id),
+                data=data
+        )
+
+    def get(self, project_id, object_id, item_id):
+        data_connector = \
+            data_provider.ItemDataConnector(self._provider.db_session_maker)
+        return data_connector.get_treatment(
+            item_id,
+            data=request.args
+        )
+
     def post(self, project_id, object_id, item_id):
         data_connector = \
             data_provider.ItemDataConnector(self._provider.db_session_maker)
@@ -252,4 +272,7 @@ class ObjectItemTreatmentAPI(views.MethodView):
     def delete(self, project_id, object_id, item_id):
         data_connector = \
             data_provider.ItemDataConnector(self._provider.db_session_maker)
-        return data_connector.remove_treatment(item_id, data=request.get_json())
+        return data_connector.remove_treatment(
+            item_id,
+            data=request.get_json()
+        )
