@@ -67,7 +67,9 @@ const TreatmentDialog = forwardRef(
       const [
         onCancel,
         setOnCancel,
-      ] = useState<()=>void>(props.onCancel ? props.onCancel: ()=> undefined);
+      ] = useState<()=>void>(()=> {
+        return (props.onCancel ? props.onCancel : () => undefined);
+      });
 
       useImperativeHandle(ref, () => ({
         setOnAccepted: (callback) => {
@@ -281,6 +283,7 @@ export const Treatment = (
       confirmDialog.current.setShow(true);
       confirmDialog.current.setOnConfirm(()=> {
         setAccessible(false);
+        console.log(apiUrl);
         axios.delete(apiUrl, {data: data})
             .then(handleUpdate)
             .catch(onError)
@@ -322,12 +325,6 @@ export const Treatment = (
       <ConfirmDialog ref={confirmDialog}>Are you sure?</ConfirmDialog>
       <TreatmentDialog
         ref={treatmentsDialog}
-        onAccepted={(results)=> {
-          console.log(JSON.stringify(results));
-        }}
-        onCancel={()=> {
-          console.log('canceled');
-        }}
       />
       <Form ref={form}>
         <EditableListElement

@@ -12,7 +12,7 @@ import React, {
   Ref,
   SetStateAction,
   useId,
-  useImperativeHandle,
+  useImperativeHandle, useRef,
   useState,
 } from 'react';
 import Button from 'react-bootstrap/Button';
@@ -164,66 +164,40 @@ export const ConfirmDialog = forwardRef((
     visible,
     setVisible,
   ] = useState<boolean>(props.show ? props.show : false);
-  const [
-    onConfirm,
-    setOnConfirm,
-  ] = useState<()=>void>(props.onConfirm? props.onConfirm : ()=> undefined);
-  const [
-    onCancel,
-    setOnCancel,
-  ] = useState<()=>void>(props.onCancel ? props.onCancel: ()=> undefined);
+  const onConfirm = useRef(props.onConfirm ? props.onConfirm : () => undefined);
+  const onCancel = useRef(props.onCancel ? props.onCancel: ()=> undefined);
   const handleClose = ()=>{
     setVisible(false);
   };
   const handleCancel = ()=>{
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel.current();
     handleClose();
   };
   const handleConfirm = ()=>{
-    if (onConfirm) {
-      onConfirm();
-    }
+    onConfirm.current();
     handleClose();
   };
   useImperativeHandle(ref, () => (
     {
-      setTitle: (value) => {
-        setTitle(value);
-      },
-      setShow: (value) => {
-        setVisible(value);
-      },
-      handleClose: () => {
-        handleClose();
-      },
-      accept: () => {
-        handleConfirm();
-      },
-      cancel: () => {
-        handleCancel();
-      },
+      setTitle: setTitle,
+      setShow: setVisible,
+      handleClose: handleClose,
+      accept: handleConfirm,
+      cancel: handleCancel,
       setOnConfirm: (callback: ()=>void) => {
-        setOnConfirm(()=>{
-          return callback;
-        });
+        onConfirm.current = callback;
       },
       visible: visible,
       setOnCancel: (callback: ()=>void) =>{
-        setOnCancel(callback);
+        onCancel.current = callback;
       },
     }
   ), [visible, handleConfirm, handleCancel]);
-
   return (
     <Modal show={visible}>
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
-        <CloseButton
-          aria-label="Close"
-          onClick={handleClose}
-        />
+        <CloseButton aria-label="Close" onClick={handleClose}/>
       </Modal.Header>
       <Modal.Body>{props.children}</Modal.Body>
       <Modal.Footer>

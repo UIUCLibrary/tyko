@@ -89,9 +89,6 @@ describe('ConfirmDialog', ()=>{
     test('setting setOnCancel updates onCancel handel', async ()=> {
       const onCancel = jest.fn();
       render(<ConfirmDialog ref={ref} title='dummy' show={true} />);
-      if (!ref.current) {
-        fail('The ref should be available by now');
-      }
       await waitFor(()=>{
         if (ref.current) {
           ref.current.setOnCancel(onCancel);
@@ -102,5 +99,43 @@ describe('ConfirmDialog', ()=>{
       });
       expect(onCancel).toBeCalled();
     });
+    test('setting setOnConfirm and running accept calls onConfirm', async ()=> {
+      const onConfirm = jest.fn();
+      render(<ConfirmDialog ref={ref} title='dummy' show={true} />);
+      await waitFor(()=>{
+        return screen.getByRole('dialog');
+      });
+      await waitFor(()=>{
+        if (ref.current) {
+          ref.current.setOnConfirm(onConfirm);
+          ref.current.accept();
+        } else {
+          fail('The ref should be available by now');
+        }
+      });
+      await waitFor(()=>{
+        return screen.getByRole('dialog');
+      });
+      expect(onConfirm).toBeCalled();
+    });
+    test('setting setOnConfirm without running accept does not call onConfirm',
+        async ()=> {
+          const onConfirm = jest.fn();
+          render(<ConfirmDialog ref={ref} title='dummy' show={true} />);
+          await waitFor(()=>{
+            return screen.getByRole('dialog');
+          });
+          await waitFor(()=>{
+            if (ref.current) {
+              ref.current.setOnConfirm(onConfirm);
+            } else {
+              fail('The ref should be available by now');
+            }
+          });
+          await waitFor(()=>{
+            return screen.getByRole('dialog');
+          });
+          expect(onConfirm).not.toBeCalled();
+        });
   });
 });
