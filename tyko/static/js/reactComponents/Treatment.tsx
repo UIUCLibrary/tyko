@@ -47,7 +47,7 @@ interface TreatmentDialogRef {
   setOnAccepted: (callback:(data: IModalAccepted)=> void)=>void,
   setOnCancel: (callback:()=> void)=>void,
 }
-const TreatmentDialog = forwardRef(
+export const TreatmentDialog = forwardRef(
     (
         props: ITreatmentDialog,
         ref: Ref<TreatmentDialogRef> ) => {
