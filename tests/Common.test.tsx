@@ -48,5 +48,43 @@ describe('ConfirmDialog', ()=>{
       });
       expect(ref.current.visible).toBe(true);
     });
+    test('accept calls confirm', async ()=> {
+      const onConfirm = jest.fn();
+      render(
+          <ConfirmDialog
+            ref={ref}
+            title='dummy'
+            show={true}
+            onConfirm={onConfirm}/>,
+      );
+      if (!ref.current) {
+        fail('The ref should be available by now');
+      }
+      const dialog = ref.current;
+      await waitFor(()=>{
+        dialog.accept();
+        return screen.getByRole('dialog');
+      });
+      expect(onConfirm).toBeCalled();
+    });
+    test('cancel calls onCancel', async ()=> {
+      const onCancel = jest.fn();
+      render(
+          <ConfirmDialog
+            ref={ref}
+            title='dummy'
+            show={true}
+            onCancel={onCancel}/>,
+      );
+      if (!ref.current) {
+        fail('The ref should be available by now');
+      }
+      const dialog = ref.current;
+      await waitFor(()=>{
+        dialog.cancel();
+        return screen.getByRole('dialog');
+      });
+      expect(onCancel).toBeCalled();
+    });
   });
 });

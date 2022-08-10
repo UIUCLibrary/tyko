@@ -150,6 +150,8 @@ export interface RefConfirmDialog {
   visible: boolean
   setTitle: (title: string)=>void,
   setShow: (show: boolean)=>void,
+  accept: ()=>void,
+  cancel: ()=>void,
   setOnConfirm: (callback:()=> void)=>void,
   setOnCancel: (callback:()=> void)=>void,
 }
@@ -160,7 +162,7 @@ export const ConfirmDialog = forwardRef((
   const [title, setTitle] = useState<string|undefined>(props.title);
   const [
     visible,
-    setVisible
+    setVisible,
   ] = useState<boolean>(props.show ? props.show : false);
   const [
     onConfirm,
@@ -179,6 +181,12 @@ export const ConfirmDialog = forwardRef((
     },
     handleClose: () => {
       handleClose();
+    },
+    accept: () => {
+      handleConfirm();
+    },
+    cancel: () => {
+      handleCancel();
     },
     setOnConfirm: (callback) => {
       setOnConfirm(()=>{
