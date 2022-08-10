@@ -172,34 +172,6 @@ export const ConfirmDialog = forwardRef((
     onCancel,
     setOnCancel,
   ] = useState<()=>void>(props.onCancel ? props.onCancel: ()=> undefined);
-  useImperativeHandle(ref, () => ({
-    setTitle: (value) => {
-      setTitle(value);
-    },
-    setShow: (value) => {
-      setVisible(value);
-    },
-    handleClose: () => {
-      handleClose();
-    },
-    accept: () => {
-      handleConfirm();
-    },
-    cancel: () => {
-      handleCancel();
-    },
-    setOnConfirm: (callback) => {
-      setOnConfirm(()=>{
-        return callback;
-      });
-    },
-    visible: visible,
-    setOnCancel: (callback) =>{
-      setOnCancel(()=>{
-        return callback;
-      });
-    },
-  }));
   const handleClose = ()=>{
     setVisible(false);
   };
@@ -215,6 +187,35 @@ export const ConfirmDialog = forwardRef((
     }
     handleClose();
   };
+  useImperativeHandle(ref, () => (
+    {
+      setTitle: (value) => {
+        setTitle(value);
+      },
+      setShow: (value) => {
+        setVisible(value);
+      },
+      handleClose: () => {
+        handleClose();
+      },
+      accept: () => {
+        handleConfirm();
+      },
+      cancel: () => {
+        handleCancel();
+      },
+      setOnConfirm: (callback: ()=>void) => {
+        setOnConfirm(()=>{
+          return callback;
+        });
+      },
+      visible: visible,
+      setOnCancel: (callback: ()=>void) =>{
+        setOnCancel(callback);
+      },
+    }
+  ), [visible, handleConfirm, handleCancel]);
+
   return (
     <Modal show={visible}>
       <Modal.Header>

@@ -116,8 +116,7 @@ export default function ItemDetails() {
       ) :
       <></>;
   const treatmentUrl = (itemId && projectId && objectId) ? (
-    `/api/project/${projectId}
-    /object/${objectId}/itemTreatment?item_id=${itemId}`
+`/api/project/${projectId}/object/${objectId}/itemTreatment?item_id=${itemId}`
   ) : '';
   return (
     <div>

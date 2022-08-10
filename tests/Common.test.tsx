@@ -86,5 +86,21 @@ describe('ConfirmDialog', ()=>{
       });
       expect(onCancel).toBeCalled();
     });
+    test('setting setOnCancel updates onCancel handel', async ()=> {
+      const onCancel = jest.fn();
+      render(<ConfirmDialog ref={ref} title='dummy' show={true} />);
+      if (!ref.current) {
+        fail('The ref should be available by now');
+      }
+      await waitFor(()=>{
+        if (ref.current) {
+          ref.current.setOnCancel(onCancel);
+          ref.current.cancel();
+        } else {
+          fail('The ref should be available by now');
+        }
+      });
+      expect(onCancel).toBeCalled();
+    });
   });
 });
