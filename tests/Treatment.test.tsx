@@ -74,5 +74,22 @@ describe('TreatmentDialog', ()=>{
       });
       expect(newTitle).toBeInTheDocument();
     });
+    test('update set visible', async ()=> {
+      render(
+          <>
+            <TreatmentDialog ref={ref} title='dummy' show={false}/>
+          </>,
+      );
+      if (!ref.current) {
+        fail('The ref should be available by now');
+      }
+      const dialog = ref.current;
+      expect(dialog.visible).toBe(false);
+      await waitFor(()=>{
+        dialog.setShow(true);
+        return screen.getByRole('dialog');
+      });
+      expect(ref.current.visible).toBe(true);
+    });
   });
 });

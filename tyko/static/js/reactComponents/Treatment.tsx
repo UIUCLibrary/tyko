@@ -40,8 +40,9 @@ interface ITreatmentDialog {
 
 export interface TreatmentDialogRef {
   handleClose: ()=>void
-  setVisible: (visible: boolean)=>void
+  visible: boolean,
   setTitle: (title: string)=>void
+  setShow: (visible: boolean)=>void
   setType: (value: TreatmentType)=>void
   setDescription: (text: string|null)=>void
   setOnAccepted: (callback:(data: IModalAccepted)=> void)=>void,
@@ -54,8 +55,10 @@ export const TreatmentDialog = forwardRef(
       const [title, setTitle] = useState(props.title);
       const [description, setDescription] = useState<string|null>(null);
       const [type, setType] = useState<TreatmentType>();
-
-      const [visible, setVisible] = useState<boolean|undefined>(props.show);
+      const [
+        visible,
+        setVisible,
+      ] = useState<boolean>(props.show ? props.show : false);
       const treatmentContent = useRef<HTMLTextAreaElement>(null);
       const saveButton = useRef<HTMLButtonElement>(null);
       const [
@@ -82,9 +85,10 @@ export const TreatmentDialog = forwardRef(
             return callback;
           });
         },
-        setVisible(value) {
+        setShow(value) {
           setVisible(value);
         },
+        visible: visible,
         setType(value) {
           setType(value);
         },
@@ -262,7 +266,7 @@ export const Treatment = (
   const handleNew = (type: TreatmentType) =>{
     if (treatmentsDialog.current) {
       treatmentsDialog.current.setTitle('Create new');
-      treatmentsDialog.current.setVisible(true);
+      treatmentsDialog.current.setShow(true);
       treatmentsDialog.current.setDescription(null);
       treatmentsDialog.current.setType(type);
       treatmentsDialog.current.setOnAccepted((data)=> {
@@ -303,7 +307,7 @@ export const Treatment = (
     ).then((response: AxiosResponse<ITreatment>)=> {
       if (treatmentsDialog.current) {
         treatmentsDialog.current.setTitle(`Edit ${response.data.type}`);
-        treatmentsDialog.current.setVisible(true);
+        treatmentsDialog.current.setShow(true);
         treatmentsDialog.current.setDescription(response.data.message);
         treatmentsDialog.current.setType(type);
         treatmentsDialog.current.setOnAccepted((data)=> {
