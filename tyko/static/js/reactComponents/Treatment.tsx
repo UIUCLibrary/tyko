@@ -85,9 +85,7 @@ export const TreatmentDialog = forwardRef(
             return callback;
           });
         },
-        setShow(value) {
-          setVisible(value);
-        },
+        setShow: setVisible,
         visible: visible,
         setType(value) {
           setType(value);
