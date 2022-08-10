@@ -379,7 +379,7 @@ interface IEditableListElement {
   onAddElement?: ()=>void
 }
 
-const EditableListElement: FC<IEditableListElement> = (
+export const EditableListElement: FC<IEditableListElement> = (
     {
       label,
       elements,
