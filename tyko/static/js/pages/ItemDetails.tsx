@@ -19,7 +19,7 @@ export default function ItemDetails() {
   const {objectId} = useParams<string>();
   const {itemId} = useParams<string>();
 
-  const [apiData, setApiData] = useState<IItemMetadata | null>(null);
+  const [apiData, setApiData] = useState<IItemMetadata | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -74,12 +74,12 @@ export default function ItemDetails() {
       barcode={apiData.barcode ? apiData.barcode: undefined}
       objectSequence={apiData.obj_sequence}
       apiUrl={apiUrl}
-      onUpdated={()=>setApiData(null)}
+      onUpdated={()=>setApiData(undefined)}
     />;
     formatDetailsPanel = <FormatDetails
       apiData={apiData}
       apiUrl={apiUrl}
-      onUpdated={()=>setApiData(null)}/>;
+      onUpdated={()=>setApiData(undefined)}/>;
     filesPanel = <>do stuff here</>;
     notesPanel = <>do stuff here</>;
   }
@@ -107,7 +107,7 @@ export default function ItemDetails() {
     onAccessibleChange={setBusy}
     onUpdated={()=> {
       setBusy(false);
-      setApiData(null);
+      setApiData(undefined);
     }}
   />;
   const blocker = busy ?
@@ -147,7 +147,7 @@ export default function ItemDetails() {
                 apiData={apiData}
                 onAccessibleChange={setBusy}
                 onUpdated={()=>{
-                  setApiData(null);
+                  setApiData(undefined);
                 }}
               />
             </Panel>
