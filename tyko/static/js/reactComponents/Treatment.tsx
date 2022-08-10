@@ -38,7 +38,7 @@ interface ITreatmentDialog {
   onCancel?: ()=>void
 }
 
-interface TreatmentDialogRef {
+export interface TreatmentDialogRef {
   handleClose: ()=>void
   setVisible: (visible: boolean)=>void
   setTitle: (title: string)=>void
@@ -94,9 +94,7 @@ export const TreatmentDialog = forwardRef(
         setDescription: (value) => {
           setDescription(value);
         },
-        setTitle: (value) => {
-          setTitle(value);
-        },
+        setTitle: setTitle,
       }));
       const handleClose = () => {
         setVisible(false);

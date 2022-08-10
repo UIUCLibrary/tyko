@@ -7,13 +7,15 @@ import '@testing-library/jest-dom';
 import {
   EditableListElement,
   TreatmentDialog,
-  Treatment,
+  Treatment, TreatmentDialogRef,
 } from '../tyko/static/js/reactComponents/Treatment';
 import {
   render,
   fireEvent,
-  screen,
+  screen, waitFor,
 } from '@testing-library/react';
+import React from 'react';
+import {ConfirmDialog} from 'Common';
 describe('Treatment', ()=>{
   test('edit mode', ()=>{
     render(<Treatment apiUrl='/foo'/>);
@@ -54,5 +56,23 @@ describe('TreatmentDialog', ()=>{
   test('title', ()=>{
     render(<TreatmentDialog title={'foo'} show={true}/>);
     expect(screen.getByText('foo')).toBeInTheDocument();
+  });
+  describe('ref', ()=> {
+    const ref = React.createRef<TreatmentDialogRef>();
+    test('update title', async ()=> {
+      render(
+          <>
+            <TreatmentDialog ref={ref} title='dummy' show={true}/>
+          </>,
+      );
+      expect(ref.current).toBeTruthy();
+      const newTitle = await waitFor(()=>{
+        if (ref.current) {
+          ref.current?.setTitle('newTitle');
+        }
+        return screen.getByText('newTitle');
+      });
+      expect(newTitle).toBeInTheDocument();
+    });
   });
 });
