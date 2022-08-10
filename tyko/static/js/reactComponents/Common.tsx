@@ -138,7 +138,7 @@ export const submitFormUpdates = (
 };
 
 
-interface IConfirmDialog {
+export interface PropsConfirmDialog {
   children?: string | JSX.Element | JSX.Element[]
   title?: string
   show?: boolean
@@ -147,6 +147,7 @@ interface IConfirmDialog {
 }
 export interface RefConfirmDialog {
   handleClose: ()=>void,
+  visible: boolean
   setTitle: (title: string)=>void,
   setShow: (show: boolean)=>void,
   setOnConfirm: (callback:()=> void)=>void,
@@ -154,10 +155,13 @@ export interface RefConfirmDialog {
 }
 
 export const ConfirmDialog = forwardRef((
-    props: IConfirmDialog,
+    props: PropsConfirmDialog,
     ref: Ref<RefConfirmDialog>) =>{
   const [title, setTitle] = useState<string|undefined>(props.title);
-  const [visible, setVisible] = useState<boolean|undefined>(props.show);
+  const [
+    visible,
+    setVisible
+  ] = useState<boolean>(props.show ? props.show : false);
   const [
     onConfirm,
     setOnConfirm,
@@ -181,6 +185,7 @@ export const ConfirmDialog = forwardRef((
         return callback;
       });
     },
+    visible: visible,
     setOnCancel: (callback) =>{
       setOnCancel(()=>{
         return callback;
