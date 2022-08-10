@@ -10,7 +10,7 @@ import React, {
   FC,
   forwardRef,
   Ref,
-  SetStateAction,
+  SetStateAction, useCallback,
   useId,
   useImperativeHandle, useRef,
   useState,
@@ -169,14 +169,14 @@ export const ConfirmDialog = forwardRef((
   const handleClose = ()=>{
     setVisible(false);
   };
-  const handleCancel = ()=>{
+  const handleCancel = useCallback(()=>{
     onCancel.current();
     handleClose();
-  };
-  const handleConfirm = ()=>{
+  }, [onCancel, handleClose]);
+  const handleConfirm = useCallback(()=>{
     onConfirm.current();
     handleClose();
-  };
+  }, [onCancel, onConfirm]);
   useImperativeHandle(ref, () => (
     {
       setTitle: setTitle,
