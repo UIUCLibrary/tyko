@@ -225,7 +225,7 @@ AlertDismissible.displayName = 'AlertDismissible';
 
 interface PropsTreatment {
   apiUrl: string,
-  apiData: IItemMetadata | null,
+  apiData?: IItemMetadata,
   onUpdated?: ()=>void
   onAccessibleChange? : (busy: boolean)=>void
 }
@@ -237,7 +237,10 @@ export const Treatment = (
       onAccessibleChange,
     }: PropsTreatment,
 )=>{
-  const [editMode, setEditMode] = useReducer((mode)=>!mode, false);
+  const [
+    editMode,
+    setEditMode,
+  ] = useReducer((mode)=>!mode, false);
   const [accessible, setAccessible] = useState(true);
   const onError = (e: Error | AxiosError)=>{
     if (errorMessageAlert.current) {
