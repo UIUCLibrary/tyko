@@ -46,9 +46,9 @@ export interface TreatmentDialogRef {
   setType: (value: TreatmentType)=>void
   setDescription: (text: string|null)=>void
   accept: ()=>void
-  cancel: ()=>void
+  reject: ()=>void
   setOnAccepted: (callback:(data: IModalAccepted)=> void)=>void,
-  setOnCancel: (callback:()=> void)=>void,
+  setOnRejected: (callback:()=> void)=>void,
 }
 export const TreatmentDialog = forwardRef(
     (
@@ -68,32 +68,25 @@ export const TreatmentDialog = forwardRef(
             props.onAccepted :
             (_results: IModalAccepted) => undefined,
       );
-      const [
-        onCancel,
-        setOnCancel,
-      ] = useState<()=>void>(()=> {
-        return (props.onCancel ? props.onCancel : () => undefined);
-      });
+      const onRejected = useRef(
+          props.onCancel ?props.onCancel : () => undefined,
+      );
 
       useImperativeHandle(ref, () => ({
         setOnAccepted: (callback: ((results: IModalAccepted) => void)) => {
           onAccepted.current = callback;
         },
-        setOnCancel: (callback) =>{
-          setOnCancel(()=>{
-            return callback;
-          });
+        setOnRejected: (callback) =>{
+          onRejected.current = callback;
         },
         setShow: setVisible,
         visible: visible,
-        cancel: handleCanceled,
+        reject: handleCanceled,
         accept: handleAccepted,
         setType(value) {
           type.current = value;
         },
-        handleClose() {
-          handleClose();
-        },
+        handleClose: handleClose,
         setDescription: (value) => {
           setDescription(value);
         },
@@ -104,8 +97,8 @@ export const TreatmentDialog = forwardRef(
       };
 
       const handleCanceled = () => {
-        if (onCancel) {
-          onCancel();
+        if (onRejected.current) {
+          onRejected.current();
         }
         handleClose();
       };

@@ -11,7 +11,7 @@ import {
   TreatmentDialogRef,
   TreatmentType,
 } from '../tyko/static/js/reactComponents/Treatment';
-import {fireEvent, render, screen, waitFor,} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import React from 'react';
 
 describe('Treatment', ()=>{
@@ -103,7 +103,7 @@ describe('TreatmentDialog', ()=>{
       }
       const dialog = ref.current;
       await waitFor(()=>{
-        dialog.cancel();
+        dialog.reject();
       });
       expect(onCancel).toBeCalled();
     });
@@ -147,7 +147,7 @@ describe('TreatmentDialog', ()=>{
       });
       expect(onAccepted).toBeCalled();
     });
-    test('setting setOnConfirm without running accept does not call onConfirm',
+    test('setting setOnAccepted without running accept does not call onConfirm',
         async ()=> {
           const onAccepted = jest.fn();
           render(<TreatmentDialog ref={ref} title='dummy' show={true} />);
@@ -165,6 +165,49 @@ describe('TreatmentDialog', ()=>{
             return screen.getByRole('dialog');
           });
           expect(onAccepted).not.toBeCalled();
+        });
+    test(
+        'setting setOnRejected and running accept calls onRejected',
+        async ()=> {
+          const onReject = jest.fn();
+          render(<TreatmentDialog ref={ref} title='dummy' show={true} />);
+          await waitFor(()=>{
+            return screen.getByRole('dialog');
+          });
+          await waitFor(()=>{
+            if (ref.current) {
+              ref.current.setType(TreatmentType.Performed);
+              ref.current.setOnRejected(onReject);
+              ref.current.reject();
+            } else {
+              fail('The ref should be available by now');
+            }
+          });
+          await waitFor(()=>{
+            return screen.getByRole('dialog');
+          });
+          expect(onReject).toBeCalled();
+        });
+    test(
+        'setting setOnRejected without running accept does not call ' +
+        'onRejected',
+        async ()=> {
+          const onRejected = jest.fn();
+          render(<TreatmentDialog ref={ref} title='dummy' show={true} />);
+          await waitFor(()=>{
+            return screen.getByRole('dialog');
+          });
+          await waitFor(()=>{
+            if (ref.current) {
+              ref.current.setOnRejected(onRejected);
+            } else {
+              fail('The ref should be available by now');
+            }
+          });
+          await waitFor(()=>{
+            return screen.getByRole('dialog');
+          });
+          expect(onRejected).not.toBeCalled();
         });
   });
 });
