@@ -5,7 +5,7 @@ import React, {
   useState,
   forwardRef,
   useImperativeHandle,
-  Ref, useEffect,
+  Ref, useEffect, RefObject,
 } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -21,7 +21,7 @@ export enum TreatmentType {
   Needed = 'needed',
   Performed = 'done'
 }
-interface IModalAccepted {
+interface NewTreatment {
   type: TreatmentType
   message?: string
 }
@@ -34,7 +34,7 @@ export interface ITreatment {
 interface PropsTreatmentDialog {
   show?: boolean
   title?: string
-  onAccepted?: (results: IModalAccepted)=>void
+  onAccepted?: (results: NewTreatment)=>void
   onCancel?: ()=>void
 }
 
@@ -47,7 +47,7 @@ export interface TreatmentDialogRef {
   setDescription: (text: string|null)=>void
   accept: ()=>void
   reject: ()=>void
-  setOnAccepted: (callback:(data: IModalAccepted)=> void)=>void,
+  setOnAccepted: (callback:(data: NewTreatment)=> void)=>void,
   setOnRejected: (callback:()=> void)=>void,
 }
 export const TreatmentDialog = forwardRef(
@@ -199,148 +199,164 @@ const AlertDismissible = forwardRef((
 });
 AlertDismissible.displayName = 'AlertDismissible';
 
-interface PropsTreatment {
+export interface TreatmentProps {
   apiUrl: string,
   apiData?: IItemMetadata,
   onUpdated?: ()=>void
   onAccessibleChange? : (busy: boolean)=>void
 }
-export const Treatment = (
-    {
-      apiUrl,
-      onUpdated,
-      apiData,
-      onAccessibleChange,
-    }: PropsTreatment,
-)=>{
-  const [
-    editMode,
-    setEditMode,
-  ] = useReducer((mode)=>!mode, false);
-  const [accessible, setAccessible] = useState(true);
-  const onError = (e: Error | AxiosError)=>{
-    if (errorMessageAlert.current) {
-      errorMessageAlert.current.setTitle(e.name);
-      errorMessageAlert.current.setMessage(e.message);
-      errorMessageAlert.current.setShow(true);
-    }
-    console.error(e);
-  };
-  const form = useRef<HTMLFormElement>(null);
-  useEffect(()=>{
-    if (onAccessibleChange) {
-      onAccessibleChange(!accessible);
-    }
-  }, [accessible, onAccessibleChange]);
-  const handleUpdate = () =>{
-    if (onUpdated) {
-      onUpdated();
-    }
-  };
-  const handleNew = (type: TreatmentType) =>{
-    if (treatmentsDialog.current) {
-      treatmentsDialog.current.setTitle('Create new');
-      treatmentsDialog.current.setShow(true);
-      treatmentsDialog.current.setDescription(null);
-      treatmentsDialog.current.setType(type);
-      treatmentsDialog.current.setOnAccepted((data)=> {
-        setAccessible(false);
-        axios.post(apiUrl, data)
-            .then(handleUpdate)
-            .catch(onError)
-            .finally(()=>setAccessible(true));
-      });
-    }
-  };
+export interface TreatmentRef {
+  editMode: boolean,
+  treatmentsDialog: RefObject<TreatmentDialogRef>,
+  add: (data: NewTreatment)=>void
+}
 
-  const handleRemoval = (id: number, type: TreatmentType) =>{
-    const data = {
-      id: id,
-    };
-    if (confirmDialog.current) {
-      confirmDialog.current.setTitle(`Remove from ${type}`);
-      confirmDialog.current.setShow(true);
-      confirmDialog.current.setOnAccept(()=> {
+export const Treatment = forwardRef(
+    (
+        props: TreatmentProps,
+        ref: Ref<TreatmentRef> ) => {
+      const [
+        editMode,
+        setEditMode,
+      ] = useReducer((mode)=>!mode, false);
+      const [accessible, setAccessible] = useState(true);
+      const onError = (e: Error | AxiosError)=>{
+        if (errorMessageAlert.current) {
+          errorMessageAlert.current.setTitle(e.name);
+          errorMessageAlert.current.setMessage(e.message);
+          errorMessageAlert.current.setShow(true);
+        }
+        console.error(e);
+      };
+      useImperativeHandle(ref, () => (
+        {
+          editMode: editMode,
+          treatmentsDialog: treatmentsDialog,
+          add: (data)=> handleCreateNew(data),
+        }
+      ), [editMode]);
+      const form = useRef<HTMLFormElement>(null);
+      useEffect(()=>{
+        if (props.onAccessibleChange) {
+          props.onAccessibleChange(!accessible);
+        }
+      }, [accessible, props.onAccessibleChange]);
+      const handleUpdate = () =>{
+        if (props.onUpdated) {
+          props.onUpdated();
+        }
+      };
+      const handleCreateNew = (data: NewTreatment)=>{
         setAccessible(false);
-        console.log(apiUrl);
-        axios.delete(apiUrl, {data: data})
+        axios.post(props.apiUrl, data)
             .then(handleUpdate)
             .catch(onError)
             .finally(()=>setAccessible(true));
-      });
-    }
-  };
-  const handleEdit = (id: number, type: TreatmentType) =>{
-    axios.get(
-        apiUrl,
-        {
-          params: {
-            treatment_id: id,
-          },
-        },
-    ).then((response: AxiosResponse<ITreatment>)=> {
-      if (treatmentsDialog.current) {
-        treatmentsDialog.current.setTitle(`Edit ${response.data.type}`);
-        treatmentsDialog.current.setShow(true);
-        treatmentsDialog.current.setDescription(response.data.message);
-        treatmentsDialog.current.setType(type);
-        treatmentsDialog.current.setOnAccepted((data)=> {
-          const putUrl = `${apiUrl}&treatment_id=${id}`;
-          setAccessible(false);
-          axios.put(putUrl, data)
-              .then(handleUpdate)
-              .catch(onError)
-              .finally(()=>setAccessible(true));
-        });
-      }
-    }).catch(onError);
-  };
-  const confirmDialog = useRef<RefConfirmDialog>(null);
-  const errorMessageAlert = useRef<RefAlertDismissible>(null);
-  const treatmentsDialog = useRef<TreatmentDialogRef>(null);
-  return (
-    <>
-      <AlertDismissible ref={errorMessageAlert}/>
-      <ConfirmDialog ref={confirmDialog}>Are you sure?</ConfirmDialog>
-      <TreatmentDialog
-        ref={treatmentsDialog}
-      />
-      <Form ref={form}>
-        <EditableListElement
-          label='Treatment Needed'
-          editMode={editMode}
-          elements={
-            apiData ? parseTreatmentType(apiData, TreatmentType.Needed): []
+      };
+      const handleOpenNewDialogBox = (type: TreatmentType) =>{
+        if (treatmentsDialog.current) {
+          treatmentsDialog.current.setTitle('Create new');
+          treatmentsDialog.current.setShow(true);
+          treatmentsDialog.current.setDescription(null);
+          treatmentsDialog.current.setType(type);
+          treatmentsDialog.current.setOnAccepted(handleCreateNew);
+        }
+      };
+
+      const handleRemoval = (id: number, type: TreatmentType) =>{
+        const data = {
+          id: id,
+        };
+        if (confirmDialog.current) {
+          confirmDialog.current.setTitle(`Remove from ${type}`);
+          confirmDialog.current.setShow(true);
+          confirmDialog.current.setOnAccept(()=> {
+            setAccessible(false);
+            console.log(props.apiUrl);
+            axios.delete(props.apiUrl, {data: data})
+                .then(handleUpdate)
+                .catch(onError)
+                .finally(()=>setAccessible(true));
+          });
+        }
+      };
+      const handleEdit = (id: number, type: TreatmentType) =>{
+        axios.get(
+            props.apiUrl,
+            {
+              params: {
+                treatment_id: id,
+              },
+            },
+        ).then((response: AxiosResponse<ITreatment>)=> {
+          if (treatmentsDialog.current) {
+            treatmentsDialog.current.setTitle(`Edit ${response.data.type}`);
+            treatmentsDialog.current.setShow(true);
+            treatmentsDialog.current.setDescription(response.data.message);
+            treatmentsDialog.current.setType(type);
+            treatmentsDialog.current.setOnAccepted((data)=> {
+              const putUrl = `${props.apiUrl}&treatment_id=${id}`;
+              setAccessible(false);
+              axios.put(putUrl, data)
+                  .then(handleUpdate)
+                  .catch(onError)
+                  .finally(()=>setAccessible(true));
+            });
           }
-          onAddElement={()=>handleNew(TreatmentType.Needed)}
-          onEdit={(id)=> handleEdit(id, TreatmentType.Needed)}
-          onRemove={(id)=> handleRemoval(id, TreatmentType.Needed)}
-        />
-        <EditableListElement
-          label='Treatment Done'
-          editMode={editMode}
-          elements={
-            apiData ? parseTreatmentType(apiData, TreatmentType.Performed): []
-          }
-          onAddElement={()=>handleNew(TreatmentType.Performed)}
-          onEdit={(id)=> handleEdit(id, TreatmentType.Performed)}
-          onRemove={(id)=> handleRemoval(id, TreatmentType.Performed)}
-        />
-        <ButtonGroup hidden={!editMode} className={'float-end'}>
-          <Button
-            variant={'outline-primary'}
-            onClick={setEditMode}
-          >
+        }).catch(onError);
+      };
+      const confirmDialog = useRef<RefConfirmDialog>(null);
+      const errorMessageAlert = useRef<RefAlertDismissible>(null);
+      const treatmentsDialog = useRef<TreatmentDialogRef>(null);
+      return (
+        <>
+          <AlertDismissible ref={errorMessageAlert}/>
+          <ConfirmDialog ref={confirmDialog}>Are you sure?</ConfirmDialog>
+          <TreatmentDialog ref={treatmentsDialog}/>
+          <Form ref={form}>
+            <EditableListElement
+              label='Treatment Needed'
+              editMode={editMode}
+              elements={
+                props.apiData ?
+                    parseTreatmentType(
+                        props.apiData,
+                        TreatmentType.Needed,
+                    ):
+                    []
+              }
+              onAddElement={()=>handleOpenNewDialogBox(TreatmentType.Needed)}
+              onEdit={(id)=> handleEdit(id, TreatmentType.Needed)}
+              onRemove={(id)=> handleRemoval(id, TreatmentType.Needed)}
+            />
+            <EditableListElement
+              label='Treatment Done'
+              editMode={editMode}
+              elements={
+                props.apiData ?
+                    parseTreatmentType(props.apiData, TreatmentType.Performed):
+                    []
+              }
+              onAddElement={()=>handleOpenNewDialogBox(TreatmentType.Performed)}
+              onEdit={(id)=> handleEdit(id, TreatmentType.Performed)}
+              onRemove={(id)=> handleRemoval(id, TreatmentType.Performed)}
+            />
+            <ButtonGroup hidden={!editMode} className={'float-end'}>
+              <Button
+                variant={'outline-primary'}
+                onClick={setEditMode}
+              >
             Done
-          </Button>
-        </ButtonGroup>
-        <ButtonGroup hidden={editMode} className={'float-end'}>
-          <Button hidden={editMode} onClick={setEditMode}>Edit</Button>
-        </ButtonGroup>
-      </Form>
-    </>
-  );
-};
+              </Button>
+            </ButtonGroup>
+            <ButtonGroup hidden={editMode} className={'float-end'}>
+              <Button hidden={editMode} onClick={setEditMode}>Edit</Button>
+            </ButtonGroup>
+          </Form>
+        </>
+      );
+    });
+Treatment.displayName = 'Treatment';
 
 interface IElement {
   content: string

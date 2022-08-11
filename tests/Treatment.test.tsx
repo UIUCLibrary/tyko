@@ -8,13 +8,14 @@ import {
   EditableListElement,
   Treatment,
   TreatmentDialog,
-  TreatmentDialogRef,
+  TreatmentDialogRef, TreatmentRef,
   TreatmentType,
 } from '../tyko/static/js/reactComponents/Treatment';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
-import React from 'react';
+import React, {createRef} from 'react';
 import {IItemMetadata} from '../tyko/static/js/reactComponents/ItemApp';
-
+import axios from 'axios';
+jest.mock('axios');
 describe('Treatment', ()=>{
   const sampleData: IItemMetadata = {
     obj_sequence: 0,
@@ -69,9 +70,41 @@ describe('Treatment', ()=>{
     fireEvent.click(screen.getByText('Done'));
     expect(screen.getByText('Edit')).toBeVisible();
   });
-  test('s', ()=>{
-    render(<Treatment apiUrl='/foo' apiData={sampleData}/>);
-    expect(1).toBe(1);
+  test('s', async () => {
+    const mockedAxios = axios as jest.Mocked<typeof axios>;
+    mockedAxios.post.mockResolvedValue({data: []});
+    const treatmentRef = createRef<TreatmentRef>();
+    const onAccessibleChange=jest.fn();
+    render(
+        <Treatment
+          ref={treatmentRef}
+          apiUrl='/foo'
+          apiData={sampleData}
+          onAccessibleChange={onAccessibleChange}
+        />,
+    );
+    if (treatmentRef.current) {
+      expect(treatmentRef.current.editMode).toBe(false);
+      expect(treatmentRef.current.treatmentsDialog.current?.visible)
+          .toBe(false);
+      const data = {
+        type: TreatmentType.Needed,
+        message: 'dummy',
+      };
+      await waitFor(()=>{
+        if (!treatmentRef.current) {
+          fail('treatmentRef ref should be available by now');
+        }
+        treatmentRef.current.add(data);
+      });
+      await waitFor(()=>expect(onAccessibleChange).toBeCalled());
+      expect(mockedAxios.post).toBeCalledWith(
+          expect.stringMatching('/foo'),
+          expect.objectContaining(
+              {'message': 'dummy', 'type': 'needed'},
+          ),
+      );
+    }
   });
 });
 describe('EditableListElement', ()=>{
