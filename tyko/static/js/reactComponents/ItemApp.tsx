@@ -15,7 +15,8 @@ import {
   submitEvent,
   submitFormUpdates,
 } from './Common';
-import {ITreatment} from '../reactComponents/Treatment';
+import {ITreatment} from './Treatment';
+import {EnumMetadata} from './FormatDetails';
 interface IEditableField{
   id?: string
   display: string | number | null
@@ -128,7 +129,9 @@ export interface IItemMetadata {
     id: number,
     name: string
     },
-  format_details: {[key: string]: string | number | null | boolean}
+  format_details: {
+    [key: string]: string | number | null | boolean | EnumMetadata
+  }
   vendor?: {
     vendor_name: string
     deliverable_received_date: string | null

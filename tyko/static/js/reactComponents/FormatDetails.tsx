@@ -10,14 +10,14 @@ import axios, {AxiosResponse} from 'axios';
 import {IItemMetadata} from './ItemApp';
 import {ApiEnum, sortNameAlpha, SelectDate} from './Items';
 import {Button, ButtonGroup} from 'react-bootstrap';
-interface EnumMetadata {
+export interface EnumMetadata {
   id: number
   name: string
 }
 
 interface Element {
   key: string,
-  value: string | number | boolean | EnumMetadata
+  value: string | number | boolean | EnumMetadata | null,
 }
 
 const createEnumField = (
@@ -1330,7 +1330,7 @@ function getTableBody(
   const items = data.map(
       (
           item: {
-          value?: string | number | boolean | EnumMetadata,
+          value?: string | number | boolean | EnumMetadata | null,
           key: string
         },
       ) => {
