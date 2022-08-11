@@ -109,5 +109,24 @@ describe('TreatmentDialog', ()=>{
       });
       expect(onCancel).toBeCalled();
     });
+    test('okay calls accept', async ()=> {
+      const onAccepted = jest.fn();
+      render(
+          <TreatmentDialog
+            ref={ref}
+            title='dummy'
+            show={true}
+            onAccepted={onAccepted}
+          />,
+      );
+      if (!ref.current) {
+        fail('The ref should be available by now');
+      }
+      const dialog = ref.current;
+      await waitFor(()=>{
+        dialog.accept();
+      });
+      expect(onAccepted).toBeCalled();
+    });
   });
 });
