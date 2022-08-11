@@ -45,6 +45,7 @@ export interface TreatmentDialogRef {
   setShow: (visible: boolean)=>void
   setType: (value: TreatmentType)=>void
   setDescription: (text: string|null)=>void
+  cancel: ()=>void
   setOnAccepted: (callback:(data: IModalAccepted)=> void)=>void,
   setOnCancel: (callback:()=> void)=>void,
 }
@@ -87,6 +88,7 @@ export const TreatmentDialog = forwardRef(
         },
         setShow: setVisible,
         visible: visible,
+        cancel: handleCanceled,
         setType(value) {
           setType(value);
         },

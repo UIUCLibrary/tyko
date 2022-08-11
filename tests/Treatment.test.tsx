@@ -91,5 +91,23 @@ describe('TreatmentDialog', ()=>{
       });
       expect(ref.current.visible).toBe(true);
     });
+    test('cancel calls onCancel', async ()=> {
+      const onCancel = jest.fn();
+      render(
+          <TreatmentDialog
+            ref={ref}
+            title='dummy'
+            show={true}
+            onCancel={onCancel}/>,
+      );
+      if (!ref.current) {
+        fail('The ref should be available by now');
+      }
+      const dialog = ref.current;
+      await waitFor(()=>{
+        dialog.cancel();
+      });
+      expect(onCancel).toBeCalled();
+    });
   });
 });
