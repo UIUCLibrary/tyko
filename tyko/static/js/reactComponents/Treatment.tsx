@@ -66,7 +66,7 @@ export const TreatmentDialog = forwardRef(
       const onAccepted = useRef(
           props.onAccepted ?
             props.onAccepted :
-            (_results: IModalAccepted) => undefined,
+            undefined,
       );
       const onRejected = useRef(
           props.onCancel ?props.onCancel : () => undefined,
@@ -102,7 +102,7 @@ export const TreatmentDialog = forwardRef(
       };
 
       const handleAccepted = () => {
-        if (onAccepted) {
+        if (onAccepted.current) {
           if (type.current) {
             onAccepted.current({
               type: type.current,
