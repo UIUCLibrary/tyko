@@ -209,6 +209,7 @@ export interface TreatmentRef {
   editMode: boolean,
   treatmentsDialog: RefObject<TreatmentDialogRef>,
   openNewDialog: (type: TreatmentType)=>void,
+  openEditDialog: (id: number, type: TreatmentType)=>void,
   add: (type: TreatmentType, message: string)=>void
   edit: (id: number, data: NewTreatment)=> void
 }
@@ -239,6 +240,7 @@ export const Treatment = forwardRef(
           ),
           edit: handleEditData,
           openNewDialog: handleOpenNewDialogBox,
+          openEditDialog: handleOpenEditDialog,
         }
       ), [editMode]);
       const form = useRef<HTMLFormElement>(null);

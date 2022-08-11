@@ -131,6 +131,32 @@ describe('Treatment', ()=>{
         ),
     );
   });
+  test('openEditDialog opens dialog', async () => {
+    const mockedAxios = axios as jest.Mocked<typeof axios>;
+    mockedAxios.get.mockResolvedValue({data: []});
+    const treatmentRef = createRef<TreatmentRef>();
+    render(
+        <Treatment
+          ref={treatmentRef}
+          apiUrl='/foo'
+          apiData={sampleData}
+        />,
+    );
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      expect(treatmentRef.current.treatmentsDialog.current?.visible)
+          .toBe(false);
+      treatmentRef.current.openEditDialog(1, TreatmentType.Needed);
+    });
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      expect(treatmentRef.current.treatmentsDialog.current?.visible).toBe(true);
+    });
+  });
   test('edit calls put', async () => {
     const mockedAxios = axios as jest.Mocked<typeof axios>;
     mockedAxios.put.mockResolvedValue({data: []});
