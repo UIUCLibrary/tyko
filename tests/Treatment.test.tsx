@@ -86,7 +86,7 @@ describe('Treatment', ()=>{
         fail('treatmentRef ref should be available by now');
       }
       expect(
-          treatmentRef.current.treatmentsDialog.current?.visible
+          treatmentRef.current.treatmentsDialog.current?.visible,
       ).toBe(false);
       treatmentRef.current.openNewDialog(TreatmentType.Needed);
     });
@@ -193,6 +193,64 @@ describe('Treatment', ()=>{
             {'message': 'dummy', 'type': TreatmentType.Performed.toString()},
         ),
     );
+  });
+  test('remove calls delete', async () => {
+    const mockedAxios = axios as jest.Mocked<typeof axios>;
+    mockedAxios.delete.mockResolvedValue({data: []});
+    const treatmentRef = createRef<TreatmentRef>();
+    const onAccessibleChange=jest.fn();
+    render(
+        <Treatment
+          ref={treatmentRef}
+          apiUrl='/foo'
+          apiData={sampleData}
+          onAccessibleChange={onAccessibleChange}
+        />,
+    );
+    if (!treatmentRef.current) {
+      fail('treatmentRef ref should be available by now');
+    }
+    expect(treatmentRef.current.confirmDialog.current?.visible)
+        .toBe(false);
+
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      treatmentRef.current.remove(1);
+    });
+    await waitFor(()=>expect(onAccessibleChange).toBeCalled());
+    expect(mockedAxios.delete).toBeCalledWith(
+        expect.stringMatching('/foo'),
+        expect.objectContaining(
+            {data: {'id': 1}},
+        ),
+    );
+  });
+  test('openRemoveDialog opens confirm', async () => {
+    const treatmentRef = createRef<TreatmentRef>();
+    render(
+        <Treatment
+          ref={treatmentRef}
+          apiUrl='/foo'
+          apiData={sampleData}
+        />,
+    );
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      expect(
+          treatmentRef.current.confirmDialog.current?.visible,
+      ).toBe(false);
+      treatmentRef.current.openConfirmDialog(1, TreatmentType.Performed);
+    });
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      expect(treatmentRef.current.confirmDialog.current?.visible).toBe(true);
+    });
   });
 });
 describe('EditableListElement', ()=>{

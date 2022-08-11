@@ -208,10 +208,13 @@ export interface TreatmentProps {
 export interface TreatmentRef {
   editMode: boolean,
   treatmentsDialog: RefObject<TreatmentDialogRef>,
+  confirmDialog: RefObject<RefConfirmDialog>,
   openNewDialog: (type: TreatmentType)=>void,
+  openConfirmDialog: (id: number, type: TreatmentType)=>void,
   openEditDialog: (id: number, type: TreatmentType)=>void,
   add: (type: TreatmentType, message: string)=>void
   edit: (id: number, data: NewTreatment)=> void
+  remove: (id: number)=> void
 }
 
 export const Treatment = forwardRef(
@@ -235,12 +238,15 @@ export const Treatment = forwardRef(
         {
           editMode: editMode,
           treatmentsDialog: treatmentsDialog,
+          confirmDialog: confirmDialog,
           add: (type: TreatmentType, message: string)=> handleCreateNew(
               {type: type, message: message},
           ),
           edit: handleEditData,
           openNewDialog: handleOpenNewDialogBox,
+          openConfirmDialog: openRemovalDialog,
           openEditDialog: handleOpenEditDialog,
+          remove: removeTreatment,
         }
       ), [editMode]);
       const form = useRef<HTMLFormElement>(null);
@@ -270,22 +276,19 @@ export const Treatment = forwardRef(
           treatmentsDialog.current.setOnAccepted(handleCreateNew);
         }
       };
+      const removeTreatment = (id: number)=> {
+        setAccessible(false);
+        axios.delete(props.apiUrl, {data: {id: id}})
+            .then(handleUpdate)
+            .catch(onError)
+            .finally(()=>setAccessible(true));
+      };
 
-      const handleRemoval = (id: number, type: TreatmentType) =>{
-        const data = {
-          id: id,
-        };
+      const openRemovalDialog = (id: number, type: TreatmentType) =>{
         if (confirmDialog.current) {
           confirmDialog.current.setTitle(`Remove from ${type}`);
           confirmDialog.current.setShow(true);
-          confirmDialog.current.setOnAccept(()=> {
-            setAccessible(false);
-            console.log(props.apiUrl);
-            axios.delete(props.apiUrl, {data: data})
-                .then(handleUpdate)
-                .catch(onError)
-                .finally(()=>setAccessible(true));
-          });
+          confirmDialog.current.setOnAccept(()=>removeTreatment(id));
         }
       };
       const handleEditData = (id: number, data: NewTreatment)=> {
@@ -338,7 +341,7 @@ export const Treatment = forwardRef(
               }
               onAddElement={()=>handleOpenNewDialogBox(TreatmentType.Needed)}
               onEdit={(id)=> handleOpenEditDialog(id, TreatmentType.Needed)}
-              onRemove={(id)=> handleRemoval(id, TreatmentType.Needed)}
+              onRemove={(id)=> openRemovalDialog(id, TreatmentType.Needed)}
             />
             <EditableListElement
               label='Treatment Done'
@@ -350,7 +353,7 @@ export const Treatment = forwardRef(
               }
               onAddElement={()=>handleOpenNewDialogBox(TreatmentType.Performed)}
               onEdit={(id)=> handleOpenEditDialog(id, TreatmentType.Performed)}
-              onRemove={(id)=> handleRemoval(id, TreatmentType.Performed)}
+              onRemove={(id)=> openRemovalDialog(id, TreatmentType.Performed)}
             />
             <ButtonGroup hidden={!editMode} className={'float-end'}>
               <Button
