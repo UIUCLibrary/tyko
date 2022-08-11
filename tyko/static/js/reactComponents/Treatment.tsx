@@ -63,14 +63,10 @@ export const TreatmentDialog = forwardRef(
       ] = useState<boolean>(props.show ? props.show : false);
       const treatmentContent = useRef<HTMLTextAreaElement>(null);
       const saveButton = useRef<HTMLButtonElement>(null);
-      const onAccepted = useRef(
-          props.onAccepted ?
-            props.onAccepted :
-            undefined,
-      );
-      const onRejected = useRef(
-          props.onCancel ?props.onCancel : () => undefined,
-      );
+      const onAccepted =
+          useRef(props.onAccepted ? props.onAccepted : undefined);
+      const onRejected =
+          useRef(props.onCancel ? props.onCancel : () => undefined);
 
       useImperativeHandle(ref, () => ({
         setOnAccepted: (callback: ((results: IModalAccepted) => void)) => {
