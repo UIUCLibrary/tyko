@@ -535,3 +535,32 @@ class TestItemDataConnector:
             session.add.call_args[0][0].name == 'spam',
             session.add.call_args[0][0].barcode == '12345'
         ])
+
+
+class TestItemDataConnector:
+    def test_add_treatment_appends(self):
+        item = Mock(formats.CollectionItem)
+        def query(*args):
+            if args[0] == formats.AVFormat:
+                return Mock(
+                        spec=Query,
+                        name='Query',
+                        filter=Mock(
+                            name='filter',
+                            return_value=Mock(
+                                one=Mock(
+                                    name='one',
+                                    return_value=item
+                                )
+                            )
+                        )
+                    )
+        session = Mock(
+            name='session',
+            spec=Session,
+            query=query
+        )
+        mock_sessionmaker = Mock(spec=sessionmaker, return_value=session)
+        connector = data_provider.ItemDataConnector(mock_sessionmaker)
+        connector.add_treatment(2, {"message": "dummy"})
+        assert item.treatments.append.called is True
