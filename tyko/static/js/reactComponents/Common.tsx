@@ -167,9 +167,9 @@ export const ConfirmDialog = forwardRef((
   const onConfirm =
       useRef(props.onAccepted ? props.onAccepted : () => undefined);
   const onCancel = useRef(props.onCancel ? props.onCancel: ()=> undefined);
-  const handleClose = ()=>{
+  const handleClose = useCallback(()=>{
     setVisible(false);
-  };
+  }, [setVisible]);
   const handleCancel = useCallback(()=>{
     onCancel.current();
     handleClose();
@@ -177,7 +177,7 @@ export const ConfirmDialog = forwardRef((
   const handleConfirm = useCallback(()=>{
     onConfirm.current();
     handleClose();
-  }, [onCancel, onConfirm]);
+  }, [handleClose, onConfirm]);
   useImperativeHandle(ref, () => (
     {
       setTitle: setTitle,
