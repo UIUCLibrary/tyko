@@ -70,6 +70,31 @@ describe('Treatment', ()=>{
     fireEvent.click(screen.getByText('Done'));
     expect(screen.getByText('Edit')).toBeVisible();
   });
+  test('openNewDialog opens dialog', async () => {
+    const treatmentRef = createRef<TreatmentRef>();
+    render(
+        <Treatment
+          ref={treatmentRef}
+          apiUrl='/foo'
+          apiData={sampleData}
+        />,
+    );
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      expect(
+          treatmentRef.current.treatmentsDialog.current?.visible
+      ).toBe(false);
+      treatmentRef.current.openNewDialog(TreatmentType.Needed);
+    });
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      expect(treatmentRef.current.treatmentsDialog.current?.visible).toBe(true);
+    });
+  });
   test('add calls post', async () => {
     const mockedAxios = axios as jest.Mocked<typeof axios>;
     mockedAxios.post.mockResolvedValue({data: []});
@@ -83,25 +108,26 @@ describe('Treatment', ()=>{
           onAccessibleChange={onAccessibleChange}
         />,
     );
-    if (treatmentRef.current) {
-      expect(treatmentRef.current.editMode).toBe(false);
-      expect(treatmentRef.current.treatmentsDialog.current?.visible)
-          .toBe(false);
-
-      await waitFor(()=>{
-        if (!treatmentRef.current) {
-          fail('treatmentRef ref should be available by now');
-        }
-        treatmentRef.current.add(TreatmentType.Needed, 'dummy');
-      });
-      await waitFor(()=>expect(onAccessibleChange).toBeCalled());
-      expect(mockedAxios.post).toBeCalledWith(
-          expect.stringMatching('/foo'),
-          expect.objectContaining(
-              {'message': 'dummy', 'type': 'needed'},
-          ),
-      );
+    if (!treatmentRef.current) {
+      fail('treatmentRef ref should be available by now');
     }
+    expect(treatmentRef.current.editMode).toBe(false);
+    expect(treatmentRef.current.treatmentsDialog.current?.visible)
+        .toBe(false);
+
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      treatmentRef.current.add(TreatmentType.Needed, 'dummy');
+    });
+    await waitFor(()=>expect(onAccessibleChange).toBeCalled());
+    expect(mockedAxios.post).toBeCalledWith(
+        expect.stringMatching('/foo'),
+        expect.objectContaining(
+            {'message': 'dummy', 'type': 'needed'},
+        ),
+    );
   });
 });
 describe('EditableListElement', ()=>{
