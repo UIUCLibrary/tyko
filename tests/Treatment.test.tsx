@@ -70,7 +70,7 @@ describe('Treatment', ()=>{
     fireEvent.click(screen.getByText('Done'));
     expect(screen.getByText('Edit')).toBeVisible();
   });
-  test('s', async () => {
+  test('add calls post', async () => {
     const mockedAxios = axios as jest.Mocked<typeof axios>;
     mockedAxios.post.mockResolvedValue({data: []});
     const treatmentRef = createRef<TreatmentRef>();
