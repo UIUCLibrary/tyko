@@ -69,30 +69,22 @@ export const TreatmentDialog = forwardRef(
           useRef(props.onCancel ? props.onCancel : () => undefined);
 
       useImperativeHandle(ref, () => ({
-        setOnAccepted: (callback: ((results: IModalAccepted) => void)) => {
-          onAccepted.current = callback;
-        },
-        setOnRejected: (callback) =>{
-          onRejected.current = callback;
-        },
+        setOnAccepted: (callback) => onAccepted.current = callback,
+        setOnRejected: (callback) => onRejected.current = callback,
         setShow: setVisible,
         visible: visible,
         reject: handleCanceled,
         accept: handleAccepted,
-        setType(value) {
-          type.current = value;
-        },
+        setType: (value) => type.current = value,
         handleClose: handleClose,
         setDescription: setDescription,
         setTitle: setTitle,
       }));
       const handleClose = () => setVisible(false);
-
       const handleCanceled = () => {
         onRejected.current();
         handleClose();
       };
-
       const handleAccepted = () => {
         if (onAccepted.current) {
           if (type.current) {
