@@ -538,6 +538,25 @@ class TestItemDataConnector:
 
 
 class TestItemDataConnector:
+    def test_remove_treatment_deletes(self, monkeypatch):
+        session = Mock(
+            name='session',
+            spec=Session,
+        )
+        mock_sessionmaker = Mock(spec=sessionmaker, return_value=session)
+        connector = data_provider.ItemDataConnector(mock_sessionmaker)
+        monkeypatch.setattr(
+            data_provider.ItemDataConnector,
+            "_get_item",
+            lambda *args, **kwargs: Mock(
+                formats.CollectionItem, treatments=[
+                    Mock(id=2)
+                ]
+            )
+        )
+        connector.remove_treatment(2, {"id": 2})
+        assert session.delete.called is True
+
     def test_add_treatment_appends(self):
         item = Mock(formats.CollectionItem)
         def query(*args):
