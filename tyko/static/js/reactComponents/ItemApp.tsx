@@ -128,7 +128,7 @@ export interface IItemMetadata {
     id: number,
     name: string
     },
-  format_details: {[key: string]: string}
+  format_details: {[key: string]: string | number | null | boolean}
   vendor?: {
     vendor_name: string
     deliverable_received_date: string | null
@@ -142,7 +142,7 @@ export interface IItemMetadata {
   barcode: string | null,
   obj_sequence: number,
   parent_object_id: number,
-  transfer_date?: string
+  transfer_date?: string,
   treatment: ITreatment[]
 }
 

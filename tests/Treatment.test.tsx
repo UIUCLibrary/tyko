@@ -13,20 +13,65 @@ import {
 } from '../tyko/static/js/reactComponents/Treatment';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import React from 'react';
+import {IItemMetadata} from '../tyko/static/js/reactComponents/ItemApp';
 
 describe('Treatment', ()=>{
+  const sampleData: IItemMetadata = {
+    obj_sequence: 0,
+    treatment: [
+      {
+        type: 'done',
+        message: 'foo',
+        item_id: 1,
+        treatment_id: 1,
+      },
+    ],
+    barcode: null,
+    files: [],
+    format: {
+      id: 4,
+      name: 'open reel',
+    },
+    format_details: {
+      base: null,
+      date_of_reel: null,
+      duration: null,
+      format_subtype: null,
+      generation: null,
+      reel_brand: null,
+      reel_diameter: null,
+      reel_size: null,
+      reel_speed: null,
+      reel_thickness: null,
+      reel_type: null,
+      reel_width: null,
+      title_of_reel: 'sample open reel',
+      track_configuration: null,
+      track_count: null,
+      wind: null,
+    },
+    format_id: 4,
+    item_id: 1,
+    name: 'sample open reel',
+    notes: [],
+    parent_object_id: 1,
+  };
   test('edit mode', ()=>{
-    render(<Treatment apiUrl='/foo'/>);
+    render(<Treatment apiUrl='/foo' apiData={sampleData}/>);
     fireEvent.click(screen.getByText('Edit'));
     expect(screen.getByText('Edit')).not.toBeVisible();
     expect(screen.getByText('Done')).toBeVisible();
   });
   test('edit mode out', ()=>{
-    render(<Treatment apiUrl='/foo'/>);
+    render(<Treatment apiUrl='/foo' apiData={sampleData}/>);
     fireEvent.click(screen.getByText('Edit'));
     expect(screen.getByText('Edit')).not.toBeVisible();
     fireEvent.click(screen.getByText('Done'));
     expect(screen.getByText('Edit')).toBeVisible();
+  });
+  test('s', ()=>{
+    render(<Treatment apiUrl='/foo' apiData={sampleData}/>);
+    expect(1).toBe(1);
   });
 });
 describe('EditableListElement', ()=>{
