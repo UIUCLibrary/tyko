@@ -17,7 +17,7 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import axios, {AxiosError, AxiosResponse} from 'axios';
 import {ConfirmDialog, RefConfirmDialog} from './Common';
 import {IItemMetadata} from '../reactComponents/ItemApp';
-enum TreatmentType {
+export enum TreatmentType {
   Needed = 'needed',
   Performed = 'done'
 }
@@ -31,7 +31,7 @@ export interface ITreatment {
   item_id: number
   treatment_id: number
 }
-interface ITreatmentDialog {
+interface PropsTreatmentDialog {
   show?: boolean
   title?: string
   onAccepted?: (results: IModalAccepted)=>void
@@ -52,22 +52,21 @@ export interface TreatmentDialogRef {
 }
 export const TreatmentDialog = forwardRef(
     (
-        props: ITreatmentDialog,
+        props: PropsTreatmentDialog,
         ref: Ref<TreatmentDialogRef> ) => {
       const [title, setTitle] = useState(props.title);
       const [description, setDescription] = useState<string|null>(null);
-      const [type, setType] = useState<TreatmentType>();
+      const type = useRef<TreatmentType>();
       const [
         visible,
         setVisible,
       ] = useState<boolean>(props.show ? props.show : false);
       const treatmentContent = useRef<HTMLTextAreaElement>(null);
       const saveButton = useRef<HTMLButtonElement>(null);
-      const [
-        onAccepted,
-        setOnAccepted,
-      ] = useState<(results: IModalAccepted)=>void>(
-          props.onAccepted? props.onAccepted : ()=> undefined,
+      const onAccepted = useRef(
+          props.onAccepted ?
+            props.onAccepted :
+            (_results: IModalAccepted) => undefined,
       );
       const [
         onCancel,
@@ -77,10 +76,8 @@ export const TreatmentDialog = forwardRef(
       });
 
       useImperativeHandle(ref, () => ({
-        setOnAccepted: (callback) => {
-          setOnAccepted(()=>{
-            return callback;
-          });
+        setOnAccepted: (callback: ((results: IModalAccepted) => void)) => {
+          onAccepted.current = callback;
         },
         setOnCancel: (callback) =>{
           setOnCancel(()=>{
@@ -92,7 +89,7 @@ export const TreatmentDialog = forwardRef(
         cancel: handleCanceled,
         accept: handleAccepted,
         setType(value) {
-          setType(value);
+          type.current = value;
         },
         handleClose() {
           handleClose();
@@ -115,9 +112,9 @@ export const TreatmentDialog = forwardRef(
 
       const handleAccepted = () => {
         if (onAccepted) {
-          if (type) {
-            onAccepted({
-              type: type,
+          if (type.current) {
+            onAccepted.current({
+              type: type.current,
               message: treatmentContent.current?.value,
             });
           }
@@ -288,7 +285,7 @@ export const Treatment = (
     if (confirmDialog.current) {
       confirmDialog.current.setTitle(`Remove from ${type}`);
       confirmDialog.current.setShow(true);
-      confirmDialog.current.setOnConfirm(()=> {
+      confirmDialog.current.setOnAccept(()=> {
         setAccessible(false);
         console.log(apiUrl);
         axios.delete(apiUrl, {data: data})

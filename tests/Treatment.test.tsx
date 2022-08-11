@@ -6,16 +6,14 @@
 import '@testing-library/jest-dom';
 import {
   EditableListElement,
+  Treatment,
   TreatmentDialog,
-  Treatment, TreatmentDialogRef,
+  TreatmentDialogRef,
+  TreatmentType,
 } from '../tyko/static/js/reactComponents/Treatment';
-import {
-  render,
-  fireEvent,
-  screen, waitFor,
-} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor,} from '@testing-library/react';
 import React from 'react';
-import {ConfirmDialog} from 'Common';
+
 describe('Treatment', ()=>{
   test('edit mode', ()=>{
     render(<Treatment apiUrl='/foo'/>);
@@ -124,9 +122,49 @@ describe('TreatmentDialog', ()=>{
       }
       const dialog = ref.current;
       await waitFor(()=>{
+        dialog.setType(TreatmentType.Performed);
         dialog.accept();
       });
       expect(onAccepted).toBeCalled();
     });
+    test('setting setOnConfirm and running accept calls onConfirm', async ()=> {
+      const onAccepted = jest.fn();
+      render(<TreatmentDialog ref={ref} title='dummy' show={true} />);
+      await waitFor(()=>{
+        return screen.getByRole('dialog');
+      });
+      await waitFor(()=>{
+        if (ref.current) {
+          ref.current.setType(TreatmentType.Performed);
+          ref.current.setOnAccepted(onAccepted);
+          ref.current.accept();
+        } else {
+          fail('The ref should be available by now');
+        }
+      });
+      await waitFor(()=>{
+        return screen.getByRole('dialog');
+      });
+      expect(onAccepted).toBeCalled();
+    });
+    test('setting setOnConfirm without running accept does not call onConfirm',
+        async ()=> {
+          const onAccepted = jest.fn();
+          render(<TreatmentDialog ref={ref} title='dummy' show={true} />);
+          await waitFor(()=>{
+            return screen.getByRole('dialog');
+          });
+          await waitFor(()=>{
+            if (ref.current) {
+              ref.current.setOnAccepted(onAccepted);
+            } else {
+              fail('The ref should be available by now');
+            }
+          });
+          await waitFor(()=>{
+            return screen.getByRole('dialog');
+          });
+          expect(onAccepted).not.toBeCalled();
+        });
   });
 });

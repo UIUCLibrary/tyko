@@ -55,7 +55,7 @@ describe('ConfirmDialog', ()=>{
             ref={ref}
             title='dummy'
             show={true}
-            onConfirm={onConfirm}/>,
+            onAccepted={onConfirm}/>,
       );
       if (!ref.current) {
         fail('The ref should be available by now');
@@ -107,7 +107,7 @@ describe('ConfirmDialog', ()=>{
       });
       await waitFor(()=>{
         if (ref.current) {
-          ref.current.setOnConfirm(onConfirm);
+          ref.current.setOnAccept(onConfirm);
           ref.current.accept();
         } else {
           fail('The ref should be available by now');
@@ -127,7 +127,7 @@ describe('ConfirmDialog', ()=>{
           });
           await waitFor(()=>{
             if (ref.current) {
-              ref.current.setOnConfirm(onConfirm);
+              ref.current.setOnAccept(onConfirm);
             } else {
               fail('The ref should be available by now');
             }
@@ -136,6 +136,6 @@ describe('ConfirmDialog', ()=>{
             return screen.getByRole('dialog');
           });
           expect(onConfirm).not.toBeCalled();
-        });
+    });
   });
 });
