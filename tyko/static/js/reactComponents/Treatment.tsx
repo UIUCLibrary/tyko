@@ -86,14 +86,10 @@ export const TreatmentDialog = forwardRef(
         setDescription: setDescription,
         setTitle: setTitle,
       }));
-      const handleClose = () => {
-        setVisible(false);
-      };
+      const handleClose = () => setVisible(false);
 
       const handleCanceled = () => {
-        if (onRejected.current) {
-          onRejected.current();
-        }
+        onRejected.current();
         handleClose();
       };
 
