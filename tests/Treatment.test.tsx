@@ -8,13 +8,15 @@ import {
   EditableListElement,
   Treatment,
   TreatmentDialog,
-  TreatmentDialogRef, TreatmentRef,
+  TreatmentDialogRef,
+  TreatmentRef,
   TreatmentType,
 } from '../tyko/static/js/reactComponents/Treatment';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import React, {createRef} from 'react';
 import {IItemMetadata} from '../tyko/static/js/reactComponents/ItemApp';
 import axios from 'axios';
+
 jest.mock('axios');
 describe('Treatment', ()=>{
   const sampleData: IItemMetadata = {
@@ -126,6 +128,43 @@ describe('Treatment', ()=>{
         expect.stringMatching('/foo'),
         expect.objectContaining(
             {'message': 'dummy', 'type': 'needed'},
+        ),
+    );
+  });
+  test('edit calls put', async () => {
+    const mockedAxios = axios as jest.Mocked<typeof axios>;
+    mockedAxios.put.mockResolvedValue({data: []});
+    const treatmentRef = createRef<TreatmentRef>();
+    const onAccessibleChange=jest.fn();
+    render(
+        <Treatment
+          ref={treatmentRef}
+          apiUrl='/foo'
+          apiData={sampleData}
+          onAccessibleChange={onAccessibleChange}
+        />,
+    );
+    if (!treatmentRef.current) {
+      fail('treatmentRef ref should be available by now');
+    }
+    expect(treatmentRef.current.editMode).toBe(false);
+    expect(treatmentRef.current.treatmentsDialog.current?.visible)
+        .toBe(false);
+
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      treatmentRef.current.edit(1, {
+        type: TreatmentType.Performed,
+        message: 'dummy'})
+      ;
+    });
+    await waitFor(()=>expect(onAccessibleChange).toBeCalled());
+    expect(mockedAxios.put).toBeCalledWith(
+        expect.stringMatching('/foo'),
+        expect.objectContaining(
+            {'message': 'dummy', 'type': TreatmentType.Performed.toString()},
         ),
     );
   });

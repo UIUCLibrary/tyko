@@ -210,6 +210,7 @@ export interface TreatmentRef {
   treatmentsDialog: RefObject<TreatmentDialogRef>,
   openNewDialog: (type: TreatmentType)=>void,
   add: (type: TreatmentType, message: string)=>void
+  edit: (id: number, data: NewTreatment)=> void
 }
 
 export const Treatment = forwardRef(
@@ -236,6 +237,7 @@ export const Treatment = forwardRef(
           add: (type: TreatmentType, message: string)=> handleCreateNew(
               {type: type, message: message},
           ),
+          edit: handleEditData,
           openNewDialog: handleOpenNewDialogBox,
         }
       ), [editMode]);
@@ -284,7 +286,15 @@ export const Treatment = forwardRef(
           });
         }
       };
-      const handleEdit = (id: number, type: TreatmentType) =>{
+      const handleEditData = (id: number, data: NewTreatment)=> {
+        const putUrl = `${props.apiUrl}&treatment_id=${id}`;
+        setAccessible(false);
+        axios.put(putUrl, data)
+            .then(handleUpdate)
+            .catch(onError)
+            .finally(()=>setAccessible(true));
+      };
+      const handleOpenEditDialog = (id: number, type: TreatmentType) =>{
         axios.get(
             props.apiUrl,
             {
@@ -298,14 +308,9 @@ export const Treatment = forwardRef(
             treatmentsDialog.current.setShow(true);
             treatmentsDialog.current.setDescription(response.data.message);
             treatmentsDialog.current.setType(type);
-            treatmentsDialog.current.setOnAccepted((data)=> {
-              const putUrl = `${props.apiUrl}&treatment_id=${id}`;
-              setAccessible(false);
-              axios.put(putUrl, data)
-                  .then(handleUpdate)
-                  .catch(onError)
-                  .finally(()=>setAccessible(true));
-            });
+            treatmentsDialog.current.setOnAccepted(
+                (data)=>handleEditData(id, data),
+            );
           }
         }).catch(onError);
       };
@@ -330,7 +335,7 @@ export const Treatment = forwardRef(
                     []
               }
               onAddElement={()=>handleOpenNewDialogBox(TreatmentType.Needed)}
-              onEdit={(id)=> handleEdit(id, TreatmentType.Needed)}
+              onEdit={(id)=> handleOpenEditDialog(id, TreatmentType.Needed)}
               onRemove={(id)=> handleRemoval(id, TreatmentType.Needed)}
             />
             <EditableListElement
@@ -342,7 +347,7 @@ export const Treatment = forwardRef(
                     []
               }
               onAddElement={()=>handleOpenNewDialogBox(TreatmentType.Performed)}
-              onEdit={(id)=> handleEdit(id, TreatmentType.Performed)}
+              onEdit={(id)=> handleOpenEditDialog(id, TreatmentType.Performed)}
               onRemove={(id)=> handleRemoval(id, TreatmentType.Performed)}
             />
             <ButtonGroup hidden={!editMode} className={'float-end'}>
