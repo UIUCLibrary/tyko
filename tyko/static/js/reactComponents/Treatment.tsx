@@ -87,9 +87,7 @@ export const TreatmentDialog = forwardRef(
           type.current = value;
         },
         handleClose: handleClose,
-        setDescription: (value) => {
-          setDescription(value);
-        },
+        setDescription: setDescription,
         setTitle: setTitle,
       }));
       const handleClose = () => {
