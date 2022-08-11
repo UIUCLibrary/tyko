@@ -87,15 +87,12 @@ describe('Treatment', ()=>{
       expect(treatmentRef.current.editMode).toBe(false);
       expect(treatmentRef.current.treatmentsDialog.current?.visible)
           .toBe(false);
-      const data = {
-        type: TreatmentType.Needed,
-        message: 'dummy',
-      };
+
       await waitFor(()=>{
         if (!treatmentRef.current) {
           fail('treatmentRef ref should be available by now');
         }
-        treatmentRef.current.add(data);
+        treatmentRef.current.add(TreatmentType.Needed, 'dummy');
       });
       await waitFor(()=>expect(onAccessibleChange).toBeCalled());
       expect(mockedAxios.post).toBeCalledWith(

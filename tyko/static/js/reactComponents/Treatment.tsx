@@ -208,7 +208,7 @@ export interface TreatmentProps {
 export interface TreatmentRef {
   editMode: boolean,
   treatmentsDialog: RefObject<TreatmentDialogRef>,
-  add: (data: NewTreatment)=>void
+  add: (type: TreatmentType, message: string)=>void
 }
 
 export const Treatment = forwardRef(
@@ -232,7 +232,9 @@ export const Treatment = forwardRef(
         {
           editMode: editMode,
           treatmentsDialog: treatmentsDialog,
-          add: (data)=> handleCreateNew(data),
+          add: (type: TreatmentType, message: string)=> handleCreateNew(
+              {type: type, message: message},
+          ),
         }
       ), [editMode]);
       const form = useRef<HTMLFormElement>(null);
