@@ -221,17 +221,19 @@ export interface RefAlertDismissible {
   setTitle: (title: string)=>void,
   setMessage: (message: string)=>void,
   setShow: (show: boolean)=>void,
+  visible: boolean
 }
 export const AlertDismissible = forwardRef((
     props: PropsAlertDismissible,
     ref: Ref<RefAlertDismissible>) =>{
-  const [show, setShow] = useState(props.display);
+  const [show, setShow] = useState(props.display ? props.display: false);
   const [title, setTitle] = useState<string|undefined>(props.title);
   const [message, setMessage] = useState<string|undefined>(props.message);
   useImperativeHandle(ref, () => ({
     setTitle: setTitle,
     setMessage: setMessage,
     setShow: setShow,
+    visible: show,
   }));
   if (show) {
     return (

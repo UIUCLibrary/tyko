@@ -3,9 +3,10 @@
  */
 'use strict';
 import '@testing-library/jest-dom';
-import {screen, render, waitFor} from '@testing-library/react';
+import {screen, render, waitFor, fireEvent} from '@testing-library/react';
 import {
-  ConfirmDialog,
+  AlertDismissible,
+  ConfirmDialog, RefAlertDismissible,
   RefConfirmDialog,
 } from '../tyko/static/js/reactComponents/Common';
 import React from 'react';
@@ -136,6 +137,23 @@ describe('ConfirmDialog', ()=>{
             return screen.getByRole('dialog');
           });
           expect(onConfirm).not.toBeCalled();
-    });
+        });
+  });
+});
+describe('AlertDismissible', ()=>{
+  test('title displayed when alert is displayed', ()=>{
+    render(<AlertDismissible title="foo" display={true}/>);
+    expect(screen.queryByText('foo')).toBeInTheDocument();
+  });
+  test('title not displayed when alert is not displayed', ()=>{
+    render(<AlertDismissible title="foo" display={false}/>);
+    expect(screen.queryByText('foo')).not.toBeInTheDocument();
+  });
+  test('window is closed displayed when alert is displayed', ()=>{
+    const ref = React.createRef<RefAlertDismissible>();
+    render(<AlertDismissible ref={ref} title="foo" display={true}/>);
+    expect(ref.current?.visible).toBe(true);
+    fireEvent.click(screen.getByLabelText('Close alert'));
+    expect(ref.current?.visible).toBe(false);
   });
 });
