@@ -12,10 +12,13 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import {ButtonGroup, CloseButton, ListGroup} from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
-import Alert from 'react-bootstrap/Alert';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import axios, {AxiosError, AxiosResponse} from 'axios';
-import {ConfirmDialog, RefConfirmDialog} from './Common';
+import {
+  ConfirmDialog,
+  RefConfirmDialog,
+  AlertDismissible,
+  RefAlertDismissible} from './Common';
 import {IItemMetadata} from '../reactComponents/ItemApp';
 export enum TreatmentType {
   Needed = 'needed',
@@ -160,38 +163,6 @@ const parseTreatmentType = (
   }
   return items;
 };
-interface PropsAlertDismissible {
-  display?: boolean
-  title?: string
-  message?: string
-}
-interface RefAlertDismissible {
-  setTitle: (title: string)=>void,
-  setMessage: (message: string)=>void,
-  setShow: (show: boolean)=>void,
-}
-const AlertDismissible = forwardRef((
-    props: PropsAlertDismissible,
-    ref: Ref<RefAlertDismissible>) =>{
-  const [show, setShow] = useState(props.display);
-  const [title, setTitle] = useState<string|undefined>(props.title);
-  const [message, setMessage] = useState<string|undefined>(props.message);
-  useImperativeHandle(ref, () => ({
-    setTitle: setTitle,
-    setMessage: setMessage,
-    setShow: setShow,
-  }));
-  if (show) {
-    return (
-      <Alert variant="danger" onClose={() => setShow(false)} dismissible>
-        <Alert.Heading>{title}</Alert.Heading>
-        <p>{message}</p>
-      </Alert>
-    );
-  }
-  return <></>;
-});
-AlertDismissible.displayName = 'AlertDismissible';
 
 export interface TreatmentProps {
   apiUrl: string,

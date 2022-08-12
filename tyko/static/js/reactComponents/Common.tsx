@@ -18,6 +18,7 @@ import React, {
 import Button from 'react-bootstrap/Button';
 import axios, {AxiosResponse} from 'axios';
 import Modal from 'react-bootstrap/Modal';
+import Alert from 'react-bootstrap/Alert';
 
 export const LoadingIndeterminate = ({message}: {message?: string}) => {
   return (
@@ -209,3 +210,37 @@ export const ConfirmDialog = forwardRef((
   );
 });
 ConfirmDialog.displayName = 'ConfirmDialog';
+
+
+export interface PropsAlertDismissible {
+  display?: boolean
+  title?: string
+  message?: string
+}
+export interface RefAlertDismissible {
+  setTitle: (title: string)=>void,
+  setMessage: (message: string)=>void,
+  setShow: (show: boolean)=>void,
+}
+export const AlertDismissible = forwardRef((
+    props: PropsAlertDismissible,
+    ref: Ref<RefAlertDismissible>) =>{
+  const [show, setShow] = useState(props.display);
+  const [title, setTitle] = useState<string|undefined>(props.title);
+  const [message, setMessage] = useState<string|undefined>(props.message);
+  useImperativeHandle(ref, () => ({
+    setTitle: setTitle,
+    setMessage: setMessage,
+    setShow: setShow,
+  }));
+  if (show) {
+    return (
+      <Alert variant="danger" onClose={() => setShow(false)} dismissible>
+        <Alert.Heading>{title}</Alert.Heading>
+        <p>{message}</p>
+      </Alert>
+    );
+  }
+  return <></>;
+});
+AlertDismissible.displayName = 'AlertDismissible';
