@@ -776,7 +776,11 @@ class ItemDataConnector(AbsNotesConnector):
                 raise DataError(f"Item with ID: {item_id} has no treatments")
 
             # Find treatment that matches the treatment ID
-            treatment = self._get_treatment_by_id(item, treatment_id)
+            treatment = self.get_treatment(
+                item_id,
+                treatment_id,
+                serialize=False
+            )
             item.treatments.remove(treatment)
             session.delete(treatment)
             session.commit()
@@ -831,7 +835,7 @@ class ItemDataConnector(AbsNotesConnector):
         finally:
             session.close()
 
-    def get_treatment(self, item_id, treatment_id: int):
+    def get_treatment(self, item_id, treatment_id: int, serialize=True):
         session = self.session_maker()
         try:
             item = session.query(schema.formats.AVFormat) \
@@ -839,7 +843,9 @@ class ItemDataConnector(AbsNotesConnector):
                 .one()
             for treatment in item.treatments:
                 if treatment.id == treatment_id:
-                    return treatment.serialize()
+                    if serialize:
+                        return treatment.serialize()
+                    return treatment
             raise DataError(
                 message=f"Item id {item_id} contains no treatment with an"
                         f" id {treatment_id}",
