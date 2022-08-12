@@ -3,6 +3,7 @@ import React, {
   useReducer,
   useRef,
   useState,
+  useCallback,
   forwardRef,
   useImperativeHandle,
   Ref, useEffect, RefObject,
@@ -202,12 +203,78 @@ export const Treatment = forwardRef(
         setEditMode,
       ] = useReducer((mode)=>!mode, false);
       const [accessible, setAccessible] = useState(true);
-      const onError = (e: Error | AxiosError)=>{
+      const treatmentsDialog = useRef<TreatmentDialogRef>(null);
+      const onError = useCallback((e: Error | AxiosError)=>{
         updateErrorMessage(errorMessageAlert, e);
         if (props.onError) {
           props.onError(e);
         }
-      };
+      }, [props]);
+      const handleUpdate = useCallback(() =>{
+        if (props.onUpdated) {
+          props.onUpdated();
+        }
+      }, [props]);
+      const handleEditData = useCallback((id: number, data: NewTreatment)=> {
+        const putUrl = `${props.apiUrl}&treatment_id=${id}`;
+        setAccessible(false);
+        axios.put(putUrl, data)
+            .then(handleUpdate)
+            .catch(onError)
+            .finally(()=>setAccessible(true));
+      }, [handleUpdate, onError, props.apiUrl]);
+      const handleCreateNew = useCallback((data: NewTreatment)=>{
+        setAccessible(false);
+        axios.post(props.apiUrl, data)
+            .then(handleUpdate)
+            .catch(onError)
+            .finally(()=>setAccessible(true));
+      }, [handleUpdate, onError, props.apiUrl]);
+      const handleOpenEditDialog =
+          useCallback((id: number, type: TreatmentType) =>{
+            axios.get(props.apiUrl, {params: {treatment_id: id}})
+                .then((response: AxiosResponse<ITreatment>)=> {
+                  if (treatmentsDialog.current) {
+                    treatmentsDialog.current.setTitle(
+                        `Edit ${response.data.type}`,
+                    );
+                    treatmentsDialog.current.setShow(true);
+                    treatmentsDialog.current.setDescription(
+                        response.data.message,
+                    );
+                    treatmentsDialog.current.setType(type);
+                    treatmentsDialog.current.setOnAccepted(
+                        (data)=>handleEditData(id, data),
+                    );
+                  }
+                })
+                .catch(onError);
+          }, [handleEditData, onError, props.apiUrl]);
+      const handleOpenNewDialogBox = useCallback((type: TreatmentType) =>{
+        if (!treatmentsDialog.current) {
+          return;
+        }
+        treatmentsDialog.current.setTitle('Create new');
+        treatmentsDialog.current.setShow(true);
+        treatmentsDialog.current.setDescription(null);
+        treatmentsDialog.current.setType(type);
+        treatmentsDialog.current.setOnAccepted(handleCreateNew);
+      }, [handleCreateNew]);
+      const removeTreatment = useCallback((id: number)=> {
+        setAccessible(false);
+        axios.delete(props.apiUrl, {data: {id: id}})
+            .then(handleUpdate)
+            .catch(onError)
+            .finally(()=>setAccessible(true));
+      }, [handleUpdate, onError, props.apiUrl]);
+      const openRemovalDialog =
+          useCallback((id: number, type: TreatmentType) =>{
+            if (confirmDialog.current) {
+              confirmDialog.current.setTitle(`Remove from ${type}`);
+              confirmDialog.current.setShow(true);
+              confirmDialog.current.setOnAccept(() => removeTreatment(id));
+            }
+          }, [removeTreatment]);
       useImperativeHandle(ref, () => (
         {
           editMode: editMode,
@@ -223,82 +290,23 @@ export const Treatment = forwardRef(
           openEditDialog: handleOpenEditDialog,
           remove: removeTreatment,
         }
-      ), [editMode]);
+      ), [
+        editMode,
+        handleCreateNew,
+        handleEditData,
+        handleOpenEditDialog,
+        handleOpenNewDialogBox,
+        openRemovalDialog,
+        removeTreatment,
+      ]);
       const form = useRef<HTMLFormElement>(null);
       useEffect(()=>{
         if (props.onAccessibleChange) {
           props.onAccessibleChange(!accessible);
         }
       }, [accessible, props.onAccessibleChange]);
-      const handleUpdate = () =>{
-        if (props.onUpdated) {
-          props.onUpdated();
-        }
-      };
-      const handleCreateNew = (data: NewTreatment)=>{
-        setAccessible(false);
-        axios.post(props.apiUrl, data)
-            .then(handleUpdate)
-            .catch(onError)
-            .finally(()=>setAccessible(true));
-      };
-      const handleOpenNewDialogBox = (type: TreatmentType) =>{
-        if (!treatmentsDialog.current) {
-          return;
-        }
-        treatmentsDialog.current.setTitle('Create new');
-        treatmentsDialog.current.setShow(true);
-        treatmentsDialog.current.setDescription(null);
-        treatmentsDialog.current.setType(type);
-        treatmentsDialog.current.setOnAccepted(handleCreateNew);
-      };
-      const removeTreatment = (id: number)=> {
-        setAccessible(false);
-        axios.delete(props.apiUrl, {data: {id: id}})
-            .then(handleUpdate)
-            .catch(onError)
-            .finally(()=>setAccessible(true));
-      };
-
-      const openRemovalDialog = (id: number, type: TreatmentType) =>{
-        if (!confirmDialog.current) {
-          return;
-        }
-        confirmDialog.current.setTitle(`Remove from ${type}`);
-        confirmDialog.current.setShow(true);
-        confirmDialog.current.setOnAccept(()=>removeTreatment(id));
-      };
-      const handleEditData = (id: number, data: NewTreatment)=> {
-        const putUrl = `${props.apiUrl}&treatment_id=${id}`;
-        setAccessible(false);
-        axios.put(putUrl, data)
-            .then(handleUpdate)
-            .catch(onError)
-            .finally(()=>setAccessible(true));
-      };
-      const handleOpenEditDialog = (id: number, type: TreatmentType) =>{
-        axios.get(
-            props.apiUrl,
-            {
-              params: {
-                treatment_id: id,
-              },
-            },
-        ).then((response: AxiosResponse<ITreatment>)=> {
-          if (treatmentsDialog.current) {
-            treatmentsDialog.current.setTitle(`Edit ${response.data.type}`);
-            treatmentsDialog.current.setShow(true);
-            treatmentsDialog.current.setDescription(response.data.message);
-            treatmentsDialog.current.setType(type);
-            treatmentsDialog.current.setOnAccepted(
-                (data)=>handleEditData(id, data),
-            );
-          }
-        }).catch(onError);
-      };
       const confirmDialog = useRef<RefConfirmDialog>(null);
       const errorMessageAlert = useRef<RefAlertDismissible>(null);
-      const treatmentsDialog = useRef<TreatmentDialogRef>(null);
       const treatmentNeededElements =
           props.apiData ?
               parseTreatmentType(props.apiData, TreatmentType.Needed):
