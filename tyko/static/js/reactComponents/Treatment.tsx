@@ -177,15 +177,9 @@ const AlertDismissible = forwardRef((
   const [title, setTitle] = useState<string|undefined>(props.title);
   const [message, setMessage] = useState<string|undefined>(props.message);
   useImperativeHandle(ref, () => ({
-    setTitle: (value) => {
-      setTitle(value);
-    },
-    setMessage: (value) => {
-      setMessage(value);
-    },
-    setShow: (value) => {
-      setShow(value);
-    },
+    setTitle: setTitle,
+    setMessage: setMessage,
+    setShow: setShow,
   }));
   if (show) {
     return (
@@ -204,11 +198,13 @@ export interface TreatmentProps {
   apiData?: IItemMetadata,
   onUpdated?: ()=>void
   onAccessibleChange? : (busy: boolean)=>void
+  onError? : (e: Error | AxiosError)=>void
 }
 export interface TreatmentRef {
   editMode: boolean,
   treatmentsDialog: RefObject<TreatmentDialogRef>,
   confirmDialog: RefObject<RefConfirmDialog>,
+  errorMessageAlert: RefObject<RefAlertDismissible>
   openNewDialog: (type: TreatmentType)=>void,
   openConfirmDialog: (id: number, type: TreatmentType)=>void,
   openEditDialog: (id: number, type: TreatmentType)=>void,
@@ -216,7 +212,16 @@ export interface TreatmentRef {
   edit: (id: number, data: NewTreatment)=> void
   remove: (id: number)=> void
 }
-
+const updateErrorMessage = (
+    alertBox: RefObject<RefAlertDismissible>,
+    error: Error | AxiosError,
+) =>{
+  if (alertBox.current) {
+    alertBox.current.setTitle(error.name);
+    alertBox.current.setMessage(error.message);
+    alertBox.current.setShow(true);
+  }
+};
 export const Treatment = forwardRef(
     (
         props: TreatmentProps,
@@ -227,10 +232,9 @@ export const Treatment = forwardRef(
       ] = useReducer((mode)=>!mode, false);
       const [accessible, setAccessible] = useState(true);
       const onError = (e: Error | AxiosError)=>{
-        if (errorMessageAlert.current) {
-          errorMessageAlert.current.setTitle(e.name);
-          errorMessageAlert.current.setMessage(e.message);
-          errorMessageAlert.current.setShow(true);
+        updateErrorMessage(errorMessageAlert, e);
+        if (props.onError) {
+          props.onError(e);
         }
         console.error(e);
       };
@@ -239,6 +243,7 @@ export const Treatment = forwardRef(
           editMode: editMode,
           treatmentsDialog: treatmentsDialog,
           confirmDialog: confirmDialog,
+          errorMessageAlert: errorMessageAlert,
           add: (type: TreatmentType, message: string)=> handleCreateNew(
               {type: type, message: message},
           ),
@@ -268,13 +273,14 @@ export const Treatment = forwardRef(
             .finally(()=>setAccessible(true));
       };
       const handleOpenNewDialogBox = (type: TreatmentType) =>{
-        if (treatmentsDialog.current) {
-          treatmentsDialog.current.setTitle('Create new');
-          treatmentsDialog.current.setShow(true);
-          treatmentsDialog.current.setDescription(null);
-          treatmentsDialog.current.setType(type);
-          treatmentsDialog.current.setOnAccepted(handleCreateNew);
+        if (!treatmentsDialog.current) {
+          return;
         }
+        treatmentsDialog.current.setTitle('Create new');
+        treatmentsDialog.current.setShow(true);
+        treatmentsDialog.current.setDescription(null);
+        treatmentsDialog.current.setType(type);
+        treatmentsDialog.current.setOnAccepted(handleCreateNew);
       };
       const removeTreatment = (id: number)=> {
         setAccessible(false);
@@ -285,11 +291,12 @@ export const Treatment = forwardRef(
       };
 
       const openRemovalDialog = (id: number, type: TreatmentType) =>{
-        if (confirmDialog.current) {
-          confirmDialog.current.setTitle(`Remove from ${type}`);
-          confirmDialog.current.setShow(true);
-          confirmDialog.current.setOnAccept(()=>removeTreatment(id));
+        if (!confirmDialog.current) {
+          return;
         }
+        confirmDialog.current.setTitle(`Remove from ${type}`);
+        confirmDialog.current.setShow(true);
+        confirmDialog.current.setOnAccept(()=>removeTreatment(id));
       };
       const handleEditData = (id: number, data: NewTreatment)=> {
         const putUrl = `${props.apiUrl}&treatment_id=${id}`;
@@ -322,6 +329,14 @@ export const Treatment = forwardRef(
       const confirmDialog = useRef<RefConfirmDialog>(null);
       const errorMessageAlert = useRef<RefAlertDismissible>(null);
       const treatmentsDialog = useRef<TreatmentDialogRef>(null);
+      const treatmentNeededElements =
+          props.apiData ?
+              parseTreatmentType(props.apiData, TreatmentType.Needed):
+              [];
+      const treatmentPerformedElements =
+          props.apiData ?
+              parseTreatmentType(props.apiData, TreatmentType.Performed):
+              [];
       return (
         <>
           <AlertDismissible ref={errorMessageAlert}/>
@@ -331,14 +346,7 @@ export const Treatment = forwardRef(
             <EditableListElement
               label='Treatment Needed'
               editMode={editMode}
-              elements={
-                props.apiData ?
-                    parseTreatmentType(
-                        props.apiData,
-                        TreatmentType.Needed,
-                    ):
-                    []
-              }
+              elements={treatmentNeededElements}
               onAddElement={()=>handleOpenNewDialogBox(TreatmentType.Needed)}
               onEdit={(id)=> handleOpenEditDialog(id, TreatmentType.Needed)}
               onRemove={(id)=> openRemovalDialog(id, TreatmentType.Needed)}
@@ -346,11 +354,7 @@ export const Treatment = forwardRef(
             <EditableListElement
               label='Treatment Done'
               editMode={editMode}
-              elements={
-                props.apiData ?
-                    parseTreatmentType(props.apiData, TreatmentType.Performed):
-                    []
-              }
+              elements={treatmentPerformedElements}
               onAddElement={()=>handleOpenNewDialogBox(TreatmentType.Performed)}
               onEdit={(id)=> handleOpenEditDialog(id, TreatmentType.Performed)}
               onRemove={(id)=> openRemovalDialog(id, TreatmentType.Performed)}

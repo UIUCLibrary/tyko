@@ -194,6 +194,44 @@ describe('Treatment', ()=>{
         ),
     );
   });
+  test('error on put makes an error message', async () => {
+    const mockedAxios = axios as jest.Mocked<typeof axios>;
+    mockedAxios.put
+        .mockRejectedValueOnce(new Error('Async error message'))
+        .mockResolvedValueOnce({data: ''});
+    const treatmentRef = createRef<TreatmentRef>();
+    const onAccessibleChange=jest.fn();
+    const onError=jest.fn();
+    render(
+        <Treatment
+          ref={treatmentRef}
+          apiUrl='/foo'
+          apiData={sampleData}
+          onAccessibleChange={onAccessibleChange}
+          onError={onError}
+        />,
+    );
+    if (!treatmentRef.current) {
+      fail('treatmentRef ref should be available by now');
+    }
+    expect(treatmentRef.current.editMode).toBe(false);
+    expect(treatmentRef.current.treatmentsDialog.current?.visible)
+        .toBe(false);
+
+    await waitFor(()=>{
+      if (!treatmentRef.current) {
+        fail('treatmentRef ref should be available by now');
+      }
+      treatmentRef.current.edit(1, {
+        type: TreatmentType.Performed,
+        message: 'dummy'})
+      ;
+      expect(onError).toBeCalled();
+    });
+    await waitFor(()=> {
+      expect(screen.getByText('Async error message')).toBeInTheDocument();
+    });
+  });
   test('remove calls delete', async () => {
     const mockedAxios = axios as jest.Mocked<typeof axios>;
     mockedAxios.delete.mockResolvedValue({data: []});
