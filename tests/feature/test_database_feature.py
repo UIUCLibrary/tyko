@@ -330,10 +330,19 @@ def test_add_treatment():
 
 @when("the new treatment record is added to the item")
 def treatment_add_to_item(dummy_database, new_item, treatment_record):
-    new_item.treatment.append(treatment_record)
+    new_item.treatments.append(treatment_record)
     dummy_database.commit()
     return dummy_database
-
+@given(
+    parsers.parse(
+        'a new treatment record is created that "{type}" "{treatment}" treatment'),
+    target_fixture='treatment_record'
+)
+def perform_treatment(type, treatment):
+    return schema.Treatment(treatment_type=type,
+                            message=treatment)
+    raise NotImplementedError(
+        u'STEP: And a new treatment record is created that needs "X, Y, Z treatment"')
 
 @given(
     parsers.parse(
@@ -357,13 +366,11 @@ def treatment_record_reads(dummy_database, needs, given):
     collection_item = dummy_database.query(
         tyko.schema.formats.CollectionItem).first()
 
-    assert len(collection_item.treatment) == 1, \
-        "Can only test if there is a single treatement record"
+    assert len(collection_item.treatments) == 1, \
+        "Can only test if there is a single treatment record"
 
-    treatment_record = collection_item.treatment[0]
-
-    assert treatment_record.needed == needs
-    assert treatment_record.given == given
+    assert collection_item.treatments[0].treatment_type == 'needs'
+    # assert collection_item.treatments[1].treatment_type == 'given'
 
 
 @scenario("database.feature", "Create a new media project")
@@ -1023,3 +1030,5 @@ def audio_cassette_inspection_date(
     cassette_date = cassette.serialize()
     assert \
         cassette_date['inspection_date'] == inspection_date
+
+

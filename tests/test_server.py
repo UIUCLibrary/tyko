@@ -372,6 +372,21 @@ class TestItemDataConnector:
             # No note with id 2
             item_provider.get_note(new_item_data['item_id'], note_id=2)
 
+    def test_add_treatment(self, item_provider, dummy_session):
+        new_item_data = item_provider.create(name="dummy", format_id=4)
+        item_provider.add_treatment(
+            item_id=new_item_data['item_id'],
+            data={
+                "type": 'done',
+                "message":'something',
+            }
+        )
+        treatments = item_provider.get(
+            id=new_item_data['item_id'],
+            serialize=True
+        )['treatment']
+        assert len(treatments) > 0
+
     def test_add_file(self, item_provider, dummy_session):
         project_provider = \
             data_provider.ProjectDataConnector(dummy_session)

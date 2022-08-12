@@ -131,7 +131,8 @@ Feature: database
     And a new Project
     And a new object for the collection
     And a new film item is created by the staff
-    And a new treatment record is created that needs "X, Y, Z treatment" and got "Y treatment only"
+    And a new treatment record is created that "needs" "X, Y, Z" treatment
+#    And a new treatment record is created that needs "X, Y, Z treatment" and got "Y treatment only"
     When the new treatment record is added to the item
     And the item is added to the object
     Then the database has 1 CollectionObject records

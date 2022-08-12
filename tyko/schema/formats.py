@@ -61,7 +61,7 @@ class AVFormat(AVTables, abc.ABC):
 
     format_type = relationship("FormatTypes", foreign_keys=[format_type_id])
     files = relationship("InstantiationFile", backref="file_source")
-    treatment = relationship("Treatment", backref="treatment_id")
+    treatments = relationship("Treatment", backref="treatment_id")
     barcode = db.Column("barcode", db.Text)
 
     vendor_name = db.Column("vendor_name", db.Text)
@@ -78,6 +78,9 @@ class AVFormat(AVTables, abc.ABC):
                     "id": file_.file_id,
                     "generation": file_.generation
                 }
+
+    def _iter_treatment(self):
+        yield from self.treatments
 
     def _iter_notes(self):
         yield from self.notes
@@ -109,6 +112,9 @@ class AVFormat(AVTables, abc.ABC):
             "obj_sequence": self.obj_sequence,
             "notes": [note.serialize() for note in self._iter_notes()],
             "barcode": self.barcode,
+            "treatment": [
+                treatment.serialize() for treatment in self._iter_treatment()
+            ],
         }
 
         try:

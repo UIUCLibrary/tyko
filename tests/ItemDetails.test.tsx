@@ -52,6 +52,7 @@ describe('ItemDetails', () => {
                 notes: [],
                 obj_sequence: null,
                 parent_object_id: 1,
+                treatment: [],
                 transfer_date: null,
               },
             },

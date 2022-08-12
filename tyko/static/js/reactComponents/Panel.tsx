@@ -42,7 +42,7 @@ export function InactiveCover(
           position: 'absolute',
           left: 0,
           top: 0,
-          zIndex: 0,
+          zIndex: 10,
           opacity: '75%',
         }
       }

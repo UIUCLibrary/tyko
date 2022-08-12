@@ -16,7 +16,7 @@ import Panel from './reactComponents/Panel';
 import {LoadingIndeterminate} from './reactComponents/Common';
 import {ProjectDetailDetails} from './reactComponents/ProjectDetails';
 import {ObjectDetails} from './reactComponents/ObjectDetails';
-
+import {Treatment} from './reactComponents/Treatment';
 
 import('bootstrap');
 import('bootstrap-table');
@@ -216,6 +216,7 @@ function loadReactComponents() {
     });
   }
 
+
   const itemDetails = document.getElementById('itemDetails');
   if (itemDetails) {
     const root = createRoot(itemDetails);
@@ -237,6 +238,34 @@ function loadReactComponents() {
           </Panel>,
       );
     });
+  }
+  const itemTreatmentDetails = document.getElementById('itemTreatmentDetails');
+  if (itemTreatmentDetails) {
+    const root = createRoot(itemTreatmentDetails);
+    root.render(
+          <div className="card my-1">
+            <div id="TreatmentHeader"
+                 className="card-header">Treatment</div>
+            <div className="card-body">Loading ...</div>
+        </div>
+      );
+    axios.get(itemTreatmentDetails.dataset.tykoApiUrl).then(
+        (data) =>{
+          root.render(
+              <div className="card my-1">
+                <div id="TreatmentHeader"
+                     className="card-header">Treatment</div>
+                <div className="card-body">
+                  <Treatment
+                    apiUrl={itemTreatmentDetails.dataset.tykoApiTreatment}
+                    apiData={data.data.item}
+                    onUpdated={()=> {location.reload();}}
+                />
+                </div>
+            </div>
+          );
+        }
+    )
   }
 
   const aboutComponent = document.getElementById('aboutApp');
