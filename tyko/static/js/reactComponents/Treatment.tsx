@@ -236,7 +236,6 @@ export const Treatment = forwardRef(
         if (props.onError) {
           props.onError(e);
         }
-        console.error(e);
       };
       useImperativeHandle(ref, () => (
         {
