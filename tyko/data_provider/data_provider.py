@@ -776,13 +776,10 @@ class ItemDataConnector(AbsNotesConnector):
                 raise DataError(f"Item with ID: {item_id} has no treatments")
 
             # Find treatment that matches the treatment ID
-            treatment = self.get_treatment(
-                item_id,
-                treatment_id,
-                serialize=False
-            )
-            item.treatments.remove(treatment)
-            session.delete(treatment)
+            for treatment in item.treatments:
+                if treatment.id == treatment_id:
+                    item.treatments.remove(treatment)
+                    session.delete(treatment)
             session.commit()
             return self._get_item(item_id, session).serialize()
 

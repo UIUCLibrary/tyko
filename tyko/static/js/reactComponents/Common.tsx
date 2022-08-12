@@ -194,7 +194,7 @@ export const ConfirmDialog = forwardRef((
         onCancel.current = callback;
       },
     }
-  ), [visible, handleConfirm, handleCancel]);
+  ), [visible, handleConfirm, handleCancel, handleClose]);
   return (
     <Modal show={visible}>
       <Modal.Header>
