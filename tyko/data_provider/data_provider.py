@@ -831,16 +831,9 @@ class ItemDataConnector(AbsNotesConnector):
         finally:
             session.close()
 
-    def get_treatment(self, item_id, data):
-        treatment_id = data.get("treatment_id")
-        if not treatment_id:
-            raise AttributeError('missing id')
-        treatment_id = int(treatment_id)
+    def get_treatment(self, item_id, treatment_id: int):
         session = self.session_maker()
         try:
-            new_treatment = Treatment()
-            new_treatment.message = data.get('message')
-            new_treatment.treatment_type = data.get('type')
             item = session.query(schema.formats.AVFormat) \
                 .filter(schema.formats.AVFormat.table_id == item_id) \
                 .one()

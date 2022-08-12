@@ -259,10 +259,11 @@ class ObjectItemTreatmentAPI(views.MethodView):
     def get(self, project_id, object_id, item_id):
         data_connector = \
             data_provider.ItemDataConnector(self._provider.db_session_maker)
-        return data_connector.get_treatment(
-            item_id,
-            data=request.args
-        )
+        treatment_id = request.args.get("treatment_id")
+        if not treatment_id:
+            raise AttributeError('missing id')
+        treatment_id = int(treatment_id)
+        return data_connector.get_treatment(item_id, treatment_id)
 
     def post(self, project_id, object_id, item_id):
         data_connector = \

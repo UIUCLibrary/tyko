@@ -7,7 +7,7 @@ import tyko.data_provider.formats
 from tyko import data_provider
 from tyko.schema import objects, formats
 import tyko
-from tyko.exceptions import NotValidRequest
+from tyko.exceptions import NotValidRequest, DataError
 
 
 class TestOpticalDataConnector:
@@ -536,9 +536,8 @@ class TestItemDataConnector:
             session.add.call_args[0][0].barcode == '12345'
         ])
 
-
-class TestItemDataConnector:
     def test_remove_treatment_deletes(self, monkeypatch):
+
         session = Mock(
             name='session',
             spec=Session,
@@ -583,3 +582,70 @@ class TestItemDataConnector:
         connector = data_provider.ItemDataConnector(mock_sessionmaker)
         connector.add_treatment(2, {"message": "dummy"})
         assert item.treatments.append.called is True
+    def test_get_treatment(self):
+
+        mock_treatment = Mock(id=2, serialize=Mock(return_value={"id":2}))
+        item = Mock(
+            formats.CollectionItem,
+            treatments=[
+                Mock(id=1, serialize=Mock(return_value={"id": 1})),
+                mock_treatment,
+            ]
+        )
+
+        def query(*args):
+            if args[0] == formats.AVFormat:
+                return Mock(
+                    spec=Query,
+                    name='Query',
+                    filter=Mock(
+                        name='filter',
+                        return_value=Mock(
+                            one=Mock(
+                                name='one',
+                                return_value=item
+                            )
+                        )
+                    )
+                )
+        session = Mock(
+            name='session',
+            spec=Session,
+            query=query
+        )
+        mock_sessionmaker = Mock(spec=sessionmaker, return_value=session)
+        connector = data_provider.ItemDataConnector(mock_sessionmaker)
+        treatment = connector.get_treatment(item_id=1, treatment_id=2)
+        assert treatment['id'] == 2
+
+    def test_get_treatment_invalid_raises_exception(self):
+
+        item = Mock(
+            formats.CollectionItem,
+            treatments=[]
+        )
+
+        def query(*args):
+            if args[0] == formats.AVFormat:
+                return Mock(
+                    spec=Query,
+                    name='Query',
+                    filter=Mock(
+                        name='filter',
+                        return_value=Mock(
+                            one=Mock(
+                                name='one',
+                                return_value=item
+                            )
+                        )
+                    )
+                )
+        session = Mock(
+            name='session',
+            spec=Session,
+            query=query
+        )
+        mock_sessionmaker = Mock(spec=sessionmaker, return_value=session)
+        connector = data_provider.ItemDataConnector(mock_sessionmaker)
+        with pytest.raises(DataError):
+            connector.get_treatment(item_id=1, treatment_id=3)
