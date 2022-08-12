@@ -1,11 +1,13 @@
 import json
 from typing import Dict
+from unittest.mock import Mock
 
 import pytest
-from flask import url_for, Flask
+from flask import url_for, Flask, request
 
 from tyko.schema.formats import format_types
-
+from tyko.views import object_item
+from tyko.data_provider import DataProvider
 
 def test_project_create_and_delete(app):
     with app.test_client() as server:
@@ -1504,3 +1506,50 @@ class TestItemTreatment:
         )
         response = server.get(item_api_url).get_json()
         assert response['treatment'][0]['message'] == 'bacon'
+
+
+class TestObjectItemTreatmentAPI:
+    @pytest.fixture()
+    def simple_app(self):
+        app = Flask(__name__, template_folder="../tyko/templates")
+        app.config.update({
+            "TESTING": True,
+            "SQLALCHEMY_TRACK_MODIFICATIONS": False
+        })
+        yield app
+
+    @pytest.fixture()
+    def client(self, simple_app):
+        return simple_app.test_client()
+
+    def test_treatment_get(self, monkeypatch, simple_app):
+        item = Mock(name="Item", treatments=[
+            Mock(id=1, serialize=Mock(return_value={"treatment_id": 1}))
+        ])
+        data_provider = Mock(
+            spec=DataProvider,
+            db_session_maker=Mock(
+                name='db_session_maker',
+                return_value=Mock(
+                    name="session",
+                    query=Mock(return_value=Mock(
+                        name="query",
+                        filter=Mock(return_value=Mock(
+                            name="filter",
+                            one=Mock(return_value=item)
+                        ))
+                    ))
+                )
+            )
+        )
+        view = object_item.ObjectItemTreatmentAPI(
+            provider=data_provider
+        ).as_view('dummy', provider=data_provider)
+        simple_app.add_url_rule(
+            '/dummy/<int:project_id>/<int:object_id>/<int:item_id>',
+            view_func=view
+        )
+        with simple_app.test_client() as client:
+            response = client.get("/dummy/1/1/1?item_id=1&treatment_id=1")
+            assert response.get_json()['treatment_id'] == 1
+
