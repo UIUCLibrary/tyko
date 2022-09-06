@@ -10,68 +10,6 @@
     <div id="itemVendorDetails" data-tyko-api-url="{{ url_for('api.item', item_id=item['item_id'] ) }}"></div>
 {% endblock %}
 
-{% macro casstte_display(data) %}
-    <table class="table table-sm" id="formatDetails">
-        <caption hidden>Cassette Data</caption>
-        <thead hidden>
-            <tr>
-                <th scope="col">Key</th>
-                <th scope="col">Value</th>
-                <th scope="col">Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr id="cassetteAudioType"
-                class="tyko-metadata-entity tyko-metadata-entity-editable tyko-metadata-entity-enum"
-                data-name="Audio Type"
-                data-displaydata="{{ data['cassette_type']['name'] }}"
-                data-value="{{ data['cassette_type']['id'] }}"
-                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
-                data-metadatakey="format_details.format_type_id"
-            >
-            </tr>
-            <tr class="tyko-metadata-entity tyko-metadata-entity-editable tyko-metadata-entity-fulldate"
-                data-name="Inspection Date"
-                data-displaydata="{{ data['inspection_date'] }}"
-                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
-                data-metadatakey="format_details.inspection_date"
-            >
-            </tr>
-            <tr class="tyko-metadata-entity tyko-metadata-entity-editable"
-                data-name="Date Recorded"
-                data-displaydata="{{ data['date_recorded'] }}"
-                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
-                data-metadatakey="format_details.date_recorded"
-            >
-            </tr>
-            <tr id="rowTapeTape"
-                class="tyko-metadata-entity tyko-metadata-entity-editable tyko-metadata-entity-enum"
-                data-name="Tape Type"
-                data-displaydata="{{ data['tape_type']['name'] if 'tape_type' in data}}"
-                data-value="{{ data['tape_type']['id'] if 'id' in data}}"
-                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
-                data-metadatakey="format_details.tape_type_id"
-            >
-            </tr>
-            <tr id="cassetteTapeThickness"
-                class="tyko-metadata-entity tyko-metadata-entity-editable tyko-metadata-entity-enum"
-                data-name="Tape Thickness"
-                {% if 'tape_thickness' in data %}
-                data-displaydata="{{ data['tape_thickness']['value']}}{{ " "~data['tape_thickness']['unit'] if data['tape_thickness']['unit'] else ""}} "
-                {% else %}
-                data-displaydata=""
-                {% endif %}
-                data-value="{{ data['tape_thickness']['id'] if data['tape_thickness']['id'] else "" }}"
-                data-apiroute="{{ url_for("api.object_item", project_id=project_id, object_id=object_id, item_id=item['item_id']) }}"
-                data-metadatakey="format_details.tape_thickness_id"
-            >
-            </tr>
-        </tbody>
-    </table>
-    <script type="module" src="{{ url_for('static', filename='js/metadataWidgets.mjs')}}"></script>
-
-
-{% endmacro %}
 {% block secondary_details %}
     <div id="itemTreatmentDetails"
          data-tyko-api-treatment="{{ url_for('api.item_treatment', item_id=item['item_id'], object_id=object_id, project_id=project_id ) }}"
