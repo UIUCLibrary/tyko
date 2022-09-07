@@ -233,11 +233,15 @@ export const FilesDialog = forwardRef(
           <Modal.Body>
             <Form>
               <Form.Group className="mb-3 row">
-                <Form.Label className="col-sm-2 col-form-label">
+                <Form.Label
+                  className="col-sm-2 col-form-label"
+                  htmlFor='fileName'
+                >
                   File Name
                 </Form.Label>
                 <Form.Group className="col-sm-10">
                   <Form.Control
+                    id='fileName'
                     ref={fileNameContent}
                     autoFocus={true}
                     onChange={validateContent}
@@ -304,11 +308,19 @@ export const Files = forwardRef(
 
       const removeFile = useCallback((id: number)=>{
         setAccessible(false);
+        if (props.onAccessibleChange) {
+          props.onAccessibleChange(false);
+        }
         const url = `${props.apiUrl}?id=${id}`;
         axios.delete(url, {data: {id: id}})
             .then(handleUpdate)
             .catch(onError)
-            .finally(()=>setAccessible(true));
+            .finally(()=> {
+              setAccessible(true);
+              if (props.onAccessibleChange) {
+                props.onAccessibleChange(true);
+              }
+            });
       }, [handleUpdate, onError, props.apiUrl]);
       const handleOpenEditDialog = useCallback((url: string) =>{
         window.location.href = url;
@@ -346,6 +358,9 @@ export const Files = forwardRef(
       };
       const handleNewFile = useCallback((data: NewFile) => {
         setAccessible(false);
+        if (props.onAccessibleChange) {
+          props.onAccessibleChange(false);
+        }
         axios.post(
             props.apiUrl,
             {
@@ -357,6 +372,9 @@ export const Files = forwardRef(
             .catch(onError)
             .finally(()=>{
               setAccessible(true);
+              if (props.onAccessibleChange) {
+                props.onAccessibleChange(true);
+              }
             });
       }, [onError, handelOnUpdated, props.apiUrl]);
       const handleOpenNewDialogBox = useCallback(()=>{
