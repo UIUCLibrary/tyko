@@ -17,6 +17,7 @@ import {LoadingIndeterminate} from './reactComponents/Common';
 import {ProjectDetailDetails} from './reactComponents/ProjectDetails';
 import {ObjectDetails} from './reactComponents/ObjectDetails';
 import {Treatment} from './reactComponents/Treatment';
+import {Files} from './reactComponents/Files';
 
 import('bootstrap');
 import('bootstrap-table');
@@ -266,6 +267,34 @@ function loadReactComponents() {
           );
         }
     )
+  }
+  const itemFilesDetails = document.getElementById('itemFilesDetails');
+  if (itemFilesDetails) {
+    const root = createRoot(itemFilesDetails);
+    root.render(
+          <div className="card my-1">
+            <div id="FilesHeader"
+                 className="card-header">Files</div>
+            <div className="card-body">Loading ...</div>
+        </div>
+      );
+    axios.get(itemFilesDetails.dataset.tykoApiUrl).then(
+        (data) =>{
+          root.render(
+              <div className="card my-1">
+                <div id="FilesHeader"
+                     className="card-header">Files</div>
+                <div className="card-body">
+                  <Files
+                    apiUrl={itemFilesDetails.dataset.tykoApiFiles}
+                    apiData={data.data.item}
+                    onUpdated={()=> {location.reload();}}
+                />
+                </div>
+            </div>
+          );
+        }
+    ).catch(console.error)
   }
 
   const aboutComponent = document.getElementById('aboutApp');

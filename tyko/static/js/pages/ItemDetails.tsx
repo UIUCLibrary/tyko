@@ -10,6 +10,8 @@ import axios from 'axios';
 import {LoadingIndeterminate} from '../reactComponents/Common';
 import {VendorDataEdit} from '../reactComponents/Vendor';
 import {Treatment} from '../reactComponents/Treatment';
+import {Files} from '../reactComponents/Files';
+
 /**
  * Item details
  * @constructor
@@ -80,7 +82,19 @@ export default function ItemDetails() {
       apiData={apiData}
       apiUrl={apiUrl}
       onUpdated={()=>setApiData(undefined)}/>;
-    filesPanel = <>do stuff here</>;
+    const filesURL = (projectId && objectId && itemId) ?
+        `/api/project/${projectId}/object/${objectId}/item/${itemId}/files`: '';
+
+    filesPanel = (
+      <>
+        <Files
+          apiUrl={filesURL}
+          apiData={apiData}
+          onUpdated={()=>{
+            setApiData(undefined);
+          }}/>
+      </>
+    );
     notesPanel = <>do stuff here</>;
   }
   const vendorInfo = apiData?.vendor ?
