@@ -41,6 +41,7 @@ interface IEditableRollProps {
   link: string,
   onRemove?: (id: number, itemDisplayName?:string)=>void
   onEdit?: (link: string)=>void,
+  editMode?: boolean,
 }
 
 export const EditableRow: FC<IEditableRollProps> = (
@@ -51,6 +52,7 @@ export const EditableRow: FC<IEditableRollProps> = (
       link,
       onRemove,
       onEdit,
+      editMode,
     },
 )=>{
   const handleEdit = () => {
@@ -63,23 +65,26 @@ export const EditableRow: FC<IEditableRollProps> = (
       onRemove(id, fileName);
     }
   };
+  const editButton = (
+    <DropdownButton title='' size='sm' variant='secondary'>
+      <Dropdown.Item size='sm' onClick={handleEdit}>Edit</Dropdown.Item>
+      <Dropdown.Item
+        size='sm'
+        onClick={()=>handleRemoval(fileId)}
+      >Remove</Dropdown.Item>
+    </DropdownButton>
+  );
   return (
     <tr>
       <td>{generation}</td>
       <td><a href={link}>{fileName}</a></td>
       <td>
-        <div className={'float-end'}>
-          <DropdownButton title='' size='sm' variant='secondary'>
-            <Dropdown.Item
-              size='sm'
-              onClick={handleEdit}
-            >Edit</Dropdown.Item>
-            <Dropdown.Item
-              size='sm'
-              onClick={()=>handleRemoval(fileId)}
-            >Remove</Dropdown.Item>
-          </DropdownButton>
-        </div>
+        {
+            editMode ?
+            <div className={'float-end'}>{editButton}</div> :
+                <div></div>
+        }
+
       </td>
     </tr>
   );
@@ -330,6 +335,7 @@ export const Files = forwardRef(
             link={file.routes.frontend}
             onEdit={handleOpenEditDialog}
             onRemove={openConfirmRemovalDialog}
+            editMode={editMode}
           />
         );
       });
