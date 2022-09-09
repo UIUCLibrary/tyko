@@ -28,9 +28,8 @@ describe('Files', ()=> {
     fireEvent.click(screen.getByText('Done'));
     expect(screen.getByText('Edit')).toBeVisible();
   });
-  test('remove', async ()=>{
-    const onAccessibleChange = jest.fn();
-    const data: IItemMetadata = {
+  describe('optionsMenu', ()=>{
+    const itemMetadata: IItemMetadata = {
       barcode: null,
       format_details: {},
       format_id: 0,
@@ -56,56 +55,88 @@ describe('Files', ()=> {
         name: 'foo',
       },
     };
-    const mockedAxios = axios as jest.Mocked<typeof axios>;
-    mockedAxios.delete.mockResolvedValue({});
-    const onUpdated = jest.fn();
-    render(
-        <Files
-          apiUrl='/foo'
-          onAccessibleChange={onAccessibleChange}
-          onUpdated={onUpdated}
-          apiData={data}
-        />,
-    );
-    fireEvent.click(screen.getByText('Edit'));
-    const row = screen.getByRole(
-        'cell', {name: 'bar'},
-    ).closest('tr') as HTMLTableRowElement;
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    test('remove', async ()=>{
+      const onAccessibleChange = jest.fn();
+      const mockedAxios = axios as jest.Mocked<typeof axios>;
+      mockedAxios.delete.mockResolvedValueOnce({});
+      const onUpdated = jest.fn();
+      render(
+          <Files
+            apiUrl='/foo'
+            onAccessibleChange={onAccessibleChange}
+            onUpdated={onUpdated}
+            apiData={itemMetadata}
+          />,
+      );
+      fireEvent.click(screen.getByText('Edit'));
+      const row = screen.getByRole(
+          'cell', {name: 'bar'},
+      ).closest('tr') as HTMLTableRowElement;
 
-    fireEvent.click(
-        within(within(row).getByRole('optionsMenu')).getByRole('button'),
-    );
-    fireEvent.click(within(row).getByText('Remove'));
-    fireEvent.click(within(screen.getByRole('dialog')).getByText('Remove'));
-    await waitFor(onUpdated);
-    await waitFor(()=> {
-      expect(mockedAxios.delete)
-          .toBeCalledWith('/foo?id=1', {'data': {'id': 1}});
-      return onUpdated;
+      fireEvent.click(
+          within(within(row).getByRole('optionsMenu')).getByRole('button'),
+      );
+      fireEvent.click(within(row).getByText('Remove'));
+      fireEvent.click(within(screen.getByRole('dialog')).getByText('Remove'));
+      await waitFor(()=> {
+        expect(mockedAxios.delete)
+            .toBeCalledWith('/foo?id=1', {'data': {'id': 1}});
+      });
+      await waitFor(onUpdated);
     });
-  });
-  test('add', async ()=>{
-    const onAccessibleChange = jest.fn();
-    render(<Files apiUrl='/foo' onAccessibleChange={onAccessibleChange}/>);
-    fireEvent.click(screen.getByText('Edit'));
-    fireEvent.click(screen.getByText('Add'));
-    fireEvent.change(
-        screen.getByLabelText('File Name'),
-        {target: {value: '123123'}},
-    );
-    const mockedAxios = axios as jest.Mocked<typeof axios>;
-    mockedAxios.post.mockResolvedValue({data: []});
-    fireEvent.click(screen.getByText('Save'));
-    await waitFor(()=>{
-      expect(mockedAxios.post)
-          .toBeCalledWith(
-              '/foo',
-              {
-                'file_name': '123123',
-                'generation': 'Access',
-              },
-          );
+    test('remove cancelled', async ()=>{
+      const onAccessibleChange = jest.fn();
+      const mockedAxios = axios as jest.Mocked<typeof axios>;
+      mockedAxios.delete.mockResolvedValueOnce({});
+      const onUpdated = jest.fn();
+      render(
+          <Files
+            apiUrl='/foo'
+            onAccessibleChange={onAccessibleChange}
+            onUpdated={onUpdated}
+            apiData={itemMetadata}
+          />,
+      );
+      fireEvent.click(screen.getByText('Edit'));
+      const row = screen.getByRole(
+          'cell', {name: 'bar'},
+      ).closest('tr') as HTMLTableRowElement;
+
+      fireEvent.click(
+          within(within(row).getByRole('optionsMenu')).getByRole('button'),
+      );
+      fireEvent.click(within(row).getByText('Remove'));
+      fireEvent.click(within(screen.getByRole('dialog')).getByText('Cancel'));
+      await waitFor(()=> {
+        expect(mockedAxios.delete).not.toBeCalled();
+      });
     });
-    await waitFor(()=>expect(onAccessibleChange).toBeCalled());
-  });
+    test('add', async ()=>{
+      const onAccessibleChange = jest.fn();
+      render(<Files apiUrl='/foo' onAccessibleChange={onAccessibleChange}/>);
+      fireEvent.click(screen.getByText('Edit'));
+      fireEvent.click(screen.getByText('Add'));
+      fireEvent.change(
+          screen.getByLabelText('File Name'),
+          {target: {value: '123123'}},
+      );
+      const mockedAxios = axios as jest.Mocked<typeof axios>;
+      mockedAxios.post.mockResolvedValue({data: []});
+      fireEvent.click(screen.getByText('Save'));
+      await waitFor(()=>{
+        expect(mockedAxios.post)
+            .toBeCalledWith(
+                '/foo',
+                {
+                  'file_name': '123123',
+                  'generation': 'Access',
+                },
+            );
+      });
+      await waitFor(()=>expect(onAccessibleChange).toBeCalled());
+    });
+  })
 });
