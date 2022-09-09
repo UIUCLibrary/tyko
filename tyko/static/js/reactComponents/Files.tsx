@@ -14,12 +14,11 @@ import {
   AlertDismissible, ConfirmDialog,
   RefAlertDismissible,
   RefConfirmDialog,
+  EditOptionsDropDown,
 } from './Common';
 import Table from 'react-bootstrap/Table';
 import {ButtonGroup, CloseButton} from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 export interface FileProps {
@@ -65,15 +64,6 @@ export const EditableRow: FC<IEditableRollProps> = (
       onRemove(id, fileName);
     }
   };
-  const editButton = (
-    <DropdownButton role='optionsMenu' title='' size='sm' variant='secondary'>
-      <Dropdown.Item size='sm' onClick={handleEdit}>Edit</Dropdown.Item>
-      <Dropdown.Item
-        size='sm'
-        onClick={()=>handleRemoval(fileId)}
-      >Remove</Dropdown.Item>
-    </DropdownButton>
-  );
   return (
     <tr>
       <td>{generation}</td>
@@ -81,10 +71,13 @@ export const EditableRow: FC<IEditableRollProps> = (
       <td>
         {
             editMode ?
-            <div className={'float-end'}>{editButton}</div> :
+            <div className={'float-end'}>
+              <EditOptionsDropDown
+                onEdit={handleEdit}
+                onRemoval={()=>handleRemoval(fileId)}/>
+            </div> :
                 <div></div>
         }
-
       </td>
     </tr>
   );

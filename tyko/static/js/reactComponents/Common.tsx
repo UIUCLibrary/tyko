@@ -19,6 +19,8 @@ import Button from 'react-bootstrap/Button';
 import axios, {AxiosResponse} from 'axios';
 import Modal from 'react-bootstrap/Modal';
 import Alert from 'react-bootstrap/Alert';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 export const LoadingIndeterminate = ({message}: {message?: string}) => {
   return (
@@ -246,3 +248,24 @@ export const AlertDismissible = forwardRef((
   return <></>;
 });
 AlertDismissible.displayName = 'AlertDismissible';
+
+
+interface EditOptionsDropDownProps {
+  onRemoval: ()=>void
+  onEdit: ()=>void
+}
+export const EditOptionsDropDown: FC<EditOptionsDropDownProps> = (
+    {onRemoval, onEdit},
+)=>{
+  return (
+    <DropdownButton role='optionsMenu' title='' size='sm' variant='secondary'>
+      <Dropdown.Item size='sm' onClick={onEdit}>
+        Edit
+      </Dropdown.Item>
+      <Dropdown.Item
+        size='sm'
+        onClick={onRemoval}
+      >Remove</Dropdown.Item>
+    </DropdownButton>
+  );
+};
