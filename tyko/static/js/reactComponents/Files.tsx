@@ -177,20 +177,13 @@ export const FilesDialog = forwardRef(
         handleClose();
       };
       const handleAccepted = useCallback(() => {
-        if (onAccepted.current) {
-          const fileNameValue = fileNameContent.current ?
-                fileNameContent.current.value :
-                '';
-          const gen = generationSelection.current ?
-            generationSelection.current.value :
-            '';
-          onAccepted.current({
-            generation: gen,
-            fileName: fileNameValue,
-          });
-        }
+        defaultAccepted(
+            onAccepted.current,
+            fileNameContent.current,
+            generationSelection.current,
+        );
         handleClose();
-      }, [fileName, generation]);
+      },[]);
       const validateContent = () =>{
         if (
           saveButton.current &&
@@ -312,7 +305,7 @@ export const Files = forwardRef(
         editMode: editMode,
         errorMessageAlert: errorMessageAlert,
         forwardingUrl: forwardingUrl,
-      }),[forwardingUrl]);
+      }), [forwardingUrl]);
       const removeFile = useCallback((id: number)=>{
         setAccessible(false);
         if (props.onAccessibleChange) {
@@ -436,3 +429,25 @@ export const Files = forwardRef(
 );
 
 Files.displayName = 'Files';
+
+const defaultAccepted = (
+    onAccepted: ((data: NewFile)=>void) | undefined,
+    fileNameElement: HTMLInputElement | null,
+    generationElement: HTMLSelectElement | null,
+) =>{
+  if (!fileNameElement) {
+    return;
+  }
+  if (!generationElement) {
+    return;
+  }
+  const generation = generationElement? generationElement.value : '';
+  const fileName = fileNameElement ? fileNameElement.value: '';
+  if (onAccepted) {
+    onAccepted({
+      generation: generation,
+      fileName: fileName,
+    });
+  }
+};
+
