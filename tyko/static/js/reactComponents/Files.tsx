@@ -308,7 +308,7 @@ export const Files = forwardRef(
         editMode: editMode,
         errorMessageAlert: errorMessageAlert,
         forwardingUrl: forwardingUrl,
-      }), [forwardingUrl]);
+      }), [forwardingUrl, editMode]);
       const removeFile = useCallback((id: number)=>{
         setAccessible(false);
         if (props.onAccessibleChange) {
