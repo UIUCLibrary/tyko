@@ -5,8 +5,10 @@
 'use strict';
 import '@testing-library/jest-dom';
 import {Files} from '../tyko/static/js/reactComponents/Files';
+import {within} from '@testing-library/dom';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import axios from 'axios';
+import {IItemMetadata} from 'ItemApp';
 
 jest.mock('axios');
 
@@ -25,6 +27,62 @@ describe('Files', ()=> {
     fireEvent.click(screen.getByText('Edit'));
     fireEvent.click(screen.getByText('Done'));
     expect(screen.getByText('Edit')).toBeVisible();
+  });
+  test('remove', async ()=>{
+    const onAccessibleChange = jest.fn();
+    const data: IItemMetadata = {
+      barcode: null,
+      format_details: {},
+      format_id: 0,
+      item_id: 0,
+      name: '',
+      notes: [],
+      obj_sequence: 0,
+      parent_object_id: 0,
+      treatment: [],
+      files: [
+        {
+          generation: 'foo',
+          id: 1,
+          name: 'bar',
+          routes: {
+            api: '/api/baz',
+            frontend: '/baz',
+          },
+        },
+      ],
+      format: {
+        id: 1,
+        name: 'foo',
+      },
+    };
+    const mockedAxios = axios as jest.Mocked<typeof axios>;
+    mockedAxios.delete.mockResolvedValue({});
+    const onUpdated = jest.fn();
+    render(
+        <Files
+          apiUrl='/foo'
+          onAccessibleChange={onAccessibleChange}
+          onUpdated={onUpdated}
+          apiData={data}
+        />,
+    );
+    fireEvent.click(screen.getByText('Edit'));
+    const row = screen.getByRole(
+        'cell', {name: 'bar'},
+    ).closest('tr') as HTMLTableRowElement;
+
+    fireEvent.click(
+        within(within(row).getByRole('optionsMenu')).getByRole('button'),
+    );
+    fireEvent.click(within(row).getByText('Remove'));
+    fireEvent.click(within(screen.getByRole('dialog')).getByText('Remove'));
+    await waitFor(onUpdated);
+    await waitFor(()=> {
+      expect(mockedAxios.delete)
+          .toBeCalledWith('/foo?id=1', {'data': {'id': 1}});
+      return onUpdated;
+    });
   });
   test('add', async ()=>{
     const onAccessibleChange = jest.fn();

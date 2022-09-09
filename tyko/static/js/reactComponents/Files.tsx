@@ -66,7 +66,7 @@ export const EditableRow: FC<IEditableRollProps> = (
     }
   };
   const editButton = (
-    <DropdownButton title='' size='sm' variant='secondary'>
+    <DropdownButton role='optionsMenu' title='' size='sm' variant='secondary'>
       <Dropdown.Item size='sm' onClick={handleEdit}>Edit</Dropdown.Item>
       <Dropdown.Item
         size='sm'
