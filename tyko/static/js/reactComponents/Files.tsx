@@ -25,12 +25,14 @@ export interface FileProps {
   apiUrl: string,
   apiData?: IItemMetadata,
   onUpdated?: ()=>void
+  onRedirect?: (url: string)=>void
   onAccessibleChange? : (busy: boolean)=>void
   onError? : (e: Error | AxiosError)=>void
 }
 export interface FileRef {
   editMode: boolean,
   errorMessageAlert: RefObject<RefAlertDismissible>
+  forwardingUrl: string | undefined
 }
 
 interface IEditableRollProps {
@@ -43,7 +45,7 @@ interface IEditableRollProps {
   editMode?: boolean,
 }
 
-export const EditableRow: FC<IEditableRollProps> = (
+const EditableRow: FC<IEditableRollProps> = (
     {
       generation,
       fileName,
@@ -289,7 +291,10 @@ export const Files = forwardRef(
         editMode,
         setEditMode,
       ] = useReducer((mode)=>!mode, false);
-
+      const [
+        forwardingUrl,
+        setForwardingUrl,
+      ] = useState<string|undefined>(undefined);
       const [accessible, setAccessible] = useState(true);
       const filesDialog = useRef<FilesDialogRef>(null);
       const onError = useCallback((e: Error | AxiosError)=>{
@@ -303,7 +308,11 @@ export const Files = forwardRef(
           props.onUpdated();
         }
       };
-
+      useImperativeHandle(ref, ()=>({
+        editMode: editMode,
+        errorMessageAlert: errorMessageAlert,
+        forwardingUrl: forwardingUrl,
+      }),[forwardingUrl]);
       const removeFile = useCallback((id: number)=>{
         setAccessible(false);
         if (props.onAccessibleChange) {
@@ -320,8 +329,11 @@ export const Files = forwardRef(
               }
             });
       }, [handleUpdate, onError, props.apiUrl]);
-      const handleOpenEditDialog = useCallback((url: string) =>{
-        window.location.href = url;
+      const handleOpenEdit = useCallback((url: string) =>{
+        setForwardingUrl(url);
+        if (props.onRedirect) {
+          props.onRedirect(url);
+        }
       }, []);
       const openConfirmRemovalDialog = useCallback(
           (id: number, displayName?: string) =>{
@@ -343,7 +355,7 @@ export const Files = forwardRef(
             fileName={file.name}
             fileId={file.id}
             link={file.routes.frontend}
-            onEdit={handleOpenEditDialog}
+            onEdit={handleOpenEdit}
             onRemove={openConfirmRemovalDialog}
             editMode={editMode}
           />

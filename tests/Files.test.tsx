@@ -5,7 +5,7 @@
 'use strict';
 import '@testing-library/jest-dom';
 import {
-  FileGeneration,
+  FileGeneration, FileRef,
   Files,
   FilesDialog,
   FilesDialogRef,
@@ -63,6 +63,26 @@ describe('Files', ()=> {
     };
     afterEach(() => {
       jest.clearAllMocks();
+    });
+    test('Edit dialog box open', async ()=>{
+      const filesRef = createRef<FileRef>();
+      render(
+          <Files
+            ref={filesRef}
+            apiUrl='/foo'
+            apiData={itemMetadata}
+          />,
+      );
+      fireEvent.click(screen.getByText('Edit'));
+      const row = screen.getByRole(
+          'cell', {name: 'bar'},
+      ).closest('tr') as HTMLTableRowElement;
+      const optionsMenu = within(row).getByRole('optionsMenu');
+      fireEvent.click(within(optionsMenu).getByRole('button'));
+      fireEvent.click(within(optionsMenu).getByText('Edit'));
+      await waitFor(()=>{
+        expect(filesRef.current?.forwardingUrl).toBe('/baz');
+      });
     });
     test('remove', async ()=>{
       const onAccessibleChange = jest.fn();
