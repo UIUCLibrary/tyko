@@ -183,19 +183,7 @@ export const FilesDialog = forwardRef(
             generationSelection.current,
         );
         handleClose();
-      },[]);
-      const validateContent = () =>{
-        if (
-          saveButton.current &&
-          fileNameContent.current
-        ) {
-          if (fileNameContent.current.value.length == 0) {
-            saveButton.current.disabled = true;
-            return;
-          }
-          saveButton.current.disabled = false;
-        }
-      };
+      }, []);
       const createEnumOptions = () =>{
         const elements = Object.keys(FileGeneration)
             .filter((key) => isNaN(Number(key)))
@@ -211,7 +199,12 @@ export const FilesDialog = forwardRef(
         );
       };
       return (
-        <Modal show={visible} onShow={validateContent} size={'lg'}>
+        <Modal
+          show={visible}
+          onShow={
+            ()=>validateContent(saveButton.current, fileNameContent.current)
+          }
+          size={'lg'}>
           <Modal.Header>
             <Modal.Title>{title}</Modal.Title>
             <CloseButton
@@ -233,7 +226,12 @@ export const FilesDialog = forwardRef(
                     id='fileName'
                     ref={fileNameContent}
                     autoFocus={true}
-                    onChange={validateContent}
+                    onChange={
+                      ()=>validateContent(
+                          saveButton.current,
+                          fileNameContent.current,
+                      )
+                    }
                     defaultValue={fileName ? fileName: undefined}
                   />
                 </Form.Group>
@@ -250,7 +248,12 @@ export const FilesDialog = forwardRef(
                     ref={generationSelection}
                     id='generation'
                     name='generation'
-                    onChange={validateContent}>
+                    onChange={
+                      ()=>validateContent(
+                          saveButton.current,
+                          fileNameContent.current,
+                      )
+                    }>
                     {createEnumOptions()}
                   </Form.Select>
                 </Form.Group>
@@ -451,3 +454,18 @@ const defaultAccepted = (
   }
 };
 
+const validateContent = (
+    saveButton: HTMLButtonElement | null,
+    fileNameContent: HTMLInputElement | null,
+) =>{
+  if (
+    saveButton &&
+    fileNameContent
+  ) {
+    if (fileNameContent.value.length == 0) {
+      saveButton.disabled = true;
+      return;
+    }
+    saveButton.disabled = false;
+  }
+};
