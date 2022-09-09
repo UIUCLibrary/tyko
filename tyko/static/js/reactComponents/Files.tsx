@@ -5,7 +5,7 @@ import React, {
   useReducer,
   useRef,
   FC,
-  useCallback, useState, useImperativeHandle,
+  useCallback, useState, useImperativeHandle, useEffect,
 } from 'react';
 
 import {IItemMetadata} from './ItemApp';
@@ -96,14 +96,14 @@ export enum FileGeneration {
 }
 interface NewFile {
   fileName: string,
-  generation: FileGeneration
+  generation: string
 }
 export interface FilesDialogRef {
   handleClose: ()=>void
   visible: boolean,
   setTitle: (title: string)=>void
   setShow: (visible: boolean)=>void
-  setDescription: (text: string|null)=>void
+  setFileName: (text: string|null)=>void
   accept: ()=>void
   reject: ()=>void
   setGeneration: (value: FileGeneration)=>void,
@@ -121,41 +121,45 @@ const updateErrorMessage = (
   }
 };
 
-const matchGenerationSelection = (
-    value: keyof typeof FileGeneration,
-): FileGeneration | null =>{
-  for (const key of Object.keys(FileGeneration)) {
-    if (key === value) {
-      return FileGeneration[value];
-    }
-  }
-  return null;
-};
 interface FilesDialogProps {
   show?: boolean
   title?: string
   onAccepted?: (results: NewFile)=>void
   onCancel?: ()=>void
 }
+
 export const FilesDialog = forwardRef(
     (
         props: FilesDialogProps,
         ref: Ref<FilesDialogRef> ) => {
       const [title, setTitle] = useState(props.title);
-      const [description, setDescription] = useState<string|null>(null);
-      const generation = useRef<FileGeneration>();
+      const [fileName, setFileName] = useState<string|null>(null);
+      const [generation, setGeneration] = useState<FileGeneration|null>(null);
       const [
         visible,
         setVisible,
       ] = useState<boolean>(props.show ? props.show : false);
+
       const fileNameContent = useRef<HTMLInputElement>(null);
+      useEffect(()=>{
+        if (fileNameContent.current) {
+          fileNameContent.current.value = fileName? fileName : '';
+        }
+      }, [fileName]);
+
       const generationSelection = useRef<HTMLSelectElement>(null);
+
+      useEffect(()=>{
+        if (generation && generationSelection.current) {
+          generationSelection.current.value = generation.toString();
+        }
+      }, [generation]);
+
       const saveButton = useRef<HTMLButtonElement>(null);
       const onAccepted =
           useRef(props.onAccepted ? props.onAccepted : undefined);
       const onRejected =
           useRef(props.onCancel ? props.onCancel : () => undefined);
-
       useImperativeHandle(ref, () => ({
         setOnAccepted: (callback) => onAccepted.current = callback,
         setOnRejected: (callback) => onRejected.current = callback,
@@ -163,42 +167,39 @@ export const FilesDialog = forwardRef(
         visible: visible,
         reject: handleCanceled,
         accept: handleAccepted,
-        setGeneration: (value) => generation.current = value,
+        setGeneration: (value) => {
+          setGeneration(value);
+        },
         handleClose: handleClose,
-        setDescription: setDescription,
+        setFileName: (value)=>{
+          setFileName(value);
+        },
         setTitle: setTitle,
-      }));
+      }), [fileNameContent.current]);
       const handleClose = () => setVisible(false);
       const handleCanceled = () => {
         onRejected.current();
         handleClose();
       };
-      const handleAccepted = () => {
+      const handleAccepted = useCallback(() => {
         if (onAccepted.current) {
-          if (generationSelection.current) {
-            const fileNameValue = fileNameContent.current ?
+          const fileNameValue = fileNameContent.current ?
                 fileNameContent.current.value :
                 '';
-            const selectedGeneration =
-                generationSelection.current.value;
-            const generationEnum = matchGenerationSelection(
-                selectedGeneration as keyof typeof FileGeneration,
-            );
-            if (generationEnum != null) {
-              onAccepted.current({
-                generation: generationEnum,
-                fileName: fileNameValue,
-              });
-            }
-          }
+          const gen = generationSelection.current ?
+            generationSelection.current.value :
+            '';
+          onAccepted.current({
+            generation: gen,
+            fileName: fileNameValue,
+          });
         }
         handleClose();
-      };
+      }, [fileName, generation]);
       const validateContent = () =>{
         if (
           saveButton.current &&
-          fileNameContent.current &&
-          generationSelection.current
+          fileNameContent.current
         ) {
           if (fileNameContent.current.value.length == 0) {
             saveButton.current.disabled = true;
@@ -212,7 +213,7 @@ export const FilesDialog = forwardRef(
             .filter((key) => isNaN(Number(key)))
             .map((key, index) => {
               return (
-                <option key={index}>{key}</option>
+                <option key={index} value={key}>{key}</option>
               );
             });
         return (
@@ -245,17 +246,21 @@ export const FilesDialog = forwardRef(
                     ref={fileNameContent}
                     autoFocus={true}
                     onChange={validateContent}
-                    defaultValue={description ? description : undefined}
+                    defaultValue={fileName ? fileName: undefined}
                   />
                 </Form.Group>
               </Form.Group>
               <Form.Group className="mb-3 row">
-                <Form.Label className="col-sm-2 col-form-label">
+                <Form.Label
+                  className="col-sm-2 col-form-label"
+                  htmlFor='generation'
+                >
                   Generation
                 </Form.Label>
                 <Form.Group className="col-sm-10">
                   <Form.Select
                     ref={generationSelection}
+                    id='generation'
                     name='generation'
                     onChange={validateContent}>
                     {createEnumOptions()}
@@ -365,7 +370,7 @@ export const Files = forwardRef(
             props.apiUrl,
             {
               'file_name': data.fileName,
-              'generation': data.generation as string,
+              'generation': data.generation,
             },
         )
             .then(handelOnUpdated)
@@ -377,7 +382,7 @@ export const Files = forwardRef(
               }
             });
       }, [onError, handelOnUpdated, props.apiUrl]);
-      const handleOpenNewDialogBox = useCallback(()=>{
+      const handleOpenNewDialogBox = ()=> {
         if (!filesDialog.current) {
           return;
         }
@@ -385,7 +390,7 @@ export const Files = forwardRef(
         filesDialog.current.setTitle('New File');
         filesDialog.current.setOnAccepted(handleNewFile);
         filesDialog.current.setShow(true);
-      }, [handleNewFile]);
+      };
 
       const errorMessageAlert = useRef<RefAlertDismissible>(null);
       const confirmDialog = useRef<RefConfirmDialog>(null);

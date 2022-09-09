@@ -4,11 +4,17 @@
 
 'use strict';
 import '@testing-library/jest-dom';
-import {Files} from '../tyko/static/js/reactComponents/Files';
+import {
+  FileGeneration,
+  Files,
+  FilesDialog,
+  FilesDialogRef,
+} from '../tyko/static/js/reactComponents/Files';
 import {within} from '@testing-library/dom';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import axios from 'axios';
 import {IItemMetadata} from 'ItemApp';
+import {createRef} from 'react';
 
 jest.mock('axios');
 
@@ -123,6 +129,10 @@ describe('Files', ()=> {
           screen.getByLabelText('File Name'),
           {target: {value: '123123'}},
       );
+      fireEvent.change(
+          screen.getByLabelText('Generation'),
+          {target: {value: 'Access'}},
+      );
       const mockedAxios = axios as jest.Mocked<typeof axios>;
       mockedAxios.post.mockResolvedValue({data: []});
       fireEvent.click(screen.getByText('Save'));
@@ -138,5 +148,30 @@ describe('Files', ()=> {
       });
       await waitFor(()=>expect(onAccessibleChange).toBeCalled());
     });
-  })
+  });
+});
+
+describe('FilesDialog', ()=>{
+  describe('use ref', ()=>{
+    test('set file name', async ()=>{
+      const dialogRef = createRef<FilesDialogRef>();
+      const onAccepted = jest.fn();
+      render(<FilesDialog ref={dialogRef} onAccepted={onAccepted}/>);
+      expect(dialogRef.current).not.toBe(null);
+      const dialog = dialogRef.current as FilesDialogRef;
+      await waitFor(()=> {
+        dialog.setFileName('foo.txt');
+        dialog.setGeneration(FileGeneration.Preservation);
+        dialog.setShow(true);
+        expect(screen.getByLabelText('File Name')).toHaveValue('foo.txt');
+      });
+      const dialogElement = screen.getByRole('dialog');
+      await waitFor(()=>{
+        dialog.accept();
+        expect(dialogElement).not.toBeVisible();
+      });
+      expect(onAccepted)
+          .toBeCalledWith({fileName: 'foo.txt', generation: 'Preservation'});
+    });
+  });
 });
