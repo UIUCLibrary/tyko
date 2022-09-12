@@ -155,6 +155,18 @@ export const FilesDialog = forwardRef(
           useRef(props.onAccepted ? props.onAccepted : undefined);
       const onRejected =
           useRef(props.onCancel ? props.onCancel : () => undefined);
+      const handleCanceled = () => {
+        onRejected.current();
+        handleClose();
+      };
+      const handleAccepted = useCallback(() => {
+        defaultAccepted(
+            onAccepted.current,
+            fileNameContent.current,
+            generationSelection.current,
+        );
+        handleClose();
+      }, []);
       useImperativeHandle(ref, () => ({
         setOnAccepted: (callback) => onAccepted.current = callback,
         setOnRejected: (callback) => onRejected.current = callback,
@@ -170,20 +182,14 @@ export const FilesDialog = forwardRef(
           setFileName(value);
         },
         setTitle: setTitle,
-      }), [fileNameContent.current]);
+      }), [
+        fileNameContent.current,
+        handleCanceled,
+        handleAccepted,
+        visible,
+      ]);
       const handleClose = () => setVisible(false);
-      const handleCanceled = () => {
-        onRejected.current();
-        handleClose();
-      };
-      const handleAccepted = useCallback(() => {
-        defaultAccepted(
-            onAccepted.current,
-            fileNameContent.current,
-            generationSelection.current,
-        );
-        handleClose();
-      }, []);
+
       const createEnumOptions = () =>{
         const elements = Object.keys(FileGeneration)
             .filter((key) => isNaN(Number(key)))
@@ -325,12 +331,15 @@ export const Files = forwardRef(
               }
             });
       }, [handleUpdate, onError, props.apiUrl]);
+      const redirectCallback = props.onRedirect;
+
       const handleOpenEdit = useCallback((url: string) =>{
         setForwardingUrl(url);
-        if (props.onRedirect) {
-          props.onRedirect(url);
+        if (redirectCallback) {
+          redirectCallback(url);
         }
-      }, []);
+      }, [redirectCallback]);
+
       const openConfirmRemovalDialog = useCallback(
           (id: number, displayName?: string) =>{
             if (confirmDialog.current) {
