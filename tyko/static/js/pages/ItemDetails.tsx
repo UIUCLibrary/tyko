@@ -174,12 +174,16 @@ interface FilesPanelProps {
   onUpdated: ()=>void
 }
 const FilesPanel: FC<FilesPanelProps> = ({apiData, filesUrl, onUpdated}) => {
+  const handleRedirect = (url: string) =>{
+    document.location.href = url;
+  };
   return apiData ?
       (
           <>
             <Files
               apiUrl={filesUrl}
               apiData={apiData}
+              onRedirect={handleRedirect}
               onUpdated={onUpdated}/>
           </>
       ) : (<>

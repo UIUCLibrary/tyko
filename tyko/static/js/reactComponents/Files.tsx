@@ -7,7 +7,6 @@ import React, {
   FC,
   useCallback, useState, useImperativeHandle, useEffect,
 } from 'react';
-
 import {IItemMetadata} from './ItemApp';
 import axios, {AxiosError} from 'axios';
 import {
@@ -15,8 +14,8 @@ import {
   RefAlertDismissible,
   RefConfirmDialog,
   EditOptionsDropDown,
+  ComponentTable,
 } from './Common';
-import Table from 'react-bootstrap/Table';
 import {ButtonGroup, CloseButton} from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -35,48 +34,53 @@ export interface FileRef {
   forwardingUrl: string | undefined
 }
 
-interface IEditableRollProps {
-  generation: string,
-  fileName: string,
-  fileId: number,
-  link: string,
-  onRemove?: (id: number, itemDisplayName?:string)=>void
-  onEdit?: (link: string)=>void,
-  editMode?: boolean,
+interface IFile{
+  generation: string
+  id: number
+  name: string
+  routes:{
+    api: string
+    frontend: string
+  }
 }
 
-const EditableRow: FC<IEditableRollProps> = (
-    {
-      generation,
-      fileName,
-      fileId,
-      link,
-      onRemove,
-      onEdit,
-      editMode,
-    },
-)=>{
-  const handleEdit = () => {
+interface IBase {
+  onRemove?: (id: number, itemDisplayName?:string)=>void
+  onEdit?: (link: string)=>void
+  editMode?: boolean
+}
+
+interface IEditableRowProps2 extends IBase{
+  file: IFile,
+}
+
+const EditableFileRow: FC<IEditableRowProps2> = (
+    {file, onRemove, onEdit, editMode},
+) =>{
+  const {name, generation, id, routes} = file;
+
+  const handleEdit = () =>{
     if (onEdit) {
-      onEdit(link);
+      onEdit(routes.frontend);
     }
   };
-  const handleRemoval = (id: number) => {
+  const handleRemove = () =>{
     if (onRemove) {
-      onRemove(id, fileName);
+      onRemove(id, name);
     }
   };
+
   return (
     <tr>
       <td>{generation}</td>
-      <td><a href={link}>{fileName}</a></td>
+      <td><a href={routes.frontend}>{name}</a></td>
       <td>
         {
             editMode ?
             <div className={'float-end'}>
               <EditOptionsDropDown
                 onEdit={handleEdit}
-                onRemoval={()=>handleRemoval(fileId)}/>
+                onRemoval={handleRemove}/>
             </div> :
                 <div></div>
         }
@@ -362,20 +366,6 @@ export const Files = forwardRef(
               dialogBox.setOnAccept(() => removeFile(id));
             }
           }, [removeFile]);
-      const row = props.apiData?.files.map((file, index) =>{
-        return (
-          <EditableRow key={index}
-            generation={file.generation}
-            fileName={file.name}
-            fileId={file.id}
-            link={file.routes.frontend}
-            onEdit={handleOpenEdit}
-            onRemove={openConfirmRemovalDialog}
-            editMode={editMode}
-          />
-        );
-      });
-
       const handleNewFile = useCallback((data: NewFile) => {
         setAccessible(false);
         if (onAccessibleCallback) {
@@ -410,23 +400,30 @@ export const Files = forwardRef(
 
       const errorMessageAlert = useRef<RefAlertDismissible>(null);
       const confirmDialog = useRef<RefConfirmDialog>(null);
+      const table = props.apiData? (
+          <ComponentTable
+            items={props.apiData?.files}
+            resourceName="file"
+            itemComponent={EditableFileRow as FC<IBase>}
+            onEdit={handleOpenEdit}
+            onRemove={openConfirmRemovalDialog}
+            tableHeader={
+              <tr>
+                <th style={{width: '15%'}}>Generation</th>
+                <th>File Name</th>
+                <th/>
+              </tr>
+            }
+            editMode={editMode}
+          />
+      ):
+          (<></>);
       return (
         <>
           <AlertDismissible ref={errorMessageAlert}/>
           <FilesDialog ref={filesDialog}/>
           <ConfirmDialog ref={confirmDialog}>Are you sure?</ConfirmDialog>
-          <Table>
-            <thead>
-              <tr>
-                <td>Generation</td>
-                <td>File Name</td>
-                <td/>
-              </tr>
-            </thead>
-            <tbody>
-              {row}
-            </tbody>
-          </Table>
+          {table}
           <ButtonGroup hidden={!editMode} className={'float-end'}>
             <Button
               variant={'outline-primary'}
@@ -447,6 +444,18 @@ export const Files = forwardRef(
 );
 
 Files.displayName = 'Files';
+
+const FileTableHeader = () =>{
+  return (
+    <thead>
+      <tr>
+        <th style={{width: '15%'}}>Generation</th>
+        <th>File Name</th>
+        <th/>
+      </tr>
+    </thead>
+  );
+};
 
 const defaultAccepted = (
     onAccepted: ((data: NewFile)=>void) | undefined,
