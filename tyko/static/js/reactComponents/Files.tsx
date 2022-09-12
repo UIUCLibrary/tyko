@@ -203,19 +203,17 @@ export const FilesDialog = forwardRef(
           </>
         );
       };
+      const runValidate = ()=>{
+        validateContent(
+            saveButton.current,
+            fileNameContent.current,
+        );
+      };
       return (
-        <Modal
-          show={visible}
-          onShow={
-            ()=>validateContent(saveButton.current, fileNameContent.current)
-          }
-          size={'lg'}>
+        <Modal show={visible} onShow={runValidate} size={'lg'}>
           <Modal.Header>
             <Modal.Title>{title}</Modal.Title>
-            <CloseButton
-              aria-label="Close"
-              onClick={handleCanceled}
-            />
+            <CloseButton aria-label="Close" onClick={handleCanceled}/>
           </Modal.Header>
           <Modal.Body>
             <Form>
@@ -231,12 +229,7 @@ export const FilesDialog = forwardRef(
                     id='fileName'
                     ref={fileNameContent}
                     autoFocus={true}
-                    onChange={
-                      ()=>validateContent(
-                          saveButton.current,
-                          fileNameContent.current,
-                      )
-                    }
+                    onChange={runValidate}
                     defaultValue={fileName ? fileName: undefined}
                   />
                 </Form.Group>
@@ -253,12 +246,8 @@ export const FilesDialog = forwardRef(
                     ref={generationSelection}
                     id='generation'
                     name='generation'
-                    onChange={
-                      ()=>validateContent(
-                          saveButton.current,
-                          fileNameContent.current,
-                      )
-                    }>
+                    onChange={runValidate}
+                  >
                     {createEnumOptions()}
                   </Form.Select>
                 </Form.Group>
@@ -300,18 +289,26 @@ export const Files = forwardRef(
       const filesDialog = useRef<FilesDialogRef>(null);
       const apiUrl = props.apiUrl;
       const onAccessibleCallback = props.onAccessibleChange;
-      const onUpdated = props.onUpdated;
       const onError = useCallback((e: Error | AxiosError)=>{
         updateErrorMessage(errorMessageAlert, e);
         if (props.onError) {
           props.onError(e);
         }
       }, [props]);
+
+      const onUpdated = props.onUpdated;
       const handleUpdate = useCallback(()=>{
         if (onUpdated) {
           onUpdated();
         }
       }, [onUpdated]);
+      const resetAccessibilityState = useCallback(()=>{
+        setAccessible(true);
+        if (onAccessibleCallback) {
+          onAccessibleCallback(true);
+        }
+      }, [onAccessibleCallback]);
+
       useImperativeHandle(ref, ()=>({
         editMode: editMode,
         errorMessageAlert: errorMessageAlert,
@@ -326,13 +323,14 @@ export const Files = forwardRef(
         axios.delete(url, {data: {id: id}})
             .then(handleUpdate)
             .catch(onError)
-            .finally(()=> {
-              setAccessible(true);
-              if (onAccessibleCallback) {
-                onAccessibleCallback(true);
-              }
-            });
-      }, [handleUpdate, onError, apiUrl, onAccessibleCallback]);
+            .finally(resetAccessibilityState);
+      }, [
+        handleUpdate,
+        onError,
+        apiUrl,
+        onAccessibleCallback,
+        resetAccessibilityState,
+      ]);
       const redirectCallback = props.onRedirect;
 
       const handleOpenEdit = useCallback((url: string) =>{
@@ -389,13 +387,14 @@ export const Files = forwardRef(
         )
             .then(handelOnUpdated)
             .catch(onError)
-            .finally(()=>{
-              setAccessible(true);
-              if (onAccessibleCallback) {
-                onAccessibleCallback(true);
-              }
-            });
-      }, [onError, handelOnUpdated, onAccessibleCallback, apiUrl]);
+            .finally(resetAccessibilityState);
+      }, [
+        onError,
+        handelOnUpdated,
+        onAccessibleCallback,
+        apiUrl,
+        resetAccessibilityState,
+      ]);
       const handleOpenNewDialogBox = ()=> {
         if (!filesDialog.current) {
           return;
