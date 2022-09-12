@@ -19,6 +19,9 @@ import Button from 'react-bootstrap/Button';
 import axios, {AxiosResponse} from 'axios';
 import Modal from 'react-bootstrap/Modal';
 import Alert from 'react-bootstrap/Alert';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
+import Table from 'react-bootstrap/Table';
 
 export const LoadingIndeterminate = ({message}: {message?: string}) => {
   return (
@@ -246,3 +249,61 @@ export const AlertDismissible = forwardRef((
   return <></>;
 });
 AlertDismissible.displayName = 'AlertDismissible';
+
+interface IBase {
+  onRemove?: (id: number, itemDisplayName?:string)=>void
+  onEdit?: (link: string)=>void
+  editMode?: boolean
+}
+interface EditOptionsDropDownProps {
+  onRemoval: ()=>void
+  onEdit: ()=>void
+}
+export const EditOptionsDropDown: FC<EditOptionsDropDownProps> = (
+    {onRemoval, onEdit},
+)=>{
+  return (
+    <DropdownButton role='optionsMenu' title='' size='sm' variant='secondary'>
+      <Dropdown.Item size='sm' onClick={onEdit}>
+        Edit
+      </Dropdown.Item>
+      <Dropdown.Item
+        size='sm'
+        onClick={onRemoval}
+      >Remove</Dropdown.Item>
+    </DropdownButton>
+  );
+};
+
+interface ComponentTableProps {
+  items?: { [key: string]: any }[],
+  resourceName: string,
+  onEdit: (url: string)=>void,
+  onRemove: (id: number, displayName?: string)=>void,
+  editMode: boolean,
+  itemComponent: FC<IBase>,
+  tableHeader: React.ReactElement
+}
+
+export const ComponentTable: FC<ComponentTableProps> = (props)=>{
+  const rows = props.items?.map(
+      (item, index) =>(
+        <props.itemComponent
+          key={index}
+          onEdit={props.onEdit}
+          onRemove={props.onRemove}
+          editMode={props.editMode}
+          {...{[props.resourceName]: item}}
+        />
+      ));
+  return (
+    <Table responsive="sm">
+      <thead>
+        {props.tableHeader}
+      </thead>
+      <tbody>
+        {rows}
+      </tbody>
+    </Table>
+  );
+};

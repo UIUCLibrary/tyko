@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {Col, Row} from 'react-bootstrap';
 import Panel, {InactiveCover} from '../reactComponents/Panel';
 import {
-  IItemMetadata, ItemDetails as ItemDetailsComponent,
+  IItemMetadata,
+  ItemDetails as ItemDetailsComponent,
 } from '../reactComponents/ItemApp';
 import FormatDetails from '../reactComponents/FormatDetails';
 import {useParams} from 'react-router-dom';
@@ -10,6 +11,8 @@ import axios from 'axios';
 import {LoadingIndeterminate} from '../reactComponents/Common';
 import {VendorDataEdit} from '../reactComponents/Vendor';
 import {Treatment} from '../reactComponents/Treatment';
+import {Files} from '../reactComponents/Files';
+
 /**
  * Item details
  * @constructor
@@ -41,7 +44,10 @@ export default function ItemDetails() {
 
   let detailsPanel;
   let formatDetailsPanel;
-  let filesPanel;
+  const onUpdated= ()=>setApiData(undefined);
+  const filesURL = (projectId && objectId && itemId) ?
+        `/api/project/${projectId}/object/${objectId}/item/${itemId}/files`: '';
+
   let notesPanel;
   if (!apiData) {
     detailsPanel = <>
@@ -51,12 +57,6 @@ export default function ItemDetails() {
     </>;
 
     formatDetailsPanel = <>
-      <div style={{textAlign: 'center'}}>
-        <LoadingIndeterminate/>
-      </div>
-    </>;
-
-    filesPanel = <>
       <div style={{textAlign: 'center'}}>
         <LoadingIndeterminate/>
       </div>
@@ -74,13 +74,13 @@ export default function ItemDetails() {
       barcode={apiData.barcode ? apiData.barcode: undefined}
       objectSequence={apiData.obj_sequence}
       apiUrl={apiUrl}
-      onUpdated={()=>setApiData(undefined)}
+      onUpdated={onUpdated}
     />;
     formatDetailsPanel = <FormatDetails
       apiData={apiData}
       apiUrl={apiUrl}
-      onUpdated={()=>setApiData(undefined)}/>;
-    filesPanel = <>do stuff here</>;
+      onUpdated={onUpdated}/>;
+
     notesPanel = <>do stuff here</>;
   }
   const vendorInfo = apiData?.vendor ?
@@ -146,15 +146,16 @@ export default function ItemDetails() {
                 apiUrl={treatmentUrl}
                 apiData={apiData}
                 onAccessibleChange={setBusy}
-                onUpdated={()=>{
-                  setApiData(undefined);
-                }}
+                onUpdated={onUpdated}
               />
             </Panel>
           </Row>
           <Row>
             <Panel title="Files">
-              {filesPanel}
+              <FilesPanel
+                apiData={apiData}
+                filesUrl={filesURL}
+                onUpdated={onUpdated}/>
             </Panel>
           </Row>
           <Row>
@@ -167,3 +168,28 @@ export default function ItemDetails() {
     </div>
   );
 }
+interface FilesPanelProps {
+  apiData: IItemMetadata| undefined,
+  filesUrl: string,
+  onUpdated: ()=>void
+}
+const FilesPanel: FC<FilesPanelProps> = ({apiData, filesUrl, onUpdated}) => {
+  const handleRedirect = (url: string) =>{
+    document.location.href = url;
+  };
+  return apiData ?
+      (
+          <>
+            <Files
+              apiUrl={filesUrl}
+              apiData={apiData}
+              onRedirect={handleRedirect}
+              onUpdated={onUpdated}/>
+          </>
+      ) : (<>
+        <div style={{textAlign: 'center'}}>
+          <LoadingIndeterminate/>
+        </div>
+      </>
+      );
+};
