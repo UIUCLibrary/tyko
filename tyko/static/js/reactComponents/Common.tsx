@@ -275,16 +275,6 @@ export const EditOptionsDropDown: FC<EditOptionsDropDownProps> = (
   );
 };
 
-
-interface ComponentTableProps {
-  items?: { [key: string]: any }[],
-  resourceName: string,
-  onEdit: (url: string)=>void,
-  onRemove: (id: number, displayName?: string)=>void,
-  editMode: boolean,
-  itemComponent: FC<IBase>
-}
-
 interface ComponentTableProps {
   items?: { [key: string]: any }[],
   resourceName: string,
