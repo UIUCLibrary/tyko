@@ -276,6 +276,34 @@ export const FilesDialog = forwardRef(
 
 FilesDialog.displayName = 'FilesDialog';
 
+const confirmRemovalDialog = (
+    confirmDialog: RefConfirmDialog | null,
+    removeFile: (id: number)=>void,
+    id: number, displayName?: string,
+) =>{
+  if (confirmDialog) {
+    const dialogBox = confirmDialog;
+    if (displayName) {
+      dialogBox.setTitle(`Remove "${displayName}" from object?`);
+    } else {
+      dialogBox.setTitle('Remove File from object?');
+    }
+    dialogBox.setShow(true);
+    dialogBox.setOnAccept(() => removeFile(id));
+  }
+};
+const openNewDialogBox = (
+    filesDialog: FilesDialogRef | null,
+    handleNewFile: (data: NewFile)=>void,
+)=>{
+  if (!filesDialog) {
+    return;
+  }
+
+  filesDialog.setTitle('New File');
+  filesDialog.setOnAccepted(handleNewFile);
+  filesDialog.setShow(true);
+};
 export const Files = forwardRef(
     (
         props: FileProps,
@@ -353,19 +381,6 @@ export const Files = forwardRef(
         }
       }, [redirectCallback]);
 
-      const openConfirmRemovalDialog = useCallback(
-          (id: number, displayName?: string) =>{
-            if (confirmDialog.current) {
-              const dialogBox = confirmDialog.current;
-              if (displayName) {
-                dialogBox.setTitle(`Remove "${displayName}" from object?`);
-              } else {
-                dialogBox.setTitle('Remove File from object?');
-              }
-              dialogBox.setShow(true);
-              dialogBox.setOnAccept(() => removeFile(id));
-            }
-          }, [removeFile]);
       const handleNewFile = useCallback((data: NewFile) => {
         setAccessible(false);
         if (onAccessibleCallback) {
@@ -388,15 +403,6 @@ export const Files = forwardRef(
         apiUrl,
         resetAccessibilityState,
       ]);
-      const handleOpenNewDialogBox = ()=> {
-        if (!filesDialog.current) {
-          return;
-        }
-
-        filesDialog.current.setTitle('New File');
-        filesDialog.current.setOnAccepted(handleNewFile);
-        filesDialog.current.setShow(true);
-      };
 
       const errorMessageAlert = useRef<RefAlertDismissible>(null);
       const confirmDialog = useRef<RefConfirmDialog>(null);
@@ -406,7 +412,14 @@ export const Files = forwardRef(
             resourceName="file"
             itemComponent={EditableFileRow as FC<IBase>}
             onEdit={handleOpenEdit}
-            onRemove={openConfirmRemovalDialog}
+            onRemove={(id: number, displayName?: string) =>{
+              confirmRemovalDialog(
+                  confirmDialog.current,
+                  removeFile,
+                  id,
+                  displayName,
+              );
+            }}
             tableHeader={
               <tr>
                 <th style={{width: '15%'}}>Generation</th>
@@ -427,7 +440,8 @@ export const Files = forwardRef(
           <ButtonGroup hidden={!editMode} className={'float-end'}>
             <Button
               variant={'outline-primary'}
-              onClick={handleOpenNewDialogBox}>Add</Button>
+              onClick={()=>openNewDialogBox(filesDialog.current, handleNewFile)}
+            >Add</Button>
             <Button
               variant={'outline-primary'}
               onClick={setEditMode}
@@ -445,17 +459,6 @@ export const Files = forwardRef(
 
 Files.displayName = 'Files';
 
-const FileTableHeader = () =>{
-  return (
-    <thead>
-      <tr>
-        <th style={{width: '15%'}}>Generation</th>
-        <th>File Name</th>
-        <th/>
-      </tr>
-    </thead>
-  );
-};
 
 const defaultAccepted = (
     onAccepted: ((data: NewFile)=>void) | undefined,
