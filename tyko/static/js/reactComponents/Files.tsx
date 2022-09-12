@@ -149,16 +149,16 @@ export const FilesDialog = forwardRef(
           generationSelection.current.value = generation.toString();
         }
       }, [generation]);
-
       const saveButton = useRef<HTMLButtonElement>(null);
       const onAccepted =
           useRef(props.onAccepted ? props.onAccepted : undefined);
       const onRejected =
           useRef(props.onCancel ? props.onCancel : () => undefined);
-      const handleCanceled = () => {
+      const handleClose = useCallback(() => setVisible(false), [setVisible]);
+      const handleCanceled = useCallback(() => {
         onRejected.current();
         handleClose();
-      };
+      }, [handleClose]);
       const handleAccepted = useCallback(() => {
         defaultAccepted(
             onAccepted.current,
@@ -166,7 +166,7 @@ export const FilesDialog = forwardRef(
             generationSelection.current,
         );
         handleClose();
-      }, []);
+      }, [handleClose]);
       useImperativeHandle(ref, () => ({
         setOnAccepted: (callback) => onAccepted.current = callback,
         setOnRejected: (callback) => onRejected.current = callback,
@@ -183,12 +183,11 @@ export const FilesDialog = forwardRef(
         },
         setTitle: setTitle,
       }), [
-        fileNameContent.current,
+        handleClose,
         handleCanceled,
         handleAccepted,
         visible,
       ]);
-      const handleClose = () => setVisible(false);
 
       const createEnumOptions = () =>{
         const elements = Object.keys(FileGeneration)
@@ -299,17 +298,20 @@ export const Files = forwardRef(
       ] = useState<string|undefined>(undefined);
       const [accessible, setAccessible] = useState(true);
       const filesDialog = useRef<FilesDialogRef>(null);
+      const apiUrl = props.apiUrl;
+      const onAccessibleCallback = props.onAccessibleChange;
+      const onUpdated = props.onUpdated;
       const onError = useCallback((e: Error | AxiosError)=>{
         updateErrorMessage(errorMessageAlert, e);
         if (props.onError) {
           props.onError(e);
         }
       }, [props]);
-      const handleUpdate = ()=>{
-        if (props.onUpdated) {
-          props.onUpdated();
+      const handleUpdate = useCallback(()=>{
+        if (onUpdated) {
+          onUpdated();
         }
-      };
+      }, [onUpdated]);
       useImperativeHandle(ref, ()=>({
         editMode: editMode,
         errorMessageAlert: errorMessageAlert,
@@ -317,20 +319,20 @@ export const Files = forwardRef(
       }), [forwardingUrl, editMode]);
       const removeFile = useCallback((id: number)=>{
         setAccessible(false);
-        if (props.onAccessibleChange) {
-          props.onAccessibleChange(false);
+        if (onAccessibleCallback) {
+          onAccessibleCallback(false);
         }
-        const url = `${props.apiUrl}?id=${id}`;
+        const url = `${apiUrl}?id=${id}`;
         axios.delete(url, {data: {id: id}})
             .then(handleUpdate)
             .catch(onError)
             .finally(()=> {
               setAccessible(true);
-              if (props.onAccessibleChange) {
-                props.onAccessibleChange(true);
+              if (onAccessibleCallback) {
+                onAccessibleCallback(true);
               }
             });
-      }, [handleUpdate, onError, props.apiUrl]);
+      }, [handleUpdate, onError, apiUrl, onAccessibleCallback]);
       const redirectCallback = props.onRedirect;
 
       const handleOpenEdit = useCallback((url: string) =>{
@@ -366,18 +368,20 @@ export const Files = forwardRef(
           />
         );
       });
-      const handelOnUpdated = () =>{
-        if (props.onUpdated) {
-          props.onUpdated();
+      const updatedCallback = props.onUpdated;
+      const handelOnUpdated = useCallback(()=>{
+        if (updatedCallback) {
+          updatedCallback();
         }
-      };
+      }, [updatedCallback]);
+
       const handleNewFile = useCallback((data: NewFile) => {
         setAccessible(false);
-        if (props.onAccessibleChange) {
-          props.onAccessibleChange(false);
+        if (onAccessibleCallback) {
+          onAccessibleCallback(false);
         }
         axios.post(
-            props.apiUrl,
+            apiUrl,
             {
               'file_name': data.fileName,
               'generation': data.generation,
@@ -387,11 +391,11 @@ export const Files = forwardRef(
             .catch(onError)
             .finally(()=>{
               setAccessible(true);
-              if (props.onAccessibleChange) {
-                props.onAccessibleChange(true);
+              if (onAccessibleCallback) {
+                onAccessibleCallback(true);
               }
             });
-      }, [onError, handelOnUpdated, props.apiUrl]);
+      }, [onError, handelOnUpdated, onAccessibleCallback, apiUrl]);
       const handleOpenNewDialogBox = ()=> {
         if (!filesDialog.current) {
           return;
