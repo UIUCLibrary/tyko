@@ -288,20 +288,29 @@ export const Files = forwardRef(
       const [accessible, setAccessible] = useState(true);
       const filesDialog = useRef<FilesDialogRef>(null);
       const apiUrl = props.apiUrl;
-      const onAccessibleCallback = props.onAccessibleChange;
-      const onError = useCallback((e: Error | AxiosError)=>{
+
+      const onError = props.onError;
+      const onErrorCallback = useCallback((e: Error | AxiosError)=>{
         updateErrorMessage(errorMessageAlert, e);
-        if (props.onError) {
-          props.onError(e);
+        if (onError) {
+          onError(e);
         }
-      }, [props]);
+      }, [onError]);
+
+      const onAccessibleCallback = props.onAccessibleChange;
+      useEffect(()=>{
+        if (onAccessibleCallback) {
+          onAccessibleCallback(!accessible);
+        }
+      }, [accessible, onAccessibleCallback]);
 
       const onUpdated = props.onUpdated;
-      const handleUpdate = useCallback(()=>{
+      const handelOnUpdatedCallback = useCallback(()=>{
         if (onUpdated) {
           onUpdated();
         }
       }, [onUpdated]);
+
       const resetAccessibilityState = useCallback(()=>{
         setAccessible(true);
         if (onAccessibleCallback) {
@@ -321,18 +330,18 @@ export const Files = forwardRef(
         }
         const url = `${apiUrl}?id=${id}`;
         axios.delete(url, {data: {id: id}})
-            .then(handleUpdate)
-            .catch(onError)
+            .then(handelOnUpdatedCallback)
+            .catch(onErrorCallback)
             .finally(resetAccessibilityState);
       }, [
-        handleUpdate,
-        onError,
+        handelOnUpdatedCallback,
+        onErrorCallback,
         apiUrl,
         onAccessibleCallback,
         resetAccessibilityState,
       ]);
-      const redirectCallback = props.onRedirect;
 
+      const redirectCallback = props.onRedirect;
       const handleOpenEdit = useCallback((url: string) =>{
         setForwardingUrl(url);
         if (redirectCallback) {
@@ -366,12 +375,6 @@ export const Files = forwardRef(
           />
         );
       });
-      const updatedCallback = props.onUpdated;
-      const handelOnUpdated = useCallback(()=>{
-        if (updatedCallback) {
-          updatedCallback();
-        }
-      }, [updatedCallback]);
 
       const handleNewFile = useCallback((data: NewFile) => {
         setAccessible(false);
@@ -385,12 +388,12 @@ export const Files = forwardRef(
               'generation': data.generation,
             },
         )
-            .then(handelOnUpdated)
-            .catch(onError)
+            .then(handelOnUpdatedCallback)
+            .catch(onErrorCallback)
             .finally(resetAccessibilityState);
       }, [
-        onError,
-        handelOnUpdated,
+        onErrorCallback,
+        handelOnUpdatedCallback,
         onAccessibleCallback,
         apiUrl,
         resetAccessibilityState,
