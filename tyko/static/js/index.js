@@ -14,7 +14,7 @@ import {ItemDetails} from './reactComponents/ItemApp';
 import axios from 'axios';
 import Panel from './reactComponents/Panel';
 import {LoadingIndeterminate} from './reactComponents/Common';
-import {ProjectDetailDetails} from './reactComponents/ProjectDetails';
+import {ProjectDetailDetails, ProjectObjects} from './reactComponents/ProjectDetails';
 import {ObjectDetails} from './reactComponents/ObjectDetails';
 import {Treatment} from './reactComponents/Treatment';
 import {Files} from './reactComponents/Files';
@@ -288,7 +288,12 @@ function loadReactComponents() {
                   <Files
                     apiUrl={itemFilesDetails.dataset.tykoApiFiles}
                     apiData={data.data.item}
-                    onUpdated={()=> {location.reload();}}
+                    onRedirect={(url)=>{
+                      window.location.href = url
+                    }}
+                    onUpdated={()=> {
+                        location.reload();
+                    }}
                 />
                 </div>
             </div>
@@ -297,6 +302,38 @@ function loadReactComponents() {
     ).catch(console.error)
   }
 
+  const projectObjects = document.getElementById('projectObjects');
+  if (projectObjects) {
+    const root = createRoot(projectObjects);
+    root.render(
+          <div className="card my-1">
+            <div id="ObjectsHeader" className="card-header">Objects</div>
+            <div className="card-body">Loading ...</div>
+        </div>
+      );
+    axios.get(projectObjects.dataset.tykoApiUrl).then(
+        (data) =>{
+          root.render(
+              <div className="card my-1">
+                <div id="ObjectsHeader"
+                     className="card-header">Objects</div>
+                <div className="card-body">
+                  <ProjectObjects
+                    submitUrl={projectObjects.dataset.tykoSubmitUrl}
+                    apiData={data.data}
+                    onRedirect={(url)=>{
+                      {window.location.href = url}
+                    }}
+                    onUpdated={()=> {
+                      location.reload();
+                    }}
+                  />
+                </div>
+            </div>
+          );
+        }
+    ).catch(console.error)
+  }
   const aboutComponent = document.getElementById('aboutApp');
   if (aboutComponent) {
     const root = createRoot(aboutComponent);

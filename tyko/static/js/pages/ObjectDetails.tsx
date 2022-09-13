@@ -51,7 +51,7 @@ interface IDetails {
   onError? : (error: Error| AxiosError)=>void
 }
 
-const ObjectItems: FC<IDetails> = (
+const ObjectItemsPanel: FC<IDetails> = (
     {apiData, apiUrl, onUpdated},
 ) => {
   const handleNewItemSubmitted = (event: React.SyntheticEvent)=>{
@@ -298,7 +298,7 @@ export default function ObjectDetails() {
       originalsReturnedDate={apiData.originals_return_date}
       apiUrl={updateObjectUrl}
       onUpdated={()=>setApiData(null)}/>;
-    itemsPanel = <ObjectItems
+    itemsPanel = <ObjectItemsPanel
       apiData={apiData}
       apiUrl={newItemApiUrl}
       onUpdated={()=>setApiData(null)}/>;

@@ -1,6 +1,6 @@
 import {LoadingIndeterminate} from '../reactComponents/Common';
 import Panel from '../reactComponents/Panel';
-import {Link, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {
   ButtonGroup,
   CloseButton,
@@ -11,14 +11,14 @@ import {
 } from 'react-bootstrap';
 import React, {useEffect, useState, FC, useRef} from 'react';
 import axios from 'axios';
-import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import {SelectDate} from '../reactComponents/Items';
 import {
   ProjectDetailDetails,
   IProjectApi,
+  ProjectObjects,
 } from '../reactComponents/ProjectDetails';
+import {SelectDate} from '../reactComponents/Items';
 
 interface ICollection {
         collection_id: number
@@ -90,8 +90,8 @@ export const NewObjectModal: FC<NewObjectModalProps> = (
                 Collection
           </Form.Label>
           <Form.Group className="col-sm-10">
-            <Form.Select name="collection_id" required>
-              <option value="" disabled selected>Select a collection
+            <Form.Select name="collection_id" defaultValue="" required>
+              <option value="" disabled>Select a collection
               </option>
               {collectionsOptions}
             </Form.Select>
@@ -161,64 +161,6 @@ interface NewObjectModalProps{
   onClosed?: ()=>void
 }
 
-const ProjectObjects: FC<IProjectObjectDetails> = (
-    {apiData, submitUrl, onUpdated},
-) =>{
-  const [
-    newObjectDialogShown,
-    setNewObjectDialogShown,
-  ] = useState<boolean>(false);
-  const handleCreateObject = () =>{
-    setNewObjectDialogShown(true);
-  };
-  const handleAcceptedNewObject = (event: React.SyntheticEvent) => {
-    const formData = new FormData(event.target as HTMLFormElement);
-    const formProps = Object.fromEntries(formData);
-    axios.post(submitUrl, formProps)
-        .then(()=>{
-          setNewObjectDialogShown(false);
-          if (onUpdated) {
-            onUpdated();
-          }
-        })
-        .catch(console.error);
-  };
-  const handleClosedNewDialogBox = () => {
-    setNewObjectDialogShown(false);
-  };
-  const rows = apiData.project.objects.map((data, index) => {
-    return (
-      <tr key={index}>
-        <td>
-          <Link to={data.routes.frontend}>{data.name}</Link>
-          <pre>TO DO: make editable</pre>
-        </td>
-      </tr>
-    );
-  });
-  const table = <Table>
-    <thead>
-      <tr>
-        <td>Name</td>
-      </tr>
-    </thead>
-    <tbody>
-      {rows}
-    </tbody>
-  </Table>;
-  return (<>
-    <NewObjectModal
-      show={newObjectDialogShown}
-      onAccepted={handleAcceptedNewObject}
-      onClosed={handleClosedNewDialogBox}
-    />
-    {table}
-    <ButtonGroup className="float-end">
-      {<Button onClick={handleCreateObject}>Add</Button>}
-    </ButtonGroup>
-  </>);
-};
-
 /**
  * j
  * @constructor
@@ -248,20 +190,14 @@ export default function ProjectDetails() {
     return <LoadingIndeterminate/>;
   }
   let detailsPanel;
-  let objectsPanel;
   let notesPanel;
   if (!apiData) {
     detailsPanel = <LoadingIndeterminate/>;
-    objectsPanel = <LoadingIndeterminate/>;
     notesPanel = <LoadingIndeterminate/>;
   } else {
     detailsPanel = <ProjectDetailDetails
       apiData={apiData}
       apiUrl={apiUrl}
-      onUpdated={()=>setApiData(null)}/>;
-    objectsPanel = <ProjectObjects
-      apiData={apiData}
-      submitUrl={submitNewObjectUrl}
       onUpdated={()=>setApiData(null)}/>;
     notesPanel = <>do stuff here</>;
   }
@@ -280,7 +216,11 @@ export default function ProjectDetails() {
           <Col md={{span: 6}}>
             <Row>
               <Panel title="Objects">
-                {objectsPanel}
+                <ObjectPanel
+                  apiData={apiData}
+                  submitNewObjectUrl={submitNewObjectUrl}
+                  onUpdated={()=>setApiData(null)}
+                />
               </Panel>
             </Row>
             <Row>
@@ -295,3 +235,32 @@ export default function ProjectDetails() {
   );
 }
 
+interface ObjectPanelProps {
+  apiData: IProjectApi| undefined | null,
+  submitNewObjectUrl: string,
+  onUpdated: ()=>void
+}
+
+const ObjectPanel: FC<ObjectPanelProps> = ({
+  apiData,
+  submitNewObjectUrl,
+  onUpdated,
+}) =>{
+  const handleRedirect = (url: string) =>{
+    document.location.href = url;
+  };
+  if (!apiData) {
+    return (
+      <>
+        <div style={{textAlign: 'center'}}>
+          <LoadingIndeterminate/>
+        </div>
+      </>
+    );
+  }
+  return <ProjectObjects
+    apiData={apiData}
+    submitUrl={submitNewObjectUrl}
+    onRedirect={handleRedirect}
+    onUpdated={onUpdated}/>;
+};
