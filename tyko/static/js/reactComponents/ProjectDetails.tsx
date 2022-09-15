@@ -204,17 +204,17 @@ export const ProjectObjects = forwardRef(
       };
       const onErrorNewObject = (reason: AxiosError|Error)=>{
         if (errorMessageAlert.current) {
-            const messageBox = errorMessageAlert.current;
-            messageBox.setMessage(reason.toString());
-            messageBox.setShow(true);
-          }
+          const messageBox = errorMessageAlert.current;
+          messageBox.setMessage(reason.toString());
+          messageBox.setShow(true);
+        }
       };
       const onAcceptedNewObject = ()=>{
         setNewObjectDialogShown(false);
         if (props.onUpdated) {
-            props.onUpdated();
+          props.onUpdated();
         }
-      }
+      };
       const handleClosedNewDialogBox = () => {
         setNewObjectDialogShown(false);
       };
@@ -311,7 +311,7 @@ export const ProjectObjects = forwardRef(
                 event,
                 props.submitUrl,
                 onAcceptedNewObject,
-                onErrorNewObject
+                onErrorNewObject,
             )
           }
           onClosed={handleClosedNewDialogBox}
@@ -342,14 +342,14 @@ const handleAcceptedNewObject = (
     event: React.SyntheticEvent,
     submitUrl: string,
     onSuccess: ()=>void,
-    onError: (reason: AxiosError|Error)=>void
+    onError: (reason: AxiosError|Error)=>void,
 ) => {
-    axios.post(
-        submitUrl,
-        convertToProps(event.target as HTMLFormElement),
-    )
-        .then(onSuccess)
-        .catch(onError);
+  axios.post(
+      submitUrl,
+      convertToProps(event.target as HTMLFormElement),
+  )
+      .then(onSuccess)
+      .catch(onError);
 };
 
 interface IEditableRowProps2 extends IBase{
@@ -557,7 +557,7 @@ const useGetCollections = ():[ICollection[] | null, boolean] =>{
     setLoading(true);
     fetchData('/api/collection')
         .then((s)=> {
-          if (s != undefined){
+          if (s != undefined) {
             setCollections(s);
           }
         })
