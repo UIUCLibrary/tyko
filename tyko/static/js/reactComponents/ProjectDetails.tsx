@@ -196,11 +196,7 @@ export const ProjectObjects = forwardRef(
       const errorMessageAlert = useRef<RefAlertDismissible>(null);
       const confirmDialog = useRef<RefConfirmDialog>(null);
       useEffect(()=>{
-        if (loading) {
-          setAccessible(false);
-        } else {
-          setAccessible(true);
-        }
+        setAccessible(!loading);
       }, [loading]);
 
       const handleCreateObject = () =>{
@@ -215,9 +211,9 @@ export const ProjectObjects = forwardRef(
       };
       const onAcceptedNewObject = ()=>{
         setNewObjectDialogShown(false);
-          if (props.onUpdated) {
+        if (props.onUpdated) {
             props.onUpdated();
-          }
+        }
       }
       const handleClosedNewDialogBox = () => {
         setNewObjectDialogShown(false);
@@ -229,9 +225,7 @@ export const ProjectObjects = forwardRef(
         if (onRedirect) {
           onRedirect(url);
         }
-      }, [
-        onRedirect,
-      ],
+      }, [onRedirect],
       );
 
       const onUpdated = props.onUpdated;
@@ -311,7 +305,7 @@ export const ProjectObjects = forwardRef(
         <AlertDismissible ref={errorMessageAlert}/>
         <NewObjectModal
           show={newObjectDialogShown}
-          collections={collections ? collections : undefined}
+          collections={collections}
           onAccepted={
             (event)=>handleAcceptedNewObject(
                 event,
@@ -419,7 +413,7 @@ interface NewObjectModalProps{
   onAccepted?: (event: React.SyntheticEvent)=>void
   onClosed?: ()=>void
   onAccessibleChange?: (value: boolean)=>void
-  collections?: ICollection[]
+  collections: ICollection[] | undefined | null
 }
 
 interface ICollection {
@@ -556,14 +550,16 @@ const useGetCollections = ():[ICollection[] | null, boolean] =>{
     setCollections,
   ] = useState<ICollection[] | null>(null);
   useEffect(()=>{
-    const fetchData = async (url: string) => {
+    const fetchData = async (url: string)=> {
       const data = ((await axios.get(url)).data as ICollectionsApi);
       return data.collections;
     };
     setLoading(true);
     fetchData('/api/collection')
         .then((s)=> {
-          setCollections(s);
+          if (s != undefined){
+            setCollections(s);
+          }
         })
         .catch(console.error)
         .finally(()=>setLoading(false));
