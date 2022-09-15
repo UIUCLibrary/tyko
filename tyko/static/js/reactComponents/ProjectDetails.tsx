@@ -206,25 +206,19 @@ export const ProjectObjects = forwardRef(
       const handleCreateObject = () =>{
         setNewObjectDialogShown(true);
       };
-      const handleAcceptedNewObject = (event: React.SyntheticEvent) => {
-        axios.post(
-            props.submitUrl,
-            convertToProps(event.target as HTMLFormElement),
-        )
-            .then(()=>{
-              setNewObjectDialogShown(false);
-              if (props.onUpdated) {
-                props.onUpdated();
-              }
-            })
-            .catch((reason: AxiosError|Error)=>{
-              if (errorMessageAlert.current) {
-                const messageBox = errorMessageAlert.current;
-                messageBox.setMessage(reason.toString());
-                messageBox.setShow(true);
-              }
-            });
+      const onErrorNewObject = (reason: AxiosError|Error)=>{
+        if (errorMessageAlert.current) {
+            const messageBox = errorMessageAlert.current;
+            messageBox.setMessage(reason.toString());
+            messageBox.setShow(true);
+          }
       };
+      const onAcceptedNewObject = ()=>{
+        setNewObjectDialogShown(false);
+          if (props.onUpdated) {
+            props.onUpdated();
+          }
+      }
       const handleClosedNewDialogBox = () => {
         setNewObjectDialogShown(false);
       };
@@ -318,7 +312,14 @@ export const ProjectObjects = forwardRef(
         <NewObjectModal
           show={newObjectDialogShown}
           collections={collections ? collections : undefined}
-          onAccepted={handleAcceptedNewObject}
+          onAccepted={
+            (event)=>handleAcceptedNewObject(
+                event,
+                props.submitUrl,
+                onAcceptedNewObject,
+                onErrorNewObject
+            )
+          }
           onClosed={handleClosedNewDialogBox}
         />
         <ConfirmDialog ref={confirmDialog}>Are you sure?</ConfirmDialog>
@@ -341,6 +342,21 @@ export const ProjectObjects = forwardRef(
       </>);
     });
 ProjectObjects.displayName = 'ProjectObjects';
+
+
+const handleAcceptedNewObject = (
+    event: React.SyntheticEvent,
+    submitUrl: string,
+    onSuccess: ()=>void,
+    onError: (reason: AxiosError|Error)=>void
+) => {
+    axios.post(
+        submitUrl,
+        convertToProps(event.target as HTMLFormElement),
+    )
+        .then(onSuccess)
+        .catch(onError);
+};
 
 interface IEditableRowProps2 extends IBase{
   object: IObject,
