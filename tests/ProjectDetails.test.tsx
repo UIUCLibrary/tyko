@@ -22,6 +22,7 @@ import {
   ProjectObjectsRef,
 } from '../tyko/static/js/reactComponents/ProjectDetails';
 import {createRef} from 'react';
+import {within} from '@testing-library/dom';
 jest.mock('vanillajs-datepicker', ()=>{});
 describe('ProjectDetails', () => {
   beforeEach(()=>{
@@ -120,7 +121,6 @@ describe('ProjectDetailDetails', ()=>{
 });
 
 describe('ProjectObjects', ()=>{
-
   const sampleData = {
     project: {
       current_location: 'dummy',
@@ -133,21 +133,22 @@ describe('ProjectObjects', ()=>{
     },
   };
   describe('update', ()=>{
+    const collections = [
+      {
+        'collection_id': 1,
+        'collection_name': 'sample collection',
+        'contact': null,
+        'contact_id': null,
+        'department': null,
+        'record_series': null,
+      },
+    ];
     test('update', async ()=> {
       const mockedAxios = axios as jest.Mocked<typeof axios>;
       mockedAxios.get.mockResolvedValue(
           {
             data: {
-              collections: [
-                {
-                  'collection_id': 1,
-                  'collection_name': 'sample collection',
-                  'contact': null,
-                  'contact_id': null,
-                  'department': null,
-                  'record_series': null,
-                },
-              ],
+              collections: collections,
             },
           },
       );
@@ -190,41 +191,18 @@ describe('ProjectObjects', ()=>{
         'record_series': null,
       },
     ];
-    const mockedAxios = axios as jest.Mocked<typeof axios>;
-    test('Edit', async ()=>{
+
+    test('onRedirect', async ()=>{
+      const mockedAxios = axios as jest.Mocked<typeof axios>;
       mockedAxios.get.mockResolvedValue(
-          {data: {collections: collections}}
-          );
-      await waitFor(()=>{
-        render(<ProjectObjects submitUrl='/foo'/>);
-      });
-      await waitFor(()=>expect(screen.getByText('Edit')).toBeVisible());
-    });
-    test('Clicked Edit removes edit button', async ()=>{
-      mockedAxios.get.mockResolvedValue(
-          {data: {collections: collections}}
-          );
-      render(<ProjectObjects submitUrl='/foo'/>);
-      await waitFor(()=> {
-        fireEvent.click(screen.getByText('Edit'));
-      });
-      expect(screen.getByText('Edit')).not.toBeVisible();
-    });
-    test('edit mode switches back', async ()=>{
-      render(<ProjectObjects submitUrl='/foo'/>);
-      await waitFor(()=>{
-        fireEvent.click(screen.getByText('Edit'));
-        fireEvent.click(screen.getByText('Done'));
-      })
-      expect(screen.getByText('Edit')).toBeVisible();
-    });
-  });
-  test('Remove', async ()=> {
-    const dummyData = {
-      project: {
-        current_location: 'somewhere',
-        notes: [],
-        objects: [
+          {data: {collections: collections}},
+      );
+      const onRedirect = jest.fn();
+      const dummyData = {
+        project: {
+          current_location: 'somewhere',
+          notes: [],
+          objects: [
             {
               barcode: null,
               collection_id: 1,
@@ -241,6 +219,93 @@ describe('ProjectObjects', ()=>{
               },
             },
           ],
+          project_code: 'project code',
+          project_id: 1,
+          status: 'Complete',
+          title: 'foo',
+        },
+      };
+      await waitFor(()=>{
+        render(
+            <ProjectObjects
+              submitUrl='/foo'
+              onRedirect={onRedirect}
+              apiData={dummyData}
+            />);
+      });
+      await waitFor(() => {
+        fireEvent.click(screen.getByText('Edit'));
+      });
+      await waitFor(() => {
+        const optionMenu = screen.getByRole('optionsMenu');
+        fireEvent.click(optionMenu.children[0]);
+        fireEvent.click(within(optionMenu).getByText('Edit'));
+      });
+      expect(onRedirect).toBeCalled();
+    });
+    test('Edit', async ()=>{
+      const mockedAxios = axios as jest.Mocked<typeof axios>;
+      mockedAxios.get.mockResolvedValue(
+          {data: {collections: collections}},
+      );
+      await waitFor(()=>{
+        render(<ProjectObjects submitUrl='/foo'/>);
+      });
+      await waitFor(()=>expect(screen.getByText('Edit')).toBeVisible());
+    });
+    test('Clicked Edit removes edit button', async ()=>{
+      const dummyData = {
+        project: {
+          current_location: 'somewhere',
+          notes: [],
+          objects: [],
+          project_code: 'project code',
+          project_id: 1,
+          status: 'Complete',
+          title: 'foo',
+        },
+      };
+      const mockedAxios = axios as jest.Mocked<typeof axios>;
+      mockedAxios.get.mockResolvedValue(
+          {data: {collections: collections}},
+      );
+      render(<ProjectObjects submitUrl='/foo' apiData={dummyData}/>);
+      await waitFor(()=> {
+        fireEvent.click(screen.getByText('Edit'));
+      });
+      expect(screen.getByText('Edit')).not.toBeVisible();
+    });
+    test('edit mode switches back', async ()=>{
+      render(<ProjectObjects submitUrl='/foo'/>);
+      await waitFor(()=>{
+        fireEvent.click(screen.getByText('Edit'));
+        fireEvent.click(screen.getByText('Done'));
+      });
+      expect(screen.getByText('Edit')).toBeVisible();
+    });
+  });
+  test('Remove', async ()=> {
+    const dummyData = {
+      project: {
+        current_location: 'somewhere',
+        notes: [],
+        objects: [
+          {
+            barcode: null,
+            collection_id: 1,
+            contact: null,
+            items: [],
+            name: 'sample object',
+            notes: [],
+            object_id: 1,
+            originals_rec_date: null,
+            originals_return_date: null,
+            routes: {
+              api: '/api/project/1/object/1',
+              frontend: '/project/1/object/1',
+            },
+          },
+        ],
         project_code: 'project code',
         project_id: 1,
         status: 'Complete',
@@ -256,9 +321,8 @@ describe('ProjectObjects', ()=>{
       fireEvent.click(screen.getByText('Remove'));
     });
     expect(
-        screen.getByText('Remove "sample object" from project?')
-    ).toBeInTheDocument()
-
+        screen.getByText('Remove "sample object" from project?'),
+    ).toBeInTheDocument();
   });
   describe('ref', ()=>{
     test('editMode', async ()=>{
@@ -267,7 +331,7 @@ describe('ProjectObjects', ()=>{
       expect(projectObjectRef.current?.editMode).toBe(false);
       await waitFor(()=>{
         fireEvent.click(screen.getByText('Edit'));
-      })
+      });
       expect(projectObjectRef.current?.editMode).toBe(true);
     });
   });
@@ -289,8 +353,13 @@ describe('NewObjectModal', ()=>{
   });
   test('onClosed', ()=>{
     const onClosed = jest.fn();
-    render(<NewObjectModal show={true} collections={collections} onClosed={onClosed}/>);
-    fireEvent.click(screen.getByText('Cancel'))
+    render(
+        <NewObjectModal
+          show={true}
+          collections={collections}
+          onClosed={onClosed}/>,
+    );
+    fireEvent.click(screen.getByText('Cancel'));
     expect(onClosed).toBeCalled();
   });
 });

@@ -304,7 +304,10 @@ export const ProjectObjects = forwardRef(
                 event,
                 props.submitUrl,
                 onAcceptedNewObject,
-                (reason: AxiosError|Error)=>onErrorNewObject(reason, errorMessageAlert),
+                (reason: AxiosError|Error)=>onErrorNewObject(
+                    reason,
+                    errorMessageAlert,
+                ),
             )
           }
           onClosed={handleClosedNewDialogBox}
@@ -561,7 +564,10 @@ const useGetCollections = ():[ICollection[] | null, boolean] =>{
   return [collections, loading];
 };
 
-const onErrorNewObject = (reason: AxiosError|Error, dialog: RefObject<RefAlertDismissible>)=>{
+const onErrorNewObject = (
+    reason: AxiosError|Error,
+    dialog: RefObject<RefAlertDismissible>,
+)=>{
   if (dialog.current) {
     const messageBox = dialog.current;
     messageBox.setMessage(reason.toString());
