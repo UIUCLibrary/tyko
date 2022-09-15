@@ -56,15 +56,15 @@ export const ProjectDetailDetails: FC<IProjectDetails> = (
   const [accessible, setAccessible] = useState(true);
   const handleUpdate = (event: React.SyntheticEvent)=> {
     event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    const formProps = Object.fromEntries(formData);
     setAccessible(false);
-    axios.put(apiUrl, formProps).then(()=>{
-      setAccessible(true);
-      if (onUpdated) {
-        onUpdated();
-      }
-    }).catch(console.error);
+    axios.put(apiUrl, convertToProps(event.target as HTMLFormElement))
+      .then(()=>{
+        setAccessible(true);
+        if (onUpdated) {
+          onUpdated();
+        }
+      })
+      .catch(console.error);
   };
   return (
     <div id='outer'>
@@ -162,6 +162,11 @@ const updateErrorMessage = (
     alertBox.current.setShow(true);
   }
 };
+
+export const convertToProps = (target: HTMLFormElement)=>{
+  const formData = new FormData(target);
+  return Object.fromEntries(formData);
+}
 export interface ProjectObjectsRef {
   editMode: boolean,
   errorMessageAlert: RefObject<RefAlertDismissible>
@@ -202,9 +207,10 @@ export const ProjectObjects = forwardRef(
         setNewObjectDialogShown(true);
       };
       const handleAcceptedNewObject = (event: React.SyntheticEvent) => {
-        const formData = new FormData(event.target as HTMLFormElement);
-        const formProps = Object.fromEntries(formData);
-        axios.post(props.submitUrl, formProps)
+        axios.post(
+            props.submitUrl,
+            convertToProps(event.target as HTMLFormElement)
+        )
             .then(()=>{
               setNewObjectDialogShown(false);
               if (props.onUpdated) {
