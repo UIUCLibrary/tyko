@@ -1,12 +1,12 @@
 import React, {
-  FC,
-  RefObject,
+  FC, forwardRef,
+  RefObject, Ref,
   useCallback,
   useReducer,
   useRef,
-  useState,
+  useState, useImperativeHandle, useEffect,
 } from 'react';
-import {Button, ButtonGroup, Form} from 'react-bootstrap';
+import {Button, ButtonGroup, CloseButton, Form} from 'react-bootstrap';
 import axios, {AxiosError} from 'axios';
 import {
   ComponentTable,
@@ -19,7 +19,8 @@ import {
   ConfirmDialog, AlertDismissible,
 } from './Common';
 import {InactiveCover} from './Panel';
-import {NewObjectModal} from '../pages/ProjectDetails';
+import {SelectDate} from './Items';
+import Modal from 'react-bootstrap/Modal';
 
 interface IObject {
   barcode: string|null
@@ -143,9 +144,9 @@ export const ProjectDetailDetails: FC<IProjectDetails> = (
 };
 
 interface IProjectObjectDetails {
-  apiData: IProjectApi
+  apiData?: IProjectApi
   submitUrl: string
-  onUpdated: ()=>void
+  onUpdated?: ()=>void
   onRedirect?: (url: string)=>void
   onAccessibleChange? : (busy: boolean)=>void
   onError? : (e: Error | AxiosError)=>void
@@ -161,98 +162,127 @@ const updateErrorMessage = (
     alertBox.current.setShow(true);
   }
 };
+export interface ProjectObjectsRef {
+  editMode: boolean,
+  errorMessageAlert: RefObject<RefAlertDismissible>
+  forwardingUrl: string | undefined
+  accessible: boolean,
+  collections: ICollection[] | null
+}
+export const ProjectObjects = forwardRef(
+    (
+        props: IProjectObjectDetails,
+        ref: Ref<ProjectObjectsRef>,
+    ) =>{
+      const [
+        newObjectDialogShown,
+        setNewObjectDialogShown,
+      ] = useState<boolean>(false);
+      const [
+        editMode,
+        setEditMode,
+      ] = useReducer((mode)=>!mode, false);
+      const [
+        forwardingUrl,
+        setForwardingUrl,
+      ] = useState<string|undefined>(undefined);
+      const [accessible, setAccessible] = useState(true);
+      const [collections, loading] = useGetCollections();
+      const errorMessageAlert = useRef<RefAlertDismissible>(null);
+      const confirmDialog = useRef<RefConfirmDialog>(null);
+      useEffect(()=>{
+        if (loading) {
+          setAccessible(false);
+        } else {
+          setAccessible(true);
+        }
+      }, [loading]);
 
-export const ProjectObjects: FC<IProjectObjectDetails> = (
-    {apiData, submitUrl, onUpdated, onAccessibleChange, onRedirect, onError},
-) =>{
-  const [
-    newObjectDialogShown,
-    setNewObjectDialogShown,
-  ] = useState<boolean>(false);
-  const [
-    editMode,
-    setEditMode,
-  ] = useReducer((mode)=>!mode, false);
-  const [
-    forwardingUrl,
-    setForwardingUrl,
-  ] = useState<string|undefined>(undefined);
-  const [accessible, setAccessible] = useState(true);
-  const errorMessageAlert = useRef<RefAlertDismissible>(null);
-  const confirmDialog = useRef<RefConfirmDialog>(null);
-  const handleCreateObject = () =>{
-    setNewObjectDialogShown(true);
-  };
-  const handleAcceptedNewObject = (event: React.SyntheticEvent) => {
-    const formData = new FormData(event.target as HTMLFormElement);
-    const formProps = Object.fromEntries(formData);
-    axios.post(submitUrl, formProps)
-        .then(()=>{
-          setNewObjectDialogShown(false);
-          if (onUpdated) {
-            onUpdated();
-          }
-        })
-        .catch((reason: AxiosError|Error)=>{
-          if (errorMessageAlert.current) {
-            const messageBox = errorMessageAlert.current;
-            messageBox.setMessage(reason.toString());
-            messageBox.setShow(true);
-          }
-        });
-  };
-  const handleClosedNewDialogBox = () => {
-    setNewObjectDialogShown(false);
-  };
-  const handleOpenEdit = useCallback((url: string) =>{
-    setForwardingUrl(url);
-    if (onRedirect) {
-      onRedirect(url);
-    }
-  }, [
-    onRedirect,
-  ],
-  );
-  const handelOnUpdatedCallback = useCallback(()=>{
-    if (onUpdated) {
-      onUpdated();
-    }
-  }, [onUpdated]);
+      const handleCreateObject = () =>{
+        setNewObjectDialogShown(true);
+      };
+      const handleAcceptedNewObject = (event: React.SyntheticEvent) => {
+        const formData = new FormData(event.target as HTMLFormElement);
+        const formProps = Object.fromEntries(formData);
+        axios.post(props.submitUrl, formProps)
+            .then(()=>{
+              setNewObjectDialogShown(false);
+              if (props.onUpdated) {
+                props.onUpdated();
+              }
+            })
+            .catch((reason: AxiosError|Error)=>{
+              if (errorMessageAlert.current) {
+                const messageBox = errorMessageAlert.current;
+                messageBox.setMessage(reason.toString());
+                messageBox.setShow(true);
+              }
+            });
+      };
+      const handleClosedNewDialogBox = () => {
+        setNewObjectDialogShown(false);
+      };
 
-  const onAccessibleCallback = onAccessibleChange;
-  const resetAccessibilityState = useCallback(()=>{
-    setAccessible(true);
-    if (onAccessibleCallback) {
-      onAccessibleCallback(true);
-    }
-  }, [onAccessibleCallback]);
-  const onErrorCallback = useCallback((e: Error | AxiosError)=>{
-    updateErrorMessage(errorMessageAlert, e);
-    if (onError) {
-      onError(e);
-    }
-  }, [onError]);
+      const onRedirect = props.onRedirect;
+      const handleOpenEdit = useCallback((url: string) =>{
+        setForwardingUrl(url);
+        if (onRedirect) {
+          onRedirect(url);
+        }
+      }, [
+        onRedirect,
+      ],
+      );
 
-  const removeObject = useCallback((url: string)=> {
-    setAccessible(false);
-    if (onAccessibleCallback) {
-      onAccessibleCallback(false);
-    }
-    axios.delete(url)
-        .then(handelOnUpdatedCallback)
-        .catch(onErrorCallback)
-        .finally(resetAccessibilityState);
-  },
-  [
-    handelOnUpdatedCallback,
-    onAccessibleCallback,
-    onErrorCallback,
-    resetAccessibilityState,
-  ]);
-  const table = apiData ?
+      const onUpdated = props.onUpdated;
+      const handelOnUpdatedCallback = useCallback(()=>{
+        if (onUpdated) {
+          onUpdated();
+        }
+      }, [onUpdated]);
+
+      const onAccessibleCallback = props.onAccessibleChange;
+      const resetAccessibilityState = useCallback(()=>{
+        setAccessible(true);
+        if (onAccessibleCallback) {
+          onAccessibleCallback(true);
+        }
+      }, [onAccessibleCallback]);
+      const onError = props.onError;
+      const onErrorCallback = useCallback((e: Error | AxiosError)=>{
+        updateErrorMessage(errorMessageAlert, e);
+        if (onError) {
+          onError(e);
+        }
+      }, [onError]);
+
+      const removeObject = useCallback((url: string)=> {
+        setAccessible(false);
+        if (onAccessibleCallback) {
+          onAccessibleCallback(false);
+        }
+        axios.delete(url)
+            .then(handelOnUpdatedCallback)
+            .catch(onErrorCallback)
+            .finally(resetAccessibilityState);
+      },
+      [
+        handelOnUpdatedCallback,
+        onAccessibleCallback,
+        onErrorCallback,
+        resetAccessibilityState,
+      ]);
+      useImperativeHandle(ref, ()=>({
+        collections: collections,
+        editMode: editMode,
+        errorMessageAlert: errorMessageAlert,
+        forwardingUrl: forwardingUrl,
+        accessible: accessible,
+      }), [collections, accessible, forwardingUrl, editMode]);
+      const table = props.apiData ?
       (
           <ComponentTable
-            items={apiData.project.objects}
+            items={props.apiData.project.objects}
             resourceName='object'
             onEdit={handleOpenEdit}
             onRemove={(url, args, displayName?: string) =>{
@@ -274,33 +304,37 @@ export const ProjectObjects: FC<IProjectObjectDetails> = (
           />
       ):
       (<></>);
-
-  return (<>
-    <AlertDismissible ref={errorMessageAlert}/>
-    <NewObjectModal
-      show={newObjectDialogShown}
-      onAccepted={handleAcceptedNewObject}
-      onClosed={handleClosedNewDialogBox}
-    />
-    <ConfirmDialog ref={confirmDialog}>Are you sure?</ConfirmDialog>
-    {table}
-    <ButtonGroup hidden={!editMode} className={'float-end'}>
-      <Button
-        variant={'outline-primary'}
-        onClick={handleCreateObject}
-      >Add</Button>
-      <Button
-        variant={'outline-primary'}
-        onClick={setEditMode}
-      >
+      if (loading) {
+        return (<>Loading...</>);
+      }
+      return (<>
+        <AlertDismissible ref={errorMessageAlert}/>
+        <NewObjectModal
+          show={newObjectDialogShown}
+          collections={collections ? collections : undefined}
+          onAccepted={handleAcceptedNewObject}
+          onClosed={handleClosedNewDialogBox}
+        />
+        <ConfirmDialog ref={confirmDialog}>Are you sure?</ConfirmDialog>
+        {table}
+        <ButtonGroup hidden={!editMode} className={'float-end'}>
+          <Button
+            variant={'outline-primary'}
+            onClick={handleCreateObject}
+          >Add</Button>
+          <Button
+            variant={'outline-primary'}
+            onClick={setEditMode}
+          >
         Done
-      </Button>
-    </ButtonGroup>
-    <ButtonGroup hidden={editMode} className={'float-end'}>
-      <Button hidden={editMode} onClick={setEditMode}>Edit</Button>
-    </ButtonGroup>
-  </>);
-};
+          </Button>
+        </ButtonGroup>
+        <ButtonGroup hidden={editMode} className={'float-end'}>
+          <Button hidden={editMode} onClick={setEditMode}>Edit</Button>
+        </ButtonGroup>
+      </>);
+    });
+ProjectObjects.displayName = 'ProjectObjects';
 
 interface IEditableRowProps2 extends IBase{
   object: IObject,
@@ -356,4 +390,168 @@ const confirmRemovalDialog = (
   }
   dialogBox.setShow(true);
   dialogBox.setOnAccept(() => removeObject(url));
+};
+
+interface NewObjectModalProps{
+  show: boolean,
+  onAccepted?: (event: React.SyntheticEvent)=>void
+  onClosed?: ()=>void
+  onAccessibleChange?: (value: boolean)=>void
+  collections?: ICollection[]
+}
+
+interface ICollection {
+    collection_id: number
+    collection_name: string
+}
+
+interface ICollectionsApi {
+  collections: ICollection[];
+}
+
+export const NewObjectModal: FC<NewObjectModalProps> = (
+    {show, onAccepted, onClosed, onAccessibleChange, collections},
+)=>{
+  const [accessible, setAccessible] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const newItemDialog = useRef(null);
+  useEffect(()=>{
+    setIsOpen(show);
+  },
+  [show],
+  );
+  const handleClose = () => {
+    setIsOpen(false);
+    if (onClosed) {
+      onClosed();
+    }
+  };
+
+  const handleSubmit = (event: React.SyntheticEvent) => {
+    event.preventDefault();
+    if (onAccepted) {
+      onAccepted(event);
+    }
+  };
+  useEffect(()=>{
+    if (onAccessibleChange) {
+      onAccessibleChange(accessible);
+    }
+  }, [onAccessibleChange, accessible]);
+  let form;
+  if (collections) {
+    const collectionsOptions = collections.map((collection) =>{
+      return (
+        <option
+          key={collection.collection_id}
+          value={collection.collection_id}>
+          {collection.collection_name}
+        </option>
+      );
+    });
+    form = (
+      <>
+        <Form.Group className="mb-3 row">
+          <Form.Label
+            htmlFor='projectName'
+            className="col-sm-2 col-form-label"
+          >
+            Name
+          </Form.Label>
+          <Form.Group className="col-sm-10">
+            <Form.Control id='projectName' name="name" required/>
+          </Form.Group>
+        </Form.Group>
+        <Form.Group className="mb-3 row">
+          <Form.Label
+            className="col-sm-2 col-form-label"
+            htmlFor="collectionSelect"
+          >
+              Collection
+          </Form.Label>
+          <Form.Group className="col-sm-10">
+            <Form.Select
+              id="collectionSelect"
+              name="collection_id"
+              defaultValue=""
+              required
+            >
+              <option value="" disabled>Select a collection
+              </option>
+              {collectionsOptions}
+            </Form.Select>
+          </Form.Group>
+        </Form.Group>
+
+        <Form.Group className="mb-3 row">
+          <Form.Label className="col-sm-2 col-form-label">
+                Originals Received
+          </Form.Label>
+          <Form.Group className="col-sm-10">
+            <SelectDate
+              name='originals_rec_date'
+              dateFormat='m/dd/yyyy'
+            />
+          </Form.Group>
+        </Form.Group>
+      </>
+    );
+  } else {
+    form = <LoadingIndeterminate/>;
+  }
+  const modalFooter = collections ? (
+    <ButtonGroup>
+      <Button variant='danger' onClick={handleClose}>Cancel</Button>
+      <Button variant="primary" type="submit">Create</Button>
+    </ButtonGroup>
+  ) : (
+      <ButtonGroup>
+        <Button variant='danger' onClick={handleClose}>Cancel</Button>
+      </ButtonGroup>
+  );
+  return (
+    <Modal
+      data-testid='newObjectModal'
+      show={isOpen}
+      onHide={handleClose}
+      size="lg"
+      ref={newItemDialog}>
+      <Modal.Header>
+        <h5 className="modal-title" id="titleId">New Object</h5>
+        <CloseButton
+          aria-label="Close"
+          onClick={handleClose}
+        />
+      </Modal.Header>
+      <form id="formId" title='newObject' onSubmit={handleSubmit}>
+        <Modal.Body>
+          {form}
+        </Modal.Body>
+        <Modal.Footer>{modalFooter}</Modal.Footer>
+      </form>
+    </Modal>
+  );
+};
+
+const useGetCollections = ():[ICollection[] | null, boolean] =>{
+  const [loading, setLoading] = useState(false);
+  const [
+    collections,
+    setCollections,
+  ] = useState<ICollection[] | null>(null);
+  useEffect(()=>{
+    const fetchData = async (url: string) => {
+      const data = ((await axios.get(url)).data as ICollectionsApi);
+      return data.collections;
+    };
+    setLoading(true);
+    fetchData('/api/collection')
+        .then((s)=> {
+          setCollections(s);
+        })
+        .catch(console.error)
+        .finally(()=>setLoading(false));
+    setCollections([]);
+  }, []);
+  return [collections, loading];
 };
