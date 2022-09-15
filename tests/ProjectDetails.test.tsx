@@ -22,6 +22,7 @@ import {
   ProjectObjectsRef,
 } from '../tyko/static/js/reactComponents/ProjectDetails';
 import {createRef} from 'react';
+import fn = jest.fn;
 jest.mock('vanillajs-datepicker', ()=>{});
 describe('ProjectDetails', () => {
   beforeEach(()=>{
@@ -236,19 +237,24 @@ describe('ProjectObjects', ()=>{
   });
 });
 describe('NewObjectModal', ()=>{
+  const collections = [
+    {
+      'collection_id': 1,
+      'collection_name': 'sample collection',
+      'contact': null,
+      'contact_id': null,
+      'department': null,
+      'record_series': null,
+    },
+  ];
   test('collections added', ()=>{
-    //     const mockedAxios = axios as jest.Mocked<typeof axios>;
-    const collections = [
-      {
-        'collection_id': 1,
-        'collection_name': 'sample collection',
-        'contact': null,
-        'contact_id': null,
-        'department': null,
-        'record_series': null,
-      },
-    ];
     render(<NewObjectModal show={true} collections={collections}/>);
     expect(screen.getByText('sample collection')).toBeInTheDocument();
+  });
+  test('onClosed', ()=>{
+    const onClosed = jest.fn();
+    render(<NewObjectModal show={true} collections={collections} onClosed={onClosed}/>);
+    fireEvent.click(screen.getByText('Cancel'))
+    expect(onClosed).toBeCalled();
   });
 });
