@@ -284,7 +284,7 @@ describe('ProjectObjects', ()=>{
       expect(screen.getByText('Edit')).toBeVisible();
     });
   });
-  test('Remove', async ()=> {
+  test('Remove dialog box', async ()=> {
     const dummyData = {
       project: {
         current_location: 'somewhere',
@@ -323,6 +323,54 @@ describe('ProjectObjects', ()=>{
     expect(
         screen.getByText('Remove "sample object" from project?'),
     ).toBeInTheDocument();
+  });
+  test('Remove calls delete', async ()=> {
+    const dummyData = {
+      project: {
+        current_location: 'somewhere',
+        notes: [],
+        objects: [
+          {
+            barcode: null,
+            collection_id: 1,
+            contact: null,
+            items: [],
+            name: 'sample object',
+            notes: [],
+            object_id: 1,
+            originals_rec_date: null,
+            originals_return_date: null,
+            routes: {
+              api: '/api/project/1/object/1',
+              frontend: '/project/1/object/1',
+            },
+          },
+        ],
+        project_code: 'project code',
+        project_id: 1,
+        status: 'Complete',
+        title: 'foo',
+      },
+    };
+    render(<ProjectObjects apiData={dummyData} submitUrl='/foo'/>);
+    await waitFor(() => {
+      fireEvent.click(screen.getByText('Edit'));
+      fireEvent.click(screen.getByRole('optionsMenu').children[0]);
+    });
+    await waitFor(()=> {
+      fireEvent.click(screen.getByText('Remove'));
+    });
+    expect(
+        screen.getByText('Remove "sample object" from project?'),
+    ).toBeInTheDocument();
+    const mockedAxios = axios as jest.Mocked<typeof axios>;
+    mockedAxios.delete.mockResolvedValue({});
+    await waitFor(()=> {
+      fireEvent.click(within(screen.getByRole('dialog')).getByText('Remove'));
+    });
+    await waitFor(()=> {
+      expect(mockedAxios.delete).toBeCalled();
+    });
   });
   describe('ref', ()=>{
     test('editMode', async ()=>{
