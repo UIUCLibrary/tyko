@@ -418,7 +418,6 @@ interface ICollectionsApi {
 export const NewObjectModal: FC<NewObjectModalProps> = (
     {show, onAccepted, onClosed, onAccessibleChange, collections},
 )=>{
-  const [accessible, setAccessible] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const newItemDialog = useRef(null);
   useEffect(()=>{
@@ -439,11 +438,6 @@ export const NewObjectModal: FC<NewObjectModalProps> = (
       onAccepted(event);
     }
   };
-  useEffect(()=>{
-    if (onAccessibleChange) {
-      onAccessibleChange(accessible);
-    }
-  }, [onAccessibleChange, accessible]);
   let form;
   if (collections) {
     const collectionsOptions = collections.map((collection) =>{
