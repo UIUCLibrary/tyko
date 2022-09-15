@@ -202,13 +202,6 @@ export const ProjectObjects = forwardRef(
       const handleCreateObject = () =>{
         setNewObjectDialogShown(true);
       };
-      const onErrorNewObject = (reason: AxiosError|Error)=>{
-        if (errorMessageAlert.current) {
-          const messageBox = errorMessageAlert.current;
-          messageBox.setMessage(reason.toString());
-          messageBox.setShow(true);
-        }
-      };
       const onAcceptedNewObject = ()=>{
         setNewObjectDialogShown(false);
         if (props.onUpdated) {
@@ -311,7 +304,7 @@ export const ProjectObjects = forwardRef(
                 event,
                 props.submitUrl,
                 onAcceptedNewObject,
-                onErrorNewObject,
+                (reason: AxiosError|Error)=>onErrorNewObject(reason, errorMessageAlert),
             )
           }
           onClosed={handleClosedNewDialogBox}
@@ -566,4 +559,12 @@ const useGetCollections = ():[ICollection[] | null, boolean] =>{
     setCollections([]);
   }, []);
   return [collections, loading];
+};
+
+const onErrorNewObject = (reason: AxiosError|Error, dialog: RefObject<RefAlertDismissible>)=>{
+  if (dialog.current) {
+    const messageBox = dialog.current;
+    messageBox.setMessage(reason.toString());
+    messageBox.setShow(true);
+  }
 };
