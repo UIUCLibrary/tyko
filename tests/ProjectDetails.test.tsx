@@ -22,7 +22,6 @@ import {
   ProjectObjectsRef,
 } from '../tyko/static/js/reactComponents/ProjectDetails';
 import {createRef} from 'react';
-import fn = jest.fn;
 jest.mock('vanillajs-datepicker', ()=>{});
 describe('ProjectDetails', () => {
   beforeEach(()=>{
@@ -220,14 +219,51 @@ describe('ProjectObjects', ()=>{
       expect(screen.getByText('Edit')).toBeVisible();
     });
   });
+  test('Remove', async ()=> {
+    const dummyData = {
+      project: {
+        current_location: 'somewhere',
+        notes: [],
+        objects: [
+            {
+              barcode: null,
+              collection_id: 1,
+              contact: null,
+              items: [],
+              name: 'sample object',
+              notes: [],
+              object_id: 1,
+              originals_rec_date: null,
+              originals_return_date: null,
+              routes: {
+                api: '/api/project/1/object/1',
+                frontend: '/project/1/object/1',
+              },
+            },
+          ],
+        project_code: 'project code',
+        project_id: 1,
+        status: 'Complete',
+        title: 'foo',
+      },
+    };
+    render(<ProjectObjects apiData={dummyData} submitUrl='/foo'/>);
+    await waitFor(() => {
+      fireEvent.click(screen.getByText('Edit'));
+      fireEvent.click(screen.getByRole('optionsMenu').children[0]);
+    });
+    await waitFor(()=> {
+      fireEvent.click(screen.getByText('Remove'));
+    });
+    expect(
+        screen.getByText('Remove "sample object" from project?')
+    ).toBeInTheDocument()
+
+  });
   describe('ref', ()=>{
     test('editMode', async ()=>{
       const projectObjectRef = createRef<ProjectObjectsRef>();
-      render(
-          <ProjectObjects
-            ref={projectObjectRef}
-            submitUrl='/foo'
-          />);
+      render(<ProjectObjects ref={projectObjectRef} submitUrl='/foo'/>);
       expect(projectObjectRef.current?.editMode).toBe(false);
       await waitFor(()=>{
         fireEvent.click(screen.getByText('Edit'));
