@@ -250,8 +250,12 @@ export const AlertDismissible = forwardRef((
 });
 AlertDismissible.displayName = 'AlertDismissible';
 
-interface IBase {
-  onRemove?: (id: number, itemDisplayName?:string)=>void
+export interface IBase {
+  onRemove?: (
+      url: string,
+      args?: {[key: string]: any},
+      itemDisplayName?:string
+  )=>void
   onEdit?: (link: string)=>void
   editMode?: boolean
 }
@@ -279,7 +283,11 @@ interface ComponentTableProps {
   items?: { [key: string]: any }[],
   resourceName: string,
   onEdit: (url: string)=>void,
-  onRemove: (id: number, displayName?: string)=>void,
+  onRemove: (
+      url: string,
+      args?: {[key: string]: any},
+      displayName?: string
+  )=>void,
   editMode: boolean,
   itemComponent: FC<IBase>,
   tableHeader: React.ReactElement

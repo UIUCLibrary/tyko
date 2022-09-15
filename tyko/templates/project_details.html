@@ -4,75 +4,13 @@
 {% from "dialog_boxes.html" import newEntityModal, editNoteModal, newNoteModal, removeNoteModal %}
 {% block main_details -%}
 <div id="projectDetailsDetails" data-tyko-api-url={{ api_path }}></div>
-{#{% call card("Details", card_class="my-1 h-100") %}#}
-{#    {%  call metadata_table() %}#}
-{#            <tr>{{ metadata_text_edit_widget("Title", project['title'], "title", api_path) }}</tr>#}
-{#            <tr>{{ metadata_text_edit_widget("Project Code", project['project_code'], "project_code", api_path) }}</tr>#}
-{#            <tr>{{ metadata_select_edit_widget("Status",#}
-{#                                               project['status'],#}
-{#                                               options=project_status_options,#}
-{#                                               field_key="status",#}
-{#                                               update_api_path=api_path) }}</tr>#}
-{#            <tr>{{ metadata_text_edit_widget("Current Location", project['current_location'], 'current_location', api_path) }}</tr>#}
-{#        {% endcall %}#}
-{#    {% endcall %}#}
 {% endblock %}
 
 {% block secondary_details %}
-
-    {% call card("Objects", card_class="my-1") %}
-        <table class="table">
-            <caption hidden>Objects</caption>
-            <thead>
-                <tr>
-                    <th scope="col" hidden>Object</th>
-                    <th scope="col" hidden>Remove</th>
-                </tr>
-            </thead>
-            <tbody>
-                {%- for child_object in project['objects'] %}
-                    {{ child_entity_row(
-                        child_object['name'],
-                        url_for('site.page_project_object_details', project_id=project_id, object_id=child_object.object_id),
-                        "removeObjectModal",
-                        url_for('api.project_object', project_id=project_id, object_id=child_object.object_id)
-                        ) }}
-                {%- endfor %}
-            </tbody>
-        </table>
-        <div class="btn-group float-end" role="group">
-            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newObjectModal">Add</button>
-        </div>
-        {{ confirm_remove_entity_modal("removeObjectModal") }}
-        {% call newEntityModal('newObjectModal', title="New Object", submitUrl=url_for("site.add_new_object", project_id=project_id), formId="newEdityForm") %}
-            <div class="mb-3 row">
-                <label for="objectNameInput" class="col-sm-2 col-form-label">Name</label>
-                <div class="col-sm-10">
-                    <input type="text" id="objectNameInput" class="form-control" name="name" required>
-                </div>
-            </div>
-            <div class="mb-3 row">
-                <label for="objectCollectionSelection" class="col-sm-2 col-form-label">Collection</label>
-                <div class="col-sm-10">
-                    <select class="form-select" class="form-control" name="collection_id" id="objectCollectionSelection" required>
-                        <option value="" disabled selected>Select a collection</option>
-                        {%- for collection in collections%}
-                            <option value="{{collection.collection_id}}">{{ collection.collection_name }}</option>
-                        {%- endfor %}
-                    </select>
-                </div>
-            </div>
-            <div class="mb-3 row">
-                <label for="datepickerOriginalsRecInput" class="col-sm-2 col-form-label">Originals Received Date</label>
-                <div class="col-sm-10">
-                    <div class="input-group">
-                        <input id="datepickerOriginalsRecInput" class="form-control tyko-date-selector" name="originals_rec_date" pattern="^([0-9]{4})-([0-9]{2})-([0-9]{2})$"/>
-                        <button type="button" onclick="tyko.openDateSelect('datepickerOriginalsRecInput')" class="btn btn-outline-secondary"> <em class="bi bi-calendar-event"></em></button>
-                    </div>
-                </div>
-            </div>
-        {% endcall %}
-    {% endcall %}
+    <div id="projectObjects"
+         data-tyko-api-url={{ api_path }}
+         data-tyko-submit-url={{ url_for("api.project_add_object", project_id=project_id) }}>
+    </div>
     {% call card("Notes", card_class="my-1") %}
         <div class="flex-column" id="noteCard">
             {{ notes_table2(api_path, table_id="notesTable") }}
@@ -165,7 +103,6 @@
 
         })
     </script>
-{#    {{ new_object_modal("newObjectModal", collections, api_path + "/object") }}#}
 {%- endblock -%}
 {% block scripts %}
     {{ super() }}

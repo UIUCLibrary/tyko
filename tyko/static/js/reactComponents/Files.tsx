@@ -15,6 +15,7 @@ import {
   RefConfirmDialog,
   EditOptionsDropDown,
   ComponentTable,
+  IBase,
 } from './Common';
 import {ButtonGroup, CloseButton} from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
@@ -44,11 +45,6 @@ interface IFile{
   }
 }
 
-interface IBase {
-  onRemove?: (id: number, itemDisplayName?:string)=>void
-  onEdit?: (link: string)=>void
-  editMode?: boolean
-}
 
 interface IEditableRowProps2 extends IBase{
   file: IFile,
@@ -66,7 +62,7 @@ const EditableFileRow: FC<IEditableRowProps2> = (
   };
   const handleRemove = () =>{
     if (onRemove) {
-      onRemove(id, name);
+      onRemove('', {id: id}, name);
     }
   };
 
@@ -412,7 +408,8 @@ export const Files = forwardRef(
             resourceName="file"
             itemComponent={EditableFileRow as FC<IBase>}
             onEdit={handleOpenEdit}
-            onRemove={(id: number, displayName?: string) =>{
+            onRemove={(url, args, displayName) =>{
+              const {id} = args as {id: number};
               confirmRemovalDialog(
                   confirmDialog.current,
                   removeFile,
